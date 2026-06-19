@@ -1,0 +1,29 @@
+# OS / editor junk
+Thumbs.db
+.DS_Store
+desktop.ini
+
+# Office lock files, backups, temp
+~$*
+*.bak
+*.tmp
+
+# .NET build artifacts (for the *.cs engines)
+bin/
+obj/
+
+# --- Third-party reference PDFs (copyrighted: TCRP, ITDP BRT Standard, TxDOT
+#     specs, FRA superelevation, etc.). refs/README.md lists each one and where
+#     to download it for free, so the docs aren't redistributed here.
+refs/*.pdf
+
+# --- Large raw/source geodata (reproducible; excluded to keep the repo lean) ---
+# OpenStreetMap network extracts (© OpenStreetMap contributors, ODbL) — up to ~61 MB
+data/dfw_arterials.json
+data/dfw_freeways.json
+data/dfw_routes.json
+data/dfw_rail.json
+# US Census LEHD LODES origin-destination + workplace area characteristics
+data/tx_od.csv.gz
+data/tx_wac.csv.gz
+data/od_tracts.csv

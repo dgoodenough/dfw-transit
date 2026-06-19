@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<title>Fort Worth Metro — Growth Time-Series</title>
+<style>
+  :root{ --bg:#f7f7f4; --ink:#222; --muted:#777; }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:Helvetica,Arial,sans-serif;background:#ececea;color:var(--ink)}
+  header{padding:16px 22px 6px}
+  h1{margin:0;font-size:20px}
+  .sub{color:var(--muted);font-size:13px;margin-top:2px}
+  .stage{background:var(--bg);margin:10px auto;max-width:1180px;border:1px solid #ddd;border-radius:8px;overflow:hidden}
+  .stage img{display:block;width:100%;height:auto}
+  .controls{max-width:1180px;margin:10px auto;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+  button{font-size:14px;padding:8px 16px;border:1px solid #bbb;background:#fff;border-radius:6px;cursor:pointer}
+  button:hover{background:#f0f0f0}
+  button.primary{background:#0b7;color:#fff;border-color:#0b7}
+  .years{display:flex;gap:6px}
+  .yr{padding:6px 14px;border:1px solid #ccc;border-radius:20px;cursor:pointer;font-size:13px;background:#fff}
+  .yr.active{background:#222;color:#fff;border-color:#222}
+  .cap{max-width:1180px;margin:4px auto 30px;color:var(--muted);font-size:13px}
+</style>
+</head>
+<body>
+<header>
+  <h1>Fort Worth Metro — Hypothetical Growth, 2050 → 2070</h1>
+  <div class="sub">To-scale geographic build. Trinity River forks shown in blue. Each step shows the cumulative network; newest lines are drawn bold.</div>
+</header>
+
+<div class="stage"><img id="map" src="FW_timeseries_P1.svg" alt="phase map"/></div>
+
+<div class="controls">
+  <button id="prev">◀ Prev</button>
+  <button id="play" class="primary">▶ Play</button>
+  <button id="next">Next ▶</button>
+  <div class="years">
+    <span class="yr active" data-p="1">2050 · Phase 1</span>
+    <span class="yr" data-p="2">2060 · Phase 2</span>
+    <span class="yr" data-p="3">2070 · Phase 3</span>
+  </div>
+</div>
+<div class="cap" id="cap"></div>
+
+<script>
+  const caps = {
+    1:"Phase 1 (2050): the core build — Teal (E–W backbone), Blue (Handley→downtown), Orange (Meacham→Waterside), Pink (Meacham→La Gran Plaza). Orange & Pink share one West Fork crossing; Blue terminates downtown.",
+    2:"Phase 2 (2060): + Silver (Lake Worth ↔ Berry/Stalcup), Red (Orange extended to Benbrook + Ol South→Museum Way), Blue extended west to I-820.",
+    3:"Phase 3 (2070): + Purple to TCU/Bluebonnet, Orange south to Hulen/Altamesa, Pink south to Everman, Teal east to Woodhaven."
+  };
+  let p = 1, timer = null;
+  const img = document.getElementById('map'), cap = document.getElementById('cap');
+  function show(n){
+    p = ((n-1+3)%3)+1;
+    img.src = `FW_timeseries_P${p}.svg`;
+    cap.textContent = caps[p];
+    document.querySelectorAll('.yr').forEach(e=>e.classList.toggle('active', +e.dataset.p===p));
+  }
+  document.getElementById('prev').onclick = ()=>{stop();show(p-1)};
+  document.getElementById('next').onclick = ()=>{stop();show(p+1)};
+  document.querySelectorAll('.yr').forEach(e=>e.onclick=()=>{stop();show(+e.dataset.p)});
+  const playBtn = document.getElementById('play');
+  function stop(){ if(timer){clearInterval(timer);timer=null;playBtn.textContent='▶ Play';playBtn.classList.add('primary');} }
+  playBtn.onclick = ()=>{
+    if(timer){stop();return;}
+    playBtn.textContent='⏸ Pause'; playBtn.classList.remove('primary');
+    timer = setInterval(()=>show(p+1), 1800);
+  };
+  show(1);
+</script>
+</body>
+</html>

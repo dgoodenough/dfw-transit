@@ -1,0 +1,3225 @@
+{
+  "version": 0.6,
+  "generator": "Overpass API 0.7.62.11 87bfad18",
+  "osm3s": {
+    "timestamp_osm_base": "2026-06-08T16:03:40Z",
+    "copyright": "The data included in this document is from www.openstreetmap.org. The data is made available under ODbL."
+  },
+  "elements": [
+
+{
+  "type": "node",
+  "id": 26454871,
+  "lat": 33.1976496,
+  "lon": -96.6154471,
+  "tags": {
+    "capital": "6",
+    "name": "McKinney",
+    "name:en": "McKinney",
+    "name:ko": "매키니",
+    "name:sr": "Макинли",
+    "place": "city",
+    "population": "202690",
+    "population:date": "2021-07-01",
+    "source:population": "US Census Bureau",
+    "website": "https://www.mckinneytexas.org/",
+    "wikidata": "Q51697",
+    "wikipedia": "en:McKinney, Texas"
+  }
+},
+{
+  "type": "node",
+  "id": 26506087,
+  "lat": 32.7762719,
+  "lon": -96.7968559,
+  "tags": {
+    "alt_name:el": "Ντάλλας",
+    "capital": "6",
+    "ele": "131",
+    "importance": "national",
+    "name": "Dallas",
+    "name:am": "ዳላስ",
+    "name:ar": "دالاس",
+    "name:be": "Далас",
+    "name:bg": "Далас",
+    "name:bn": "ডালাস",
+    "name:ce": "Даллас",
+    "name:chr": "ᏕᎳᏏ",
+    "name:el": "Ντάλας",
+    "name:en": "Dallas",
+    "name:fa": "دالاس",
+    "name:fr": "Dallas",
+    "name:fy": "Dallas",
+    "name:ga": "Dallas",
+    "name:gd": "Dallas",
+    "name:gl": "Dallas",
+    "name:gu": "ડલ્લાસ",
+    "name:he": "דאלאס",
+    "name:hi": "डैलस",
+    "name:ht": "Dalas",
+    "name:hy": "Դալաս",
+    "name:ia": "Dallas",
+    "name:ja": "ダラス",
+    "name:ka": "დალასი",
+    "name:kk": "Даллас",
+    "name:kn": "ಡಲ್ಲಾಸ್",
+    "name:ko": "댈러스",
+    "name:ky": "Даллас",
+    "name:la": "Dallasium",
+    "name:li": "Dallas",
+    "name:lt": "Dalasas",
+    "name:lv": "Dalasa",
+    "name:mi": "Tarihi",
+    "name:mk": "Далас",
+    "name:ml": "ഡാളസ്",
+    "name:mn": "Даллас",
+    "name:mr": "डॅलस",
+    "name:my": "ဒါးလတ်စ်မြို့",
+    "name:nl": "Dallas",
+    "name:oc": "Dallas",
+    "name:os": "Даллас",
+    "name:pa": "ਡਾਲਸ",
+    "name:pt": "Dallas",
+    "name:ru": "Даллас",
+    "name:ru:word_stress": "Да́ллас",
+    "name:sd": "ڊلاس",
+    "name:sl": "Dallas",
+    "name:sr": "Далас",
+    "name:sw": "Dallas",
+    "name:ta": "டாலஸ்",
+    "name:te": "డల్లాస్",
+    "name:tg": "Даллас",
+    "name:th": "แดลลัส",
+    "name:tl": "Dallas",
+    "name:tt": "Дәлас",
+    "name:uk": "Даллас",
+    "name:ur": "ڈیلاس",
+    "name:vo": "Dallas",
+    "name:zh": "达拉斯;達拉斯",
+    "name:zh-Hans": "达拉斯",
+    "name:zh-Hant": "達拉斯",
+    "place": "city",
+    "population": "1288457",
+    "population:date": "2021",
+    "source:name:oc": "Lo Congrès",
+    "source:population": "US Census Bureau",
+    "website": "https://dallascityhall.com/",
+    "wikidata": "Q16557",
+    "wikipedia": "en:Dallas"
+  }
+},
+{
+  "type": "node",
+  "id": 26579688,
+  "lat": 33.6398609,
+  "lon": -96.6089146,
+  "tags": {
+    "capital": "6",
+    "name": "Sherman",
+    "name:ko": "셔먼",
+    "name:ru": "Шерман",
+    "place": "city",
+    "population": "43645",
+    "population:date": "2020",
+    "source:population": "US Census",
+    "website": "https://www.ci.sherman.tx.us/",
+    "wikidata": "Q982379",
+    "wikipedia": "en:Sherman, Texas"
+  }
+},
+{
+  "type": "node",
+  "id": 27286467,
+  "lat": 32.7531770,
+  "lon": -97.3327459,
+  "tags": {
+    "capital": "6",
+    "name": "Fort Worth",
+    "name:ar": "فورت وورث",
+    "name:az": "Fort-Uort",
+    "name:be": "Форт-Уэрт",
+    "name:bg": "Форт Уърт",
+    "name:bn": "ফোর্ট ওয়ার্থ",
+    "name:br": "Fort Worth",
+    "name:ce": "Форт-Верт",
+    "name:cy": "Fort Worth",
+    "name:da": "Fort Worth",
+    "name:el": "Φορτ Γουόρθ",
+    "name:en": "Fort Worth",
+    "name:fa": "فورت ورث",
+    "name:ga": "Fort Worth",
+    "name:gd": "Fort Worth",
+    "name:gl": "Fort Worth",
+    "name:ha": "Fort Worth",
+    "name:he": "פורט וורת'",
+    "name:hi": "फोर्ट वर्थ",
+    "name:hr": "Fort Worth",
+    "name:ht": "Fort Worth",
+    "name:hy": "Ֆորտ Ուերտ",
+    "name:ia": "Fort Worth",
+    "name:id": "Fort Worth",
+    "name:ja": "フォートワース",
+    "name:ka": "ფორტ-უერთი",
+    "name:ko": "포트워스",
+    "name:ku": "Fort Worth",
+    "name:kw": "Fort Worth",
+    "name:la": "Arx Vorthensis",
+    "name:lt": "Fort Vertas",
+    "name:lv": "Fortvērta",
+    "name:mg": "Fort Worth",
+    "name:mk": "Форт Ворт",
+    "name:ml": "ഫോർട്ട് വർത്ത്",
+    "name:mn": "Форт-Уэрт",
+    "name:mr": "फोर्ट वर्थ",
+    "name:my": "ဖို့တ် ဝေါ့သ်မြို့၊ တက္ကဆပ်ပြည်နယ်",
+    "name:os": "Форт-Уэрт",
+    "name:pa": "ਫ਼ੋਰਟ ਵਰਥ",
+    "name:ro": "Fort Worth",
+    "name:ru": "Форт-Уэрт",
+    "name:sc": "Fort Worth",
+    "name:sd": "فورٽ ورٿ",
+    "name:sl": "Fort Worth",
+    "name:sr": "Форт Ворт",
+    "name:sw": "Fort Worth",
+    "name:ta": "வொர்த் கோட்டை",
+    "name:th": "ฟอร์ตเวิร์ท",
+    "name:tl": "Fort Worth",
+    "name:tt": "Форт-Ворт",
+    "name:uk": "Форт-Верт",
+    "name:ur": "فورٹ ورتھ، ٹیکساس",
+    "name:uz": "Fort Worth",
+    "name:vi": "Fort Worth",
+    "name:zh": "沃斯堡",
+    "place": "city",
+    "population": "996756",
+    "population:date": "2024-01-01",
+    "website": "https://www.fortworthtexas.gov",
+    "wikidata": "Q16558",
+    "wikipedia": "en:Fort Worth, Texas"
+  }
+},
+{
+  "type": "node",
+  "id": 151329584,
+  "lat": 33.0842854,
+  "lon": -96.5766577,
+  "tags": {
+    "ele": "173",
+    "gnis:feature_id": "1378618",
+    "name": "Lucas",
+    "place": "town",
+    "population": "8029",
+    "population:date": "2021-07-01",
+    "source:population": "US Census Bureau",
+    "wikidata": "Q980163",
+    "wikipedia": "en:Lucas, Texas"
+  }
+},
+{
+  "type": "node",
+  "id": 151329805,
+  "lat": 33.7556593,
+  "lon": -96.5366580,
+  "tags": {
+    "ele": "222",
+    "gnis:feature_id": "1379652",
+    "name": "Denison",
+    "place": "town",
+    "population": "23957",
+    "population:date": "2006",
+    "source:population": "US Census",
+    "wikidata": "Q534669"
+  }
+},
+{
+  "type": "node",
+  "id": 151332855,
+  "lat": 33.0040126,
+  "lon": -97.2258483,
+  "tags": {
+    "ele": "193",
+    "gnis:feature_id": "1345293",
+    "name": "Roanoke",
+    "place": "town",
+    "population": "9665",
+    "population:date": "2020",
+    "source:population": "https://www.census.gov/quickfacts/fact/table/roanokecitytexas/POP010220",
+    "wikidata": "Q969223",
+    "wikipedia": "en:Roanoke, Texas"
+  }
+},
+{
+  "type": "node",
+  "id": 151334873,
+  "lat": 32.3293111,
+  "lon": -96.6252679,
+  "tags": {
+    "ele": "164",
+    "gnis:feature_id": "1335474",
+    "name": "Ennis",
+    "place": "town",
+    "population": "19086",
+    "population:date": "2006",
+    "source:population": "US Census",
+    "wikidata": "Q982629"
+  }
+},
+{
+  "type": "node",
+  "id": 151342922,
+  "lat": 32.6279113,
+  "lon": -96.4558196,
+  "tags": {
+    "ele": "129",
+    "gnis:feature_id": "1333620",
+    "name": "Crandall",
+    "place": "town",
+    "population": "5100",
+    "population:date": "2023",
+    "wikidata": "Q969829",
+    "wikipedia": "en:Crandall, Texas"
+  }
+},
+{
+  "type": "node",
+  "id": 151343001,
+  "lat": 32.7359626,
+  "lon": -96.2752569,
+  "tags": {
+    "ele": "155",
+    "gnis:feature_id": "1348380",
+    "name": "Terrell",
+    "place": "town",
+    "population": "18506",
+    "population:date": "2006",
+    "source:population": "US Census",
+    "wikidata": "Q979784"
+  }
+},
+{
+  "type": "node",
+  "id": 151346605,
+  "lat": 32.9029017,
+  "lon": -96.5638800,
+  "tags": {
+    "ele": "154",
+    "gnis:feature_id": "1345719",
+    "name": "Rowlett",
+    "place": "town",
+    "population": "63671",
+    "population:date": "2021-07-01",
+    "source:population": "US Census Bureau",
+    "wikidata": "Q976950",
+    "wikipedia": "en:Rowlett, Texas"
+  }
+},
+{
+  "type": "node",
+  "id": 151349179,
+  "lat": 32.5634870,
+  "lon": -97.1420308,
+  "tags": {
+    "ele": "184",
+    "gnis:feature_id": "1340898",
+    "name": "Mansfield",
+    "place": "town",
+    "population": "56368",
+    "wikidata": "Q974040"
+  }
+},
+{
+  "type": "node",
+  "id": 151349458,
+  "lat": 32.3310170,
+  "lon": -96.1126799,
+  "tags": {
+    "gnis:feature_id": "1337131",
+    "name": "Gun Barrel City",
+    "place": "town",
+    "population": "6190",
+    "population:date": "2020",
+    "source:population": "https://www.census.gov/quickfacts/fact/table/gunbarrelcitycitytexas/POP010220",
+    "wikidata": "Q981778",
+    "wikipedia": "en:Gun Barrel City, Texas"
+  }
+},
+{
+  "type": "node",
+  "id": 151351081,
+  "lat": 32.4065312,
+  "lon": -97.2116782,
+  "tags": {
+    "admin_level": "8",
+    "boundary": "administrative",
+    "name": "Alvarado",
+    "place": "town",
+    "population": "4530",
+    "wikidata": "Q448358",
+    "wikipedia": "en:Alvarado, Texas"
+  }
+},
+{
+  "type": "node",
+  "id": 151353292,
+  "lat": 32.7666103,
+  "lon": -96.5994720,
+  "tags": {
+    "ele": "151",
+    "gnis:feature_id": "1341400",
+    "name": "Mesquite",
+    "name:en": "Mesquite",
+    "name:ko": "메스키트",
+    "place": "city",
+    "population": "150108",
+    "population:date": "2020",
+    "website": "https://cityofmesquite.com/",
+    "wikidata": "Q51696",
+    "wikipedia": "en:Mesquite, Texas"
+  }
+},
+{
+  "type": "node",
+  "id": 151354580,
+  "lat": 33.5589930,
+  "lon": -97.8484719,
+  "tags": {
+    "gnis:feature_id": "1352736",
+    "name": "Bowie",
+    "name:pronunciation": "ˈbuːi",
+    "place": "town",
+    "population": "5218",
+    "wikidata": "Q973724",
+    "wikipedia": "en:Bowie, Texas"
+  }
+},
+{
+  "type": "node",
+  "id": 151368045,
+  "lat": 33.1632162,
+  "lon": -96.3603548,
+  "tags": {
+    "ele": "199",
+    "gnis:feature_id": "1335715",
+    "name": "Farmersville",
+    "place": "town",
+    "population": "3808",
+    "population:date": "2021-07-01",
+    "source:population": "US Census Bureau",
+    "wikidata": "Q205272",
+    "wikipedia": "en:Farmersville, Texas"
+  }
+},
+{
+  "type": "node",
+  "id": 151372311,
+  "lat": 33.3959396,
+  "lon": -96.9591054,
+  "tags": {
+    "ele": "220",
+    "gnis:feature_id": "1365245",
+    "name": "Pilot Point",
+    "place": "town",
+    "population": "3856",
+    "wikidata": "Q982258",
+    "wikipedia": "en:Pilot Point, Texas"
+  }
+},
+{
+  "type": "node",
+  "id": 151394339,
+  "lat": 32.9552598,
+  "lon": -97.0155703,
+  "tags": {
+    "ele": "158",
+    "gnis:feature_id": "1373209",
+    "name": "Coppell",
+    "place": "town",
+    "population": "38659",
+    "wikidata": "Q982554",
+    "wikipedia": "en:Coppell, Texas"
+  }
+},
+{
+  "type": "node",
+  "id": 151396665,
+  "lat": 32.9312336,
+  "lon": -96.4597089,
+  "tags": {
+    "capital": "6",
+    "ele": "180",
+    "gnis:feature_id": "1345424",
+    "name": "Rockwall",
+    "place": "town",
+    "population": "49669",
+    "population:date": "2021-07-01",
+    "source:population": "US Census Bureau",
+    "wikidata": "Q383014",
+    "wikipedia": "en:Rockwall, Texas"
+  }
+},
+{
+  "type": "node",
+  "id": 151401189,
+  "lat": 32.5420821,
+  "lon": -97.3208492,
+  "tags": {
+    "ele": "217",
+    "gnis:feature_id": "1331683",
+    "name": "Burleson",
+    "place": "town",
+    "population": "36690",
+    "wikidata": "Q981820"
+  }
+},
+{
+  "type": "node",
+  "id": 151404019,
+  "lat": 33.2371585,
+  "lon": -96.7977048,
+  "tags": {
+    "ele": "208",
+    "name": "Prosper",
+    "place": "town",
+    "population": "34136",
+    "population:date": "2021-07-01",
+    "source:population": "US Census Bureau",
+    "wikidata": "Q620305",
+    "wikipedia": "en:Prosper, Texas"
+  }
+},
+{
+  "type": "node",
+  "id": 151408731,
+  "lat": 32.6447916,
+  "lon": -96.5418608,
+  "tags": {
+    "ele": "134",
+    "gnis:feature_id": "1346844",
+    "name": "Seagoville",
+    "place": "town",
+    "population": "18446",
+    "population:date": "2020",
+    "source:population": "https://www.census.gov/quickfacts/fact/table/seagovillecitytexas/POP010220",
+    "wikidata": "Q976464",
+    "wikipedia": "en:Seagoville, Texas"
+  }
+},
+{
+  "type": "node",
+  "id": 151409940,
+  "lat": 32.9299655,
+  "lon": -97.2271249,
+  "tags": {
+    "ele": "216",
+    "gnis:feature_id": "1338994",
+    "name": "Keller",
+    "place": "town",
+    "population": "42907",
+    "wikidata": "Q26485",
+    "wikipedia": "en:Keller, Texas"
+  }
+},
+{
+  "type": "node",
+  "id": 151415261,
+  "lat": 32.5920798,
+  "lon": -96.7561083,
+  "tags": {
+    "ele": "159",
+    "gnis:feature_id": "1339599",
+    "name": "Lancaster",
+    "place": "town",
+    "population": "33790",
+    "population:date": "2006",
+    "source:population": "US Census",
+    "wikidata": "Q976739"
+  }
+},
+{
+  "type": "node",
+  "id": 151432840,
+  "lat": 32.7287413,
+  "lon": -96.6227714,
+  "tags": {
+    "ele": "152",
+    "gnis:feature_id": "1329964",
+    "name": "Balch Springs",
+    "place": "town",
+    "population": "27685",
+    "population:date": "2020",
+    "wikidata": "Q804712"
+  }
+},
+{
+  "type": "node",
+  "id": 151443449,
+  "lat": 33.0555687,
+  "lon": -96.6220692,
+  "tags": {
+    "ele": "184",
+    "gnis:feature_id": "1378837",
+    "name": "Parker",
+    "place": "town",
+    "population": "5833",
+    "population:date": "2021-07-01",
+    "source:population": "US Census Bureau",
+    "wikidata": "Q982391",
+    "wikipedia": "en:Parker, Texas"
+  }
+},
+{
+  "type": "node",
+  "id": 151445593,
+  "lat": 33.0151208,
+  "lon": -96.6130478,
+  "tags": {
+    "ele": "177",
+    "gnis:feature_id": "1378721",
+    "name": "Murphy",
+    "place": "town",
+    "population": "21219",
+    "population:date": "2021-07-01",
+    "source:population": "US Census Bureau",
+    "wikidata": "Q973908",
+    "wikipedia": "en:Murphy, Texas"
+  }
+},
+{
+  "type": "node",
+  "id": 151464986,
+  "lat": 32.9481789,
+  "lon": -96.7297206,
+  "tags": {
+    "ele": "192",
+    "gnis:feature_id": "1345172",
+    "name": "Richardson",
+    "name:en": "Richardson",
+    "name:ko": "리처드슨",
+    "name:sr": "Ричардсон",
+    "place": "city",
+    "population": "116382",
+    "population:date": "2021-07-01",
+    "source:population": "US Census Bureau",
+    "website": "https://www.cor.net/",
+    "wikidata": "Q128375",
+    "wikipedia": "en:Richardson, Texas"
+  }
+},
+{
+  "type": "node",
+  "id": 151465068,
+  "lat": 33.0283854,
+  "lon": -97.0867203,
+  "tags": {
+    "ele": "184",
+    "gnis:feature_id": "1335983",
+    "name": "Flower Mound",
+    "place": "town",
+    "population": "75956",
+    "population:date": "2020",
+    "source:population": "https://www.census.gov/quickfacts/fact/table/flowermoundtowntexas/POP010220",
+    "wikidata": "Q976183",
+    "wikipedia": "en:Flower Mound, Texas"
+  }
+},
+{
+  "type": "node",
+  "id": 151472674,
+  "lat": 33.0151561,
+  "lon": -96.5388038,
+  "tags": {
+    "ele": "170",
+    "gnis:feature_id": "1350621",
+    "name": "Wylie",
+    "place": "town",
+    "population": "59394",
+    "population:date": "2021-07-01",
+    "source:population": "US Census Bureau",
+    "wikidata": "Q620323",
+    "wikipedia": "en:Wylie, Texas"
+  }
+},
+{
+  "type": "node",
+  "id": 151484067,
+  "lat": 32.8342952,
+  "lon": -97.2289029,
+  "tags": {
+    "ele": "184",
+    "gnis:feature_id": "1375190",
+    "name": "North Richland Hills",
+    "place": "town",
+    "population": "62306",
+    "population:date": "2006",
+    "source:population": "US Census",
+    "wikidata": "Q26489"
+  }
+},
+{
+  "type": "node",
+  "id": 151495247,
+  "lat": 32.5888072,
+  "lon": -96.9553675,
+  "tags": {
+    "ele": "253",
+    "gnis:feature_id": "1332440",
+    "name": "Cedar Hill",
+    "name:en": "Cedar Hill",
+    "place": "town",
+    "population": "49148",
+    "population:date": "2020",
+    "source:population": "https://www.census.gov/quickfacts/fact/table/cedarhillcitytexas/POP010220",
+    "wikidata": "Q976904",
+    "wikipedia": "en:Cedar Hill, Texas"
+  }
+},
+{
+  "type": "node",
+  "id": 151518242,
+  "lat": 33.2862455,
+  "lon": -96.5722411,
+  "tags": {
+    "ele": "207",
+    "gnis:feature_id": "1362586",
+    "name": "Melissa",
+    "place": "town",
+    "population": "16983",
+    "population:date": "2021-07-01",
+    "source:population": "US Census Bureau",
+    "wikidata": "Q973781",
+    "wikipedia": "en:Melissa, Texas"
+  }
+},
+{
+  "type": "node",
+  "id": 151518282,
+  "lat": 32.7995738,
+  "lon": -97.2691817,
+  "tags": {
+    "ele": "163",
+    "gnis:feature_id": "1373985",
+    "name": "Haltom City",
+    "place": "town",
+    "population": "39987",
+    "population:date": "2006",
+    "source:population": "US Census",
+    "wikidata": "Q26500"
+  }
+},
+{
+  "type": "node",
+  "id": 151520328,
+  "lat": 32.5897831,
+  "lon": -96.8570183,
+  "tags": {
+    "ele": "203",
+    "gnis:feature_id": "1373357",
+    "name": "De Soto",
+    "place": "town",
+    "population": "49047",
+    "wikidata": "Q981771",
+    "wikipedia": "en:DeSoto, Texas"
+  }
+},
+{
+  "type": "node",
+  "id": 151528273,
+  "lat": 33.1031744,
+  "lon": -96.6705503,
+  "tags": {
+    "ele": "201",
+    "gnis:feature_id": "1329377",
+    "name": "Allen",
+    "name:ko": "앨런",
+    "place": "city",
+    "population": "106874",
+    "population:date": "2021-07-01",
+    "source:ele": "National Elevation Dataset",
+    "source:population": "US Census Bureau",
+    "website": "https://www.cityofallen.org/",
+    "wikidata": "Q33147",
+    "wikipedia": "en:Allen, Texas"
+  }
+},
+{
+  "type": "node",
+  "id": 151528688,
+  "lat": 33.5775340,
+  "lon": -96.1786007,
+  "tags": {
+    "capital": "6",
+    "ele": "186",
+    "gnis:feature_id": "1352653",
+    "name": "Bonham",
+    "place": "town",
+    "population": "10408",
+    "population:date": "2020",
+    "source:population": "https://www.census.gov/quickfacts/fact/table/bonhamcitytexas/POP010220",
+    "wikidata": "Q144856",
+    "wikipedia": "en:Bonham, Texas"
+  }
+},
+{
+  "type": "node",
+  "id": 151555680,
+  "lat": 32.3944908,
+  "lon": -96.8439365,
+  "tags": {
+    "capital": "6",
+    "ele": "170",
+    "gnis:feature_id": "1349560",
+    "name": "Waxahachie",
+    "name:pronunciation": "ˌwɒksəˈhætʃi",
+    "place": "town",
+    "population": "26709",
+    "population:date": "2006",
+    "source:population": "US Census",
+    "wikidata": "Q645475"
+  }
+},
+{
+  "type": "node",
+  "id": 151555783,
+  "lat": 32.7355816,
+  "lon": -97.1071186,
+  "tags": {
+    "admin_level": "8",
+    "name": "Arlington",
+    "name:en": "Arlington",
+    "name:ko": "알링턴",
+    "name:sr": "Арлингтон",
+    "place": "city",
+    "population": "403672",
+    "population:date": "2024",
+    "source:population": "census",
+    "website": "https://www.arlingtontx.gov/",
+    "wikidata": "Q17943",
+    "wikipedia": "en:Arlington, Texas"
+  }
+},
+{
+  "type": "node",
+  "id": 151578627,
+  "lat": 33.1505998,
+  "lon": -96.8238183,
+  "tags": {
+    "ele": "212",
+    "gnis:feature_id": "1336263",
+    "name": "Frisco",
+    "name:en": "Frisco",
+    "name:ko": "프리스코",
+    "name:sr": "Фриско",
+    "place": "city",
+    "population": "210719",
+    "population:date": "2021-07-01",
+    "source:population": "US Census Bureau",
+    "website": "https://www.friscotexas.gov/",
+    "wikidata": "Q128269",
+    "wikipedia": "en:Frisco, Texas"
+  }
+},
+{
+  "type": "node",
+  "id": 151579822,
+  "lat": 32.8370727,
+  "lon": -97.0819541,
+  "tags": {
+    "ele": "179",
+    "gnis:feature_id": "1335538",
+    "name": "Euless",
+    "place": "town",
+    "population": "52016",
+    "population:date": "2006",
+    "source:population": "US Census",
+    "wikidata": "Q26483"
+  }
+},
+{
+  "type": "node",
+  "id": 151599307,
+  "lat": 32.9414409,
+  "lon": -96.3813805,
+  "tags": {
+    "ele": "179",
+    "gnis:feature_id": "1335725",
+    "name": "Fate",
+    "place": "town",
+    "population": "21013",
+    "population:date": "2021-07-01",
+    "source:population": "US Census Bureau",
+    "wikidata": "Q981518",
+    "wikipedia": "en:Fate, Texas"
+  }
+},
+{
+  "type": "node",
+  "id": 151600594,
+  "lat": 32.9761045,
+  "lon": -96.3313340,
+  "tags": {
+    "ele": "169",
+    "gnis:feature_id": "1345732",
+    "name": "Royse City",
+    "place": "town",
+    "population": "15978",
+    "population:date": "2021-07-01",
+    "source:population": "US Census Bureau",
+    "wikidata": "Q975173",
+    "wikipedia": "en:Royse City, Texas"
+  }
+},
+{
+  "type": "node",
+  "id": 151608732,
+  "lat": 32.7478930,
+  "lon": -96.4719289,
+  "tags": {
+    "ele": "144",
+    "gnis:feature_id": "1336039",
+    "name": "Forney",
+    "place": "town",
+    "population": "23455",
+    "population:date": "2020",
+    "wikidata": "Q979126",
+    "wikipedia": "en:Forney, Texas"
+  }
+},
+{
+  "type": "node",
+  "id": 151611270,
+  "lat": 32.3474463,
+  "lon": -97.3865494,
+  "tags": {
+    "capital": "6",
+    "ele": "233",
+    "gnis:feature_id": "1332964",
+    "name": "Cleburne",
+    "place": "town",
+    "population": "29689",
+    "population:date": "2006",
+    "source:population": "US Census",
+    "start_date": "1867-03-23",
+    "wikidata": "Q534957",
+    "wikipedia": "en:Cleburne, Texas"
+  }
+},
+{
+  "type": "node",
+  "id": 151613205,
+  "lat": 32.9412363,
+  "lon": -97.1341783,
+  "tags": {
+    "ele": "195",
+    "gnis:feature_id": "1347589",
+    "name": "Southlake",
+    "place": "town",
+    "population": "26575",
+    "wikidata": "Q973729",
+    "wikipedia": "en:Southlake, Texas"
+  }
+},
+{
+  "type": "node",
+  "id": 151613947,
+  "lat": 32.8579056,
+  "lon": -97.2547371,
+  "tags": {
+    "ele": "185",
+    "gnis:feature_id": "1376659",
+    "name": "Watauga",
+    "place": "town",
+    "population": "23685",
+    "population:date": "2006",
+    "source:population": "US Census",
+    "wikidata": "Q982228"
+  }
+},
+{
+  "type": "node",
+  "id": 151623964,
+  "lat": 32.4823610,
+  "lon": -96.9944489,
+  "tags": {
+    "ele": "230",
+    "gnis:feature_id": "1341552",
+    "name": "Midlothian",
+    "place": "town",
+    "population": "14452",
+    "population:date": "2006",
+    "source:population": "US Census",
+    "wikidata": "Q750795",
+    "wikipedia": "en:Midlothian, Texas"
+  }
+},
+{
+  "type": "node",
+  "id": 151626347,
+  "lat": 32.5867797,
+  "lon": -96.3086768,
+  "tags": {
+    "capital": "6",
+    "ele": "140",
+    "gnis:feature_id": "1338964",
+    "name": "Kaufman",
+    "place": "town",
+    "population": "7788",
+    "wikidata": "Q975843",
+    "wikipedia": "en:Kaufman, Texas"
+  }
+},
+{
+  "type": "node",
+  "id": 151627776,
+  "lat": 33.1578325,
+  "lon": -96.6318301,
+  "tags": {
+    "ele": "192",
+    "gnis:feature_id": "1335618",
+    "name": "Fairview",
+    "place": "town",
+    "population": "10683",
+    "population:date": "2021-07-01",
+    "source:population": "US Census Bureau",
+    "wikidata": "Q277459",
+    "wikipedia": "en:Fairview, Texas"
+  }
+},
+{
+  "type": "node",
+  "id": 151629440,
+  "lat": 32.8809603,
+  "lon": -97.1550120,
+  "tags": {
+    "ele": "187",
+    "gnis:feature_id": "1373161",
+    "name": "Colleyville",
+    "place": "town",
+    "population": "23210",
+    "population:date": "2006",
+    "source:population": "US Census",
+    "wikidata": "Q974075"
+  }
+},
+{
+  "type": "node",
+  "id": 151629997,
+  "lat": 33.6558015,
+  "lon": -96.9068601,
+  "tags": {
+    "ele": "250",
+    "gnis:feature_id": "1371458",
+    "name": "Whitesboro",
+    "place": "town",
+    "population": "4078",
+    "wikidata": "Q982169",
+    "wikipedia": "en:Whitesboro, Texas"
+  }
+},
+{
+  "type": "node",
+  "id": 151639254,
+  "lat": 32.8601275,
+  "lon": -97.3639068,
+  "tags": {
+    "ele": "222",
+    "gnis:feature_id": "1345838",
+    "name": "Saginaw",
+    "place": "town",
+    "population": "18739",
+    "population:date": "2006",
+    "source:population": "US Census",
+    "wikidata": "Q970802"
+  }
+},
+{
+  "type": "node",
+  "id": 151643798,
+  "lat": 32.8365147,
+  "lon": -96.4749870,
+  "tags": {
+    "ele": "153",
+    "gnis:feature_id": "1337538",
+    "name": "Heath",
+    "place": "town",
+    "population": "10266",
+    "population:date": "2021-07-01",
+    "source:population": "US Census Bureau",
+    "wikidata": "Q981699",
+    "wikipedia": "en:Heath, Texas"
+  }
+},
+{
+  "type": "node",
+  "id": 151655852,
+  "lat": 33.3496662,
+  "lon": -96.5547038,
+  "tags": {
+    "admin_level": "8",
+    "ele": "217",
+    "name": "Anna",
+    "place": "town",
+    "population": "20243",
+    "population:date": "2021-07-01",
+    "source:ele": "National Elevation Dataset",
+    "source:population": "US Census Bureau",
+    "type": "boundary",
+    "wikidata": "Q620328",
+    "wikipedia": "en:Anna, Texas"
+  }
+},
+{
+  "type": "node",
+  "id": 151656969,
+  "lat": 33.0276193,
+  "lon": -96.4341524,
+  "tags": {
+    "ele": "160",
+    "gnis:feature_id": "1339724",
+    "name": "Lavon",
+    "place": "town",
+    "population": "5342",
+    "population:date": "2021-07-01",
+    "source:population": "US Census Bureau",
+    "wikidata": "Q620334",
+    "wikipedia": "en:Lavon, Texas"
+  }
+},
+{
+  "type": "node",
+  "id": 151664304,
+  "lat": 32.6720778,
+  "lon": -97.2691812,
+  "tags": {
+    "ele": "208",
+    "gnis:feature_id": "1336023",
+    "name": "Forest Hill",
+    "place": "town",
+    "population": "13668",
+    "population:date": "2006",
+    "source:population": "US Census",
+    "wikidata": "Q26492",
+    "wikipedia": "en:Forest Hill, Texas"
+  }
+},
+{
+  "type": "node",
+  "id": 151665841,
+  "lat": 33.1540091,
+  "lon": -97.0647322,
+  "tags": {
+    "ele": "185",
+    "gnis:feature_id": "1333356",
+    "name": "Corinth",
+    "place": "town",
+    "population": "19556",
+    "population:date": "2006",
+    "source:population": "US Census",
+    "wikidata": "Q974334"
+  }
+},
+{
+  "type": "node",
+  "id": 151680163,
+  "lat": 32.4612418,
+  "lon": -97.3882581,
+  "tags": {
+    "ele": "283",
+    "gnis:feature_id": "1338888",
+    "name": "Joshua",
+    "place": "town",
+    "population": "7891",
+    "population:date": "2020",
+    "wikidata": "Q981175",
+    "wikipedia": "en:Joshua, Texas"
+  }
+},
+{
+  "type": "node",
+  "id": 151681048,
+  "lat": 33.0890094,
+  "lon": -96.8863922,
+  "tags": {
+    "ele": "180",
+    "gnis:feature_id": "1384043",
+    "name": "The Colony",
+    "place": "town",
+    "population": "42408",
+    "population:date": "2016",
+    "source:population": "US Census",
+    "wikidata": "Q975816",
+    "wikipedia": "en:The Colony, Texas"
+  }
+},
+{
+  "type": "node",
+  "id": 151702156,
+  "lat": 32.8234621,
+  "lon": -97.1705678,
+  "tags": {
+    "ele": "169",
+    "gnis:feature_id": "1374183",
+    "name": "Hurst",
+    "place": "town",
+    "population": "38182",
+    "population:date": "2006",
+    "source:population": "US Census",
+    "wikidata": "Q26497"
+  }
+},
+{
+  "type": "node",
+  "id": 151717841,
+  "lat": 32.7589648,
+  "lon": -97.7970748,
+  "tags": {
+    "capital": "6",
+    "ele": "321",
+    "gnis:feature_id": "1376666",
+    "name": "Weatherford",
+    "place": "town",
+    "population": "30854",
+    "population:date": "2020",
+    "source:population": "US Census",
+    "wikidata": "Q970527"
+  }
+},
+{
+  "type": "node",
+  "id": 151730552,
+  "lat": 32.7595737,
+  "lon": -97.4583538,
+  "tags": {
+    "ele": "203",
+    "gnis:feature_id": "1349989",
+    "name": "White Settlement",
+    "place": "town",
+    "population": "15943",
+    "population:date": "2006",
+    "source:population": "US Census",
+    "wikidata": "Q969613"
+  }
+},
+{
+  "type": "node",
+  "id": 151732354,
+  "lat": 32.3665322,
+  "lon": -96.1008056,
+  "tags": {
+    "ele": "120",
+    "gnis:feature_id": "1340780",
+    "name": "Mabank",
+    "name:pronunciation": "ˈmeɪbæŋk",
+    "place": "town",
+    "population": "3035",
+    "wikidata": "Q969293",
+    "wikipedia": "en:Mabank, Texas"
+  }
+},
+{
+  "type": "node",
+  "id": 151757602,
+  "lat": 33.1384488,
+  "lon": -96.1108066,
+  "tags": {
+    "capital": "6",
+    "ele": "165",
+    "gnis:feature_id": "1377755",
+    "name": "Greenville",
+    "place": "town",
+    "population": "29578",
+    "population:date": "2021-07-01",
+    "source:population": "US Census Bureau",
+    "wikidata": "Q976490",
+    "wikipedia": "en:Greenville, Texas"
+  }
+},
+{
+  "type": "node",
+  "id": 151764216,
+  "lat": 32.8440170,
+  "lon": -97.1430671,
+  "tags": {
+    "ele": "182",
+    "gnis:feature_id": "1372463",
+    "name": "Bedford",
+    "place": "town",
+    "population": "48752",
+    "population:date": "2006",
+    "source:population": "US Census",
+    "wikidata": "Q813867"
+  }
+},
+{
+  "type": "node",
+  "id": 151770712,
+  "lat": 33.1801161,
+  "lon": -96.4980424,
+  "tags": {
+    "ele": "175",
+    "gnis:feature_id": "1344570",
+    "name": "Princeton",
+    "place": "town",
+    "population": "20046",
+    "wikidata": "Q620301",
+    "wikipedia": "en:Princeton, Texas"
+  }
+},
+{
+  "type": "node",
+  "id": 151771234,
+  "lat": 32.6518004,
+  "lon": -96.9083366,
+  "tags": {
+    "ele": "221",
+    "gnis:feature_id": "1334786",
+    "name": "Duncanville",
+    "place": "town",
+    "population": "35583",
+    "population:date": "2006",
+    "source:population": "US Census",
+    "wikidata": "Q981394"
+  }
+},
+{
+  "type": "node",
+  "id": 151771486,
+  "lat": 33.3631706,
+  "lon": -97.1739028,
+  "tags": {
+    "ele": "206",
+    "gnis:feature_id": "1367736",
+    "name": "Sanger",
+    "place": "town",
+    "population": "8732",
+    "wikidata": "Q982012",
+    "wikipedia": "en:Sanger, Texas"
+  }
+},
+{
+  "type": "node",
+  "id": 151778987,
+  "lat": 32.4426759,
+  "lon": -97.7870525,
+  "tags": {
+    "capital": "6",
+    "ele": "224",
+    "gnis:feature_id": "1336797",
+    "name": "Granbury",
+    "place": "town",
+    "population": "7753",
+    "population:date": "2006",
+    "source:population": "US Census",
+    "wikidata": "Q923474",
+    "wikipedia": "en:Granbury, Texas"
+  }
+},
+{
+  "type": "node",
+  "id": 151804117,
+  "lat": 33.1626194,
+  "lon": -96.9375051,
+  "tags": {
+    "ele": "166",
+    "gnis:feature_id": "1340088",
+    "name": "Little Elm",
+    "place": "town",
+    "population": "42504",
+    "population:date": "2016",
+    "source:population": "US Census",
+    "wikidata": "Q979944",
+    "wikipedia": "en:Little Elm, Texas"
+  }
+},
+{
+  "type": "node",
+  "id": 151810812,
+  "lat": 32.9912260,
+  "lon": -97.1943701,
+  "tags": {
+    "ele": "204",
+    "gnis:feature_id": "1379259",
+    "name": "Westlake",
+    "place": "town",
+    "population": "1922",
+    "population:date": "04-01-2023",
+    "source:population": "NCTCOG",
+    "wikidata": "Q982660",
+    "wikipedia": "en:Westlake, Texas"
+  }
+},
+{
+  "type": "node",
+  "id": 151811081,
+  "lat": 32.9337381,
+  "lon": -97.0788754,
+  "tags": {
+    "ele": "195",
+    "gnis:feature_id": "1336834",
+    "name": "Grapevine",
+    "place": "town",
+    "population": "50631",
+    "population:date": "2020",
+    "source:population": "https://www.census.gov/quickfacts/fact/table/grapevinecitytexas/POP010220",
+    "wikidata": "Q185216",
+    "wikipedia": "en:Grapevine, Texas"
+  }
+},
+{
+  "type": "node",
+  "id": 151818041,
+  "lat": 32.6731880,
+  "lon": -97.4605759,
+  "tags": {
+    "ele": "210",
+    "gnis:feature_id": "1372495",
+    "name": "Benbrook",
+    "place": "town",
+    "population": "22307",
+    "population:date": "2006",
+    "source:population": "US Census",
+    "wikidata": "Q525342"
+  }
+},
+{
+  "type": "node",
+  "id": 151822515,
+  "lat": 32.4334742,
+  "lon": -97.1025077,
+  "tags": {
+    "ele": "203",
+    "gnis:feature_id": "1349239",
+    "name": "Venus",
+    "place": "town",
+    "population": "4368",
+    "wikidata": "Q982348",
+    "wikipedia": "en:Venus, Texas"
+  }
+},
+{
+  "type": "node",
+  "id": 151827198,
+  "lat": 33.6248484,
+  "lon": -97.1427530,
+  "tags": {
+    "capital": "6",
+    "ele": "229",
+    "gnis:feature_id": "1373791",
+    "name": "Gainesville",
+    "place": "town",
+    "population": "17394",
+    "population:date": "2020",
+    "source:population": "https://www.census.gov/quickfacts/fact/table/gainesvillecitytexas/POP010220",
+    "wikidata": "Q979889",
+    "wikipedia": "en:Gainesville, Texas"
+  }
+},
+{
+  "type": "node",
+  "id": 151829316,
+  "lat": 32.9515472,
+  "lon": -96.9034244,
+  "tags": {
+    "ele": "161",
+    "gnis:feature_id": "1332207",
+    "name": "Carrollton",
+    "name:ko": "캐럴턴",
+    "place": "city",
+    "population": "133251",
+    "population:date": "2021-07-01",
+    "source:population": "US Census Bureau",
+    "website": "https://www.cityofcarrollton.com/",
+    "wikidata": "Q128261",
+    "wikipedia": "en:Carrollton, Texas"
+  }
+},
+{
+  "type": "node",
+  "id": 151829465,
+  "lat": 33.2342834,
+  "lon": -97.5861393,
+  "tags": {
+    "capital": "6",
+    "ele": "336",
+    "gnis:feature_id": "1373362",
+    "name": "Decatur",
+    "place": "town",
+    "population": "6989",
+    "wikidata": "Q674049",
+    "wikipedia": "en:Decatur, Texas"
+  }
+},
+{
+  "type": "node",
+  "id": 151836509,
+  "lat": 32.9126240,
+  "lon": -96.6388833,
+  "tags": {
+    "ele": "168",
+    "gnis:feature_id": "1388185",
+    "name": "Garland",
+    "name:en": "Garland",
+    "name:ko": "갈랜드",
+    "place": "city",
+    "population": "242035",
+    "population:date": "2021-07-01",
+    "source:population": "US Census Bureau",
+    "website": "https://www.garlandtx.gov/",
+    "wikidata": "Q49274",
+    "wikipedia": "en:Garland, Texas"
+  }
+},
+{
+  "type": "node",
+  "id": 151837636,
+  "lat": 33.0254878,
+  "lon": -96.8563223,
+  "tags": {
+    "ele": "176",
+    "gnis:feature_id": "1378433",
+    "name": "Hebron",
+    "place": "town",
+    "population": "803",
+    "population:date": "2021-07-01",
+    "source:population": "US Census Bureau",
+    "wikidata": "Q981832",
+    "wikipedia": "en:Hebron, Texas"
+  }
+},
+{
+  "type": "node",
+  "id": 151841301,
+  "lat": 32.9265668,
+  "lon": -96.8960916,
+  "tags": {
+    "ele": "141",
+    "gnis:feature_id": "1335711",
+    "name": "Farmers Branch",
+    "place": "town",
+    "population": "34988",
+    "population:date": "2016",
+    "source:population": "US Census",
+    "wikidata": "Q980067",
+    "wikipedia": "en:Farmers Branch, Texas"
+  }
+},
+{
+  "type": "node",
+  "id": 151841399,
+  "lat": 33.4220266,
+  "lon": -96.5764834,
+  "tags": {
+    "ele": "239",
+    "gnis:feature_id": "1370567",
+    "name": "Van Alstyne",
+    "place": "town",
+    "population": "5165",
+    "population:date": "2021-07-01",
+    "source:population": "US Census Bureau",
+    "wikidata": "Q778693",
+    "wikipedia": "en:Van Alstyne, Texas"
+  }
+},
+{
+  "type": "node",
+  "id": 151846736,
+  "lat": 33.2101155,
+  "lon": -97.7547552,
+  "tags": {
+    "ele": "244",
+    "gnis:feature_id": "1381191",
+    "name": "Bridgeport",
+    "place": "town",
+    "population": "5818",
+    "population:date": "2006",
+    "source:population": "US Census",
+    "wikidata": "Q913776",
+    "wikipedia": "en:Bridgeport, Texas"
+  }
+},
+{
+  "type": "node",
+  "id": 151848621,
+  "lat": 32.8551267,
+  "lon": -96.7919454,
+  "tags": {
+    "ele": "174",
+    "gnis:feature_id": "1377750",
+    "name": "University Park",
+    "place": "town",
+    "population": "24905",
+    "population:date": "2016",
+    "wikidata": "Q979410",
+    "wikipedia": "en:University Park, Texas"
+  }
+},
+{
+  "type": "node",
+  "id": 151859897,
+  "lat": 32.7459645,
+  "lon": -96.9977846,
+  "tags": {
+    "admin_level": "8",
+    "ele": "157",
+    "gnis:feature_id": "1336802",
+    "name": "Grand Prairie",
+    "name:en": "Grand Prairie",
+    "name:ko": "그랜드프레리",
+    "place": "city",
+    "population": "183372",
+    "website": "https://www.gptx.org/",
+    "wikidata": "Q51694"
+  }
+},
+{
+  "type": "node",
+  "id": 151862832,
+  "lat": 32.8975875,
+  "lon": -97.5437799,
+  "tags": {
+    "name": "Azle",
+    "place": "town",
+    "population": "10947",
+    "wikidata": "Q793929"
+  }
+},
+{
+  "type": "node",
+  "id": 151879343,
+  "lat": 33.0462330,
+  "lon": -96.9941740,
+  "tags": {
+    "ele": "450",
+    "gnis:feature_id": "1339860",
+    "name": "Lewisville",
+    "name:en": "Lewisville",
+    "name:ko": "루이스빌",
+    "place": "city",
+    "population": "131215",
+    "population:date": "2022",
+    "source:population": "US Census",
+    "website": "https://www.cityoflewisville.com/",
+    "wikidata": "Q26495",
+    "wikipedia": "en:Lewisville, Texas"
+  }
+},
+{
+  "type": "node",
+  "id": 151903807,
+  "lat": 32.9617900,
+  "lon": -96.8291685,
+  "tags": {
+    "admin_level": "8",
+    "boundary": "administrative",
+    "name": "Addison",
+    "place": "town",
+    "population": "16661",
+    "population:date": "2020",
+    "source:population": "US Census",
+    "website": "https://addisontexas.net/",
+    "wikidata": "Q353089",
+    "wikipedia": "en:Addison, Texas"
+  }
+},
+{
+  "type": "node",
+  "id": 151915055,
+  "lat": 33.5073346,
+  "lon": -96.6126637,
+  "tags": {
+    "ele": "256",
+    "gnis:feature_id": "1359742",
+    "name": "Howe",
+    "place": "town",
+    "population": "3346",
+    "wikidata": "Q972629",
+    "wikipedia": "en:Howe, Texas"
+  }
+},
+{
+  "type": "node",
+  "id": 151922145,
+  "lat": 33.7888548,
+  "lon": -97.7267383,
+  "tags": {
+    "ele": "299",
+    "gnis:feature_id": "1363946",
+    "name": "Nocona",
+    "place": "town",
+    "population": "3279",
+    "population:date": "2006",
+    "source:population": "US Census",
+    "wikidata": "Q973864"
+  }
+},
+{
+  "type": "node",
+  "id": 151924564,
+  "lat": 33.0917880,
+  "lon": -97.0466759,
+  "tags": {
+    "ele": "169",
+    "gnis:feature_id": "1337748",
+    "name": "Highland Village",
+    "place": "town",
+    "population": "15738",
+    "population:date": "2006",
+    "source:population": "US Census",
+    "wikidata": "Q250908"
+  }
+},
+{
+  "type": "node",
+  "id": 151927530,
+  "lat": 32.9762327,
+  "lon": -96.5952703,
+  "tags": {
+    "ele": "167",
+    "gnis:feature_id": "1345812",
+    "name": "Sachse",
+    "place": "town",
+    "population": "29042",
+    "population:date": "2021-07-01",
+    "source:population": "US Census Bureau",
+    "wikidata": "Q620327",
+    "wikipedia": "en:Sachse, Texas"
+  }
+},
+{
+  "type": "node",
+  "id": 151959810,
+  "lat": 32.5783528,
+  "lon": -97.3585533,
+  "tags": {
+    "ele": "237",
+    "gnis:feature_id": "1333742",
+    "name": "Crowley",
+    "name:ko": "크롤리",
+    "place": "town",
+    "population": "14969",
+    "wikidata": "Q970371",
+    "wikipedia": "en:Crowley, Texas"
+  }
+},
+{
+  "type": "node",
+  "id": 368165405,
+  "lat": 33.5492733,
+  "lon": -97.8336454,
+  "tags": {
+    "addr:state": "TX",
+    "ele": "338",
+    "gnis:feature_id": "2031184",
+    "name": "Fort Worth and Denver City Depot",
+    "railway": "station",
+    "source": "USGS Geonames"
+  }
+},
+{
+  "type": "node",
+  "id": 1513101697,
+  "lat": 33.0136764,
+  "lon": -96.6925096,
+  "tags": {
+    "name": "Plano",
+    "name:en": "Plano",
+    "name:ko": "플레이노",
+    "place": "city",
+    "population": "288253",
+    "population:date": "2021-07-01",
+    "source:population": "US Census Bureau",
+    "website": "https://www.plano.gov/",
+    "wikidata": "Q51689",
+    "wikipedia": "en:Plano, Texas"
+  }
+},
+{
+  "type": "node",
+  "id": 1551411011,
+  "lat": 33.2150380,
+  "lon": -97.1330431,
+  "tags": {
+    "capital": "6",
+    "ele": "201",
+    "gnis:feature_id": "1334260",
+    "name": "Denton",
+    "name:en": "Denton",
+    "name:ko": "덴턴",
+    "place": "city",
+    "population": "109561",
+    "population:date": "2006",
+    "source:population": "US Census",
+    "website": "https://www.cityofdenton.com/",
+    "wikidata": "Q128306"
+  }
+},
+{
+  "type": "node",
+  "id": 1891443115,
+  "lat": 32.7526411,
+  "lon": -97.3265139,
+  "tags": {
+    "amenity": "bus_station",
+    "bus": "yes",
+    "internet_access": "wlan",
+    "name": "Greyhound Station",
+    "public_transport": "station"
+  }
+},
+{
+  "type": "node",
+  "id": 1999510358,
+  "lat": 32.8769489,
+  "lon": -96.9385518,
+  "tags": {
+    "light_rail": "yes",
+    "name": "Irving Convention Center",
+    "network": "DART",
+    "operator": "DART",
+    "public_transport": "station",
+    "railway": "station",
+    "station": "light_rail",
+    "wikidata": "Q6074522"
+  }
+},
+{
+  "type": "node",
+  "id": 1999510361,
+  "lat": 32.8686206,
+  "lon": -96.9335904,
+  "tags": {
+    "light_rail": "yes",
+    "name": "Las Colinas Urban Center",
+    "network": "DART",
+    "operator": "DART",
+    "public_transport": "station",
+    "railway": "station",
+    "station": "light_rail"
+  }
+},
+{
+  "type": "node",
+  "id": 2075685253,
+  "lat": 32.3497679,
+  "lon": -97.3822210,
+  "tags": {
+    "addr:city": "Cleburne",
+    "addr:housenumber": "203",
+    "addr:postcode": "76031",
+    "addr:state": "TX",
+    "addr:street": "North Border Street",
+    "bus": "yes",
+    "name": "Cleburne",
+    "network": "Amtrak",
+    "network:wikidata": "Q23239",
+    "operator": "Amtrak",
+    "public_transport": "station",
+    "railway": "station",
+    "railway:ref": "CBR",
+    "train": "yes",
+    "website": "https://www.amtrak.com/stations/cbr.html",
+    "wikidata": "Q5131023",
+    "wikipedia": "en:Cleburne Intermodal Transportation Depot"
+  }
+},
+{
+  "type": "node",
+  "id": 2123396931,
+  "lat": 32.8046022,
+  "lon": -97.1551434,
+  "tags": {
+    "name": "Bell",
+    "network": "TRE",
+    "operator": "Trinity Railway Express",
+    "public_transport": "station",
+    "railway": "station",
+    "train": "yes",
+    "wheelchair": "yes",
+    "wikidata": "Q5948558"
+  }
+},
+{
+  "type": "node",
+  "id": 2123396932,
+  "lat": 32.8169726,
+  "lon": -97.0526510,
+  "tags": {
+    "name": "CentrePort/DFW Airport",
+    "network": "TRE",
+    "operator": "Trinity Railway Express",
+    "public_transport": "station",
+    "railway": "station",
+    "train": "yes",
+    "website": "https://trinityrailwayexpress.org/station/centreport-dfw-airport-station/",
+    "wikidata": "Q5062215"
+  }
+},
+{
+  "type": "node",
+  "id": 2123396934,
+  "lat": 32.7526373,
+  "lon": -97.3265607,
+  "tags": {
+    "addr:city": "Fort Worth",
+    "addr:postcode": "76102",
+    "addr:state": "TX",
+    "addr:street": "1001 Jones Street",
+    "name": "Fort Worth Central",
+    "network": "Amtrak;TRE;Trinity Metro",
+    "operator": "Amtrak",
+    "public_transport": "station",
+    "railway": "station",
+    "railway:ref": "FTW",
+    "train": "yes",
+    "website": "https://trinityrailwayexpress.org/stationsdetail.html?item_id=2",
+    "wikidata": "Q5472392",
+    "wikipedia": "en:Fort Worth Central Station"
+  }
+},
+{
+  "type": "node",
+  "id": 2123396935,
+  "lat": 32.7453157,
+  "lon": -97.3278313,
+  "tags": {
+    "addr:city": "Fort Worth",
+    "addr:postcode": "76102",
+    "addr:state": "TX",
+    "addr:street": "221 W. Lancaster Ave",
+    "name": "Fort Worth T&P",
+    "network": "TRE;Trinity Metro",
+    "public_transport": "station",
+    "railway": "station",
+    "source": "local_knowledge",
+    "train": "yes",
+    "website": "https://trinityrailwayexpress.org/stations.html",
+    "wikidata": "Q7667715"
+  }
+},
+{
+  "type": "node",
+  "id": 2123396940,
+  "lat": 32.8160750,
+  "lon": -97.0072629,
+  "tags": {
+    "name": "West Irving",
+    "network": "TRE",
+    "operator": "Trinity Railway Express",
+    "public_transport": "station",
+    "railway": "station",
+    "train": "yes",
+    "wikidata": "Q7985552"
+  }
+},
+{
+  "type": "node",
+  "id": 2127091512,
+  "lat": 32.9066651,
+  "lon": -97.0363808,
+  "tags": {
+    "alt_name": "Terminal A between A13 and A16",
+    "monorail": "yes",
+    "name": "A8-A21",
+    "public_transport": "station",
+    "railway": "station",
+    "wheelchair": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 2127091514,
+  "lat": 32.9024848,
+  "lon": -97.0365567,
+  "tags": {
+    "alt_name": "Terminal A between A29 and A34",
+    "monorail": "yes",
+    "name": "A22-A39",
+    "public_transport": "station",
+    "railway": "station",
+    "wheelchair": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 2127091515,
+  "lat": 32.9027905,
+  "lon": -97.0442605,
+  "tags": {
+    "alt_name": "Terminal B between B9 and B12",
+    "monorail": "yes",
+    "name": "B1-B19",
+    "public_transport": "station",
+    "railway": "station",
+    "wheelchair": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 2127091516,
+  "lat": 32.9065929,
+  "lon": -97.0443546,
+  "tags": {
+    "alt_name": "Terminal B between B28 and B31",
+    "monorail": "yes",
+    "name": "B20-B49",
+    "public_transport": "station",
+    "railway": "station",
+    "wheelchair": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 2127091518,
+  "lat": 32.8995066,
+  "lon": -97.0363645,
+  "tags": {
+    "alt_name": "Terminal C between C8 and C12",
+    "monorail": "yes",
+    "name": "C2-C19",
+    "public_transport": "station",
+    "railway": "station"
+  }
+},
+{
+  "type": "node",
+  "id": 2127091519,
+  "lat": 32.8955622,
+  "lon": -97.0364005,
+  "tags": {
+    "alt_name": "Terminal C between C27 and C32",
+    "monorail": "yes",
+    "name": "C20-C39",
+    "public_transport": "station",
+    "railway": "station"
+  }
+},
+{
+  "type": "node",
+  "id": 2127091521,
+  "lat": 32.8962624,
+  "lon": -97.0441611,
+  "tags": {
+    "alt_name": "Terminal D between D11 and D20",
+    "monorail": "yes",
+    "name": "D6-D22",
+    "public_transport": "station",
+    "railway": "station"
+  }
+},
+{
+  "type": "node",
+  "id": 2127091522,
+  "lat": 32.8988576,
+  "lon": -97.0441816,
+  "tags": {
+    "alt_name": "Terminal D between D24 and D34",
+    "monorail": "yes",
+    "name": "D23-D40",
+    "public_transport": "station",
+    "railway": "station"
+  }
+},
+{
+  "type": "node",
+  "id": 2127091523,
+  "lat": 32.8923544,
+  "lon": -97.0364340,
+  "tags": {
+    "alt_name": "Terminal E between E8 and E11",
+    "level": "2",
+    "monorail": "yes",
+    "name": "E2-E16",
+    "public_transport": "station",
+    "railway": "station"
+  }
+},
+{
+  "type": "node",
+  "id": 2127091524,
+  "lat": 32.8883350,
+  "lon": -97.0365854,
+  "tags": {
+    "alt_name": "Terminal E between E31 and E32",
+    "level": "2",
+    "monorail": "yes",
+    "name": "E17-E38",
+    "public_transport": "station",
+    "railway": "station"
+  }
+},
+{
+  "type": "node",
+  "id": 2174067210,
+  "lat": 32.7864398,
+  "lon": -96.8006567,
+  "tags": {
+    "name": "Saint Paul & Ross",
+    "network": "MATA",
+    "public_transport": "stop_position",
+    "railway": "tram_stop",
+    "tram": "yes",
+    "wheelchair": "no"
+  }
+},
+{
+  "type": "node",
+  "id": 2174067213,
+  "lat": 32.7878079,
+  "lon": -96.8022732,
+  "tags": {
+    "name": "Saint Paul & Woodall Rodgers",
+    "network": "MATA",
+    "old_name": "Saint Paul & Woodall Rodgers South",
+    "public_transport": "stop_position",
+    "railway": "tram_stop",
+    "tram": "yes",
+    "wheelchair": "no"
+  }
+},
+{
+  "type": "node",
+  "id": 2174067222,
+  "lat": 32.7890476,
+  "lon": -96.8037478,
+  "tags": {
+    "name": "Saint Paul & McKinney",
+    "network": "MATA",
+    "old_name": "Saint Paul & Woodall Rodgers North",
+    "public_transport": "stop_position",
+    "railway": "tram_stop",
+    "tram": "yes",
+    "wheelchair": "no"
+  }
+},
+{
+  "type": "node",
+  "id": 2174067260,
+  "lat": 32.7908745,
+  "lon": -96.8035535,
+  "tags": {
+    "name": "McKinney & Harwood",
+    "network": "MATA",
+    "public_transport": "stop_position",
+    "railway": "tram_stop",
+    "tram": "yes",
+    "wheelchair": "no"
+  }
+},
+{
+  "type": "node",
+  "id": 2174067268,
+  "lat": 32.7927010,
+  "lon": -96.8029109,
+  "tags": {
+    "name": "McKinney & Pearl (N)",
+    "network": "MATA",
+    "public_transport": "stop_position",
+    "railway": "tram_stop",
+    "tram": "yes",
+    "wheelchair": "no"
+  }
+},
+{
+  "type": "node",
+  "id": 2174067278,
+  "lat": 32.7931065,
+  "lon": -96.8028118,
+  "tags": {
+    "name": "McKinney & Pearl (S)",
+    "network": "MATA",
+    "public_transport": "stop_position",
+    "railway": "tram_stop",
+    "tram": "yes",
+    "wheelchair": "no"
+  }
+},
+{
+  "type": "node",
+  "id": 2174067279,
+  "lat": 32.7938117,
+  "lon": -96.8025447,
+  "tags": {
+    "name": "McKinney & Maple (N)",
+    "network": "MATA",
+    "public_transport": "stop_position",
+    "railway": "tram_stop",
+    "tram": "yes",
+    "wheelchair": "no"
+  }
+},
+{
+  "type": "node",
+  "id": 2174067284,
+  "lat": 32.7941541,
+  "lon": -96.8024627,
+  "tags": {
+    "name": "McKinney & Maple (S)",
+    "network": "MATA",
+    "public_transport": "stop_position",
+    "railway": "tram_stop",
+    "tram": "yes",
+    "wheelchair": "no"
+  }
+},
+{
+  "type": "node",
+  "id": 2174067291,
+  "lat": 32.7961819,
+  "lon": -96.8017895,
+  "tags": {
+    "name": "McKinney & Routh (N)",
+    "network": "MATA",
+    "public_transport": "stop_position",
+    "railway": "tram_stop",
+    "tram": "yes",
+    "wheelchair": "no"
+  }
+},
+{
+  "type": "node",
+  "id": 2174067294,
+  "lat": 32.7965454,
+  "lon": -96.8017154,
+  "tags": {
+    "name": "McKinney & Routh (S)",
+    "network": "MATA",
+    "public_transport": "stop_position",
+    "railway": "tram_stop",
+    "tram": "yes",
+    "wheelchair": "no"
+  }
+},
+{
+  "type": "node",
+  "id": 2174067298,
+  "lat": 32.7977545,
+  "lon": -96.8013831,
+  "tags": {
+    "name": "McKinney & Boll (S)",
+    "network": "MATA",
+    "public_transport": "stop_position",
+    "railway": "tram_stop",
+    "tram": "yes",
+    "wheelchair": "no"
+  }
+},
+{
+  "type": "node",
+  "id": 2174067299,
+  "lat": 32.7983135,
+  "lon": -96.8011960,
+  "tags": {
+    "name": "McKinney & Worthington (N)",
+    "network": "MATA",
+    "public_transport": "stop_position",
+    "railway": "tram_stop",
+    "tram": "yes",
+    "wheelchair": "no"
+  }
+},
+{
+  "type": "node",
+  "id": 2174067304,
+  "lat": 32.7995267,
+  "lon": -96.8009078,
+  "tags": {
+    "name": "McKinney & Allen (N)",
+    "network": "MATA",
+    "public_transport": "stop_position",
+    "railway": "tram_stop",
+    "tram": "yes",
+    "wheelchair": "no"
+  }
+},
+{
+  "type": "node",
+  "id": 2174067305,
+  "lat": 32.7995797,
+  "lon": -96.8009286,
+  "tags": {
+    "name": "McKinney & Allen (S)",
+    "network": "MATA",
+    "public_transport": "stop_position",
+    "railway": "tram_stop",
+    "tram": "yes",
+    "wheelchair": "no"
+  }
+},
+{
+  "type": "node",
+  "id": 2174067353,
+  "lat": 32.8019927,
+  "lon": -96.8023623,
+  "tags": {
+    "name": "Cole & Allen",
+    "network": "MATA",
+    "public_transport": "stop_position",
+    "railway": "tram_stop",
+    "tram": "yes",
+    "wheelchair": "no"
+  }
+},
+{
+  "type": "node",
+  "id": 2174067381,
+  "lat": 32.8036099,
+  "lon": -96.7997639,
+  "tags": {
+    "name": "McKinney & Hall",
+    "network": "MATA",
+    "old_name": "McKinney Plaza",
+    "public_transport": "stop_position",
+    "railway": "tram_stop",
+    "tram": "yes",
+    "wheelchair": "no"
+  }
+},
+{
+  "type": "node",
+  "id": 2174067382,
+  "lat": 32.8036085,
+  "lon": -96.8013019,
+  "tags": {
+    "name": "Cole & Bowen",
+    "network": "MATA",
+    "public_transport": "stop_position",
+    "railway": "tram_stop",
+    "tram": "yes",
+    "wheelchair": "no"
+  }
+},
+{
+  "type": "node",
+  "id": 2174067410,
+  "lat": 32.8051415,
+  "lon": -96.8003009,
+  "tags": {
+    "name": "Cole & Hall",
+    "network": "MATA",
+    "public_transport": "stop_position",
+    "railway": "tram_stop",
+    "tram": "yes",
+    "wheelchair": "no"
+  }
+},
+{
+  "type": "node",
+  "id": 2174067413,
+  "lat": 32.8055581,
+  "lon": -96.7941030,
+  "tags": {
+    "name": "Uptown Station",
+    "network": "MATA;DART",
+    "official_name": "Cityplace/Uptown Station",
+    "public_transport": "stop_position",
+    "railway": "tram_stop",
+    "tram": "yes",
+    "wheelchair": "no"
+  }
+},
+{
+  "type": "node",
+  "id": 2174067414,
+  "lat": 32.8057199,
+  "lon": -96.7984239,
+  "tags": {
+    "name": "McKinney & Lemmon",
+    "network": "MATA",
+    "public_transport": "stop_position",
+    "railway": "tram_stop",
+    "tram": "yes",
+    "wheelchair": "no"
+  }
+},
+{
+  "type": "node",
+  "id": 2174067426,
+  "lat": 32.8063747,
+  "lon": -96.7995018,
+  "tags": {
+    "name": "Cole & Lemmon (Far)",
+    "network": "MATA",
+    "old_name": "Lemmon & Cole",
+    "public_transport": "stop_position",
+    "railway": "tram_stop",
+    "tram": "yes",
+    "wheelchair": "no"
+  }
+},
+{
+  "type": "node",
+  "id": 2174067447,
+  "lat": 32.8077839,
+  "lon": -96.7967083,
+  "tags": {
+    "name": "CityPlace & McKinney",
+    "network": "MATA",
+    "public_transport": "stop_position",
+    "railway": "tram_stop",
+    "tram": "yes",
+    "wheelchair": "no"
+  }
+},
+{
+  "type": "node",
+  "id": 2174067469,
+  "lat": 32.8083331,
+  "lon": -96.7983142,
+  "tags": {
+    "name": "Cole & West Village",
+    "network": "MATA",
+    "old_name": "Cole & Lemmon East",
+    "public_transport": "stop_position",
+    "railway": "tram_stop",
+    "tram": "yes",
+    "wheelchair": "no"
+  }
+},
+{
+  "type": "node",
+  "id": 2174067470,
+  "lat": 32.8085335,
+  "lon": -96.7960749,
+  "tags": {
+    "name": "McKinney & Blackburn",
+    "network": "MATA",
+    "operator": "McKinney Avenue Transit Authority",
+    "public_transport": "stop_position",
+    "railway": "tram_stop",
+    "tram": "yes",
+    "wheelchair": "no"
+  }
+},
+{
+  "type": "node",
+  "id": 2174067485,
+  "lat": 32.8092196,
+  "lon": -96.7965349,
+  "tags": {
+    "name": "Blackburn & West Village",
+    "network": "MATA",
+    "old_name": "Blackburn & Cole",
+    "public_transport": "stop_position",
+    "railway": "tram_stop",
+    "tram": "yes",
+    "wheelchair": "no"
+  }
+},
+{
+  "type": "node",
+  "id": 3259248622,
+  "lat": 32.7881796,
+  "lon": -97.3456715,
+  "tags": {
+    "name": "Grapevine Vintage Railroad Tickets",
+    "railway": "station",
+    "wheelchair": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 4062958597,
+  "lat": 32.7588684,
+  "lon": -96.8225833,
+  "tags": {
+    "name": "Beckley",
+    "network": "DART",
+    "official_name": "Beckley Streetcar Station",
+    "public_transport": "stop_position",
+    "railway": "tram_stop",
+    "tram": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 4062958618,
+  "lat": 32.7605437,
+  "lon": -96.8180150,
+  "tags": {
+    "name": "Oakenwald",
+    "network": "DART",
+    "official_name": "Oakenwald Streetcar Station",
+    "public_transport": "stop_position",
+    "railway": "tram_stop",
+    "tram": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 4062958629,
+  "lat": 32.7623505,
+  "lon": -96.8151746,
+  "tags": {
+    "name": "Greenbriar",
+    "network": "DART",
+    "official_name": "Greenbriar Streetcar Station",
+    "public_transport": "stop_position",
+    "railway": "tram_stop",
+    "tram": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 4062958672,
+  "lat": 32.7754525,
+  "lon": -96.8068932,
+  "tags": {
+    "name": "Union Station",
+    "network": "DART",
+    "public_transport": "stop_position",
+    "railway": "tram_stop",
+    "tram": "yes",
+    "wikidata": "Q112868307"
+  }
+},
+{
+  "type": "node",
+  "id": 4250978966,
+  "lat": 32.7857009,
+  "lon": -96.7964041,
+  "tags": {
+    "name": "Federal & Olive",
+    "network": "MATA",
+    "public_transport": "stop_position",
+    "railway": "tram_stop",
+    "tram": "yes",
+    "wheelchair": "no"
+  }
+},
+{
+  "type": "node",
+  "id": 4250978979,
+  "lat": 32.7878543,
+  "lon": -96.7986797,
+  "tags": {
+    "name": "Olive & Ross",
+    "network": "MATA",
+    "public_transport": "stop_position",
+    "railway": "tram_stop",
+    "tram": "yes",
+    "wheelchair": "no"
+  }
+},
+{
+  "type": "node",
+  "id": 4257937708,
+  "lat": 32.7605773,
+  "lon": -96.8178615,
+  "tags": {
+    "name": "Oakenwald",
+    "network": "DART",
+    "official_name": "Oakenwald Streetcar Station",
+    "public_transport": "stop_position",
+    "railway": "tram_stop",
+    "tram": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 4296998270,
+  "lat": 32.7845497,
+  "lon": -96.7984630,
+  "tags": {
+    "name": "Saint Paul & Federal",
+    "network": "MATA",
+    "public_transport": "stop_position",
+    "railway": "tram_stop",
+    "tram": "yes",
+    "wheelchair": "no"
+  }
+},
+{
+  "type": "node",
+  "id": 4296998272,
+  "lat": 32.7856662,
+  "lon": -96.7997520,
+  "tags": {
+    "name": "Saint Paul & San Jacinto",
+    "network": "MATA",
+    "public_transport": "stop_position",
+    "railway": "tram_stop",
+    "tram": "yes",
+    "wheelchair": "no"
+  }
+},
+{
+  "type": "node",
+  "id": 4296998273,
+  "lat": 32.7866873,
+  "lon": -96.7972062,
+  "tags": {
+    "name": "Olive & San Jacinto",
+    "network": "MATA",
+    "public_transport": "stop_position",
+    "railway": "tram_stop",
+    "tram": "yes",
+    "wheelchair": "no"
+  }
+},
+{
+  "type": "node",
+  "id": 4296998274,
+  "lat": 32.7885284,
+  "lon": -96.7999304,
+  "tags": {
+    "name": "Olive & Flora",
+    "network": "MATA",
+    "public_transport": "stop_position",
+    "railway": "tram_stop",
+    "tram": "yes",
+    "wheelchair": "no"
+  }
+},
+{
+  "type": "node",
+  "id": 4296998276,
+  "lat": 32.7911684,
+  "lon": -96.8029274,
+  "tags": {
+    "name": "Olive & Colby",
+    "network": "MATA",
+    "old_name": "Olive & Colby",
+    "public_transport": "stop_position",
+    "railway": "tram_stop",
+    "tram": "yes",
+    "wheelchair": "no"
+  }
+},
+{
+  "type": "node",
+  "id": 4305375507,
+  "lat": 32.6761803,
+  "lon": -97.3976564,
+  "tags": {
+    "amenity": "bus_station",
+    "bus": "yes",
+    "name": "Hulen Mall Transfer Center",
+    "operator": "Fort Worth Transportation Authority",
+    "public_transport": "station"
+  }
+},
+{
+  "type": "node",
+  "id": 4400006133,
+  "lat": 32.8295183,
+  "lon": -96.9442177,
+  "tags": {
+    "name": "Irving",
+    "name:en": "Irving",
+    "name:ko": "어빙",
+    "place": "city",
+    "population": "256684",
+    "source": "https://www.census.gov/quickfacts/fact/table/irvingcitytexas/POP010220",
+    "website": "https://www.irvingtx.gov/",
+    "wikidata": "Q51690"
+  }
+},
+{
+  "type": "node",
+  "id": 4775749683,
+  "lat": 32.7490128,
+  "lon": -96.8244170,
+  "tags": {
+    "name": "Bishop Arts",
+    "network": "DART",
+    "official_name": "Bishop Arts Station",
+    "public_transport": "stop_position",
+    "railway": "tram_stop",
+    "tram": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 4775749703,
+  "lat": 32.7529882,
+  "lon": -96.8241538,
+  "tags": {
+    "name": "6th Street",
+    "network": "DART",
+    "public_transport": "stop_position",
+    "railway": "tram_stop",
+    "tram": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 4775749704,
+  "lat": 32.7531362,
+  "lon": -96.8240799,
+  "tags": {
+    "name": "6th Street",
+    "network": "DART",
+    "public_transport": "stop_position",
+    "railway": "tram_stop",
+    "tram": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 4775749949,
+  "lat": 32.7587984,
+  "lon": -96.8224228,
+  "tags": {
+    "name": "Beckley",
+    "network": "DART",
+    "official_name": "Beckley Streetcar Station",
+    "public_transport": "stop_position",
+    "railway": "tram_stop",
+    "tram": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 5818005702,
+  "lat": 32.7896489,
+  "lon": -96.8126728,
+  "tags": {
+    "addr:city": "Dallas",
+    "addr:state": "TX",
+    "name": "Victory",
+    "network": "TRE",
+    "operator": "Trinity Railway Express",
+    "public_transport": "station",
+    "railway": "station",
+    "train": "yes",
+    "wikidata": "Q124156628"
+  }
+},
+{
+  "type": "node",
+  "id": 5818005704,
+  "lat": 32.7760083,
+  "lon": -96.8083758,
+  "tags": {
+    "addr:city": "Dallas",
+    "addr:state": "TX",
+    "name": "Dallas Union Station",
+    "network": "Amtrak;TRE",
+    "operator": "Amtrak",
+    "public_transport": "station",
+    "railway": "station",
+    "railway:ref": "DAL",
+    "train": "yes",
+    "website": "https://www.dart.org/riding/stations/unionstation.asp",
+    "wikidata": "Q5371609",
+    "wikipedia": "en:Dallas Union Station"
+  }
+},
+{
+  "type": "node",
+  "id": 5818006724,
+  "lat": 32.8091942,
+  "lon": -96.8399632,
+  "tags": {
+    "name": "Medical/Market Center",
+    "network": "TRE",
+    "operator": "Trinity Railway Express",
+    "public_transport": "station",
+    "railway": "station",
+    "train": "yes",
+    "wheelchair": "yes",
+    "wikidata": "Q6806250",
+    "wikipedia": "en:Medical/Market Center station"
+  }
+},
+{
+  "type": "node",
+  "id": 6368932349,
+  "lat": 32.8072212,
+  "lon": -96.7960459,
+  "tags": {
+    "name": "CityPlace & Noble",
+    "network": "MATA",
+    "public_transport": "stop_position",
+    "railway": "tram_stop",
+    "tram": "yes",
+    "wheelchair": "no"
+  }
+},
+{
+  "type": "node",
+  "id": 6368932350,
+  "lat": 32.8077871,
+  "lon": -96.7967047,
+  "tags": {
+    "name": "CityPlace & McKinney",
+    "network": "MATA",
+    "public_transport": "stop_position",
+    "railway": "tram_stop",
+    "tram": "yes",
+    "wheelchair": "no"
+  }
+},
+{
+  "type": "node",
+  "id": 6368932361,
+  "lat": 32.8024903,
+  "lon": -96.8005303,
+  "tags": {
+    "name": "McKinney & Bowen",
+    "network": "MATA",
+    "public_transport": "stop_position",
+    "railway": "tram_stop",
+    "tram": "yes",
+    "wheelchair": "no"
+  }
+},
+{
+  "type": "node",
+  "id": 6368932371,
+  "lat": 32.7849748,
+  "lon": -96.7971610,
+  "tags": {
+    "name": "Federal & Harwood",
+    "network": "MATA",
+    "public_transport": "stop_position",
+    "railway": "tram_stop",
+    "tram": "yes",
+    "wheelchair": "no"
+  }
+},
+{
+  "type": "node",
+  "id": 6792046018,
+  "lat": 33.2136119,
+  "lon": -97.1261586,
+  "tags": {
+    "name": "Downtown Denton Transit Center",
+    "network": "DCTA",
+    "operator": "DCTA",
+    "public_transport": "station",
+    "railway": "station",
+    "train": "yes",
+    "wikidata": "Q5303414"
+  }
+},
+{
+  "type": "node",
+  "id": 6958303301,
+  "lat": 32.8604943,
+  "lon": -96.9295730,
+  "tags": {
+    "light_rail": "yes",
+    "name": "600 Las Colinas Boulevard",
+    "network": "Las Colinas APT",
+    "public_transport": "station",
+    "railway": "station",
+    "station": "light_rail"
+  }
+},
+{
+  "type": "node",
+  "id": 6958316513,
+  "lat": 32.8693202,
+  "lon": -96.9352877,
+  "tags": {
+    "light_rail": "yes",
+    "name": "Tower 909",
+    "network": "Las Colinas APT",
+    "public_transport": "station",
+    "railway": "station",
+    "source:name": "DART",
+    "station": "light_rail"
+  }
+},
+{
+  "type": "node",
+  "id": 6958316515,
+  "lat": 32.8709022,
+  "lon": -96.9434051,
+  "tags": {
+    "light_rail": "yes",
+    "name": "Urban Towers",
+    "network": "Las Colinas APT",
+    "public_transport": "station",
+    "railway": "station",
+    "station": "light_rail"
+  }
+},
+{
+  "type": "node",
+  "id": 6958316517,
+  "lat": 32.8663458,
+  "lon": -96.9398438,
+  "tags": {
+    "light_rail": "yes",
+    "name": "Bell Tower",
+    "network": "Las Colinas APT",
+    "public_transport": "station",
+    "railway": "station",
+    "source:name": "DART",
+    "station": "light_rail"
+  }
+},
+{
+  "type": "node",
+  "id": 7020820218,
+  "lat": 32.7760501,
+  "lon": -96.8081640,
+  "tags": {
+    "addr:city": "Dallas",
+    "light_rail": "yes",
+    "name": "Union Station",
+    "network": "DART",
+    "operator": "DART",
+    "public_transport": "station",
+    "railway": "station",
+    "station": "light_rail",
+    "wikidata": "Q124100587"
+  }
+},
+{
+  "type": "node",
+  "id": 7029494093,
+  "lat": 33.6249528,
+  "lon": -97.1406903,
+  "tags": {
+    "addr:state": "TX",
+    "name": "Gainesville",
+    "network": "Amtrak",
+    "public_transport": "station",
+    "railway": "station",
+    "railway:ref": "GLE",
+    "train": "yes",
+    "wikidata": "Q5517245"
+  }
+},
+{
+  "type": "node",
+  "id": 7087487904,
+  "lat": 32.6894727,
+  "lon": -96.4512417,
+  "tags": {
+    "name": "Heartland",
+    "place": "town",
+    "population": "10343",
+    "wikidata": "Q14710488",
+    "wikipedia": "en:Heartland, Texas"
+  }
+},
+{
+  "type": "node",
+  "id": 7127084435,
+  "lat": 32.7896884,
+  "lon": -96.8124796,
+  "tags": {
+    "light_rail": "yes",
+    "name": "Victory",
+    "network": "DART",
+    "operator": "DART",
+    "public_transport": "station",
+    "railway": "station",
+    "station": "light_rail",
+    "wikidata": "Q7927450",
+    "wikipedia": "en:Victory station"
+  }
+},
+{
+  "type": "node",
+  "id": 8455855030,
+  "lat": 32.7622762,
+  "lon": -96.8152968,
+  "tags": {
+    "name": "Greenbriar",
+    "network": "DART",
+    "official_name": "Greenbriar Streetcar Station",
+    "public_transport": "stop_position",
+    "railway": "tram_stop",
+    "tram": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 8455895633,
+  "lat": 32.7892673,
+  "lon": -96.8008824,
+  "tags": {
+    "alt_name": "Klyde Warren Park/Arts District",
+    "name": "KWP/Arts District",
+    "network": "MATA",
+    "old_name": "Olive & Woodall Rodgers",
+    "public_transport": "stop_position",
+    "railway": "tram_stop",
+    "tram": "yes",
+    "wheelchair": "no"
+  }
+},
+{
+  "type": "node",
+  "id": 8455993634,
+  "lat": 32.7917889,
+  "lon": -96.8032484,
+  "tags": {
+    "name": "McKinney & Olive (S)",
+    "network": "MATA",
+    "public_transport": "stop_position",
+    "railway": "tram_stop",
+    "tram": "yes",
+    "wheelchair": "no"
+  }
+},
+{
+  "type": "node",
+  "id": 8459498228,
+  "lat": 32.8055969,
+  "lon": -96.7933465,
+  "tags": {
+    "light_rail": "yes",
+    "name": "CityPlace/Uptown",
+    "network": "DART",
+    "network:wikidata": "Q380660",
+    "operator": "Dallas Area Rapid Transit",
+    "operator:short": "DART",
+    "operator:wikidata": "Q380660",
+    "public_transport": "station",
+    "railway": "station",
+    "station": "light_rail",
+    "wikidata": "Q5124080"
+  }
+},
+{
+  "type": "node",
+  "id": 8652436868,
+  "lat": 32.8820635,
+  "lon": -96.9548730,
+  "tags": {
+    "check_date": "2022-10-24",
+    "light_rail": "yes",
+    "name": "Hidden Ridge",
+    "network": "DART",
+    "network:wikidata": "Q380660",
+    "official_name": "Hidden Ridge Station",
+    "operator": "DART",
+    "operator:wikidata": "Q380660",
+    "public_transport": "station",
+    "railway": "station",
+    "start_date": "2021-04-12",
+    "station": "light_rail",
+    "wikidata": "Q6492140",
+    "wikipedia": "en:Hidden Ridge station"
+  }
+},
+{
+  "type": "node",
+  "id": 9109918483,
+  "lat": 32.9839035,
+  "lon": -96.7495446,
+  "tags": {
+    "amenity": "bus_station",
+    "bus": "yes",
+    "name": "University Transit Center",
+    "public_transport": "station"
+  }
+},
+{
+  "type": "node",
+  "id": 9810285617,
+  "lat": 32.7849914,
+  "lon": -96.7900708,
+  "tags": {
+    "addr:housenumber": "2424",
+    "addr:postcode": "75204",
+    "addr:street": "Swiss Avenue",
+    "amenity": "bus_station",
+    "bus": "yes",
+    "name": "Flixbus Dallas - Downtown Dallas - Deep Ellum",
+    "public_transport": "station",
+    "website": "https://www.flixbus.com/"
+  }
+},
+{
+  "type": "node",
+  "id": 11580852165,
+  "lat": 32.7950232,
+  "lon": -96.8021454,
+  "tags": {
+    "name": "McKinney & Fairmount (N)",
+    "network": "MATA",
+    "public_transport": "stop_position",
+    "railway": "tram_stop",
+    "tram": "yes",
+    "wheelchair": "no"
+  }
+},
+{
+  "type": "node",
+  "id": 11580852167,
+  "lat": 32.7952832,
+  "lon": -96.8020976,
+  "tags": {
+    "name": "McKinney & Fairmount (S)",
+    "network": "MATA",
+    "public_transport": "stop_position",
+    "railway": "tram_stop",
+    "tram": "yes",
+    "wheelchair": "no"
+  }
+},
+{
+  "type": "node",
+  "id": 11581205355,
+  "lat": 32.8072921,
+  "lon": -96.7996011,
+  "tags": {
+    "name": "Cole & Lemmon (Near)",
+    "network": "MATA",
+    "public_transport": "stop_position",
+    "railway": "tram_stop",
+    "tram": "yes",
+    "wheelchair": "no"
+  }
+},
+{
+  "type": "node",
+  "id": 11922514299,
+  "lat": 33.3242486,
+  "lon": -96.7842367,
+  "tags": {
+    "name": "Celina",
+    "name:pronunciation": "sɪˈlaɪnə",
+    "place": "town",
+    "wikipedia": "en:Celina, Texas"
+  }
+},
+{
+  "type": "node",
+  "id": 12012565094,
+  "lat": 32.8053241,
+  "lon": -97.2097663,
+  "tags": {
+    "name": "Trinity Lakes",
+    "network": "Trinity Railway Express",
+    "official_name": "Trinity Lakes Station",
+    "operator": "Trinity Railway Express",
+    "public_transport": "station",
+    "railway": "station",
+    "train": "yes",
+    "website": "https://trinityrailwayexpress.org/trinity-lakes-station/"
+  }
+},
+{
+  "type": "node",
+  "id": 12015160249,
+  "lat": 32.8196890,
+  "lon": -97.2926683,
+  "tags": {
+    "name": "Mercantile Center",
+    "network": "Trinity Metro",
+    "public_transport": "station",
+    "railway": "station",
+    "train": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 12015160250,
+  "lat": 32.7961133,
+  "lon": -97.3380508,
+  "tags": {
+    "name": "North Side",
+    "network": "Trinity Metro",
+    "official_name": "North Side Station",
+    "public_transport": "station",
+    "railway": "station",
+    "train": "yes",
+    "wikidata": "Q28453188"
+  }
+},
+{
+  "type": "node",
+  "id": 12015160251,
+  "lat": 32.8448473,
+  "lon": -97.2495060,
+  "tags": {
+    "name": "North Richland Hills/Iron Horse",
+    "network": "Trinity Metro",
+    "network:wikidata": "Q5472408",
+    "network:wikipedia": "en:Trinity Metro",
+    "official_name": "North Richland Hills/Iron Horse Station",
+    "operator": "Trinity Metro",
+    "operator:wikidata": "Q5472408",
+    "public_transport": "station",
+    "railway": "station",
+    "train": "yes",
+    "wikidata": "Q28197618"
+  }
+},
+{
+  "type": "node",
+  "id": 12015160252,
+  "lat": 32.8650208,
+  "lon": -97.2114228,
+  "tags": {
+    "name": "North Richland Hills/Smithfield",
+    "network": "Trinity Metro",
+    "network:wikidata": "Q5472408",
+    "network:wikipedia": "en:Trinity Metro",
+    "operator": "Trinity Metro",
+    "operator:wikidata": "Q5472408",
+    "park_ride": "yes",
+    "public_transport": "station",
+    "railway": "station",
+    "train": "yes",
+    "wikidata": "Q28197617"
+  }
+},
+{
+  "type": "node",
+  "id": 12459207660,
+  "lat": 32.5143898,
+  "lon": -96.8066615,
+  "tags": {
+    "name": "Red Oak",
+    "place": "town",
+    "population": "14222",
+    "population:date": "2020",
+    "source:population": "wikipedia",
+    "wikidata": "Q979142",
+    "wikipedia": "en:Red Oak, Texas"
+  }
+},
+{
+  "type": "node",
+  "id": 13358385299,
+  "lat": 32.8532376,
+  "lon": -96.8798784,
+  "tags": {
+    "addr:city": "Dallas",
+    "addr:housenumber": "9755",
+    "addr:state": "TX",
+    "addr:street": "Harry Hines Boulevard",
+    "amenity": "bus_station",
+    "bus": "yes",
+    "name": "Greyhound/Flixbus Station",
+    "network": "Greyhound",
+    "network:wikidata": "Q755309",
+    "operator": "Greyhound",
+    "public_transport": "station"
+  }
+},
+{
+  "type": "node",
+  "id": 13806769242,
+  "lat": 32.7576291,
+  "lon": -97.0675194,
+  "tags": {
+    "name": "Boomtown Depot",
+    "public_transport": "station",
+    "railway": "station",
+    "train": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 13806769243,
+  "lat": 32.7567988,
+  "lon": -97.0727067,
+  "tags": {
+    "name": "Texas Depot",
+    "public_transport": "station",
+    "railway": "station",
+    "train": "yes"
+  }
+}
+
+  ]
+}

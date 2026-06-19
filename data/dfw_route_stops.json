@@ -1,0 +1,3516 @@
+{
+  "version": 0.6,
+  "generator": "Overpass API 0.7.62.11 87bfad18",
+  "osm3s": {
+    "timestamp_osm_base": "2026-06-08T19:51:30Z",
+    "copyright": "The data included in this document is from www.openstreetmap.org. The data is made available under ODbL."
+  },
+  "elements": [
+
+{
+  "type": "node",
+  "id": 81980210,
+  "lat": 32.9921551,
+  "lon": -96.9374394,
+  "tags": {
+    "light_rail": "yes",
+    "name": "North Carrollton/Frankford",
+    "network": "DART",
+    "public_transport": "stop_position",
+    "railway": "stop",
+    "request_stop": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 82008420,
+  "lat": 32.9540404,
+  "lon": -96.9080487,
+  "tags": {
+    "light_rail": "yes",
+    "name": "Downtown Carrollton",
+    "network": "DART",
+    "public_transport": "stop_position",
+    "railway": "stop",
+    "request_stop": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 82008698,
+  "lat": 32.8563326,
+  "lon": -96.7328238,
+  "tags": {
+    "light_rail": "yes",
+    "name": "White Rock",
+    "network": "DART",
+    "public_transport": "stop_position",
+    "railway": "stop",
+    "request_stop": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 82008803,
+  "lat": 32.8381930,
+  "lon": -96.7744346,
+  "tags": {
+    "light_rail": "yes",
+    "name": "SMU/Mockingbird",
+    "network": "DART",
+    "public_transport": "stop_position",
+    "railway": "stop"
+  }
+},
+{
+  "type": "node",
+  "id": 82139111,
+  "lat": 32.9412990,
+  "lon": -96.7370571,
+  "tags": {
+    "light_rail": "yes",
+    "name": "Spring Valley",
+    "network": "DART",
+    "public_transport": "stop_position",
+    "railway": "stop",
+    "request_stop": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 117192709,
+  "lat": 34.3657474,
+  "lon": -92.8137979,
+  "tags": {
+    "name": "Malvern",
+    "network": "Amtrak",
+    "public_transport": "stop_position",
+    "railway": "stop",
+    "railway:ref": "MVN",
+    "train": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 117816781,
+  "lat": 33.4204692,
+  "lon": -94.0411675,
+  "tags": {
+    "name": "Texarkana",
+    "network": "Amtrak",
+    "public_transport": "stop_position",
+    "railway": "stop",
+    "railway:ref": "TXA",
+    "train": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 118831747,
+  "lat": 34.7506183,
+  "lon": -92.2875531,
+  "tags": {
+    "name": "Little Rock",
+    "network": "Amtrak",
+    "public_transport": "stop_position",
+    "railway": "stop",
+    "railway:ref": "LRK",
+    "train": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 145691566,
+  "lat": 34.7416113,
+  "lon": -97.2180560,
+  "tags": {
+    "name": "Pauls Valley",
+    "network": "Amtrak",
+    "public_transport": "stop_position",
+    "railway": "stop",
+    "railway:ref": "PVL",
+    "train": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 152844023,
+  "lat": 30.5675130,
+  "lon": -97.4079915,
+  "tags": {
+    "name": "Taylor",
+    "network": "Amtrak",
+    "public_transport": "stop_position",
+    "railway": "stop",
+    "railway:ref": "TAY",
+    "train": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 236090217,
+  "lat": 31.4432660,
+  "lon": -97.4044577,
+  "tags": {
+    "name": "McGregor",
+    "network": "Amtrak",
+    "public_transport": "stop_position",
+    "railway": "stop",
+    "railway:ref": "MCG",
+    "train": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 236692877,
+  "lat": 38.9209450,
+  "lon": -90.1565060,
+  "tags": {
+    "name": "Alton",
+    "network": "Amtrak",
+    "public_transport": "stop_position",
+    "railway": "stop",
+    "railway:ref": "ALN",
+    "train": "yes",
+    "wheelchair": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 237049739,
+  "lat": 39.8023754,
+  "lon": -89.6518184,
+  "tags": {
+    "iata": "ZUS",
+    "name": "Springfield",
+    "network": "Amtrak",
+    "public_transport": "stop_position",
+    "railway": "stop",
+    "railway:ref": "SPI",
+    "train": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 268546876,
+  "lat": 34.0543788,
+  "lon": -118.2345685,
+  "tags": {
+    "local_ref": "8",
+    "name": "Los Angeles Union Station",
+    "network": "Amtrak;Metrolink",
+    "public_transport": "stop_position",
+    "railway": "buffer_stop",
+    "railway:position": "mi:0.0",
+    "railway:ref": "LAX",
+    "source": "bing_imagery",
+    "train": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 278529040,
+  "lat": 32.8161381,
+  "lon": -97.0077695,
+  "tags": {
+    "name": "West Irving",
+    "network": "TRE",
+    "public_transport": "stop_position",
+    "railway": "stop",
+    "train": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 279091494,
+  "lat": 32.7906901,
+  "lon": -96.8129599,
+  "tags": {
+    "name": "Victory",
+    "network": "TRE",
+    "public_transport": "stop_position",
+    "railway": "stop",
+    "train": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 279921013,
+  "lat": 32.7515301,
+  "lon": -97.3250669,
+  "tags": {
+    "name": "Fort Worth Central",
+    "network": "Amtrak",
+    "operator": "Amtrak",
+    "public_transport": "stop_position",
+    "railway": "stop",
+    "railway:ref": "FTW",
+    "train": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 279921045,
+  "lat": 32.7519942,
+  "lon": -97.3255723,
+  "tags": {
+    "name": "Fort Worth Central",
+    "network": "TRE;Trinity Metro",
+    "public_transport": "stop_position",
+    "railway": "stop",
+    "train": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 289943601,
+  "lat": 32.7690663,
+  "lon": -96.7940596,
+  "tags": {
+    "light_rail": "yes",
+    "name": "Cedars",
+    "network": "DART",
+    "public_transport": "stop_position",
+    "railway": "stop",
+    "request_stop": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 290283327,
+  "lat": 32.8981745,
+  "lon": -96.7113054,
+  "tags": {
+    "light_rail": "yes",
+    "name": "LBJ/Skillman",
+    "network": "DART",
+    "public_transport": "stop_position",
+    "railway": "stop"
+  }
+},
+{
+  "type": "node",
+  "id": 308478949,
+  "lat": 32.7520214,
+  "lon": -97.3255161,
+  "tags": {
+    "name": "Fort Worth Central",
+    "network": "Amtrak",
+    "public_transport": "stop_position",
+    "railway": "stop",
+    "railway:ref": "FTW",
+    "train": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 308931577,
+  "lat": 32.7889780,
+  "lon": -96.8125000,
+  "tags": {
+    "name": "Victory",
+    "network": "TRE",
+    "public_transport": "stop_position",
+    "railway": "stop",
+    "train": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 309436682,
+  "lat": 32.7903527,
+  "lon": -96.8126270,
+  "tags": {
+    "light_rail": "yes",
+    "name": "Victory",
+    "network": "DART",
+    "public_transport": "stop_position",
+    "railway": "stop"
+  }
+},
+{
+  "type": "node",
+  "id": 309472488,
+  "lat": 32.8160280,
+  "lon": -97.0064237,
+  "tags": {
+    "name": "West Irving",
+    "network": "TRE",
+    "public_transport": "stop_position",
+    "railway": "stop",
+    "train": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 313816562,
+  "lat": 29.8767603,
+  "lon": -97.9419885,
+  "tags": {
+    "name": "San Marcos",
+    "network": "Amtrak",
+    "public_transport": "stop_position",
+    "railway:ref": "SMC",
+    "train": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 347716208,
+  "lat": 32.7759992,
+  "lon": -96.8084414,
+  "tags": {
+    "name": "Dallas Union Station",
+    "network": "Amtrak",
+    "public_transport": "stop_position",
+    "railway": "stop",
+    "railway:ref": "DAL",
+    "train": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 366220569,
+  "lat": 33.0560134,
+  "lon": -112.0477529,
+  "tags": {
+    "name": "Maricopa",
+    "network": "Amtrak",
+    "public_transport": "stop_position",
+    "railway": "stop",
+    "railway:ref": "MRC",
+    "train": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 500394426,
+  "lat": 30.1398951,
+  "lon": -102.3991802,
+  "tags": {
+    "name": "Sanderson",
+    "network": "Amtrak",
+    "public_transport": "stop_position",
+    "railway": "stop",
+    "railway:ref": "SND",
+    "train": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 600486152,
+  "lat": 32.7883841,
+  "lon": -97.3455556,
+  "tags": {
+    "name": "Stockyards",
+    "public_transport": "stop_position",
+    "railway": "stop",
+    "tourism": "attraction",
+    "train": "yes",
+    "wheelchair": "limited"
+  }
+},
+{
+  "type": "node",
+  "id": 859339940,
+  "lat": 32.7740131,
+  "lon": -96.7648640,
+  "tags": {
+    "light_rail": "yes",
+    "name": "MLK Jr.",
+    "network": "DART",
+    "public_transport": "stop_position",
+    "railway": "stop",
+    "request_stop": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 1125873580,
+  "lat": 35.4653375,
+  "lon": -97.5125572,
+  "tags": {
+    "name": "Oklahoma City",
+    "name:am": "ኦክላሆማ ከተማ",
+    "name:ar": "أوكلاهوما سيتي",
+    "name:az-Arab": "اوکلاهوما سیتی",
+    "name:azb": "اوکلاهوما سیتی",
+    "name:el": "Οκλαχόμα Σίτι",
+    "name:en": "Oklahoma City",
+    "name:es": "Ciudad de Oklahoma",
+    "name:hy": "Օկլահոմա Սիթի",
+    "name:kk-Arab": "وكلاحوما-سىيتىي",
+    "name:ur": "اوکلاہوما شہر",
+    "network": "Amtrak",
+    "public_transport": "stop_position",
+    "railway": "stop",
+    "railway:ref": "OKC",
+    "train": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 1237726606,
+  "lat": 30.3570039,
+  "lon": -103.6615786,
+  "tags": {
+    "name": "Alpine",
+    "network": "Amtrak",
+    "public_transport": "stop_position",
+    "railway": "stop",
+    "railway:ref": "ALP",
+    "train": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 1237758325,
+  "lat": 32.3501674,
+  "lon": -108.7069955,
+  "tags": {
+    "name": "Lordsburg",
+    "network": "Amtrak",
+    "public_transport": "stop_position",
+    "railway": "stop",
+    "railway:ref": "LDB",
+    "train": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 1237775028,
+  "lat": 33.8984232,
+  "lon": -116.5489982,
+  "tags": {
+    "name": "Palm Springs",
+    "network": "Amtrak",
+    "operator": "Amtrak",
+    "public_transport": "stop_position",
+    "railway": "stop",
+    "railway:ref": "PSN",
+    "train": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 1239029698,
+  "lat": 32.8149671,
+  "lon": -96.9483675,
+  "tags": {
+    "name": "Downtown Irving/Heritage Crossing",
+    "network": "TRE",
+    "public_transport": "stop_position",
+    "railway": "stop",
+    "train": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 1417710635,
+  "lat": 32.8815290,
+  "lon": -96.8837576,
+  "tags": {
+    "light_rail": "yes",
+    "name": "Walnut Hill/Denton",
+    "network": "DART",
+    "public_transport": "stop_position",
+    "railway": "stop",
+    "request_stop": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 1417710642,
+  "lat": 32.8427024,
+  "lon": -96.8616513,
+  "tags": {
+    "light_rail": "yes",
+    "name": "Burbank",
+    "network": "DART",
+    "public_transport": "stop_position",
+    "railway": "stop"
+  }
+},
+{
+  "type": "node",
+  "id": 1521337958,
+  "lat": 32.9549342,
+  "lon": -96.9085295,
+  "tags": {
+    "light_rail": "yes",
+    "name": "Downtown Carrollton",
+    "network": "DART",
+    "public_transport": "stop_position",
+    "railway": "stop",
+    "request_stop": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 1521338032,
+  "lat": 32.9922119,
+  "lon": -96.9373527,
+  "tags": {
+    "light_rail": "yes",
+    "name": "North Carrollton/Frankford",
+    "network": "DART",
+    "public_transport": "stop_position",
+    "railway": "stop",
+    "request_stop": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 1521338390,
+  "lat": 32.8825216,
+  "lon": -96.8839402,
+  "tags": {
+    "light_rail": "yes",
+    "name": "Walnut Hill/Denton",
+    "network": "DART",
+    "public_transport": "stop_position",
+    "railway": "stop",
+    "request_stop": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 1521376783,
+  "lat": 32.9222525,
+  "lon": -96.8963141,
+  "tags": {
+    "light_rail": "yes",
+    "name": "Farmers Branch",
+    "network": "DART",
+    "public_transport": "stop_position",
+    "railway": "stop",
+    "request_stop": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 1521376816,
+  "lat": 32.9213145,
+  "lon": -96.8960780,
+  "tags": {
+    "light_rail": "yes",
+    "name": "Farmers Branch",
+    "network": "DART",
+    "public_transport": "stop_position",
+    "railway": "stop",
+    "request_stop": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 1521376848,
+  "lat": 32.8955134,
+  "lon": -96.8881574,
+  "tags": {
+    "light_rail": "yes",
+    "name": "Royal Lane",
+    "network": "DART",
+    "public_transport": "stop_position",
+    "railway": "stop",
+    "request_stop": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 1521376869,
+  "lat": 32.8965162,
+  "lon": -96.8883391,
+  "tags": {
+    "light_rail": "yes",
+    "name": "Royal Lane",
+    "network": "DART",
+    "public_transport": "stop_position",
+    "railway": "stop",
+    "request_stop": "yes",
+    "wheelchair": "limited"
+  }
+},
+{
+  "type": "node",
+  "id": 1549948173,
+  "lat": 33.2138503,
+  "lon": -97.1262160,
+  "tags": {
+    "name": "Downtown Denton Transit Center",
+    "network": "DCTA",
+    "public_transport": "stop_position",
+    "train": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 2043927536,
+  "lat": 34.1727213,
+  "lon": -97.1251837,
+  "tags": {
+    "name": "Ardmore",
+    "network": "Amtrak",
+    "public_transport": "stop_position",
+    "railway": "stop",
+    "railway:ref": "ADM",
+    "train": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 2047643399,
+  "lat": 33.0212035,
+  "lon": -96.7008622,
+  "tags": {
+    "light_rail": "yes",
+    "name": "Downtown Plano",
+    "network": "DART",
+    "public_transport": "stop_position",
+    "railway": "stop",
+    "request_stop": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 2047643493,
+  "lat": 33.0203831,
+  "lon": -96.7009195,
+  "tags": {
+    "light_rail": "yes",
+    "name": "Downtown Plano",
+    "network": "DART",
+    "public_transport": "stop_position",
+    "railway": "stop",
+    "request_stop": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 2047657833,
+  "lat": 32.9848231,
+  "lon": -96.7111176,
+  "tags": {
+    "light_rail": "yes",
+    "name": "Galatyn Park",
+    "network": "DART",
+    "public_transport": "stop_position",
+    "railway": "stop",
+    "request_stop": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 2047657963,
+  "lat": 32.9633158,
+  "lon": -96.7230607,
+  "tags": {
+    "light_rail": "yes",
+    "name": "Arapaho Center",
+    "network": "DART",
+    "public_transport": "stop_position",
+    "railway": "stop",
+    "request_stop": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 2122363586,
+  "lat": 32.7657237,
+  "lon": -96.7210955,
+  "tags": {
+    "light_rail": "yes",
+    "name": "Lawnview",
+    "network": "DART",
+    "public_transport": "stop_position",
+    "railway": "stop",
+    "request_stop": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 2122363975,
+  "lat": 32.7864281,
+  "lon": -96.7825909,
+  "tags": {
+    "light_rail": "yes",
+    "name": "Baylor University Medical Center",
+    "network": "DART",
+    "public_transport": "stop_position",
+    "railway": "stop",
+    "request_stop": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 2122364196,
+  "lat": 32.8432012,
+  "lon": -96.8626288,
+  "tags": {
+    "light_rail": "yes",
+    "name": "Burbank",
+    "network": "DART",
+    "public_transport": "stop_position",
+    "railway": "stop"
+  }
+},
+{
+  "type": "node",
+  "id": 2123121402,
+  "lat": 32.8487525,
+  "lon": -96.9145432,
+  "tags": {
+    "light_rail": "yes",
+    "name": "University of Dallas",
+    "network": "DART",
+    "public_transport": "stop_position",
+    "railway": "stop",
+    "request_stop": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 2123121403,
+  "lat": 32.8493576,
+  "lon": -96.9154698,
+  "tags": {
+    "light_rail": "yes",
+    "name": "University of Dallas",
+    "network": "DART",
+    "public_transport": "stop_position",
+    "railway": "stop",
+    "request_stop": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 2123121929,
+  "lat": 32.9082239,
+  "lon": -96.7621430,
+  "tags": {
+    "light_rail": "yes",
+    "name": "Forest Lane",
+    "network": "DART",
+    "public_transport": "stop_position",
+    "railway": "stop",
+    "request_stop": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 2123255571,
+  "lat": 32.8555215,
+  "lon": -96.7327129,
+  "tags": {
+    "light_rail": "yes",
+    "name": "White Rock",
+    "network": "DART",
+    "public_transport": "stop_position",
+    "railway": "stop",
+    "request_stop": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 2123255691,
+  "lat": 32.8979336,
+  "lon": -96.7122298,
+  "tags": {
+    "light_rail": "yes",
+    "name": "LBJ/Skillman",
+    "network": "DART",
+    "public_transport": "stop_position",
+    "railway": "stop"
+  }
+},
+{
+  "type": "node",
+  "id": 2203937172,
+  "lat": 34.0615145,
+  "lon": -117.6485530,
+  "tags": {
+    "name": "Ontario",
+    "network": "Amtrak",
+    "public_transport": "stop_position",
+    "railway": "stop",
+    "railway:ref": "ONA",
+    "train": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 2388832928,
+  "lat": 32.5523278,
+  "lon": -94.3676477,
+  "tags": {
+    "name": "Marshall",
+    "network": "Amtrak",
+    "public_transport": "stop_position",
+    "railway": "stop",
+    "railway:ref": "MHL",
+    "train": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 2398894888,
+  "lat": 41.8782930,
+  "lon": -87.6387970,
+  "tags": {
+    "name": "Chicago Union Station",
+    "public_transport": "stop_position",
+    "railway": "stop",
+    "railway:ref": "CHI",
+    "train": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 2417284795,
+  "lat": 41.5246131,
+  "lon": -88.0791772,
+  "tags": {
+    "name": "Joliet",
+    "network": "Amtrak;Metra",
+    "public_transport": "stop_position",
+    "railway": "stop",
+    "railway:position": "mi:37.5",
+    "railway:ref": "JOL",
+    "ref:metra": "JOLIET",
+    "train": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 2417284798,
+  "lat": 41.5246021,
+  "lon": -88.0790764,
+  "tags": {
+    "name": "Joliet",
+    "network": "Amtrak;Metra",
+    "public_transport": "stop_position",
+    "railway": "stop",
+    "railway:position": "mi:37.5",
+    "railway:ref": "JOL",
+    "ref:metra": "JOLIET",
+    "train": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 3240506550,
+  "lat": 30.2697275,
+  "lon": -97.7569129,
+  "tags": {
+    "name": "Austin",
+    "network": "Amtrak",
+    "public_transport": "stop_position",
+    "railway": "stop",
+    "railway:ref": "AUS",
+    "train": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 3285202940,
+  "lat": 32.7734747,
+  "lon": -96.7642453,
+  "tags": {
+    "light_rail": "yes",
+    "name": "MLK Jr.",
+    "network": "DART",
+    "public_transport": "stop_position",
+    "railway": "stop",
+    "request_stop": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 3341152452,
+  "lat": 36.7537965,
+  "lon": -90.3933316,
+  "tags": {
+    "name": "Poplar Bluff",
+    "network": "Amtrak",
+    "public_transport": "stop_position",
+    "railway": "stop",
+    "railway:ref": "PBF",
+    "train": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 3425085271,
+  "lat": 33.6250269,
+  "lon": -97.1405994,
+  "tags": {
+    "name": "Gainesville",
+    "network": "Amtrak",
+    "public_transport": "stop_position",
+    "railway": "stop",
+    "railway:ref": "GLE",
+    "train": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 3425085274,
+  "lat": 35.0120383,
+  "lon": -97.3569748,
+  "tags": {
+    "name": "Purcell",
+    "network": "Amtrak",
+    "public_transport": "stop_position",
+    "railway": "stop",
+    "railway:ref": "PUR",
+    "train": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 3445949062,
+  "lat": 31.7579867,
+  "lon": -106.4962006,
+  "tags": {
+    "name": "El Paso",
+    "network": "Amtrak",
+    "public_transport": "stop_position",
+    "railway": "stop",
+    "railway:ref": "ELP",
+    "train": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 3446452840,
+  "lat": 33.6691088,
+  "lon": -93.5923000,
+  "tags": {
+    "name": "Hope",
+    "network": "Amtrak",
+    "public_transport": "stop_position",
+    "railway": "stop",
+    "railway:ref": "HOP",
+    "train": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 3446452841,
+  "lat": 36.0674763,
+  "lon": -90.9566322,
+  "tags": {
+    "name": "Walnut Ridge",
+    "network": "Amtrak",
+    "public_transport": "stop_position",
+    "railway": "stop",
+    "railway:ref": "WNR",
+    "train": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 3725455155,
+  "lat": 32.6828241,
+  "lon": -96.7887225,
+  "tags": {
+    "light_rail": "yes",
+    "name": "Ledbetter",
+    "network": "DART",
+    "public_transport": "stop_position",
+    "railway": "stop",
+    "request_stop": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 3725455156,
+  "lat": 32.6838123,
+  "lon": -96.7888572,
+  "tags": {
+    "light_rail": "yes",
+    "name": "Ledbetter",
+    "network": "DART",
+    "public_transport": "stop_position",
+    "railway": "stop",
+    "request_stop": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 3804352784,
+  "lat": 35.2198613,
+  "lon": -97.4430311,
+  "tags": {
+    "name": "Norman",
+    "network": "Amtrak",
+    "public_transport": "stop_position",
+    "railway": "stop",
+    "railway:ref": "NOR",
+    "train": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 4211784277,
+  "lat": 32.7807707,
+  "lon": -96.8062729,
+  "tags": {
+    "light_rail": "yes",
+    "name": "West End",
+    "network": "DART",
+    "public_transport": "stop_position",
+    "railway": "stop"
+  }
+},
+{
+  "type": "node",
+  "id": 4211784278,
+  "lat": 32.7810026,
+  "lon": -96.8049896,
+  "tags": {
+    "light_rail": "yes",
+    "name": "West End",
+    "network": "DART",
+    "public_transport": "stop_position",
+    "railway": "stop"
+  }
+},
+{
+  "type": "node",
+  "id": 4211784283,
+  "lat": 32.7818377,
+  "lon": -96.8011981,
+  "tags": {
+    "light_rail": "yes",
+    "name": "Akard",
+    "network": "DART",
+    "public_transport": "stop_position",
+    "railway": "stop",
+    "request_stop": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 4211784284,
+  "lat": 32.7820150,
+  "lon": -96.8001669,
+  "tags": {
+    "light_rail": "yes",
+    "name": "Akard",
+    "network": "DART",
+    "public_transport": "stop_position",
+    "railway": "stop",
+    "request_stop": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 4211785889,
+  "lat": 32.7839891,
+  "lon": -96.7974639,
+  "tags": {
+    "light_rail": "yes",
+    "name": "Saint Paul",
+    "network": "DART",
+    "public_transport": "stop_position",
+    "railway": "stop",
+    "request_stop": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 4211785890,
+  "lat": 32.7845757,
+  "lon": -96.7966952,
+  "tags": {
+    "light_rail": "yes",
+    "name": "Saint Paul",
+    "network": "DART",
+    "public_transport": "stop_position",
+    "railway": "stop",
+    "request_stop": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 4211785895,
+  "lat": 32.7861883,
+  "lon": -96.7949150,
+  "tags": {
+    "light_rail": "yes",
+    "name": "Pearl/Arts District",
+    "network": "DART",
+    "public_transport": "stop_position",
+    "railway": "stop",
+    "request_stop": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 4211785896,
+  "lat": 32.7867635,
+  "lon": -96.7940903,
+  "tags": {
+    "light_rail": "yes",
+    "name": "Pearl/Arts District",
+    "network": "DART",
+    "public_transport": "stop_position",
+    "railway": "stop",
+    "request_stop": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 4211785897,
+  "lat": 32.8058767,
+  "lon": -96.7933990,
+  "tags": {
+    "layer": "-3",
+    "light_rail": "yes",
+    "name": "CityPlace/Uptown",
+    "network": "DART",
+    "network:wikidata": "Q380660",
+    "operator": "Dallas Area Rapid Transit",
+    "operator:short": "DART",
+    "operator:wikidata": "Q380660",
+    "public_transport": "stop_position",
+    "railway": "stop"
+  }
+},
+{
+  "type": "node",
+  "id": 4211785902,
+  "lat": 32.8067579,
+  "lon": -96.7932248,
+  "tags": {
+    "layer": "-3",
+    "light_rail": "yes",
+    "name": "CityPlace/Uptown",
+    "network": "DART",
+    "network:wikidata": "Q380660",
+    "operator": "Dallas Area Rapid Transit",
+    "operator:short": "DART",
+    "operator:wikidata": "Q380660",
+    "public_transport": "stop_position",
+    "railway": "stop"
+  }
+},
+{
+  "type": "node",
+  "id": 4211785912,
+  "lat": 32.8375316,
+  "lon": -96.7754524,
+  "tags": {
+    "light_rail": "yes",
+    "name": "SMU/Mockingbird",
+    "network": "DART",
+    "public_transport": "stop_position",
+    "railway": "stop"
+  }
+},
+{
+  "type": "node",
+  "id": 4211785922,
+  "lat": 32.8482313,
+  "lon": -96.7719069,
+  "tags": {
+    "light_rail": "yes",
+    "name": "Lovers Lane",
+    "network": "DART",
+    "public_transport": "stop_position",
+    "railway": "stop",
+    "request_stop": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 4211785923,
+  "lat": 32.8490263,
+  "lon": -96.7715949,
+  "tags": {
+    "light_rail": "yes",
+    "name": "Lovers Lane",
+    "network": "DART",
+    "public_transport": "stop_position",
+    "railway": "stop",
+    "request_stop": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 4211785929,
+  "lat": 32.8721728,
+  "lon": -96.7660763,
+  "tags": {
+    "light_rail": "yes",
+    "name": "Park Lane",
+    "network": "DART",
+    "public_transport": "stop_position",
+    "railway": "stop",
+    "request_stop": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 4211785930,
+  "lat": 32.8731755,
+  "lon": -96.7657286,
+  "tags": {
+    "light_rail": "yes",
+    "name": "Park Lane",
+    "network": "DART",
+    "public_transport": "stop_position",
+    "railway": "stop",
+    "request_stop": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 4211785944,
+  "lat": 32.8831909,
+  "lon": -96.7648651,
+  "tags": {
+    "light_rail": "yes",
+    "name": "Walnut Hill",
+    "network": "DART",
+    "public_transport": "stop_position",
+    "railway": "stop",
+    "request_stop": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 4211785945,
+  "lat": 32.8821985,
+  "lon": -96.7649936,
+  "tags": {
+    "light_rail": "yes",
+    "name": "Walnut Hill",
+    "network": "DART",
+    "public_transport": "stop_position",
+    "railway": "stop",
+    "request_stop": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 4211785952,
+  "lat": 32.9088236,
+  "lon": -96.7613251,
+  "tags": {
+    "light_rail": "yes",
+    "name": "Forest Lane",
+    "network": "DART",
+    "public_transport": "stop_position",
+    "railway": "stop",
+    "request_stop": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 4211785957,
+  "lat": 32.9181290,
+  "lon": -96.7524091,
+  "tags": {
+    "light_rail": "yes",
+    "name": "LBJ/Central",
+    "network": "DART",
+    "public_transport": "stop_position",
+    "railway": "stop",
+    "request_stop": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 4211785958,
+  "lat": 32.9186891,
+  "lon": -96.7517920,
+  "tags": {
+    "light_rail": "yes",
+    "name": "LBJ/Central",
+    "network": "DART",
+    "public_transport": "stop_position",
+    "railway": "stop",
+    "request_stop": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 4211785963,
+  "lat": 32.9405144,
+  "lon": -96.7377009,
+  "tags": {
+    "light_rail": "yes",
+    "name": "Spring Valley",
+    "network": "DART",
+    "public_transport": "stop_position",
+    "railway": "stop",
+    "request_stop": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 4211785969,
+  "lat": 32.9639652,
+  "lon": -96.7225861,
+  "tags": {
+    "light_rail": "yes",
+    "name": "Arapaho Center",
+    "network": "DART",
+    "public_transport": "stop_position",
+    "railway": "stop",
+    "request_stop": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 4211785974,
+  "lat": 32.9854648,
+  "lon": -96.7107698,
+  "tags": {
+    "light_rail": "yes",
+    "name": "Galatyn Park",
+    "network": "DART",
+    "public_transport": "stop_position",
+    "railway": "stop",
+    "request_stop": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 4211785979,
+  "lat": 33.0018068,
+  "lon": -96.7033105,
+  "tags": {
+    "light_rail": "yes",
+    "name": "CityLine/Bush",
+    "network": "DART",
+    "public_transport": "stop_position",
+    "railway": "stop"
+  }
+},
+{
+  "type": "node",
+  "id": 4211785980,
+  "lat": 33.0024905,
+  "lon": -96.7029409,
+  "tags": {
+    "light_rail": "yes",
+    "name": "CityLine/Bush",
+    "network": "DART",
+    "public_transport": "stop_position",
+    "railway": "stop"
+  }
+},
+{
+  "type": "node",
+  "id": 4211786090,
+  "lat": 33.0343202,
+  "lon": -96.7006573,
+  "tags": {
+    "light_rail": "yes",
+    "name": "Parker Road",
+    "network": "DART",
+    "public_transport": "stop_position",
+    "railway": "stop",
+    "request_stop": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 4211786091,
+  "lat": 33.0343217,
+  "lon": -96.7007646,
+  "tags": {
+    "light_rail": "yes",
+    "name": "Parker Road",
+    "network": "DART",
+    "public_transport": "stop_position",
+    "railway": "stop",
+    "request_stop": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 4211786103,
+  "lat": 32.9812709,
+  "lon": -96.9268205,
+  "tags": {
+    "light_rail": "yes",
+    "name": "Trinity Mills",
+    "network": "DART",
+    "public_transport": "stop_position",
+    "railway": "stop"
+  }
+},
+{
+  "type": "node",
+  "id": 4211786104,
+  "lat": 32.9804557,
+  "lon": -96.9260863,
+  "tags": {
+    "light_rail": "yes",
+    "name": "Trinity Mills",
+    "network": "DART",
+    "public_transport": "stop_position",
+    "railway": "stop"
+  }
+},
+{
+  "type": "node",
+  "id": 4211786105,
+  "lat": 32.9803917,
+  "lon": -96.9261764,
+  "tags": {
+    "name": "Trinity Mills",
+    "network": "DCTA",
+    "public_transport": "stop_position",
+    "railway": "stop",
+    "train": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 4211878141,
+  "lat": 32.8532316,
+  "lon": -96.8772532,
+  "tags": {
+    "light_rail": "yes",
+    "name": "Bachman",
+    "network": "DART",
+    "public_transport": "stop_position",
+    "railway": "stop",
+    "request_stop": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 4211878143,
+  "lat": 32.8542444,
+  "lon": -96.8773681,
+  "tags": {
+    "light_rail": "yes",
+    "name": "Bachman",
+    "network": "DART",
+    "public_transport": "stop_position",
+    "railway": "stop",
+    "request_stop": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 4211878155,
+  "lat": 32.8217562,
+  "lon": -96.8332612,
+  "tags": {
+    "light_rail": "yes",
+    "name": "Inwood/Love Field",
+    "network": "DART",
+    "public_transport": "stop_position",
+    "railway": "stop",
+    "request_stop": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 4211878156,
+  "lat": 32.8226786,
+  "lon": -96.8335057,
+  "tags": {
+    "light_rail": "yes",
+    "name": "Inwood/Love Field",
+    "network": "DART",
+    "public_transport": "stop_position",
+    "railway": "stop",
+    "request_stop": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 4211878172,
+  "lat": 32.8133041,
+  "lon": -96.8332662,
+  "tags": {
+    "light_rail": "yes",
+    "name": "Southwestern Medical District/Parkland",
+    "network": "DART",
+    "public_transport": "stop_position",
+    "railway": "stop"
+  }
+},
+{
+  "type": "node",
+  "id": 4211878173,
+  "lat": 32.8141947,
+  "lon": -96.8333031,
+  "tags": {
+    "light_rail": "yes",
+    "name": "Southwestern Medical District/Parkland",
+    "network": "DART",
+    "public_transport": "stop_position",
+    "railway": "stop"
+  }
+},
+{
+  "type": "node",
+  "id": 4211878183,
+  "lat": 32.8047218,
+  "lon": -96.8242591,
+  "tags": {
+    "light_rail": "yes",
+    "name": "Market Center",
+    "network": "DART",
+    "public_transport": "stop_position",
+    "railway": "stop"
+  }
+},
+{
+  "type": "node",
+  "id": 4211878184,
+  "lat": 32.8044965,
+  "lon": -96.8230703,
+  "tags": {
+    "light_rail": "yes",
+    "name": "Market Center",
+    "network": "DART",
+    "public_transport": "stop_position",
+    "railway": "stop"
+  }
+},
+{
+  "type": "node",
+  "id": 4211891990,
+  "lat": 32.7890127,
+  "lon": -96.8123378,
+  "tags": {
+    "light_rail": "yes",
+    "name": "Victory",
+    "network": "DART",
+    "public_transport": "stop_position",
+    "railway": "stop"
+  }
+},
+{
+  "type": "node",
+  "id": 4211891991,
+  "lat": 32.7724557,
+  "lon": -96.8032477,
+  "tags": {
+    "check_date": "2025-01-05",
+    "disused:public_transport": "stop_position",
+    "disused:railway": "stop",
+    "light_rail": "yes",
+    "name": "Convention Center",
+    "network": "DART",
+    "note": "Closed as of 2026-01-05. See DART press release: https://www.dart.org/about/news-and-events/newsreleases/newsrelease-detail/dart-announces-closure-date-of-convention-center-station-during-construction",
+    "opening_date": "2029"
+  }
+},
+{
+  "type": "node",
+  "id": 4211891992,
+  "lat": 32.7725585,
+  "lon": -96.8025203,
+  "tags": {
+    "check_date": "2025-01-05",
+    "disused:public_transport": "stop_position",
+    "disused:railway": "stop",
+    "light_rail": "yes",
+    "name": "Convention Center",
+    "network": "DART",
+    "note": "Closed as of 2026-01-05. See DART press release: https://www.dart.org/about/news-and-events/newsreleases/newsrelease-detail/dart-announces-closure-date-of-convention-center-station-during-construction",
+    "opening_date": "2029"
+  }
+},
+{
+  "type": "node",
+  "id": 4211891997,
+  "lat": 32.7685502,
+  "lon": -96.7932497,
+  "tags": {
+    "light_rail": "yes",
+    "name": "Cedars",
+    "network": "DART",
+    "public_transport": "stop_position",
+    "railway": "stop",
+    "request_stop": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 4211892003,
+  "lat": 32.7483434,
+  "lon": -96.7979064,
+  "tags": {
+    "light_rail": "yes",
+    "name": "8th & Corinth",
+    "network": "DART",
+    "public_transport": "stop_position",
+    "railway": "stop",
+    "request_stop": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 4211892004,
+  "lat": 32.7480083,
+  "lon": -96.7987346,
+  "tags": {
+    "light_rail": "yes",
+    "name": "8th & Corinth",
+    "network": "DART",
+    "public_transport": "stop_position",
+    "railway": "stop",
+    "request_stop": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 4211892011,
+  "lat": 32.7409224,
+  "lon": -96.8126843,
+  "tags": {
+    "light_rail": "yes",
+    "name": "Dallas Zoo",
+    "network": "DART",
+    "public_transport": "stop_position",
+    "railway": "stop",
+    "request_stop": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 4211892012,
+  "lat": 32.7404183,
+  "lon": -96.8133718,
+  "tags": {
+    "light_rail": "yes",
+    "name": "Dallas Zoo",
+    "network": "DART",
+    "public_transport": "stop_position",
+    "railway": "stop",
+    "request_stop": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 4211892017,
+  "lat": 32.7330329,
+  "lon": -96.8389990,
+  "tags": {
+    "light_rail": "yes",
+    "name": "Tyler/Vernon",
+    "network": "DART",
+    "public_transport": "stop_position",
+    "railway": "stop",
+    "request_stop": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 4211892018,
+  "lat": 32.7331873,
+  "lon": -96.8380495,
+  "tags": {
+    "light_rail": "yes",
+    "name": "Tyler/Vernon",
+    "network": "DART",
+    "public_transport": "stop_position",
+    "railway": "stop",
+    "request_stop": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 4211892023,
+  "lat": 32.7262014,
+  "lon": -96.8558019,
+  "tags": {
+    "light_rail": "yes",
+    "name": "Hampton",
+    "network": "DART",
+    "official_name": "Hampton Station",
+    "public_transport": "stop_position",
+    "railway": "stop",
+    "request_stop": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 4211892024,
+  "lat": 32.7265935,
+  "lon": -96.8550122,
+  "tags": {
+    "light_rail": "yes",
+    "name": "Hampton",
+    "network": "DART",
+    "official_name": "Hampton Station",
+    "public_transport": "stop_position",
+    "railway": "stop",
+    "request_stop": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 4211892033,
+  "lat": 32.7198197,
+  "lon": -96.8713977,
+  "tags": {
+    "light_rail": "yes",
+    "name": "Westmoreland",
+    "network": "DART",
+    "public_transport": "stop_position",
+    "railway": "stop",
+    "request_stop": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 4211892034,
+  "lat": 32.7196122,
+  "lon": -96.8722579,
+  "tags": {
+    "light_rail": "yes",
+    "name": "Westmoreland",
+    "network": "DART",
+    "public_transport": "stop_position",
+    "railway": "stop",
+    "request_stop": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 4211892068,
+  "lat": 32.8789764,
+  "lon": -96.7306231,
+  "tags": {
+    "light_rail": "yes",
+    "name": "Lake Highlands",
+    "network": "DART",
+    "public_transport": "stop_position",
+    "railway": "stop",
+    "request_stop": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 4211892069,
+  "lat": 32.8799084,
+  "lon": -96.7303181,
+  "tags": {
+    "light_rail": "yes",
+    "name": "Lake Highlands",
+    "network": "DART",
+    "public_transport": "stop_position",
+    "railway": "stop",
+    "request_stop": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 4211892093,
+  "lat": 32.9079505,
+  "lon": -96.6800303,
+  "tags": {
+    "light_rail": "yes",
+    "name": "Forest/Jupiter",
+    "network": "DART",
+    "public_transport": "stop_position",
+    "railway": "stop",
+    "request_stop": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 4211892094,
+  "lat": 32.9081689,
+  "lon": -96.6790111,
+  "tags": {
+    "light_rail": "yes",
+    "name": "Forest/Jupiter",
+    "network": "DART",
+    "public_transport": "stop_position",
+    "railway": "stop",
+    "request_stop": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 4211892103,
+  "lat": 32.9162515,
+  "lon": -96.6359211,
+  "tags": {
+    "light_rail": "yes",
+    "name": "Downtown Garland",
+    "network": "DART",
+    "public_transport": "stop_position",
+    "railway": "stop",
+    "request_stop": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 4211892104,
+  "lat": 32.9163652,
+  "lon": -96.6347045,
+  "tags": {
+    "light_rail": "yes",
+    "name": "Downtown Garland",
+    "network": "DART",
+    "public_transport": "stop_position",
+    "railway": "stop",
+    "request_stop": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 4211892115,
+  "lat": 32.7182653,
+  "lon": -96.6846964,
+  "tags": {
+    "light_rail": "yes",
+    "name": "Buckner",
+    "network": "DART",
+    "public_transport": "stop_position",
+    "railway": "stop",
+    "request_stop": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 4211892116,
+  "lat": 32.7183313,
+  "lon": -96.6846254,
+  "tags": {
+    "light_rail": "yes",
+    "name": "Buckner",
+    "network": "DART",
+    "public_transport": "stop_position",
+    "railway": "stop",
+    "request_stop": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 4211892123,
+  "lat": 32.7320279,
+  "lon": -96.7090882,
+  "tags": {
+    "light_rail": "yes",
+    "name": "Lake June",
+    "network": "DART",
+    "public_transport": "stop_position",
+    "railway": "stop",
+    "request_stop": "yes",
+    "wheelchair": "limited"
+  }
+},
+{
+  "type": "node",
+  "id": 4211892124,
+  "lat": 32.7328628,
+  "lon": -96.7096075,
+  "tags": {
+    "light_rail": "yes",
+    "name": "Lake June",
+    "network": "DART",
+    "public_transport": "stop_position",
+    "railway": "stop",
+    "request_stop": "yes",
+    "wheelchair": "limited"
+  }
+},
+{
+  "type": "node",
+  "id": 4211892132,
+  "lat": 32.7655709,
+  "lon": -96.7199526,
+  "tags": {
+    "light_rail": "yes",
+    "name": "Lawnview",
+    "network": "DART",
+    "public_transport": "stop_position",
+    "railway": "stop",
+    "request_stop": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 4211892139,
+  "lat": 32.7663553,
+  "lon": -96.7430442,
+  "tags": {
+    "light_rail": "yes",
+    "name": "Hatcher",
+    "network": "DART",
+    "public_transport": "stop_position",
+    "railway": "stop",
+    "request_stop": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 4211892140,
+  "lat": 32.7662810,
+  "lon": -96.7418703,
+  "tags": {
+    "light_rail": "yes",
+    "name": "Hatcher",
+    "network": "DART",
+    "public_transport": "stop_position",
+    "railway": "stop",
+    "request_stop": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 4211892143,
+  "lat": 32.7825717,
+  "lon": -96.7657030,
+  "tags": {
+    "light_rail": "yes",
+    "name": "Fair Park",
+    "network": "DART",
+    "operator": "DART",
+    "public_transport": "stop_position",
+    "railway": "stop",
+    "request_stop": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 4211892144,
+  "lat": 32.7813531,
+  "lon": -96.7662101,
+  "tags": {
+    "light_rail": "yes",
+    "name": "Fair Park",
+    "network": "DART",
+    "public_transport": "stop_position",
+    "railway": "stop",
+    "request_stop": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 4211892146,
+  "lat": 32.7866893,
+  "lon": -96.7813249,
+  "tags": {
+    "light_rail": "yes",
+    "name": "Baylor University Medical Center",
+    "network": "DART",
+    "public_transport": "stop_position",
+    "railway": "stop",
+    "request_stop": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 4211892155,
+  "lat": 32.7862220,
+  "lon": -96.7889367,
+  "tags": {
+    "light_rail": "yes",
+    "name": "Deep Ellum",
+    "network": "DART",
+    "public_transport": "stop_position",
+    "railway": "stop",
+    "request_stop": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 4211892156,
+  "lat": 32.7855048,
+  "lon": -96.7881501,
+  "tags": {
+    "light_rail": "yes",
+    "name": "Deep Ellum",
+    "network": "DART",
+    "public_transport": "stop_position",
+    "railway": "stop",
+    "request_stop": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 4211892168,
+  "lat": 32.7227830,
+  "lon": -96.8052932,
+  "tags": {
+    "light_rail": "yes",
+    "name": "Illinois",
+    "network": "DART",
+    "public_transport": "stop_position",
+    "railway": "stop",
+    "request_stop": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 4211892169,
+  "lat": 32.7235573,
+  "lon": -96.8051224,
+  "tags": {
+    "light_rail": "yes",
+    "name": "Illinois",
+    "network": "DART",
+    "public_transport": "stop_position",
+    "railway": "stop",
+    "request_stop": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 4211892175,
+  "lat": 32.7067758,
+  "lon": -96.8009274,
+  "tags": {
+    "light_rail": "yes",
+    "name": "Kiest",
+    "network": "DART",
+    "public_transport": "stop_position",
+    "railway": "stop",
+    "request_stop": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 4211892176,
+  "lat": 32.7075237,
+  "lon": -96.8013206,
+  "tags": {
+    "light_rail": "yes",
+    "name": "Kiest",
+    "network": "DART",
+    "public_transport": "stop_position",
+    "railway": "stop",
+    "request_stop": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 4211892186,
+  "lat": 32.6933101,
+  "lon": -96.7928107,
+  "tags": {
+    "light_rail": "yes",
+    "name": "VA Medical Center",
+    "network": "DART",
+    "public_transport": "stop_position",
+    "railway": "stop",
+    "request_stop": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 4211892187,
+  "lat": 32.6940674,
+  "lon": -96.7930408,
+  "tags": {
+    "light_rail": "yes",
+    "name": "VA Medical Center",
+    "network": "DART",
+    "public_transport": "stop_position",
+    "railway": "stop",
+    "request_stop": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 4211918829,
+  "lat": 32.7397345,
+  "lon": -96.8026658,
+  "tags": {
+    "light_rail": "yes",
+    "name": "Morrell",
+    "network": "DART",
+    "public_transport": "stop_position",
+    "railway": "stop",
+    "request_stop": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 4211918830,
+  "lat": 32.7397310,
+  "lon": -96.8026180,
+  "tags": {
+    "light_rail": "yes",
+    "name": "Morrell",
+    "network": "DART",
+    "public_transport": "stop_position",
+    "railway": "stop",
+    "request_stop": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 4212704732,
+  "lat": 32.9042310,
+  "lon": -96.5630865,
+  "tags": {
+    "light_rail": "yes",
+    "name": "Downtown Rowlett",
+    "network": "DART",
+    "public_transport": "stop_position",
+    "railway": "stop",
+    "request_stop": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 4212704733,
+  "lat": 32.9041447,
+  "lon": -96.5630652,
+  "tags": {
+    "light_rail": "yes",
+    "name": "Downtown Rowlett",
+    "network": "DART",
+    "public_transport": "stop_position",
+    "railway": "stop",
+    "request_stop": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 4212704738,
+  "lat": 32.9066936,
+  "lon": -97.0394776,
+  "tags": {
+    "light_rail": "yes",
+    "name": "DFW Airport Terminal A",
+    "network": "DART",
+    "public_transport": "stop_position",
+    "railway": "stop",
+    "request_stop": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 4212878950,
+  "lat": 32.7763425,
+  "lon": -96.8082258,
+  "tags": {
+    "light_rail": "yes",
+    "name": "Union Station",
+    "network": "DART",
+    "public_transport": "stop_position",
+    "railway": "stop"
+  }
+},
+{
+  "type": "node",
+  "id": 4212878951,
+  "lat": 32.7754968,
+  "lon": -96.8080186,
+  "tags": {
+    "light_rail": "yes",
+    "name": "Union Station",
+    "network": "DART",
+    "public_transport": "stop_position",
+    "railway": "stop"
+  }
+},
+{
+  "type": "node",
+  "id": 4212878952,
+  "lat": 32.7754664,
+  "lon": -96.8081122,
+  "tags": {
+    "name": "Dallas Union Station",
+    "network": "TRE",
+    "public_transport": "stop_position",
+    "railway": "stop",
+    "train": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 4212878953,
+  "lat": 32.9066917,
+  "lon": -97.0395254,
+  "tags": {
+    "light_rail": "yes",
+    "name": "DFW Airport Terminal A",
+    "network": "DART",
+    "public_transport": "stop_position",
+    "railway": "stop",
+    "request_stop": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 4212878970,
+  "lat": 32.8876846,
+  "lon": -96.9861411,
+  "tags": {
+    "light_rail": "yes",
+    "name": "Belt Line",
+    "network": "DART",
+    "public_transport": "stop_position",
+    "railway": "stop",
+    "request_stop": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 4212878971,
+  "lat": 32.8883732,
+  "lon": -96.9869116,
+  "tags": {
+    "light_rail": "yes",
+    "name": "Belt Line",
+    "network": "DART",
+    "public_transport": "stop_position",
+    "railway": "stop",
+    "request_stop": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 4212878972,
+  "lat": 32.8752017,
+  "lon": -96.9677709,
+  "tags": {
+    "light_rail": "yes",
+    "name": "North Lake College",
+    "network": "DART",
+    "public_transport": "stop_position",
+    "railway": "stop",
+    "request_stop": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 4212878973,
+  "lat": 32.8751555,
+  "lon": -96.9665909,
+  "tags": {
+    "light_rail": "yes",
+    "name": "North Lake College",
+    "network": "DART",
+    "public_transport": "stop_position",
+    "railway": "stop",
+    "request_stop": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 4212878976,
+  "lat": 32.8772468,
+  "lon": -96.9390613,
+  "tags": {
+    "light_rail": "yes",
+    "name": "Irving Convention Center",
+    "network": "DART",
+    "public_transport": "stop_position",
+    "railway": "stop",
+    "request_stop": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 4212878977,
+  "lat": 32.8766629,
+  "lon": -96.9380936,
+  "tags": {
+    "light_rail": "yes",
+    "name": "Irving Convention Center",
+    "network": "DART",
+    "public_transport": "stop_position",
+    "railway": "stop",
+    "request_stop": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 4212878978,
+  "lat": 32.8682235,
+  "lon": -96.9332523,
+  "tags": {
+    "light_rail": "yes",
+    "name": "Las Colinas Urban Center",
+    "network": "DART",
+    "public_transport": "stop_position",
+    "railway": "stop",
+    "request_stop": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 4212878979,
+  "lat": 32.8689898,
+  "lon": -96.9339077,
+  "tags": {
+    "light_rail": "yes",
+    "name": "Las Colinas Urban Center",
+    "network": "DART",
+    "public_transport": "stop_position",
+    "railway": "stop",
+    "request_stop": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 4214857225,
+  "lat": 33.0096999,
+  "lon": -96.9581270,
+  "tags": {
+    "name": "Hebron",
+    "network": "DCTA",
+    "public_transport": "stop_position",
+    "railway": "stop",
+    "train": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 4214857226,
+  "lat": 33.0105932,
+  "lon": -96.9587312,
+  "tags": {
+    "name": "Hebron",
+    "network": "DCTA",
+    "public_transport": "stop_position",
+    "railway": "stop",
+    "train": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 4215722686,
+  "lat": 33.1826329,
+  "lon": -97.0910341,
+  "tags": {
+    "name": "MedPark",
+    "network": "DCTA",
+    "public_transport": "stop_position",
+    "railway": "stop",
+    "train": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 4215722687,
+  "lat": 33.1821088,
+  "lon": -97.0899973,
+  "tags": {
+    "name": "MedPark",
+    "network": "DCTA",
+    "public_transport": "stop_position",
+    "railway": "stop",
+    "train": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 4215723222,
+  "lat": 33.0839026,
+  "lon": -97.0260966,
+  "tags": {
+    "name": "Highland Village/Lewisville Lake",
+    "network": "DCTA",
+    "public_transport": "stop_position",
+    "railway": "stop",
+    "train": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 4215723224,
+  "lat": 33.0829026,
+  "lon": -97.0259012,
+  "tags": {
+    "name": "Highland Village/Lewisville Lake",
+    "network": "DCTA",
+    "public_transport": "stop_position",
+    "railway": "stop",
+    "train": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 4215726237,
+  "lat": 33.0477906,
+  "lon": -96.9865721,
+  "tags": {
+    "name": "Old Town",
+    "network": "DCTA",
+    "public_transport": "stop_position",
+    "railway": "stop",
+    "train": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 4215961792,
+  "lat": 32.8090836,
+  "lon": -96.8397963,
+  "tags": {
+    "name": "Medical/Market Center",
+    "network": "TRE",
+    "public_transport": "stop_position",
+    "railway": "stop",
+    "train": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 4215961793,
+  "lat": 32.8096470,
+  "lon": -96.8410133,
+  "tags": {
+    "name": "Medical/Market Center",
+    "network": "TRE",
+    "public_transport": "stop_position",
+    "railway": "stop",
+    "train": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 4216278563,
+  "lat": 32.7453061,
+  "lon": -97.3290014,
+  "tags": {
+    "name": "Fort Worth T&P",
+    "network": "TRE;Trinity Metro",
+    "public_transport": "stop_position",
+    "railway": "stop",
+    "train": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 4216310393,
+  "lat": 32.8046278,
+  "lon": -97.1557986,
+  "tags": {
+    "name": "Bell",
+    "network": "TRE",
+    "public_transport": "stop_position",
+    "railway": "stop",
+    "train": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 4216359696,
+  "lat": 32.8170433,
+  "lon": -97.0535419,
+  "tags": {
+    "name": "CentrePort/DFW Airport",
+    "network": "TRE",
+    "public_transport": "stop_position",
+    "railway": "stop",
+    "train": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 4216359697,
+  "lat": 32.8169263,
+  "lon": -97.0521643,
+  "tags": {
+    "name": "CentrePort/DFW Airport",
+    "network": "TRE",
+    "public_transport": "stop_position",
+    "railway": "stop",
+    "train": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 4216680372,
+  "lat": 32.8148544,
+  "lon": -96.9470299,
+  "tags": {
+    "name": "Downtown Irving/Heritage Crossing",
+    "network": "TRE",
+    "public_transport": "stop_position",
+    "railway": "stop",
+    "train": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 5158326761,
+  "lat": 32.6622106,
+  "lon": -95.4891236,
+  "tags": {
+    "local_ref": "1",
+    "name": "Mineola",
+    "network": "Amtrak",
+    "operator": "Amtrak",
+    "public_transport": "stop_position",
+    "railway": "stop",
+    "railway:ref": "MIN",
+    "train": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 5793027814,
+  "lat": 32.7230702,
+  "lon": -114.6152333,
+  "tags": {
+    "name": "Yuma",
+    "network": "Amtrak",
+    "public_transport": "stop_position",
+    "railway": "stop",
+    "railway:ref": "YUM",
+    "train": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 5793027815,
+  "lat": 32.7230782,
+  "lon": -114.6153431,
+  "tags": {
+    "name": "Yuma",
+    "network": "Amtrak",
+    "public_transport": "stop_position",
+    "railway": "stop",
+    "railway:ref": "YUM",
+    "train": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 5793892716,
+  "lat": 32.2232451,
+  "lon": -110.9662552,
+  "tags": {
+    "name": "Tucson",
+    "network": "Amtrak",
+    "public_transport": "stop_position",
+    "railway": "stop",
+    "railway:ref": "TUS",
+    "train": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 5796201080,
+  "lat": 29.4204510,
+  "lon": -98.4779101,
+  "tags": {
+    "name": "San Antonio",
+    "network": "Amtrak",
+    "public_transport": "stop_position",
+    "railway": "stop",
+    "railway:ref": "SAS",
+    "train": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 5797930518,
+  "lat": 32.2718937,
+  "lon": -107.7543225,
+  "tags": {
+    "name": "Deming",
+    "network": "Amtrak",
+    "public_transport": "stop_position",
+    "railway": "stop",
+    "railway:ref": "DEM",
+    "train": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 5798742766,
+  "lat": 31.9688768,
+  "lon": -110.2970433,
+  "tags": {
+    "name": "Benson",
+    "network": "Amtrak",
+    "public_transport": "stop_position",
+    "railway": "stop",
+    "railway:ref": "BEN",
+    "train": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 5804777112,
+  "lat": 29.3625633,
+  "lon": -100.9025390,
+  "tags": {
+    "name": "Del Rio",
+    "name:ar": "ديل ريو",
+    "name:az-Arab": "دل ریو",
+    "name:azb": "دل ریو",
+    "name:es": "Del Río",
+    "name:fa": "دل ریو",
+    "network": "Amtrak",
+    "old_name": "San Felipe del Río",
+    "old_name:es": "San Felipe del Río",
+    "public_transport": "stop_position",
+    "railway": "stop",
+    "railway:ref": "DRT",
+    "train": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 5807885708,
+  "lat": 34.0589336,
+  "lon": -117.7522039,
+  "tags": {
+    "name": "Pomona–Downtown",
+    "network": "Amtrak",
+    "public_transport": "stop_position",
+    "railway": "stop",
+    "railway:position": "mi:31.90",
+    "railway:ref": "POS",
+    "train": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 5809161923,
+  "lat": 31.0953597,
+  "lon": -97.3454700,
+  "tags": {
+    "name": "Temple",
+    "network": "Amtrak",
+    "network:wikidata": "Q23239",
+    "public_transport": "stop_position",
+    "railway": "stop",
+    "railway:ref": "TPL",
+    "train": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 5811043714,
+  "lat": 32.3498119,
+  "lon": -97.3819732,
+  "tags": {
+    "name": "Cleburne",
+    "network": "Amtrak",
+    "public_transport": "stop_position",
+    "railway": "stop",
+    "railway:ref": "CBR",
+    "train": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 5821417142,
+  "lat": 32.4943080,
+  "lon": -94.7277928,
+  "tags": {
+    "name": "Longview",
+    "network": "Amtrak",
+    "public_transport": "stop_position",
+    "railway": "stop",
+    "railway:ref": "LVW",
+    "train": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 5839634375,
+  "lat": 34.1140820,
+  "lon": -93.0529159,
+  "tags": {
+    "name": "Arkadelphia",
+    "network": "Amtrak",
+    "public_transport": "stop_position",
+    "railway": "stop",
+    "railway:ref": "ARK",
+    "train": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 5840638610,
+  "lat": 38.6233679,
+  "lon": -90.2045092
+},
+{
+  "type": "node",
+  "id": 6150649388,
+  "lat": 33.8969551,
+  "lon": -116.5468179,
+  "tags": {
+    "name": "Palm Springs",
+    "network": "Amtrak",
+    "operator": "Amtrak",
+    "public_transport": "stop_position",
+    "railway": "stop",
+    "railway:ref": "PSN",
+    "train": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 6150649394,
+  "lat": 34.0589733,
+  "lon": -117.7504846,
+  "tags": {
+    "name": "Pomona–Downtown",
+    "network": "Amtrak",
+    "public_transport": "stop_position",
+    "railway": "stop",
+    "railway:position": "mi:31.90",
+    "railway:ref": "POS",
+    "train": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 6150649395,
+  "lat": 34.0614672,
+  "lon": -117.6505874,
+  "tags": {
+    "name": "Ontario",
+    "network": "Amtrak",
+    "public_transport": "stop_position",
+    "railway": "stop",
+    "railway:ref": "ONA",
+    "train": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 6249138009,
+  "lat": 32.7957590,
+  "lon": -97.3380636,
+  "tags": {
+    "name": "North Side",
+    "network": "Trinity Metro",
+    "public_transport": "stop_position",
+    "railway": "stop",
+    "train": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 6261475911,
+  "lat": 32.8195689,
+  "lon": -97.2928773,
+  "tags": {
+    "name": "Mercantile Center",
+    "network": "Trinity Metro",
+    "public_transport": "stop_position",
+    "railway": "stop",
+    "train": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 6261475928,
+  "lat": 32.8450831,
+  "lon": -97.2492930,
+  "tags": {
+    "name": "North Richland Hills/Iron Horse",
+    "network": "Trinity Metro",
+    "public_transport": "stop_position",
+    "railway": "stop",
+    "train": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 6261510038,
+  "lat": 32.8648820,
+  "lon": -97.2116861,
+  "tags": {
+    "name": "North Richland Hills/Smithfield",
+    "network": "Trinity Metro",
+    "public_transport": "stop_position",
+    "railway": "stop",
+    "train": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 6261527288,
+  "lat": 32.9337085,
+  "lon": -97.0776417,
+  "tags": {
+    "name": "Grapevine-Main Street",
+    "network": "Trinity Metro",
+    "public_transport": "stop_position",
+    "railway": "stop",
+    "train": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 6368968527,
+  "lat": 32.6670148,
+  "lon": -96.7883082,
+  "tags": {
+    "light_rail": "yes",
+    "name": "Camp Wisdom",
+    "network": "DART",
+    "public_transport": "stop_position",
+    "railway": "stop",
+    "request_stop": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 6368968528,
+  "lat": 32.6660832,
+  "lon": -96.7878990,
+  "tags": {
+    "light_rail": "yes",
+    "name": "Camp Wisdom",
+    "network": "DART",
+    "public_transport": "stop_position",
+    "railway": "stop",
+    "request_stop": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 6368968533,
+  "lat": 32.6537986,
+  "lon": -96.8015230,
+  "tags": {
+    "light_rail": "yes",
+    "name": "UNT Dallas",
+    "public_transport": "stop_position",
+    "railway": "stop",
+    "request_stop": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 6368968535,
+  "lat": 32.6538803,
+  "lon": -96.8015745,
+  "tags": {
+    "light_rail": "yes",
+    "name": "UNT Dallas",
+    "public_transport": "stop_position",
+    "railway": "stop",
+    "request_stop": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 7022584325,
+  "lat": 33.4195584,
+  "lon": -94.0433322,
+  "tags": {
+    "name": "Texarkana",
+    "network": "Amtrak",
+    "public_transport": "stop_position",
+    "railway": "stop",
+    "railway:ref": "TXA",
+    "train": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 7022604479,
+  "lat": 38.9217661,
+  "lon": -90.1578882,
+  "tags": {
+    "name": "Alton",
+    "network": "Amtrak",
+    "public_transport": "stop_position",
+    "railway": "stop",
+    "railway:ref": "ALN",
+    "train": "yes",
+    "wheelchair": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 7022604481,
+  "lat": 39.2787035,
+  "lon": -89.8898099,
+  "tags": {
+    "name": "Carlinville",
+    "network": "Amtrak",
+    "public_transport": "stop_position",
+    "railway": "stop",
+    "railway:ref": "CRV",
+    "train": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 7022604482,
+  "lat": 39.2795443,
+  "lon": -89.8891577,
+  "tags": {
+    "name": "Carlinville",
+    "network": "Amtrak",
+    "public_transport": "stop_position",
+    "railway": "stop",
+    "railway:ref": "CRV",
+    "train": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 7022681124,
+  "lat": 40.5079989,
+  "lon": -88.9853861,
+  "tags": {
+    "name": "Bloomington-Normal",
+    "network": "Amtrak",
+    "public_transport": "stop_position",
+    "railway": "stop",
+    "railway:ref": "BNL",
+    "train": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 7022681125,
+  "lat": 40.5086575,
+  "lon": -88.9840054,
+  "tags": {
+    "name": "Bloomington-Normal",
+    "network": "Amtrak",
+    "public_transport": "stop_position",
+    "railway": "stop",
+    "railway:ref": "BNL",
+    "train": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 7027398087,
+  "lat": 37.5921878,
+  "lon": -90.6242345,
+  "tags": {
+    "name": "Arcadia Valley",
+    "network": "Amtrak",
+    "public_transport": "stop_position",
+    "railway": "stop",
+    "railway:ref": "ACD",
+    "train": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 7030069370,
+  "lat": 40.8792732,
+  "lon": -88.6371247,
+  "tags": {
+    "name": "Pontiac",
+    "network": "Amtrak",
+    "public_transport": "stop_position",
+    "railway": "stop",
+    "railway:ref": "PON",
+    "train": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 7030069371,
+  "lat": 40.1481720,
+  "lon": -89.3634218,
+  "tags": {
+    "name": "Lincoln",
+    "network": "Amtrak",
+    "public_transport": "stop_position",
+    "railway": "stop",
+    "railway:ref": "LCN",
+    "train": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 7126918951,
+  "lat": 32.9337773,
+  "lon": -97.0540769,
+  "tags": {
+    "name": "DFW Airport North",
+    "network": "Trinity Metro",
+    "operator": "Trinity Metro",
+    "public_transport": "stop_position",
+    "railway": "stop",
+    "train": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 7126918960,
+  "lat": 32.9337668,
+  "lon": -97.0769273,
+  "tags": {
+    "name": "Grapevine-Main Street",
+    "network": "Trinity Metro",
+    "public_transport": "stop_position",
+    "railway": "stop",
+    "train": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 7126918961,
+  "lat": 32.8651657,
+  "lon": -97.2110880,
+  "tags": {
+    "name": "North Richland Hills/Smithfield",
+    "network": "Trinity Metro",
+    "public_transport": "stop_position",
+    "railway": "stop",
+    "train": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 7126918973,
+  "lat": 32.8445955,
+  "lon": -97.2497242,
+  "tags": {
+    "name": "North Richland Hills/Iron Horse",
+    "network": "Trinity Metro",
+    "public_transport": "stop_position",
+    "railway": "stop",
+    "train": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 7126918982,
+  "lat": 32.8198103,
+  "lon": -97.2923009,
+  "tags": {
+    "name": "Mercantile Center",
+    "network": "Trinity Metro",
+    "public_transport": "stop_position",
+    "railway": "stop",
+    "train": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 7126918983,
+  "lat": 32.7963715,
+  "lon": -97.3380662,
+  "tags": {
+    "name": "North Side",
+    "network": "Trinity Metro",
+    "public_transport": "stop_position",
+    "railway": "stop",
+    "train": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 7127084480,
+  "lat": 32.8045152,
+  "lon": -97.1542696,
+  "tags": {
+    "name": "Bell",
+    "network": "TRE",
+    "public_transport": "stop_position",
+    "railway": "stop",
+    "train": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 7127192863,
+  "lat": 33.0468402,
+  "lon": -96.9862137,
+  "tags": {
+    "name": "Old Town",
+    "network": "DCTA",
+    "public_transport": "stop_position",
+    "railway": "stop",
+    "train": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 8260777571,
+  "lat": 36.7537560,
+  "lon": -90.3932960,
+  "tags": {
+    "name": "Poplar Bluff",
+    "network": "Amtrak",
+    "public_transport": "stop_position",
+    "railway": "stop",
+    "railway:ref": "PBF",
+    "train": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 8262089536,
+  "lat": 36.0674486,
+  "lon": -90.9566031,
+  "tags": {
+    "name": "Walnut Ridge",
+    "network": "Amtrak",
+    "public_transport": "stop_position",
+    "railway": "stop",
+    "railway:ref": "WNR",
+    "train": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 8265280134,
+  "lat": 31.9689290,
+  "lon": -110.2970293,
+  "tags": {
+    "name": "Benson",
+    "network": "Amtrak",
+    "public_transport": "stop_position",
+    "railway": "stop",
+    "railway:ref": "BEN",
+    "train": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 9121475807,
+  "lat": 32.9069188,
+  "lon": -97.0412699,
+  "tags": {
+    "name": "DFW Airport Terminal B",
+    "network": "Trinity Metro",
+    "public_transport": "stop_position",
+    "railway": "buffer_stop",
+    "train": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 9121475808,
+  "lat": 32.9069183,
+  "lon": -97.0412210,
+  "tags": {
+    "name": "DFW Airport Terminal B",
+    "network": "Trinity Metro",
+    "public_transport": "stop_position",
+    "railway": "buffer_stop",
+    "train": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 11657365864,
+  "lat": 32.8052158,
+  "lon": -97.2100496,
+  "tags": {
+    "name": "Trinity Lakes",
+    "network": "Trinity Railway Express",
+    "operator": "Trinity Railway Express",
+    "public_transport": "stop_position",
+    "railway": "stop",
+    "train": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 11772332093,
+  "lat": 32.9626064,
+  "lon": -96.8183107,
+  "tags": {
+    "light_rail": "yes",
+    "name": "Knoll Trail",
+    "network": "Silver Line",
+    "operator": "DART",
+    "public_transport": "stop_position",
+    "railway": "stop",
+    "start_date": "2025-12-31"
+  }
+},
+{
+  "type": "node",
+  "id": 11778577148,
+  "lat": 32.8054610,
+  "lon": -97.2093654,
+  "tags": {
+    "name": "Trinity Lakes",
+    "network": "Trinity Railway Express",
+    "operator": "Trinity Railway Express",
+    "public_transport": "stop_position",
+    "railway": "stop",
+    "train": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 11925283677,
+  "lat": 33.0154980,
+  "lon": -96.6980256,
+  "tags": {
+    "name": "12th Street",
+    "public_transport": "stop_position",
+    "railway": "stop",
+    "train": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 12978762746,
+  "lat": 32.9591276,
+  "lon": -96.8277192,
+  "tags": {
+    "name": "Addison",
+    "network": "DART",
+    "operator": "DART",
+    "public_transport": "stop_position",
+    "railway": "stop",
+    "train": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 12978762747,
+  "lat": 32.9588257,
+  "lon": -96.8287134,
+  "tags": {
+    "name": "Addison",
+    "network": "DART",
+    "operator": "DART",
+    "public_transport": "stop_position",
+    "railway": "stop",
+    "train": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 12980576170,
+  "lat": 32.9629584,
+  "lon": -96.8172039,
+  "tags": {
+    "light_rail": "yes",
+    "name": "Knoll Trail",
+    "network": "Silver Line",
+    "operator": "DART",
+    "public_transport": "stop_position",
+    "railway": "stop",
+    "start_date": "2025-12-31"
+  }
+},
+{
+  "type": "node",
+  "id": 12981288512,
+  "lat": 32.9553740,
+  "lon": -96.9084712,
+  "tags": {
+    "name": "Downtown Carrollton Silver Line Station",
+    "network": "Silver Line",
+    "operator": "DART",
+    "public_transport": "stop_position",
+    "railway": "stop",
+    "ref": "34292",
+    "train": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 12981288513,
+  "lat": 32.9557775,
+  "lon": -96.9077289,
+  "tags": {
+    "name": "Downtown Carrollton Silver Line Station",
+    "network": "Silver Line",
+    "operator": "DART",
+    "public_transport": "stop_position",
+    "railway": "stop",
+    "ref": "34292",
+    "train": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 12981474213,
+  "lat": 33.0018176,
+  "lon": -96.7036007,
+  "tags": {
+    "name": "CityLine/Bush",
+    "network": "DART",
+    "operator": "DART",
+    "public_transport": "stop_position",
+    "railway": "stop",
+    "train": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 12981474214,
+  "lat": 33.0026600,
+  "lon": -96.7031383,
+  "tags": {
+    "name": "CityLine/Bush",
+    "network": "DART",
+    "operator": "DART",
+    "public_transport": "stop_position",
+    "railway": "stop",
+    "train": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 12981490101,
+  "lat": 32.9963539,
+  "lon": -96.7506906,
+  "tags": {
+    "name": "UT Dallas",
+    "network": "DART",
+    "public_transport": "stop_position",
+    "railway": "stop",
+    "train": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 12981490102,
+  "lat": 32.9964967,
+  "lon": -96.7496068,
+  "tags": {
+    "name": "UT Dallas",
+    "network": "DART",
+    "public_transport": "stop_position",
+    "railway": "stop",
+    "train": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 12981495410,
+  "lat": 33.0124996,
+  "lon": -96.6653700,
+  "tags": {
+    "name": "Shiloh Road",
+    "network": "Silver Line",
+    "operator": "DART",
+    "public_transport": "stop_position",
+    "railway": "stop",
+    "train": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 12981495411,
+  "lat": 33.0127568,
+  "lon": -96.6663372,
+  "tags": {
+    "name": "Shiloh Road",
+    "network": "Silver Line",
+    "operator": "DART",
+    "public_transport": "stop_position",
+    "railway": "stop",
+    "train": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 12981496134,
+  "lat": 33.0152342,
+  "lon": -96.6990742,
+  "tags": {
+    "name": "12th Street",
+    "network": "DART",
+    "public_transport": "stop_position",
+    "railway": "stop",
+    "train": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 12981502365,
+  "lat": 32.9508172,
+  "lon": -96.9828230,
+  "tags": {
+    "name": "Cypress Waters",
+    "network": "DART",
+    "operator": "DART",
+    "public_transport": "stop_position",
+    "railway": "stop",
+    "train": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 12981502366,
+  "lat": 32.9501912,
+  "lon": -96.9837870,
+  "tags": {
+    "name": "Cypress Waters",
+    "network": "DART",
+    "operator": "DART",
+    "public_transport": "stop_position",
+    "railway": "stop",
+    "train": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 12981509131,
+  "lat": 32.9342615,
+  "lon": -97.0543288,
+  "tags": {
+    "name": "DFW Airport North",
+    "network": "DART",
+    "operator": "DART",
+    "public_transport": "stop_position",
+    "railway": "stop",
+    "train": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 12981509132,
+  "lat": 32.9338026,
+  "lon": -97.0540366,
+  "tags": {
+    "name": "DFW Airport North",
+    "public_transport": "stop_position",
+    "railway": "stop",
+    "train": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 13250730344,
+  "lat": 33.0145106,
+  "lon": -96.7010474,
+  "tags": {
+    "name": "12th Street",
+    "network": "DART",
+    "public_transport": "stop_position",
+    "railway": "stop",
+    "train": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 13250730345,
+  "lat": 33.0145093,
+  "lon": -96.7009956,
+  "tags": {
+    "name": "12th Street",
+    "network": "DART",
+    "public_transport": "stop_position",
+    "railway": "stop",
+    "train": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 13758079042,
+  "lat": 32.9339595,
+  "lon": -97.0762961,
+  "tags": {
+    "name": "Grapevine",
+    "public_transport": "stop_position",
+    "railway": "stop",
+    "train": "yes"
+  }
+}
+
+  ]
+}

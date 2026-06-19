@@ -1,0 +1,8 @@
+﻿V1 DANGLING terminus: Pink -> Everman (no transfer/P&R/yard within reach)
+V1 DANGLING terminus: Purple line -> Lake Port Village (no transfer/P&R/yard within reach)
+V1 DANGLING terminus: Ross Avenue BRT -> Swiss Avenue Historic District E (no transfer/P&R/yard within reach)
+V1 DANGLING terminus: TexPress Expansion -> Primrose (no transfer/P&R/yard within reach)
+V1 DANGLING terminus: Woodhaven direct -> Haltom City SE2 (no transfer/P&R/yard within reach)
+V2 HAIRPIN: Silver [metro] near 32.6689,-96.9614 (segs 333m/1013m)
+V3 YARD: Purple line - NEW YARD SPUR NEEDED (~8.7km to nearest)
+V3 YARD: Waxahachie Line (ROW) - NEW YARD SPUR NEEDED (~6.5km to nearest)
