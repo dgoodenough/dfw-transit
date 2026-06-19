@@ -9,6 +9,8 @@ time-series build-out visuals.
 > Speculative urbanism, not an official plan. Geometry and phasing are the
 > author's own; demand figures use real Census + LODES data where noted.
 
+![Fort Worth Phase One — a generated transit map from the source-of-truth database](maps/FW_PhaseOne_revised.png)
+
 ## The four routing rules
 
 Every line in the model is checked against four rules:
