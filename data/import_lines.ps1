@@ -4,7 +4,7 @@ $ErrorActionPreference="Stop"
 #   geometry -> db/manual_geom.geojson (build_db + build_stations apply as final override)
 #   year     -> line_years.csv  (from KML Year folder, or GeoJSON "year" property)
 #   mode     -> line_modes.csv  (extra lines only; from KML Mode subfolder or GeoJSON "mode")
-$dir="C:\Users\justd\OneDrive\Documents\Ultiworld\dfw-transit"; $ddir="$dir\data"; $dbdir="$dir\db"
+$dir=(Split-Path $PSScriptRoot -Parent); $ddir="$dir\data"; $dbdir="$dir\db"
 $STEPS=@(2025,2035,2040,2045,2050,2055,2060,2065,2070)
 $feats=@()   # @{name;coords;year(or $null);mode(or $null)}
 $ext=[System.IO.Path]::GetExtension($In).ToLower()

@@ -1,7 +1,7 @@
 $ErrorActionPreference="Stop"
 # Phase 1: audit every proposed commuter line's deviation from real OSM rail.
 # Phase 2: re-route failers along the rail graph between their endpoints (gaps -> explicit new-build connectors).
-$dir="C:\Users\justd\OneDrive\Documents\Ultiworld\dfw-transit"; $ddir="$dir\data"; $dbdir="$dir\db"
+$dir=(Split-Path $PSScriptRoot -Parent); $ddir="$dir\data"; $dbdir="$dir\db"
 $mlat=110540.0;$mlon=111320.0*[math]::Cos(32.9*[math]::PI/180)
 function RDist($alon,$alat,$blon,$blat){ [math]::Sqrt([math]::Pow(($alon-$blon)*$mlon,2)+[math]::Pow(($alat-$blat)*$mlat,2)) }
 

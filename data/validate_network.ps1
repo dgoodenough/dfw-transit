@@ -3,7 +3,7 @@ $ErrorActionPreference="Stop"
 #  V1 terminus connectivity: every proposed line end must reach a transfer station, P&R (freeway), or yard - else DANGLING
 #  V2 mid-route U-turns / hairpins (retraced segments; <25deg turns between long segs)
 #  V3 rail yard access: each rail line needs a yard within 3km of a terminus (yards = OSM service=yard) + failsafe (2nd yard <=10km)
-$dir="C:\Users\justd\OneDrive\Documents\Ultiworld\dfw-transit"; $ddir="$dir\data"; $dbdir="$dir\db"
+$dir=(Split-Path $PSScriptRoot -Parent); $ddir="$dir\data"; $dbdir="$dir\db"
 function Hav($la1,$lo1,$la2,$lo2){ $R=6371.0;$dla=([math]::PI/180)*($la2-$la1);$dlo=([math]::PI/180)*($lo2-$lo1)
   $a=[math]::Sin($dla/2)*[math]::Sin($dla/2)+[math]::Cos([math]::PI/180*$la1)*[math]::Cos([math]::PI/180*$la2)*[math]::Sin($dlo/2)*[math]::Sin($dlo/2); return $R*2*[math]::Atan2([math]::Sqrt($a),[math]::Sqrt(1-$a)) }
 

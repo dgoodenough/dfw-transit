@@ -2,7 +2,7 @@ $ErrorActionPreference="Stop"
 # Merges the FW core tables (fw_*.csv) + extra-network tables (_extra_*.csv) into the
 # unified, editable source of truth: db/stations.csv, db/lines.csv, db/station_lines.csv, db/segments.csv.
 # Opening YEARS are materialized as data here (edit a cell -> rebuild app -> done).
-$dir="C:\Users\justd\OneDrive\Documents\Ultiworld\dfw-transit"; $ddir="$dir\data"; $dbdir="$dir\db"
+$dir=(Split-Path $PSScriptRoot -Parent); $ddir="$dir\data"; $dbdir="$dir\db"
 
 function Hav($la1,$lo1,$la2,$lo2){ $R=6371.0;$dla=([math]::PI/180)*($la2-$la1);$dlo=([math]::PI/180)*($lo2-$lo1)
   $a=[math]::Sin($dla/2)*[math]::Sin($dla/2)+[math]::Cos([math]::PI/180*$la1)*[math]::Cos([math]::PI/180*$la2)*[math]::Sin($dlo/2)*[math]::Sin($dlo/2); return $R*2*[math]::Atan2([math]::Sqrt($a),[math]::Sqrt(1-$a)) }

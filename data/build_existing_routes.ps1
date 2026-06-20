@@ -1,5 +1,5 @@
 $ErrorActionPreference="Stop"
-$dir="C:\Users\justd\OneDrive\Documents\Ultiworld\dfw-transit"; $ddir="$dir\data"
+$dir=(Split-Path $PSScriptRoot -Parent); $ddir="$dir\data"
 function Dm($alon,$alat,$blon,$blat){ [math]::Sqrt([math]::Pow(($alon-$blon)*93680,2)+[math]::Pow(($alat-$blat)*110540,2)) }
 $map=@{ 'Red Line'='Red Line';'Blue Line'='Blue Line';'Green Line'='Green Line';'Orange Line'='Orange Line';
         'DCTA A-Train'='A Train';'TEXRail'='Texrail';'Trinity Railway Express'='TRE';'TRE'='TRE';'Silver Line'='Cotton Belt' }

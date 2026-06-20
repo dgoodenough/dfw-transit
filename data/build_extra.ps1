@@ -1,5 +1,5 @@
 $ErrorActionPreference="Stop"
-$dir="C:\Users\justd\OneDrive\Documents\Ultiworld\dfw-transit"
+$dir=(Split-Path $PSScriptRoot -Parent)
 $dbdir="$dir\db"
 $kmlPath="C:\Users\justd\Downloads\FW_Subway_extracted\doc.kml"
 [xml]$kml=Get-Content $kmlPath

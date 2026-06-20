@@ -3,7 +3,7 @@ $ErrorActionPreference="Stop"
 #  BRT      : ITDP 2024 band 300-800m optimal / TCRP 118 US practice up to ~1.2mi arterial -> too-close <300m, ok 300-1900m, wide >1900m
 #  Metro    : industry band (TCRP 155 pending) -> too-close <600m, ok 600-2500m, wide >2500m
 #  Commuter : Nelson/TREC empirical 3.5-10mi  -> too-close <2400m (1.5mi), ok 2.4-16km, wide >16km
-$dir="C:\Users\justd\OneDrive\Documents\Ultiworld\dfw-transit"; $ddir="$dir\data"; $dbdir="$dir\db"
+$dir=(Split-Path $PSScriptRoot -Parent); $ddir="$dir\data"; $dbdir="$dir\db"
 function Hav($la1,$lo1,$la2,$lo2){ $R=6371.0;$dla=([math]::PI/180)*($la2-$la1);$dlo=([math]::PI/180)*($lo2-$lo1)
   $a=[math]::Sin($dla/2)*[math]::Sin($dla/2)+[math]::Cos([math]::PI/180*$la1)*[math]::Cos([math]::PI/180*$la2)*[math]::Sin($dlo/2)*[math]::Sin($dlo/2); return $R*2*[math]::Atan2([math]::Sqrt($a),[math]::Sqrt(1-$a)) }
 

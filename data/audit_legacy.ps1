@@ -1,7 +1,7 @@
 $ErrorActionPreference="Stop"
 # Cedar-Hill-style ROW audit for the Legacy Line: sample its geometry and measure
 # distance to nearest RAIL / FREEWAY / ARTERIAL separately, to see what (if anything) it follows.
-$dir="C:\Users\justd\OneDrive\Documents\Ultiworld\dfw-transit"; $ddir="$dir\data"; $dbdir="$dir\db"
+$dir=(Split-Path $PSScriptRoot -Parent); $ddir="$dir\data"; $dbdir="$dir\db"
 $mlat=110540.0;$mlon=111320.0*[math]::Cos(33.08*[math]::PI/180)
 function Rdm($alon,$alat,$blon,$blat){ [math]::Sqrt([math]::Pow(($alon-$blon)*$mlon,2)+[math]::Pow(($alat-$blat)*$mlat,2)) }
 function Hav($la1,$lo1,$la2,$lo2){ $R=6371.0;$dla=([math]::PI/180)*($la2-$la1);$dlo=([math]::PI/180)*($lo2-$lo1)

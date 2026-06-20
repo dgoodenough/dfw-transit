@@ -3,7 +3,7 @@ $ErrorActionPreference="Stop"
 #  - sparse anchors (3km) so the router picks streets, not stale snap points
 #  - leg-stitch backtrack trimming (no mid-route U-turns from anchor legs)
 #  - logical termini: extend each end to nearest rail/metro station (<=1.5km) else freeway P&R point (<=1km)
-$dir="C:\Users\justd\OneDrive\Documents\Ultiworld\dfw-transit"; $ddir="$dir\data"; $dbdir="$dir\db"
+$dir=(Split-Path $PSScriptRoot -Parent); $ddir="$dir\data"; $dbdir="$dir\db"
 Add-Type -TypeDefinition (Get-Content "$ddir\RoadRouter.cs" -Raw) -Language CSharp
 $rr=New-Object RoadRouter
 $rr.Load(@("$ddir\dfw_arterials.json","$ddir\dfw_freeways.json"))

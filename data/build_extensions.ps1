@@ -1,5 +1,5 @@
 $ErrorActionPreference="Stop"
-$dir="C:\Users\justd\OneDrive\Documents\Ultiworld\dfw-transit"; $ddir="$dir\data"; $dbdir="$dir\db"
+$dir=(Split-Path $PSScriptRoot -Parent); $ddir="$dir\data"; $dbdir="$dir\db"
 $mlat=110540.0;$mlon=111320.0*[math]::Cos(32.85*[math]::PI/180)
 $renames=@(); foreach($r in (Import-Csv "$ddir\renames.csv")){ $renames+=[pscustomobject]@{old=$r.old_name;lat=[double]$r.lat;lon=[double]$r.lon;new=$r.new_name} }
 function Rename($nm,$lat,$lon){ foreach($r in $renames){ if($r.old -eq $nm -and [math]::Abs($r.lat-$lat) -lt 0.003 -and [math]::Abs($r.lon-$lon) -lt 0.003){ return $r.new } }; return $nm }

@@ -1,5 +1,5 @@
 $ErrorActionPreference="Stop"
-$ddir="C:\Users\justd\OneDrive\Documents\Ultiworld\dfw-transit\data"
+$ddir=$PSScriptRoot
 # metroplex counties: Dallas 113, Tarrant 439, Collin 085, Denton 121, Rockwall 397, Johnson 251, Ellis 139, Parker 367, Kaufman 257
 $counties='113','439','085','121','397','251','139','367','257'
 $cset=@{}; foreach($c in $counties){ $cset[$c]=$true }

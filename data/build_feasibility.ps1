@@ -2,7 +2,7 @@ $ErrorActionPreference="Stop"
 # Scores every non-existing station in the UNIFIED DB (db/stations.csv) on activity
 # (act column, already computed) + park-and-ride potential (distance to nearest freeway).
 # Output: data/feasibility_stations.csv (classification lives here, not in the DB).
-$dir="C:\Users\justd\OneDrive\Documents\Ultiworld\dfw-transit"; $ddir="$dir\data"; $dbdir="$dir\db"
+$dir=(Split-Path $PSScriptRoot -Parent); $ddir="$dir\data"; $dbdir="$dir\db"
 $mlat=110540.0;$mlon=111320.0*[math]::Cos(32.85*[math]::PI/180)
 
 $stations=Import-Csv "$dbdir\stations.csv"

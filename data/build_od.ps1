@@ -1,6 +1,6 @@
 $ErrorActionPreference="Stop"
 # Stream tx_od.csv.gz -> aggregate home-tract -> work-tract flows, metroplex counties only.
-$ddir="C:\Users\justd\OneDrive\Documents\Ultiworld\dfw-transit\data"
+$ddir=$PSScriptRoot
 $counties=@('113','439','085','121','397','251','139','367','257')
 $cset=New-Object 'System.Collections.Generic.HashSet[string]'
 foreach($c in $counties){ [void]$cset.Add($c) }

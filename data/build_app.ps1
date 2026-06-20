@@ -1,5 +1,5 @@
 $ErrorActionPreference="Stop"
-$dir="C:\Users\justd\OneDrive\Documents\Ultiworld\dfw-transit"
+$dir=(Split-Path $PSScriptRoot -Parent)
 $dbdir="$dir\db"
 
 # SINGLE SOURCE OF TRUTH: the unified db tables (years are data; edit a cell -> rebuild)

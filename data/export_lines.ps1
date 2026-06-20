@@ -2,7 +2,7 @@ $ErrorActionPreference="Stop"
 # Export every line's full as-built path as ONE editable feature (KML + GeoJSON) for manual geometry fixing.
 # Edit paths in Google Earth Pro / My Maps (KML) or geojson.io (GeoJSON), then send back -> import_lines.ps1.
 # Stops are NOT exported (they auto-regenerate along the edited path). Reference stops included in a separate, ignore-on-import folder.
-$dir="C:\Users\justd\OneDrive\Documents\Ultiworld\dfw-transit"; $dbdir="$dir\db"; $ddir="$dir\data"; $outdir="$dir\edit"
+$dir=(Split-Path $PSScriptRoot -Parent); $dbdir="$dir\db"; $ddir="$dir\data"; $outdir="$dir\edit"
 if(-not (Test-Path $outdir)){ New-Item -ItemType Directory $outdir | Out-Null }
 # source = exact per-line input geometry the builders consume (idempotent round-trip):
 #   fw_lines_source.geojson (FW core, from build_db) + lines_source.geojson (extra, from build_stations)

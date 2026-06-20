@@ -2,7 +2,7 @@ $ErrorActionPreference="Stop"
 # Converge all FW-side commuter lines into downtown Fort Worth (Central Station) so
 # every one has a stop there and can transfer to TexRail/TRE. Routes each line's
 # inner terminus -> FW Central along real rail ROW (these corridors meet at Tower 55).
-$dir="C:\Users\justd\OneDrive\Documents\Ultiworld\dfw-transit"; $ddir="$dir\data"; $dbdir="$dir\db"
+$dir=(Split-Path $PSScriptRoot -Parent); $ddir="$dir\data"; $dbdir="$dir\db"
 $mlat=110540.0;$mlon=111320.0*[math]::Cos(32.75*[math]::PI/180)
 function RDist($alon,$alat,$blon,$blat){ [math]::Sqrt([math]::Pow(($alon-$blon)*$mlon,2)+[math]::Pow(($alat-$blat)*$mlat,2)) }
 $FWC=@(-97.325572,32.751994)   # Fort Worth Central (X113)

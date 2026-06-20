@@ -1,7 +1,7 @@
 $ErrorActionPreference="Stop"
 # Network overlap audit: for every pair of lines, what % of the SHORTER line lies within 250m of the other.
 # High coverage => near-duplicate (like Line 80 inside the FW Crosstown Loop). Partial = shared trunk (fine).
-$dir="C:\Users\justd\OneDrive\Documents\Ultiworld\dfw-transit"; $dbdir="$dir\db"
+$dir=(Split-Path $PSScriptRoot -Parent); $dbdir="$dir\db"
 function Hav($la1,$lo1,$la2,$lo2){ $R=6371.0;$dla=([math]::PI/180)*($la2-$la1);$dlo=([math]::PI/180)*($lo2-$lo1)
   $a=[math]::Sin($dla/2)*[math]::Sin($dla/2)+[math]::Cos([math]::PI/180*$la1)*[math]::Cos([math]::PI/180*$la2)*[math]::Sin($dlo/2)*[math]::Sin($dlo/2); return $R*2*[math]::Atan2([math]::Sqrt($a),[math]::Sqrt(1-$a)) }
 $segs=Import-Csv "$dbdir\segments.csv"

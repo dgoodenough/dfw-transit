@@ -1,5 +1,5 @@
 $ErrorActionPreference="Stop"
-$dir="C:\Users\justd\OneDrive\Documents\Ultiworld\dfw-transit\data"
+$dir=$PSScriptRoot
 $kmlPath="C:\Users\justd\Downloads\FW_Subway_extracted\doc.kml"
 
 function SegInt([double]$ax,[double]$ay,[double]$bx,[double]$by,[double]$cx,[double]$cy,[double]$dx,[double]$dy){

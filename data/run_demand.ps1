@@ -1,5 +1,5 @@
 $ErrorActionPreference="Stop"
-$dir="C:\Users\justd\OneDrive\Documents\Ultiworld\dfw-transit"; $ddir="$dir\data"; $dbdir="$dir\db"
+$dir=(Split-Path $PSScriptRoot -Parent); $ddir="$dir\data"; $dbdir="$dir\db"
 Add-Type -TypeDefinition (Get-Content "$ddir\DemandEngine.cs" -Raw) -Language CSharp
 
 $costPerKm=@{metro=150.0;brt=20.0;commuter=10.0}  # $M/km

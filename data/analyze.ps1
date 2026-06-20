@@ -1,5 +1,5 @@
 $ErrorActionPreference = "Stop"
-$dir = "C:\Users\justd\OneDrive\Documents\Ultiworld\dfw-transit\data"
+$dir = $PSScriptRoot
 $kmlPath = "C:\Users\justd\Downloads\FW_Subway_extracted\doc.kml"
 
 function Haversine($lat1,$lon1,$lat2,$lon2){

@@ -1,5 +1,5 @@
-﻿$ErrorActionPreference="Stop"
-$dir="C:\Users\justd\OneDrive\Documents\Ultiworld\dfw-transit"
+$ErrorActionPreference="Stop"
+$dir=(Split-Path $PSScriptRoot -Parent)
 $ddir="$dir\data"
 $dbdir="$dir\db"; New-Item -ItemType Directory -Force $dbdir | Out-Null
 # hand-edits round-trip: FW core lines exported as "<Line> (core)"; load any overrides
