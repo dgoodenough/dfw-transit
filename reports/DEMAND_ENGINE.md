@@ -6,25 +6,34 @@
 metroplex commutes across 827k tract-pairs), unified DB graph.*
 
 ## Model
-Line-aware graph from `db/` (1,286 nodes): ride edges per segment-line (metro
-32 / BRT 22 / commuter 50 km/h avg incl. stops), board 6 min, transfers via
-street nodes + 400 m walk links (6 min), tract access = walk ≤1.5 km or P&R
-drive ≤8 km to commuter/terminus stations. Drive baseline = **peak** door-to-door
+Line-aware graph from `db/`: ride edges per segment-line using the **spacing-
+dependent speed model** (segment time = length ÷ cruise + per-stop penalty;
+cruise 63 / BRT 38 / commuter 72 km/h, stop penalty 1.2 / 0.9 / 1.4 min — same
+model as the trip planner and map), board 6 min, transfers via street nodes +
+400 m walk links (6 min), tract access = walk ≤1.5 km or P&R drive ≤8 km to
+commuter/terminus stations. Drive baseline = **peak** door-to-door
 (38 km/h ×1.35 routing + 8 min terminal). **Competitive** = transit ≤ 1.3×drive
 +5 min, ≤90 min, trips >2 km only.
 
-## Calibration (existing network only)
-**80,657** addressable daily commutes vs. ~70k actual daily rail boardings
-(DART LRT ~60k, TRE ~7k, TexRail ~5k, A-train ~1.5k). Addressable should exceed
-chosen (capture <100%) — implied capture ~40–50%, plausible-to-generous.
-**Read absolute numbers as upper bounds; trust the relative rankings.**
-Per-line existing flows also rank sanely (TRE 24.3k > Orange 17.9k > Red 12.0k >
-Green 11.0k > TexRail 9.6k > Blue 8.4k > Silver 3.7k > A-train 3.5k).
-⚠️ First run with free-flow driving (55 km/h) produced nonsense (0.2%
-competitive) — the peak-conditions baseline is doing real work; it's also the
-model's biggest lever.
+> **Updated:** speeds synced from the old flat values (metro 32 / BRT 22 /
+> commuter 50) to the spacing model so the demand engine, trip planner, and map
+> agree. This made transit faster on sparse-stop (esp. commuter) segments,
+> roughly doubling addressable demand and — usefully — making the calibration
+> *more* realistic (see below). Full current rankings: `data/line_ranking.csv`.
 
-## Headline: full 2070 network = 199,696 addressable commutes (2.5× existing)
+## Calibration (existing network only)
+**160,892** addressable daily commutes vs. ~70k actual daily rail boardings
+(DART LRT ~60k, TRE ~7k, TexRail ~5k, A-train ~1.5k) → implied **~44% capture**
+of competitive trips — a realistic mode-share for "transit-competitive" O-D pairs
+(the old flat-speed run implied ~87%, implausibly high). **Trust the relative
+rankings over the absolute counts.** ⚠️ A first run with free-flow driving
+(55 km/h) produced nonsense (0.2% competitive) — the peak-conditions drive
+baseline is the model's biggest lever.
+
+## Headline: full 2070 network = 376,436 addressable commutes (2.3× existing)
+*(Numbers below predate the speed sync and are kept for shape; the live ranking
+is `data/line_ranking.csv` — top proposed lines now: TexPress 47.6, SE TexRail
+43.2, Ross BRT 38.2, TexRail-3rd 38, FTW/Denton 29.2 commutes per $M.)*
 
 ### Proposed lines ranked by value (commutes per $M capital)
 | Line | Mode | km | $M | Commutes | per $M |

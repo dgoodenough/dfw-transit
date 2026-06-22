@@ -6,7 +6,9 @@ using System.Globalization;
 public class DemandEngine
 {
     // ---- tunables ----
-    const double SpeedMetro = 32.0, SpeedBrt = 22.0, SpeedCommuter = 50.0; // km/h avg incl stops
+    // spacing-dependent: segment time = len/cruise*60 + per-stop penalty (matches plan_trip.ps1 / build_app)
+    const double CruiseMetro = 63.0, CruiseBrt = 38.0, CruiseCommuter = 72.0; // km/h between-stop cruise
+    const double StopMetro = 1.2, StopBrt = 0.9, StopCommuter = 1.4;          // min lost per stop (dwell + accel/decel)
     const double WalkKmh = 4.8, BoardMin = 6.0, XferWalkMin = 6.0;
     const double WalkAccessKm = 1.5, PnrKm = 8.0, PnrKmh = 40.0, PnrPenaltyMin = 5.0;
     // drive baseline = PEAK door-to-door (DFW peak avg ~38 km/h incl. signals) + parking/terminal time
@@ -101,7 +103,8 @@ public class DemandEngine
             var lns = c[iLine].Split(';'); var yrs = c[iY].Split(';');
             string mode = c[iSm];
             string lid = c[iSegLid];
-            double speed = mode == "commuter" ? SpeedCommuter : (mode == "brt" ? SpeedBrt : SpeedMetro);
+            double cruise = mode == "commuter" ? CruiseCommuter : (mode == "brt" ? CruiseBrt : CruiseMetro);
+            double tstop = mode == "commuter" ? StopCommuter : (mode == "brt" ? StopBrt : StopMetro);
             for (int k = 0; k < lns.Length; k++)
             {
                 int y = int.Parse(yrs[Math.Min(k, yrs.Length - 1)]);
@@ -109,7 +112,7 @@ public class DemandEngine
                 string ln = lid.Length > 0 ? lid + ":" + lns[k] : lns[k];   // disambiguate name collisions (two 'Silver's)
                 if (!lineLenKm.ContainsKey(ln)) { lineLenKm[ln] = 0; lineMode[ln] = mode; }
                 lineLenKm[ln] += len;
-                double t = len / speed * 60.0;
+                double t = len / cruise * 60.0 + tstop;
                 int a = GetLineNode(fi, ln), b = GetLineNode(ti, ln);
                 AddEdge(a, b, t); AddEdge(b, a, t); nRide += 2;
             }

@@ -27,10 +27,10 @@ truth — edit a `year_opens` cell, re-run the build, and every artifact updates
 
 | Table | Rows | What it holds |
 |---|---|---|
-| `stations.csv` | 599 | id, name, mode, lat/lon, `year_opens`, activity (pop+jobs within 1 km), serving lines |
+| `stations.csv` | 536 | id, name, mode, lat/lon, `year_opens`, activity (pop+jobs within 1 km), serving lines |
 | `lines.csv` | 44 | line id, name, mode, color |
-| `station_lines.csv` | 638 | line ↔ station membership + stop order |
-| `segments.csv` | 565 | geometry (WKT LINESTRING) between adjacent stations, with per-line open years |
+| `station_lines.csv` | 686 | line ↔ station membership + stop order |
+| `segments.csv` | 613 | geometry (WKT LINESTRING) between adjacent stations, with per-line open years |
 
 From those tables, the pipeline (`data/build_*.ps1` + two C# engines) generates:
 
