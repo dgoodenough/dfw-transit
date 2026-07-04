@@ -1,29 +1,69 @@
-# DFW Transit — Hypothetical Network Model
+# DFW Transit: a buildable future for a car-dependent metro
 
-A from-scratch model of a **hypothetical mass-transit network for the
-Dallas–Fort Worth metroplex** — a Fort Worth subway core plus commuter rail, BRT,
-and the existing systems across the wider metroplex. It's a single source-of-truth
-database that drives an interactive map, demand scoring, a trip planner, and
-time-series build-out visuals.
+**A hypothetical mass-transit network for Dallas–Fort Worth, modeled as a phased
+build-out.** A Fort Worth subway core, commuter rail, and BRT that grow across the
+metroplex decade by decade, with every line grounded in real Census + LODES demand.
 
-> Speculative urbanism, not an official plan. Geometry and phasing are the
-> author's own; demand figures use real Census + LODES data where noted.
+> Speculative urbanism, not an official plan. Geometry and phasing are my own;
+> demand figures use real Census + LODES data where noted.
 
-![Fort Worth Phase One — a generated transit map from the source-of-truth database](maps/FW_PhaseOne_revised.png)
+![Fort Worth Phase One, a generated transit map from the source-of-truth database](maps/FW_PhaseOne_revised.png)
 
-## The four routing rules
+## The problem
 
-Every line in the model is checked against four rules:
+Fantasy transit maps are fun to draw, and just as easy to dismiss. They never show
+how you'd actually get there from where we are today. This is a question I've come
+back to for years: DFW is one of the largest metros in the country and has basically
+no rapid-transit spine, and I wanted to see whether a serious, buildable answer
+could feel real instead of aspirational. So that's what I built. Not a finished map,
+but the first plausible step, and what a lifetime of momentum builds from it.
 
-1. **Commuter rail follows existing rail lines.**
-2. **Minimize tunnels under rivers** where possible.
-3. **Metro follows existing right-of-way (ROW)** when possible.
-4. **BRT only follows existing ROW.**
+## Who it's for
+
+Someone who wants real transit in DFW but doesn't think it can happen here. I'll
+admit part of the audience is me. The hope is you move the slider, watch the network
+grow out of a small first phase, and think "oh, there's actually a path to this."
+
+## What I built
+
+A single source-of-truth database of the network, rendered into an
+[interactive Leaflet map](maps/FW_map_interactive.html) with a **time-slider**. Drag
+it and the network builds itself out year by year, so incremental investment is
+something you can see instead of argue about. Every station is scored on real
+population and jobs data, so the phasing follows demand, not whichever lines look
+nicest.
+
+## Key product and technical decisions
+
+- **One source of truth, regenerate everything.** The whole network is four CSV
+  tables. Edit one `year_opens` cell and the map, time-series, demand scores, and
+  trip planner all rebuild. I did this out of necessity, not polish. Making the
+  future feel real meant changing my mind constantly as I found better data and
+  imperfect alignments, and I needed every artifact to stay in sync.
+- **Phasing follows demand.** A demand engine scores each station on the population
+  and jobs within reach (2020 Census, 2022 LODES), so the build order has a reason
+  behind it.
+- **Geometry stays buildable.** Four routing rules keep alignments on things that
+  already exist: commuter rail follows existing rail, metro follows existing
+  right-of-way, BRT follows ROW only, and river tunnels are minimized.
+- **Pragmatic stack.** PowerShell, two small C# engines, and Leaflet. Plain CSV
+  keeps the source of truth human-editable and easy to diff in git. The tables are
+  the interface.
 
 ## How it works
 
-The network lives in **four CSV tables** (`db/`) that are the single source of
-truth — edit a `year_opens` cell, re-run the build, and every artifact updates:
+```mermaid
+flowchart LR
+  subgraph SoT["Source of truth (db/, 4 CSV tables)"]
+    S[stations.csv] & L[lines.csv] & SL[station_lines.csv] & SG[segments.csv]
+  end
+  SoT --> B["Build pipeline<br/>(build_*.ps1 + C# engines)"]
+  B --> M[Interactive map<br/>+ time-slider]
+  B --> T[Time-series maps]
+  B --> D[Demand scores]
+  B --> P[Trip planner]
+  B --> A[Audits & validation]
+```
 
 | Table | Rows | What it holds |
 |---|---|---|
@@ -32,18 +72,25 @@ truth — edit a `year_opens` cell, re-run the build, and every artifact updates
 | `station_lines.csv` | 686 | line ↔ station membership + stop order |
 | `segments.csv` | 613 | geometry (WKT LINESTRING) between adjacent stations, with per-line open years |
 
-From those tables, the pipeline (`data/build_*.ps1` + two C# engines) generates:
+See [`reports/FW_PhaseOne_Review.md`](reports/FW_PhaseOne_Review.md) for a worked
+analysis pass and [`db/README.md`](db/README.md) for the data model.
 
-- **`maps/FW_map_interactive.html`** — a Leaflet map rendered entirely from the DB.
-- **Time-series build-out maps** (`maps/FW_timeseries_P*.{png,svg}`) — the network
-  growing over time.
-- **A demand engine** (`data/DemandEngine.cs`) — scores stations by population +
-  jobs accessibility (2020 Census + 2022 LODES).
-- **A road/ROW router** (`data/RoadRouter.cs`, `data/build_rail_router.ps1`) — snaps
-  lines to existing rail/road right-of-way per the routing rules.
-- **A trip planner** (`data/plan_trip.ps1`, `data/route_graph.json`).
-- **Audits & validation** (`data/audit_*.ps1`, `validate_network.ps1`) — ROW
-  conformance, river crossings, orphan segments.
+## Impact
+
+Not a ridership number, an existence proof. A 536-station, 44-line network that
+starts from a small, believable first phase, follows buildable right-of-way, and is
+ordered by real demand, all reproducible from four tables you can edit by hand.
+
+## V2 roadmap
+
+The slider works and the bones are here. V2 is about making it more realistic and
+more complete:
+
+- Fix the downtown alignments (the weakest part right now).
+- Make the alignments more realistic in general.
+- Loop in more BRT corridors.
+- Add the full bus network (the biggest gap).
+- Add bike lanes as another layer.
 
 ## Repository layout
 
@@ -53,30 +100,20 @@ data/      build_*.ps1 generators, DemandEngine.cs / RoadRouter.cs, source data
 maps/      generated visuals: interactive map, time-series, Phase One review
 reports/   analysis notes (DESIGN_STANDARDS, DEMAND_ENGINE, TRIP_PLANNER, audits)
 edit/      editable line geometry (geojson + kml)
-refs/      README pointing to the design-standard source PDFs (the PDFs themselves
-           are not redistributed — see below)
+refs/      README pointing to the design-standard source PDFs (not redistributed)
 ```
 
-Start with [`reports/FW_PhaseOne_Review.md`](reports/FW_PhaseOne_Review.md) for a
-worked analysis pass, and [`db/README.md`](db/README.md) for the data model.
+## Data sources and attribution
 
-## Data sources & attribution
+- **US Census Bureau:** 2020 Decennial (centers of population), 2022 LEHD LODES
+  (origin-destination + jobs). Public domain.
+- **OpenStreetMap:** road/rail right-of-way extracts. © OpenStreetMap contributors,
+  [ODbL](https://www.openstreetmap.org/copyright).
 
-- **US Census Bureau** — 2020 Decennial (block-group centers of population),
-  2022 LEHD LODES (origin-destination + jobs). Public domain.
-- **OpenStreetMap** — road/rail right-of-way extracts. © OpenStreetMap
-  contributors, licensed under the [ODbL](https://www.openstreetmap.org/copyright).
-
-## What's excluded from this repo
-
-To keep it lean and avoid redistributing third-party material, `.gitignore` omits:
-
-- **`refs/*.pdf`** — copyrighted design standards (TCRP, ITDP BRT Standard, TxDOT
-  specs, FRA superelevation). `refs/README.md` lists each document and a free
-  download source.
-- **Large raw geodata** — the multi-megabyte OSM network extracts and Census LODES
-  files (`data/dfw_arterials.json`, `data/tx_od.csv.gz`, etc.). They're reproducible
-  from the sources above; the curated `db/` tables and smaller derived data remain.
+Large raw geodata (OSM extracts, LODES files) and copyrighted design-standard PDFs
+(TCRP, ITDP, TxDOT, FRA) are `.gitignore`d to keep the repo lean. Both are
+reproducible from the sources above, and `refs/README.md` lists each with a
+download source.
 
 ## Stack
 
@@ -84,5 +121,5 @@ PowerShell · C# · Leaflet · CSV/GeoJSON/WKT · Census + LODES + OSM data.
 
 ## License
 
-[MIT](LICENSE) — covers the original code and the author's network data, not the
-third-party datasets or reference documents it draws on.
+[MIT](LICENSE). Covers my code and network data, not the third-party datasets or
+reference documents it draws on.
