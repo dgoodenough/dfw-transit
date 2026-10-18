@@ -27,7 +27,7 @@ grow out of a small first phase, and think "oh, there's actually a path to this.
 ## What I built
 
 A source-of-truth set of network tables, a model that scores any plan against
-real population and jobs data, and an [interactive map](https://dgoodenough.github.io/dfw-transit/docs/)
+real population and jobs data, and an [interactive map](https://dgoodenough.github.io/dfw-transit/)
 ([source](docs/index.html)) with a
 **time slider**, a **plan switcher** (v2 vs. the original v1) and a click-two-stations
 **trip planner**. Drag the slider and the network builds itself out year by year,
