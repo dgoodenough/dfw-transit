@@ -1,0 +1,310 @@
+<title>DFW Transit Panel Review</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Barlow:wght@400;500;600&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&display=swap">
+<style>
+/* Layout: a single reading column styled like a transit agency's board packet. Speakers carry route-bullet badges; data figures sit in ruled exhibits. */
+:root{
+  --paper:#f4f6f5; --panel:#ffffff; --ink:#18212b; --muted:#566370; --rule:#d5dcdf;
+  --accent:#c96f00;            /* Fort Worth Orange, from the plan's own line colors */
+  --teal:#00965a; --blue:#0b7fc0; --purple:#7b2d8e; --crimson:#b3123a; --slate:#56646f;
+  --good:#1d7f4e; --warn:#a86100; --bad:#b3123a;
+  --bar-a:#9fb3bf; --bar-b:#c96f00;
+  --f-display:"Barlow Condensed","Arial Narrow",Arial,sans-serif;
+  --f-ui:"Barlow","Helvetica Neue",Arial,sans-serif;
+  --f-body:"Source Serif 4",Georgia,"Times New Roman",serif;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --paper:#11171d; --panel:#18212a; --ink:#e7ecef; --muted:#9aa8b3; --rule:#2c3946;
+  --accent:#f29a2e; --teal:#3cc48a; --blue:#4fb0ea; --purple:#b77fcb; --crimson:#ef5a7a; --slate:#9aa8b3;
+  --good:#4cc488; --warn:#f2a64a; --bad:#ef6a86; --bar-a:#4c6070; --bar-b:#f29a2e; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --paper:#11171d; --panel:#18212a; --ink:#e7ecef; --muted:#9aa8b3; --rule:#2c3946;
+  --accent:#f29a2e; --teal:#3cc48a; --blue:#4fb0ea; --purple:#b77fcb; --crimson:#ef5a7a; --slate:#9aa8b3;
+  --good:#4cc488; --warn:#f2a64a; --bad:#ef6a86; --bar-a:#4c6070; --bar-b:#f29a2e; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--paper);color:var(--ink);font-family:var(--f-body);font-size:17px;line-height:1.6;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.wrap{max-width:780px;margin:0 auto;padding-block:40px 80px}
+h1,h2,h3{font-family:var(--f-display);font-weight:700;line-height:1.08;text-wrap:balance;margin:0}
+h1{font-size:clamp(2.4rem,7vw,3.6rem);letter-spacing:-.01em}
+h2{font-size:1.9rem;margin-top:56px;padding-top:14px;border-top:3px solid var(--ink)}
+h3{font-size:1.3rem;font-weight:600}
+p{margin:0}
+.eyebrow{font-family:var(--f-ui);font-size:.78rem;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--accent)}
+.lede{font-size:1.18rem;color:var(--ink);max-width:62ch}
+.note{font-family:var(--f-ui);font-size:.86rem;color:var(--muted);max-width:68ch}
+.stack{display:flex;flex-direction:column;gap:16px}
+.head{display:flex;flex-direction:column;gap:14px}
+.strip{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:0;margin-top:28px;border-top:1px solid var(--rule);border-bottom:1px solid var(--rule)}
+.strip div{padding:14px 12px 14px 0;font-family:var(--f-ui)}
+.strip div+div{padding-left:14px;border-left:1px solid var(--rule)}
+.strip b{display:block;font-family:var(--f-display);font-size:1.9rem;font-weight:600;font-variant-numeric:tabular-nums;line-height:1}
+.strip b small{font-size:1rem;color:var(--muted);font-weight:500}
+.strip span{font-size:.82rem;color:var(--muted);line-height:1.35;display:block;margin-top:6px}
+@media (max-width:620px){.strip{grid-template-columns:repeat(2,minmax(0,1fr))}.strip div:nth-child(3){border-left:0;padding-left:0}.strip div:nth-child(n+3){border-top:1px solid var(--rule)}}
+
+.cast{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;margin-top:18px}
+.who{display:flex;gap:12px;align-items:flex-start;background:var(--panel);border:1px solid var(--rule);border-radius:6px;padding:12px 14px;min-width:0}
+.who p{font-family:var(--f-ui);font-size:.88rem;line-height:1.4;color:var(--muted)}
+.who strong{display:block;color:var(--ink);font-size:.98rem}
+.bullet{flex:0 0 auto;width:36px;height:36px;border-radius:50%;display:grid;place-items:center;color:#fff;
+  font-family:var(--f-display);font-weight:700;font-size:1rem;letter-spacing:.02em}
+.b-mv{background:var(--blue)} .b-kt{background:var(--teal)} .b-ho{background:var(--purple)} .b-pr{background:var(--slate)} .b-sec{background:var(--crimson)}
+
+.round{display:flex;flex-direction:column;gap:22px;margin-top:22px}
+.say{display:grid;grid-template-columns:36px minmax(0,1fr);gap:14px}
+.say .bullet{margin-top:3px}
+.say .name{font-family:var(--f-ui);font-size:.8rem;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin-bottom:2px}
+.say p+p{margin-top:10px}
+.num{font-family:var(--f-ui);font-variant-numeric:tabular-nums;font-weight:600;white-space:nowrap}
+
+figure{margin:26px 0 0;background:var(--panel);border:1px solid var(--rule);border-radius:6px;padding:18px 18px 14px}
+figcaption{font-family:var(--f-ui);font-size:.82rem;color:var(--muted);margin-top:10px;line-height:1.45}
+.fig-title{font-family:var(--f-display);font-size:1.15rem;font-weight:600;margin-bottom:10px}
+.chart{width:100%;height:auto;display:block}
+.chart text{font-family:var(--f-ui);fill:var(--muted);font-size:12px}
+.chart .lbl{fill:var(--ink);font-weight:600}
+.chart .grid{stroke:var(--rule);stroke-width:1}
+.chart .plan{fill:none;stroke:var(--ink);stroke-width:2.5}
+.chart .dot{fill:var(--ink)}
+.chart .win{fill:var(--accent)}
+.chart .winline{stroke:var(--accent);stroke-width:1.5;stroke-dasharray:4 4}
+
+.bars{display:grid;grid-template-columns:minmax(90px,150px) minmax(0,1fr);gap:6px 12px;align-items:center;font-family:var(--f-ui);font-size:.86rem}
+.bars .lab{color:var(--ink);text-align:right;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.track{position:relative;height:22px;display:flex;flex-direction:column;justify-content:center;gap:3px}
+.bar{height:8px;border-radius:2px;min-width:2px}
+.bar.a{background:var(--bar-a)} .bar.b{background:var(--bar-b)}
+.track .v{position:absolute;right:0;top:50%;transform:translateY(-50%);font-variant-numeric:tabular-nums;color:var(--muted);font-size:.78rem;background:var(--panel);padding-left:6px}
+.legend{display:flex;gap:16px;flex-wrap:wrap;font-family:var(--f-ui);font-size:.8rem;color:var(--muted);margin-bottom:12px}
+.legend i{display:inline-block;width:14px;height:8px;border-radius:2px;margin-right:6px;vertical-align:middle}
+.vbar{height:14px;border-radius:2px;background:var(--bar-b)}
+.vbar.low{background:var(--bar-a)}
+.vrow .track{height:18px}
+
+.table-wrap{overflow-x:auto;margin-top:22px;border:1px solid var(--rule);border-radius:6px;background:var(--panel)}
+table{border-collapse:collapse;width:100%;min-width:640px;font-family:var(--f-ui);font-size:.88rem;line-height:1.4}
+th,td{text-align:left;vertical-align:top;padding:10px 12px;border-bottom:1px solid var(--rule)}
+th{font-weight:600;font-size:.74rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+tr:last-child td{border-bottom:0}
+td.id{font-family:var(--f-display);font-weight:700;font-size:1.05rem;white-space:nowrap}
+.pill{display:inline-block;font-size:.72rem;font-weight:600;letter-spacing:.05em;text-transform:uppercase;padding:2px 8px;border-radius:99px;white-space:nowrap;border:1px solid currentColor}
+.pill.now{color:var(--good)} .pill.scen{color:var(--warn)} .pill.later{color:var(--muted)}
+.mini{display:inline-flex;gap:3px;vertical-align:middle}
+.mini i{width:10px;height:10px;border-radius:50%;display:inline-block}
+.method{margin-top:56px;padding-top:14px;border-top:1px solid var(--rule)}
+.method li{margin-bottom:6px}
+.method ul{padding-left:20px;margin:10px 0 0;font-family:var(--f-ui);font-size:.88rem;color:var(--muted);line-height:1.5}
+a{color:var(--accent)}
+a:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+</style>
+
+<div class="wrap">
+  <header class="head">
+    <div class="eyebrow">Board packet · Review of the v1 plan</div>
+    <h1>Five riders read the DFW plan</h1>
+    <p class="lede">Two commuters, a transit researcher, a software engineer and the federal transportation secretary's chair each read the 536-station, 44-line DFW Transit plan. Every number they cite comes from re-running the plan through a rebuilt model.</p>
+    <p class="note">The panelists are fictional composites written by Claude. The federal seat speaks for the office of the U.S. Secretary of Transportation, not for any real person. The rebuilt model is described at the bottom of the page.</p>
+  </header>
+
+  <div class="strip" aria-label="Headline numbers for the v1 plan">
+    <div><b>5% <small>→ 22%</small></b><span>Residents within walking distance of a station, today → 2070</span></div>
+    <div><b>96k <small>→ 343k</small></b><span>Daily commutes where transit is competitive with driving</span></div>
+    <div><b>26k <small>→ 78k</small></b><span>Jobs the average resident can reach by transit in 45 minutes</span></div>
+    <div><b>$104B</b><span>Capital cost through 2070 at realistic U.S. unit costs, 2025 dollars</span></div>
+  </div>
+
+  <h2 id="panel">The panel</h2>
+  <div class="cast">
+    <div class="who"><span class="bullet b-mv" aria-hidden="true">MV</span><p><strong>Marisol Vega</strong>ICU nurse at JPS Hospital. Lives in Polytechnic, east Fort Worth. Rotating 12-hour shifts, one car shared with her son.</p></div>
+    <div class="who"><span class="bullet b-kt" aria-hidden="true">KT</span><p><strong>Kevin Tran</strong>Analyst at a Legacy West firm in Plano. Lives in McKinney. Drives US-75 and SH-121, 35 to 55 minutes each way.</p></div>
+    <div class="who"><span class="bullet b-ho" aria-hidden="true">HO</span><p><strong>Dr. Helen Okafor</strong>Transportation researcher. Works on accessibility metrics, ridership models and capital cost benchmarking.</p></div>
+    <div class="who"><span class="bullet b-pr" aria-hidden="true">PR</span><p><strong>Priya Raman</strong>Staff software engineer. Has built routing and data pipelines for a logistics company.</p></div>
+    <div class="who"><span class="bullet b-sec" aria-hidden="true">US</span><p><strong>The Secretary</strong>U.S. Secretary of Transportation, speaking for the office: federal funding, safety and project delivery.</p></div>
+  </div>
+
+  <h2 id="shows">1 · What the project shows</h2>
+  <div class="round">
+    <div class="say"><span class="bullet b-ho" aria-hidden="true">HO</span><div>
+      <div class="name">Okafor</div>
+      <p>This is a phased network, so it can be judged as one. Today about <span class="num">5%</span> of residents in the nine counties live within walking distance of a rail station, and transit is competitive with driving for about <span class="num">96,000</span> daily commutes. The full plan raises those to <span class="num">22%</span> and <span class="num">343,000</span>. The average resident could reach three times as many jobs in 45 minutes. That's a real change for a region this size.</p>
+      <p>The shape of the curve matters more than where it ends. Most of the gain comes between 2035 and 2050. After 2050 the plan spends about <span class="num">$54B</span> to add about <span class="num">60,000</span> competitive commutes.</p>
+    </div></div>
+    <div class="say"><span class="bullet b-pr" aria-hidden="true">PR</span><div>
+      <div class="name">Raman</div>
+      <p>It also shows good engineering instincts. One set of tables drives the map, the trip planner and the demand scores. When I loaded those tables cleanly, though, the station opening years and the track opening years disagreed on <span class="num">238</span> of <span class="num">642</span> line-to-stop links. The map, the planner and the scores were each drawing a slightly different network. The idea is right. The implementation had drifted.</p>
+    </div></div>
+    <div class="say"><span class="bullet b-mv" aria-hidden="true">MV</span><div>
+      <div class="name">Vega</div>
+      <p>It shows my neighborhood. The Blue Line runs down East Lancaster through Poly, and the Main Street spine goes right past JPS. Nobody has ever drawn me on a rail map before.</p>
+    </div></div>
+    <div class="say"><span class="bullet b-sec" aria-hidden="true">US</span><div>
+      <div class="name">The Secretary</div>
+      <p>It shows a region that already has the hard parts: freight corridors, two transit agencies running rail, and a new regional line in DART's Silver Line. What it lacks is a sequence that a funding partner can say yes to, one project at a time.</p>
+    </div></div>
+  </div>
+
+  <figure>
+    <div class="fig-title">Competitive commutes under the v1 phasing</div>
+    <svg class="chart" viewBox="0 0 680 270" role="img" aria-label="Line chart of daily transit-competitive commutes from 96 thousand in 2025 to 343 thousand in 2070, with a 2030 quick-win scenario at 171 thousand">
+      <line class="grid" x1="60" x2="640" y1="220" y2="220"/>
+      <line class="grid" x1="60" x2="640" y1="165.7" y2="165.7"/>
+      <line class="grid" x1="60" x2="640" y1="111.4" y2="111.4"/>
+      <line class="grid" x1="60" x2="640" y1="57.1" y2="57.1"/>
+      <text x="52" y="224" text-anchor="end">0</text>
+      <text x="52" y="169.7" text-anchor="end">100k</text>
+      <text x="52" y="115.4" text-anchor="end">200k</text>
+      <text x="52" y="61.1" text-anchor="end">300k</text>
+      <text x="60" y="242" text-anchor="middle">2025</text>
+      <text x="184.4" y="242" text-anchor="middle">2035</text>
+      <text x="308.9" y="242" text-anchor="middle">2045</text>
+      <text x="433.3" y="242" text-anchor="middle">2055</text>
+      <text x="557.8" y="242" text-anchor="middle">2065</text>
+      <text x="620" y="242" text-anchor="middle">2070</text>
+      <polyline class="plan" points="60,167.9 122.2,167.9 184.4,151.4 246.7,121.0 308.9,85.2 371.1,66.6 433.3,60.0 495.6,52.0 557.8,44.8 620,33.9"/>
+      <circle class="dot" cx="60" cy="167.9" r="4"/>
+      <circle class="dot" cx="246.7" cy="121.0" r="4"/>
+      <circle class="dot" cx="371.1" cy="66.6" r="4"/>
+      <circle class="dot" cx="620" cy="33.9" r="4"/>
+      <text class="lbl" x="68" y="185">96k today</text>
+      <text class="lbl" x="254" y="136">182k · $20B spent</text>
+      <text class="lbl" x="379" y="84">283k · $50B</text>
+      <text class="lbl" x="612" y="22" text-anchor="end">343k · $104B</text>
+      <line class="winline" x1="122.2" x2="246.7" y1="127.3" y2="127.3"/>
+      <circle class="win" cx="122.2" cy="127.3" r="6"/>
+      <text x="122.2" y="112" text-anchor="middle" style="fill:var(--accent);font-weight:600">2030 quick wins: 171k · $0.9B</text>
+    </svg>
+    <figcaption>Daily home-to-work commutes where transit takes no more than 1.3 × the peak drive time plus 5 minutes. The orange point is a 2030 test: today's rail every 15 minutes (light rail every 10) plus the four best-scoring BRT corridors opened early. It reaches about the level the v1 plan reaches in 2040.</figcaption>
+  </figure>
+
+  <h2 id="excites">2 · What excites them</h2>
+  <div class="round">
+    <div class="say"><span class="bullet b-kt" aria-hidden="true">KT</span><div>
+      <div class="name">Tran</div>
+      <p>The time slider. My manager thinks transit here is a fantasy. Watching the network grow out of something small does more than any argument I could make.</p>
+    </div></div>
+    <div class="say"><span class="bullet b-ho" aria-hidden="true">HO</span><div>
+      <div class="name">Okafor</div>
+      <p>The cheap corridors are the most efficient spending in the plan. Forest Lane BRT returns about <span class="num">80</span> competitive commutes per million dollars and Ross Avenue BRT about <span class="num">66</span>. The best metro line, Fort Worth's short Purple branch to TCU, returns about <span class="num">15</span> and most metro lines return 1 to 4. Forest Lane is a 16 km BRT on an arterial that already exists. A plan that leads with corridors like that is one I would fund.</p>
+      <p>I also like that it reuses freight right-of-way and keeps the river crossings few. Those are the right constraints.</p>
+    </div></div>
+    <div class="say"><span class="bullet b-mv" aria-hidden="true">MV</span><div>
+      <div class="name">Vega</div>
+      <p>The trip planner. I tried Poly to JPS for 2040 and got one transfer at Central Station. That's a real commute I could make.</p>
+    </div></div>
+    <div class="say"><span class="bullet b-pr" aria-hidden="true">PR</span><div>
+      <div class="name">Raman</div>
+      <p>Plain CSV as the interface. It diffs in git, a non-programmer can edit it, and it doesn't lock anyone into a GIS license. Keep that.</p>
+    </div></div>
+    <div class="say"><span class="bullet b-sec" aria-hidden="true">US</span><div>
+      <div class="name">The Secretary</div>
+      <p>A demand score for every station, published openly. Capital Investment Grant ratings rest on mobility, cost-effectiveness and land use. A plan that shows its own math is easier for a federal partner to say yes to.</p>
+    </div></div>
+  </div>
+
+  <figure>
+    <div class="fig-title">Value of each proposed line per $1M of capital</div>
+    <div class="legend"><span><i style="background:var(--bar-b)"></i>Best 10</span><span><i style="background:var(--bar-a)"></i>Weakest 8</span></div>
+    <div class="bars">
+      <div class="lab">Forest Lane BRT</div><div class="track vrow"><div class="vbar" style="width:calc(80.1% * .86)"></div><span class="v">80.1</span></div>
+      <div class="lab">Ross Avenue BRT</div><div class="track vrow"><div class="vbar" style="width:calc(65.7% * .86)"></div><span class="v">65.7</span></div>
+      <div class="lab">Jacksboro BRT ("46")</div><div class="track vrow"><div class="vbar" style="width:calc(17.0% * .86)"></div><span class="v">17.0</span></div>
+      <div class="lab">FW Purple (TCU)</div><div class="track vrow"><div class="vbar" style="width:calc(14.9% * .86)"></div><span class="v">14.9</span></div>
+      <div class="lab">FW Red</div><div class="track vrow"><div class="vbar" style="width:calc(6.7% * .86)"></div><span class="v">6.7</span></div>
+      <div class="lab">Collin Commuter</div><div class="track vrow"><div class="vbar" style="width:calc(5.4% * .86)"></div><span class="v">5.4</span></div>
+      <div class="lab">Terrell Line</div><div class="track vrow"><div class="vbar" style="width:calc(4.4% * .86)"></div><span class="v">4.4</span></div>
+      <div class="lab">FW Blue</div><div class="track vrow"><div class="vbar" style="width:calc(4.2% * .86)"></div><span class="v">4.2</span></div>
+      <div class="lab">Jefferson Blvd BRT</div><div class="track vrow"><div class="vbar" style="width:calc(4.2% * .86)"></div><span class="v">4.2</span></div>
+      <div class="lab">DNT Line West</div><div class="track vrow"><div class="vbar" style="width:calc(4.2% * .86)"></div><span class="v">4.2</span></div>
+      <div class="lab">Arlington Purple</div><div class="track vrow"><div class="vbar low" style="width:calc(0.75% * .86)"></div><span class="v">0.75</span></div>
+      <div class="lab">FW Crosstown Loop</div><div class="track vrow"><div class="vbar low" style="width:calc(0.69% * .86)"></div><span class="v">0.69</span></div>
+      <div class="lab">Gainesville Line</div><div class="track vrow"><div class="vbar low" style="width:calc(0.68% * .86)"></div><span class="v">0.68</span></div>
+      <div class="lab">TexRail 3rd ext.</div><div class="track vrow"><div class="vbar low" style="width:calc(0.56% * .86)"></div><span class="v">0.56</span></div>
+      <div class="lab">Ennis Line</div><div class="track vrow"><div class="vbar low" style="width:calc(0.36% * .86)"></div><span class="v">0.36</span></div>
+      <div class="lab">Bowie Line</div><div class="track vrow"><div class="vbar low" style="width:calc(0.18% * .86)"></div><span class="v">0.18</span></div>
+      <div class="lab">White Settlement BRT</div><div class="track vrow"><div class="vbar low" style="width:2px"></div><span class="v">≈ 0</span></div>
+      <div class="lab">Woodhaven direct</div><div class="track vrow"><div class="vbar low" style="width:2px"></div><span class="v">≈ 0</span></div>
+    </div>
+    <figcaption>Competitive commutes lost if the line is removed, divided by its capital cost in $M. Each line is tested in the year it opens and in the finished 2070 network, and the higher of the two is shown, so trunk lines that later share track with branches aren't undercounted. Bars use one linear scale from 0 to about 93.</figcaption>
+  </figure>
+
+  <h2 id="misses">3 · Where it misses</h2>
+  <div class="round">
+    <div class="say"><span class="bullet b-mv" aria-hidden="true">MV</span><div>
+      <div class="name">Vega</div>
+      <p>Nothing changes for me until 2035. The first ten years of the slider are empty. When the trains do come, the model assumes they run often, but today's TRE and TEXRail come every 30 minutes or worse. If I miss one after a night shift, I wait half an hour in the dark. Frequency matters more to me than where the line is drawn.</p>
+    </div></div>
+    <div class="say"><span class="bullet b-kt" aria-hidden="true">KT</span><div>
+      <div class="name">Tran</div>
+      <p>Collin County gets left behind. It has over a million people and the fastest growth in the region, yet only <span class="num">10%</span> of us live near a station even in 2070. Dallas and Tarrant counties reach about <span class="num">30%</span>. The biggest commute flows the old model found were McKinney and Frisco to Legacy, and the plan has no line that makes that trip.</p>
+      <p>Then the details. The McKinney commuter line opens in 2040 but connects to nothing until 2050. A stop on the Legacy Line is named "Eating Recovery Center Dallas / Plano", and there are three of them in a row. I wouldn't know where to get off.</p>
+    </div></div>
+    <div class="say"><span class="bullet b-ho" aria-hidden="true">HO</span><div>
+      <div class="name">Okafor</div>
+      <p>Three problems with the method. First, cost. The v1 numbers used about $10M per km for commuter rail on freight right-of-way, but TEXRail came in near $24M/km and DART's Silver Line near $45M/km. The same per-line math also charged shared track two or three times. At realistic costs, the outer commuter legs (Bowie, Gainesville, Ennis) move from the best money in the plan to the worst.</p>
+      <p>Second, mode. Assign every competitive commute to its fastest path and the busiest proposed link carries roughly <span class="num">1,000</span> people in the peak hour in the peak direction. That is a quarter of what a good BRT carries and about 5% of metro capacity. On commute demand alone, nothing here needs metro. Metro may still be right for speed, reliability and land use, but each metro line should have to beat a light-rail or BRT version of itself. The 93 km Arlington–Mansfield Purple line, at $12.6B and 0.75 commutes per $1M, is where to start.</p>
+      <p>Third, the plan isn't always connected. In 2045, 18 stations can't be reached from the rest of the system. The Midlothian line ends at Oak Cliff, about a kilometer short of the Red Line at Westmoreland, and is effectively stranded for 25 years. More than 50 pairs of stations share a name and a neighborhood, like the two Handleys, Uptown or Frisco, but sit 400 to 1,200 m apart with no transfer between them.</p>
+    </div></div>
+    <div class="say"><span class="bullet b-pr" aria-hidden="true">PR</span><div>
+      <div class="name">Raman</div>
+      <p>The pipeline only runs on one Windows machine, and some inputs still come from a Downloads folder. Speeds were copied by hand into three places: the demand engine, the trip planner and the map. They had already disagreed once. There are no tests, no CI, and there's no way to compare two phasing plans except by eye. Rebuilding the tables also overwrites any hand edits. "Edit the CSV" is the promise, and regeneration quietly breaks it.</p>
+      <p>Line names need fixing too. Two lines are both called "Silver", and the map toggles them together. Meanwhile DART's real Silver Line, which opened in 2025, is labeled "Cotton Belt". Other lines are just named "3", "46" and "BRT".</p>
+    </div></div>
+    <div class="say"><span class="bullet b-sec" aria-hidden="true">US</span><div>
+      <div class="name">The Secretary</div>
+      <p>The plan opens with Fort Worth's $6B downtown metro, which is its most expensive commitment. A federal partner would want the opposite: early, fundable projects that show ridership and build trust, then the big tunnel once the region has a delivery record. I'd also want to see the people the plan serves, not only the commutes. Car ownership, income and safety data aren't in the model yet. Without them nobody can say whether the 2035 network reaches the residents who need it most.</p>
+    </div></div>
+  </div>
+
+  <figure>
+    <div class="fig-title">Residents within walking distance of a station, by county</div>
+    <div class="legend"><span><i style="background:var(--bar-a)"></i>2025</span><span><i style="background:var(--bar-b)"></i>2070, v1 plan</span></div>
+    <div class="bars">
+      <div class="lab">Dallas · 2.6M</div><div class="track"><div class="bar a" style="width:calc(8.9% * 2.6)"></div><div class="bar b" style="width:calc(28.8% * 2.6)"></div><span class="v">8.9% → 28.8%</span></div>
+      <div class="lab">Tarrant · 2.1M</div><div class="track"><div class="bar a" style="width:calc(4.1% * 2.6)"></div><div class="bar b" style="width:calc(30.5% * 2.6)"></div><span class="v">4.1% → 30.5%</span></div>
+      <div class="lab">Collin · 1.1M</div><div class="track"><div class="bar a" style="width:calc(1.8% * 2.6)"></div><div class="bar b" style="width:calc(10.1% * 2.6)"></div><span class="v">1.8% → 10.1%</span></div>
+      <div class="lab">Denton · 0.9M</div><div class="track"><div class="bar a" style="width:calc(4.8% * 2.6)"></div><div class="bar b" style="width:calc(10.0% * 2.6)"></div><span class="v">4.8% → 10.0%</span></div>
+      <div class="lab">Ellis · 0.2M</div><div class="track"><div class="bar a" style="width:2px"></div><div class="bar b" style="width:calc(8.1% * 2.6)"></div><span class="v">0% → 8.1%</span></div>
+      <div class="lab">Kaufman · 0.1M</div><div class="track"><div class="bar a" style="width:2px"></div><div class="bar b" style="width:calc(9.2% * 2.6)"></div><span class="v">0% → 9.2%</span></div>
+      <div class="lab">Johnson · 0.2M</div><div class="track"><div class="bar a" style="width:2px"></div><div class="bar b" style="width:calc(2.9% * 2.6)"></div><span class="v">0% → 2.9%</span></div>
+      <div class="lab">Parker, Rockwall</div><div class="track"><div class="bar a" style="width:2px"></div><div class="bar b" style="width:2px"></div><span class="v">0% → 0%</span></div>
+    </div>
+    <figcaption>Share of 2020 census population within 800 m of a metro or BRT stop, or 1.6 km of a commuter rail station. One linear scale; the longest bar is 30.5%.</figcaption>
+  </figure>
+
+  <h2 id="steps">4 · What to do next</h2>
+  <p class="lede" style="margin-top:18px">The panel agreed on thirteen steps. Bullets show who argued for each. The status column shows what the follow-up rebuild changes now, what it tests as an alternative scenario, and what needs data the project doesn't have yet.</p>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Step</th><th>What to change</th><th>Why</th><th>From</th><th>Status</th></tr></thead>
+      <tbody>
+        <tr><td class="id">A1</td><td>Run today's rail more often by 2030: TRE, TEXRail, A-train and Silver Line every 15 minutes, DART light rail every 10.</td><td>+38k competitive commutes (+40%) with no new track.</td><td><span class="mini"><i class="b-mv"></i><i class="b-ho"></i></span></td><td><span class="pill now">Now</span></td></tr>
+        <tr><td class="id">A2</td><td>Open the four best BRT corridors by 2030: Forest Lane, Ross Avenue, Jacksboro Highway ("46") and Jefferson.</td><td>About $0.9B total. Each fits the FTA Small Starts size.</td><td><span class="mini"><i class="b-ho"></i><i class="b-sec"></i></span></td><td><span class="pill now">Now</span></td></tr>
+        <tr><td class="id">A3</td><td>Re-stage Fort Worth Phase One around the Central Station–Medical District–TCU core, and make the Orange tails prove their tunnel cost.</td><td>Purple returns 14.9 per $1M and Orange 1.9.</td><td><span class="mini"><i class="b-ho"></i><i class="b-sec"></i></span></td><td><span class="pill now">Now</span></td></tr>
+        <tr><td class="id">A4</td><td>Keep every phase connected: run Midlothian to Westmoreland, run Collin Commuter to Parker Road, and tie the stranded Fort Worth BRT ends to the network.</td><td>18 stations are unreachable in 2045.</td><td><span class="mini"><i class="b-ho"></i><i class="b-kt"></i></span></td><td><span class="pill now">Now</span></td></tr>
+        <tr><td class="id">A5</td><td>Make same-place stations real transfers, with honest walking times.</td><td>Over 50 near-miss pairs, such as Handley, Uptown and Frisco.</td><td><span class="mini"><i class="b-ho"></i><i class="b-mv"></i></span></td><td><span class="pill now">Now</span></td></tr>
+        <tr><td class="id">A6</td><td>Serve Collin County: a McKinney–Frisco–Legacy crosstown BRT on SH-121, and the McKinney line earlier.</td><td>The largest unmet commute flows. Collin reaches only 10% coverage by 2070.</td><td><span class="mini"><i class="b-kt"></i><i class="b-ho"></i></span></td><td><span class="pill now">Now</span> sketch alignment</td></tr>
+        <tr><td class="id">A7</td><td>Cut duplicates. The TexRail 3rd extension repeats the Alvarado line. Woodhaven direct and the White Settlement BRT add nothing measurable. Hold Bowie and Ennis as long-range reserve.</td><td>Near-zero value at $0.2–3.8B each.</td><td><span class="mini"><i class="b-ho"></i><i class="b-sec"></i></span></td><td><span class="pill now">Now</span></td></tr>
+        <tr><td class="id">A8</td><td>Right-size modes: test light-rail or BRT versions of the Arlington Purple and Blue Ctd metro lines.</td><td>Peak loads reach about a quarter of BRT capacity.</td><td><span class="mini"><i class="b-ho"></i></span></td><td><span class="pill scen">Scenario</span></td></tr>
+        <tr><td class="id">A9</td><td>Use names riders recognize. Rename "3", "46", "BRT", "Line 76" and the second "Silver". Call DART's Silver Line by its name. Replace clinic names on stations.</td><td>Wayfinding, and the map's line toggles.</td><td><span class="mini"><i class="b-kt"></i><i class="b-pr"></i></span></td><td><span class="pill now">Now</span></td></tr>
+        <tr><td class="id">A10</td><td>Use realistic costs: benchmark U.S. unit costs, charge shared track and stations once, and cost downtown cores as tunnel.</td><td>Re-ranks the commuter legs and the metro lines.</td><td><span class="mini"><i class="b-ho"></i></span></td><td><span class="pill now">Now</span></td></tr>
+        <tr><td class="id">A11</td><td>Rebuild the engine: normalized tables, one config file, scenario overlays, a portable Python build, tests and CI, and the map published on GitHub Pages.</td><td>Stops the drift for good.</td><td><span class="mini"><i class="b-pr"></i></span></td><td><span class="pill now">Now</span></td></tr>
+        <tr><td class="id">A12</td><td>Measure the people as well as the network: the bus network, car ownership, income, safety, NCTCOG growth forecasts, and a fresh real-LODES calibration.</td><td>Equity and growth can't be judged without these.</td><td><span class="mini"><i class="b-sec"></i><i class="b-ho"></i></span></td><td><span class="pill later">Needs data</span></td></tr>
+        <tr><td class="id">A13</td><td>Package a fundable first decade: frequency upgrades and BRT as Small Starts, station-area zoning commitments, and safety redesign of the BRT arterials.</td><td>Builds a delivery record before the tunnel.</td><td><span class="mini"><i class="b-sec"></i></span></td><td><span class="pill later">Policy</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <section class="method">
+    <h3>How the numbers were made</h3>
+    <ul>
+      <li>The v1 tables were converted, without changing any lines or years, into a normalized network and re-run through a rebuilt Python model with one shared configuration file.</li>
+      <li>Demand: 2020 census population and 2022 LODES jobs for 4,276 block groups in nine counties. The raw LODES origin-destination file is not in the repository, so commute flows come from a gravity model fitted to a 17 km mean commute (3.32M commutes in total). Trust the comparisons more than the absolute counts.</li>
+      <li>Travel time: walk up to 1.2 km or park-and-ride up to 8 km to commuter stations and line ends; wait half the headway, capped at 12 minutes; mode speeds based on stop spacing; 3-minute transfer penalty. Driving uses peak speeds (38 km/h, 1.35 detour factor, 8 minutes at the ends).</li>
+      <li>Costs: per route-km by mode and grade (BRT $15M, commuter rail $30M, surface metro $120M, tunnel $450M), plus stations. Shared track is charged once.</li>
+      <li>Today's quick-win test uses the 2030 network with the stated headways and the four BRT corridors opened early.</li>
+    </ul>
+  </section>
+</div>

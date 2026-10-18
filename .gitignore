@@ -27,3 +27,9 @@ data/dfw_rail.json
 data/tx_od.csv.gz
 data/tx_wac.csv.gz
 data/od_tracts.csv
+
+# --- v2 ---
+__pycache__/
+*.pyc
+# raw LODES OD (optional input, see data/README.md)
+data/raw/

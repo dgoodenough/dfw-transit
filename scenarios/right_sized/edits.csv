@@ -1,0 +1,4 @@
+op,target,field,value,note
+set_line,E23,mode,brt,A8: SH-360 Line (Mansfield-Arlington-Euless) as BRT instead of metro
+set_line,E22,mode,brt,A8: I-30 Line (Handley-Arlington-Grand Prairie-West Dallas) as BRT instead of metro
+set_line,E19,mode,brt,A8: I-20 Crosstown (Fort Worth-Arlington-Duncanville) as BRT instead of metro
