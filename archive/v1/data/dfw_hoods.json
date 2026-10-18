@@ -1,0 +1,1073 @@
+{
+  "version": 0.6,
+  "generator": "Overpass API 0.7.62.11 87bfad18",
+  "osm3s": {
+    "timestamp_osm_base": "2026-04-21T17:01:53Z",
+    "copyright": "The data included in this document is from www.openstreetmap.org. The data is made available under ODbL."
+  },
+  "elements": [
+
+{
+  "type": "node",
+  "id": 151326304,
+  "lat": 32.6326345,
+  "lon": -97.0741750,
+  "tags": {
+    "ele": "181",
+    "gnis:feature_id": "1349582",
+    "name": "Webb",
+    "place": "neighbourhood"
+  }
+},
+{
+  "type": "node",
+  "id": 151364361,
+  "lat": 32.6823553,
+  "lon": -97.2144574,
+  "tags": {
+    "ele": "181",
+    "gnis:feature_id": "1339961",
+    "name": "Lindberg",
+    "place": "neighbourhood"
+  }
+},
+{
+  "type": "node",
+  "id": 323557270,
+  "lat": 32.9341549,
+  "lon": -96.9531951,
+  "tags": {
+    "name": "Valley Ranch",
+    "place": "suburb",
+    "wikidata": "Q7912182"
+  }
+},
+{
+  "type": "node",
+  "id": 1325903898,
+  "lat": 32.6456716,
+  "lon": -97.0831962,
+  "tags": {
+    "name": "Enchanted Creek",
+    "place": "neighbourhood"
+  }
+},
+{
+  "type": "node",
+  "id": 1326943339,
+  "lat": 32.6151056,
+  "lon": -97.0847016,
+  "tags": {
+    "ele": "181",
+    "gnis:feature_id": "1349582",
+    "name": "Deer Cove",
+    "place": "neighbourhood"
+  }
+},
+{
+  "type": "node",
+  "id": 1326943388,
+  "lat": 32.6252350,
+  "lon": -97.0881010,
+  "tags": {
+    "ele": "181",
+    "gnis:feature_id": "1349582",
+    "name": "Berkeley Square",
+    "place": "neighbourhood"
+  }
+},
+{
+  "type": "node",
+  "id": 1326943607,
+  "lat": 32.6319499,
+  "lon": -97.0855149,
+  "tags": {
+    "ele": "181",
+    "gnis:feature_id": "1349582",
+    "name": "Artist's Glen",
+    "place": "neighbourhood"
+  }
+},
+{
+  "type": "node",
+  "id": 1326943661,
+  "lat": 32.6347318,
+  "lon": -97.0809251,
+  "tags": {
+    "ele": "181",
+    "gnis:feature_id": "1349582",
+    "name": "Western Trails",
+    "place": "neighbourhood"
+  }
+},
+{
+  "type": "node",
+  "id": 1326943722,
+  "lat": 32.6321487,
+  "lon": -97.0689710,
+  "tags": {
+    "ele": "181",
+    "gnis:feature_id": "1349582",
+    "name": "Lake Port Village",
+    "place": "neighbourhood"
+  }
+},
+{
+  "type": "node",
+  "id": 1326943737,
+  "lat": 32.6305648,
+  "lon": -97.0886863,
+  "tags": {
+    "ele": "181",
+    "gnis:feature_id": "1349582",
+    "name": "Ambercrest",
+    "place": "neighbourhood"
+  }
+},
+{
+  "type": "node",
+  "id": 1326944023,
+  "lat": 32.6288042,
+  "lon": -97.0761491,
+  "tags": {
+    "ele": "181",
+    "gnis:feature_id": "1349582",
+    "name": "Lake Port Meadows",
+    "place": "neighbourhood"
+  }
+},
+{
+  "type": "node",
+  "id": 1327028641,
+  "lat": 32.6106222,
+  "lon": -97.1006334,
+  "tags": {
+    "ele": "181",
+    "gnis:feature_id": "1349582",
+    "name": "La Frontera",
+    "place": "neighbourhood"
+  }
+},
+{
+  "type": "node",
+  "id": 1329610759,
+  "lat": 32.5972196,
+  "lon": -97.0842834,
+  "tags": {
+    "ele": "181",
+    "gnis:feature_id": "1349582",
+    "name": "Southwind",
+    "place": "neighbourhood"
+  }
+},
+{
+  "type": "node",
+  "id": 1329610769,
+  "lat": 32.6004907,
+  "lon": -97.0907094,
+  "tags": {
+    "ele": "181",
+    "gnis:feature_id": "1349582",
+    "name": "Harris Crossing",
+    "place": "neighbourhood"
+  }
+},
+{
+  "type": "node",
+  "id": 1329610809,
+  "lat": 32.6049261,
+  "lon": -97.0869663,
+  "tags": {
+    "ele": "181",
+    "gnis:feature_id": "1349582",
+    "name": "Harris Ridge",
+    "place": "neighbourhood"
+  }
+},
+{
+  "type": "node",
+  "id": 2920997467,
+  "lat": 33.0973927,
+  "lon": -97.1265550,
+  "tags": {
+    "addr:postcode": "76226",
+    "name": "Bellaire",
+    "place": "neighbourhood"
+  }
+},
+{
+  "type": "node",
+  "id": 3441938416,
+  "lat": 33.2460615,
+  "lon": -96.7953923,
+  "tags": {
+    "name": "Crestview at Prosper",
+    "place": "neighbourhood"
+  }
+},
+{
+  "type": "node",
+  "id": 3443043109,
+  "lat": 33.2396777,
+  "lon": -96.7452231,
+  "tags": {
+    "name": "Whitley Place",
+    "place": "neighbourhood"
+  }
+},
+{
+  "type": "node",
+  "id": 3443373662,
+  "lat": 33.1856216,
+  "lon": -96.8442413,
+  "tags": {
+    "name": "Emerson Estates",
+    "place": "neighbourhood",
+    "website": "https://www.standardpacifichomes.com/new-homes/texas/dallas-fort-worth/emerson-estates.aspx"
+  }
+},
+{
+  "type": "node",
+  "id": 3700583650,
+  "lat": 32.7352578,
+  "lon": -97.0093467,
+  "tags": {
+    "name": "Indian Hills",
+    "place": "neighbourhood"
+  }
+},
+{
+  "type": "node",
+  "id": 4216729469,
+  "lat": 32.7493336,
+  "lon": -96.8278997,
+  "tags": {
+    "name": "Bishop Arts District",
+    "place": "neighbourhood",
+    "website": "https://www.bishopartsdistrict.com/home",
+    "wikidata": "Q4917486",
+    "wikipedia": "en:Bishop Arts District, Dallas"
+  }
+},
+{
+  "type": "node",
+  "id": 4271334611,
+  "lat": 32.7792767,
+  "lon": -96.8060169,
+  "tags": {
+    "historic": "district",
+    "name": "West End Historic District",
+    "place": "neighbourhood",
+    "wikidata": "Q7985089"
+  }
+},
+{
+  "type": "node",
+  "id": 4273229259,
+  "lat": 32.7886660,
+  "lon": -97.3464675,
+  "tags": {
+    "historic": "district",
+    "name": "Fort Worth Stockyards National Historic District",
+    "place": "neighbourhood",
+    "wikidata": "Q109999754"
+  }
+},
+{
+  "type": "node",
+  "id": 4363548567,
+  "lat": 32.7355825,
+  "lon": -97.1623450,
+  "tags": {
+    "addr:city": "Arlington",
+    "addr:housenumber": "3211",
+    "addr:postcode": "76012",
+    "addr:state": "TX",
+    "addr:street": "West Division Street",
+    "name": "Arlington Lakeside",
+    "place": "neighbourhood"
+  }
+},
+{
+  "type": "node",
+  "id": 4400006121,
+  "lat": 32.7883249,
+  "lon": -96.7993474,
+  "tags": {
+    "name": "Arts District",
+    "place": "neighbourhood",
+    "wikidata": "Q2865867"
+  }
+},
+{
+  "type": "node",
+  "id": 4400006127,
+  "lat": 32.7842977,
+  "lon": -96.7804594,
+  "tags": {
+    "name": "Deep Ellum",
+    "place": "quarter",
+    "wikidata": "Q3021127",
+    "wikipedia": "en:Deep Ellum, Dallas"
+  }
+},
+{
+  "type": "node",
+  "id": 4400006128,
+  "lat": 32.7797876,
+  "lon": -96.7980118,
+  "tags": {
+    "name": "Downtown",
+    "place": "quarter",
+    "wikidata": "Q3038331"
+  }
+},
+{
+  "type": "node",
+  "id": 4400006130,
+  "lat": 32.7802467,
+  "lon": -96.7593700,
+  "tags": {
+    "name": "Fair Park",
+    "place": "neighbourhood",
+    "wikidata": "Q278452"
+  }
+},
+{
+  "type": "node",
+  "id": 4400006132,
+  "lat": 32.7961972,
+  "lon": -96.8190343,
+  "tags": {
+    "name": "Hi Line",
+    "place": "neighbourhood"
+  }
+},
+{
+  "type": "node",
+  "id": 4400006134,
+  "lat": 32.8227010,
+  "lon": -96.7892150,
+  "tags": {
+    "name": "Knox",
+    "place": "neighbourhood"
+  }
+},
+{
+  "type": "node",
+  "id": 4400006135,
+  "lat": 32.8862650,
+  "lon": -96.7305964,
+  "tags": {
+    "name": "Lake Highlands",
+    "place": "quarter"
+  }
+},
+{
+  "type": "node",
+  "id": 4400006137,
+  "lat": 32.8091110,
+  "lon": -96.8089492,
+  "tags": {
+    "name": "Oak Lawn",
+    "place": "neighbourhood"
+  }
+},
+{
+  "type": "node",
+  "id": 4400006138,
+  "lat": 32.9687062,
+  "lon": -96.7975376,
+  "tags": {
+    "name": "Prestonwood",
+    "place": "neighbourhood"
+  }
+},
+{
+  "type": "node",
+  "id": 4400006140,
+  "lat": 32.7696022,
+  "lon": -96.7706138,
+  "tags": {
+    "name": "South Dallas",
+    "place": "neighbourhood"
+  }
+},
+{
+  "type": "node",
+  "id": 4400006141,
+  "lat": 32.7663544,
+  "lon": -96.7981226,
+  "tags": {
+    "name": "South Side",
+    "place": "neighbourhood"
+  }
+},
+{
+  "type": "node",
+  "id": 4400006143,
+  "lat": 32.8399211,
+  "lon": -96.7726016,
+  "tags": {
+    "name": "University Crossing",
+    "place": "neighbourhood"
+  }
+},
+{
+  "type": "node",
+  "id": 4400006144,
+  "lat": 32.8007124,
+  "lon": -96.7998571,
+  "tags": {
+    "name": "Uptown",
+    "place": "quarter"
+  }
+},
+{
+  "type": "node",
+  "id": 4400006145,
+  "lat": 32.8700957,
+  "lon": -96.7527533,
+  "tags": {
+    "name": "Vickery Meadows",
+    "place": "neighbourhood",
+    "wikidata": "Q7925355"
+  }
+},
+{
+  "type": "node",
+  "id": 4457176269,
+  "lat": 32.9785001,
+  "lon": -96.6764099,
+  "tags": {
+    "name": "SpringPark",
+    "place": "neighbourhood"
+  }
+},
+{
+  "type": "node",
+  "id": 4563395946,
+  "lat": 32.9191005,
+  "lon": -96.7177100,
+  "tags": {
+    "name": "North Lake Highlands",
+    "place": "neighbourhood"
+  }
+},
+{
+  "type": "node",
+  "id": 4685741486,
+  "lat": 33.0903388,
+  "lon": -96.6838868,
+  "tags": {
+    "name": "Watters Creek",
+    "place": "neighbourhood"
+  }
+},
+{
+  "type": "node",
+  "id": 5198708744,
+  "lat": 33.0926618,
+  "lon": -96.9083624,
+  "tags": {
+    "name": "Stewart Peninsula",
+    "place": "suburb"
+  }
+},
+{
+  "type": "node",
+  "id": 5198708745,
+  "lat": 33.0996501,
+  "lon": -96.8873339,
+  "tags": {
+    "name": "The W's",
+    "place": "neighbourhood"
+  }
+},
+{
+  "type": "node",
+  "id": 5198708746,
+  "lat": 33.1031193,
+  "lon": -96.8639128,
+  "tags": {
+    "name": "The T's",
+    "place": "neighbourhood"
+  }
+},
+{
+  "type": "node",
+  "id": 5198708747,
+  "lat": 33.0955516,
+  "lon": -96.8667881,
+  "tags": {
+    "name": "The P's",
+    "place": "neighbourhood"
+  }
+},
+{
+  "type": "node",
+  "id": 5245415419,
+  "lat": 32.6363731,
+  "lon": -96.5892347,
+  "tags": {
+    "name": "Sand Branch",
+    "place": "suburb",
+    "wikidata": "Q3006882",
+    "wikipedia": "en:Sand Branch, Dallas County, Texas"
+  }
+},
+{
+  "type": "node",
+  "id": 5264696761,
+  "lat": 32.9256514,
+  "lon": -96.7087291,
+  "tags": {
+    "name": "Whispering Hills",
+    "place": "neighbourhood"
+  }
+},
+{
+  "type": "node",
+  "id": 5310973576,
+  "lat": 33.0743050,
+  "lon": -97.1113313,
+  "tags": {
+    "name": "Garner",
+    "place": "neighbourhood"
+  }
+},
+{
+  "type": "node",
+  "id": 5310973577,
+  "lat": 33.0755097,
+  "lon": -97.1174896,
+  "tags": {
+    "name": "Fairlin",
+    "place": "neighbourhood"
+  }
+},
+{
+  "type": "node",
+  "id": 5310973578,
+  "lat": 33.0764807,
+  "lon": -97.1219743,
+  "tags": {
+    "name": "Gaillardia",
+    "place": "neighbourhood"
+  }
+},
+{
+  "type": "node",
+  "id": 5310973579,
+  "lat": 33.0783356,
+  "lon": -97.1211948,
+  "tags": {
+    "name": "Reata",
+    "place": "neighbourhood"
+  }
+},
+{
+  "type": "node",
+  "id": 5310973580,
+  "lat": 33.0795867,
+  "lon": -97.1248282,
+  "tags": {
+    "name": "Telea",
+    "place": "neighbourhood"
+  }
+},
+{
+  "type": "node",
+  "id": 5310973581,
+  "lat": 33.0807554,
+  "lon": -97.1269954,
+  "tags": {
+    "name": "Sierra",
+    "place": "neighbourhood"
+  }
+},
+{
+  "type": "node",
+  "id": 5310973582,
+  "lat": 33.0848007,
+  "lon": -97.1302570,
+  "tags": {
+    "name": "Carlisle",
+    "place": "neighbourhood"
+  }
+},
+{
+  "type": "node",
+  "id": 5310973772,
+  "lat": 33.0826274,
+  "lon": -97.1232769,
+  "tags": {
+    "name": "Laviana",
+    "place": "neighbourhood"
+  }
+},
+{
+  "type": "node",
+  "id": 5310973830,
+  "lat": 33.0876367,
+  "lon": -97.1227387,
+  "tags": {
+    "name": "Palmetto",
+    "place": "neighbourhood"
+  }
+},
+{
+  "type": "node",
+  "id": 5310973831,
+  "lat": 33.0866755,
+  "lon": -97.1255605,
+  "tags": {
+    "name": "Wimberley",
+    "place": "neighbourhood"
+  }
+},
+{
+  "type": "node",
+  "id": 5310973832,
+  "lat": 33.0884551,
+  "lon": -97.1285400,
+  "tags": {
+    "name": "Camden",
+    "place": "neighbourhood"
+  }
+},
+{
+  "type": "node",
+  "id": 5310973833,
+  "lat": 33.0864595,
+  "lon": -97.1198925,
+  "tags": {
+    "name": "Meridian",
+    "place": "neighbourhood"
+  }
+},
+{
+  "type": "node",
+  "id": 5310973834,
+  "lat": 33.0874303,
+  "lon": -97.1170816,
+  "tags": {
+    "name": "Crescent",
+    "place": "neighbourhood"
+  }
+},
+{
+  "type": "node",
+  "id": 5310973835,
+  "lat": 33.0879517,
+  "lon": -97.1116957,
+  "tags": {
+    "name": "Kendall",
+    "place": "neighbourhood"
+  }
+},
+{
+  "type": "node",
+  "id": 5311138164,
+  "lat": 33.0929263,
+  "lon": -97.1304771,
+  "tags": {
+    "name": "Brazos",
+    "place": "neighbourhood"
+  }
+},
+{
+  "type": "node",
+  "id": 5311138165,
+  "lat": 33.0918387,
+  "lon": -97.1260890,
+  "tags": {
+    "name": "Sonora",
+    "place": "neighbourhood"
+  }
+},
+{
+  "type": "node",
+  "id": 5311138166,
+  "lat": 33.0924229,
+  "lon": -97.1223232,
+  "tags": {
+    "name": "Wisteria",
+    "place": "neighbourhood"
+  }
+},
+{
+  "type": "node",
+  "id": 5311138167,
+  "lat": 33.1008667,
+  "lon": -97.1301027,
+  "tags": {
+    "name": "Magnolia",
+    "place": "neighbourhood"
+  }
+},
+{
+  "type": "node",
+  "id": 5311138168,
+  "lat": 33.1053245,
+  "lon": -97.1244165,
+  "tags": {
+    "name": "Azalea",
+    "place": "neighbourhood"
+  }
+},
+{
+  "type": "node",
+  "id": 5311138169,
+  "lat": 33.0953661,
+  "lon": -97.1240517,
+  "tags": {
+    "name": "Navarro",
+    "place": "neighbourhood"
+  }
+},
+{
+  "type": "node",
+  "id": 5311138170,
+  "lat": 33.0936583,
+  "lon": -97.1214982,
+  "tags": {
+    "name": "Dakota",
+    "place": "neighbourhood"
+  }
+},
+{
+  "type": "node",
+  "id": 5311138171,
+  "lat": 33.0974873,
+  "lon": -97.1199318,
+  "tags": {
+    "name": "Brenham",
+    "place": "neighbourhood"
+  }
+},
+{
+  "type": "node",
+  "id": 5311138172,
+  "lat": 33.0985659,
+  "lon": -97.1231290,
+  "tags": {
+    "name": "Sandlin",
+    "place": "neighbourhood"
+  }
+},
+{
+  "type": "node",
+  "id": 5311138173,
+  "lat": 33.1014779,
+  "lon": -97.1210691,
+  "tags": {
+    "name": "Laurel",
+    "place": "neighbourhood"
+  }
+},
+{
+  "type": "node",
+  "id": 5311138174,
+  "lat": 33.0982603,
+  "lon": -97.1159836,
+  "tags": {
+    "name": "Larkspur",
+    "place": "neighbourhood"
+  }
+},
+{
+  "type": "node",
+  "id": 5311204722,
+  "lat": 33.1020402,
+  "lon": -97.1121569,
+  "tags": {
+    "name": "Bandera",
+    "place": "neighbourhood"
+  }
+},
+{
+  "type": "node",
+  "id": 5311204723,
+  "lat": 33.1054374,
+  "lon": -97.1182938,
+  "tags": {
+    "name": "Heritage",
+    "place": "neighbourhood"
+  }
+},
+{
+  "type": "node",
+  "id": 5311204724,
+  "lat": 33.1118001,
+  "lon": -97.1249457,
+  "tags": {
+    "name": "Madison",
+    "place": "neighbourhood"
+  }
+},
+{
+  "type": "node",
+  "id": 5311204725,
+  "lat": 33.1087806,
+  "lon": -97.1190663,
+  "tags": {
+    "name": "Isabel",
+    "place": "neighbourhood"
+  }
+},
+{
+  "type": "node",
+  "id": 5311204820,
+  "lat": 33.1125085,
+  "lon": -97.1206390,
+  "tags": {
+    "name": "Juniper",
+    "place": "neighbourhood"
+  }
+},
+{
+  "type": "node",
+  "id": 5983201516,
+  "lat": 32.9293547,
+  "lon": -96.9816184,
+  "tags": {
+    "name": "Cypress Waters",
+    "place": "neighbourhood"
+  }
+},
+{
+  "type": "node",
+  "id": 6066842258,
+  "lat": 32.7240550,
+  "lon": -96.8567152,
+  "tags": {
+    "name": "Oak Cliff",
+    "place": "neighbourhood"
+  }
+},
+{
+  "type": "node",
+  "id": 6355366345,
+  "lat": 32.7899087,
+  "lon": -96.8188110,
+  "tags": {
+    "name": "Design District",
+    "place": "quarter",
+    "wikidata": "Q19986580"
+  }
+},
+{
+  "type": "node",
+  "id": 6360962474,
+  "lat": 32.8576220,
+  "lon": -96.7629862,
+  "tags": {
+    "name": "The Village",
+    "place": "neighbourhood"
+  }
+},
+{
+  "type": "node",
+  "id": 6365515280,
+  "lat": 32.8271318,
+  "lon": -96.7524914,
+  "tags": {
+    "name": "Lakewood",
+    "place": "quarter",
+    "wikidata": "Q6479342"
+  }
+},
+{
+  "type": "node",
+  "id": 6365515281,
+  "lat": 32.8235122,
+  "lon": -96.7701359,
+  "tags": {
+    "name": "Lower Greenville",
+    "place": "neighbourhood",
+    "wikidata": "Q6693497"
+  }
+},
+{
+  "type": "node",
+  "id": 6365515282,
+  "lat": 32.7988304,
+  "lon": -96.7794219,
+  "tags": {
+    "name": "Old East Dallas",
+    "place": "quarter",
+    "wikidata": "Q7083894"
+  }
+},
+{
+  "type": "node",
+  "id": 6882908234,
+  "lat": 32.5909935,
+  "lon": -96.8011533,
+  "tags": {
+    "name": "Mill Creek Estates",
+    "place": "neighbourhood"
+  }
+},
+{
+  "type": "node",
+  "id": 6923537080,
+  "lat": 32.8906896,
+  "lon": -96.9618794,
+  "tags": {
+    "name": "Las Colinas",
+    "place": "suburb",
+    "wikidata": "Q6492135",
+    "wikipedia": "en:Las Colinas, Irving, Texas"
+  }
+},
+{
+  "type": "node",
+  "id": 6925899812,
+  "lat": 32.6682753,
+  "lon": -97.0108384,
+  "tags": {
+    "name": "North Westchester Meadows",
+    "place": "neighbourhood"
+  }
+},
+{
+  "type": "node",
+  "id": 7457256747,
+  "lat": 33.1032364,
+  "lon": -96.8928157,
+  "tags": {
+    "name": "Eastvale",
+    "note": "formerly an incoporated town, now part of The Colony",
+    "old_name": "Eastvale",
+    "place": "neighbourhood",
+    "wikidata": "Q5330959",
+    "wikipedia": "en:Eastvale, Texas"
+  }
+},
+{
+  "type": "node",
+  "id": 8565452221,
+  "lat": 32.7939743,
+  "lon": -96.8082108,
+  "tags": {
+    "name": "Harwood District",
+    "place": "neighbourhood",
+    "website": "https://harwooddistrict.com/"
+  }
+},
+{
+  "type": "node",
+  "id": 9254520542,
+  "lat": 32.8956326,
+  "lon": -96.8912794,
+  "tags": {
+    "name": "Asian Trade District",
+    "place": "neighbourhood"
+  }
+},
+{
+  "type": "node",
+  "id": 9254545324,
+  "lat": 32.9858019,
+  "lon": -96.9100366,
+  "tags": {
+    "name": "New Koreatown",
+    "place": "neighbourhood"
+  }
+},
+{
+  "type": "node",
+  "id": 9545836802,
+  "lat": 32.7548139,
+  "lon": -97.3314160,
+  "tags": {
+    "name": "Sundance Square",
+    "place": "quarter"
+  }
+},
+{
+  "type": "node",
+  "id": 9929958512,
+  "lat": 33.2145274,
+  "lon": -96.8262220,
+  "tags": {
+    "description": "Mixed used development.",
+    "name": "Firefly",
+    "place": "neighbourhood"
+  }
+},
+{
+  "type": "node",
+  "id": 10800508664,
+  "lat": 32.7664561,
+  "lon": -96.7616754,
+  "tags": {
+    "name": "Wheatley Place Historic District",
+    "place": "neighbourhood"
+  }
+},
+{
+  "type": "node",
+  "id": 10800513189,
+  "lat": 32.7477831,
+  "lon": -96.8064927,
+  "tags": {
+    "name": "Tenth Street Historic District",
+    "place": "neighbourhood"
+  }
+},
+{
+  "type": "node",
+  "id": 10800546551,
+  "lat": 32.7456657,
+  "lon": -96.8438753,
+  "tags": {
+    "name": "Winnetka Heights Historic District",
+    "place": "neighbourhood"
+  }
+},
+{
+  "type": "node",
+  "id": 10800573857,
+  "lat": 32.8075499,
+  "lon": -96.7633369,
+  "tags": {
+    "name": "Swiss Avenue Historic District",
+    "place": "neighbourhood"
+  }
+},
+{
+  "type": "node",
+  "id": 11240313450,
+  "lat": 32.8146058,
+  "lon": -96.7702330,
+  "tags": {
+    "name": "Lowest Greenville",
+    "place": "neighbourhood"
+  }
+},
+{
+  "type": "node",
+  "id": 11965842024,
+  "lat": 33.1769354,
+  "lon": -97.2821402,
+  "tags": {
+    "name": "Remington Estates",
+    "place": "neighbourhood"
+  }
+},
+{
+  "type": "node",
+  "id": 11994831773,
+  "lat": 32.6674067,
+  "lon": -96.9532876,
+  "tags": {
+    "name": "Sunset Acres",
+    "place": "neighbourhood"
+  }
+}
+
+  ]
+}

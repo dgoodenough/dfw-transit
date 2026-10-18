@@ -1,0 +1,18 @@
+# data/ — model inputs
+
+| File | What it is | Used by |
+|---|---|---|
+| `metroplex_density.csv` | 4,276 block groups in the nine core counties: 2020 Census population + 2022 LODES WAC jobs, with centroids | demand zones (`dfwt/demand.py`) |
+| `tract_centroids.csv` | the same aggregated to 1,667 tracts | reference |
+| `CenPop2020_BG_TX.txt` | Census 2020 block-group centers of population (Texas) | source of the centroids |
+| `existing_geom.json`, `existing_stops.json` | today's DART/TRE/TEXRail/A-train alignments and stops (OSM) | v1 network build (archived) |
+| `fw_rivers.json`, `dfw_yards.json`, `dfw_poi.json`, `dfw_hoods.json`, `dfw_gazetteer.json`, `dfw_route_stops.json` | OpenStreetMap extracts (© OpenStreetMap contributors, ODbL) | v1 audits and naming (archived); kept for the v2 backlog |
+
+## Optional: real commute flows
+
+The model synthesizes commute flows with a gravity model unless it finds
+`data/raw/od_tracts.csv` (columns `h_tract,w_tract,jobs`). To use real flows,
+download `tx_od_main_JT00_2022.csv.gz` from the LEHD LODES 8 site, aggregate it
+to tract pairs for counties 113, 439, 085, 121, 397, 251, 139, 367, 257
+(the v1 script `archive/v1/data/build_od.ps1` does exactly this), and save it
+there. `python -m dfwt build` then reports `Demand source: lodes`.
