@@ -19,8 +19,16 @@ overrides applied on top: op, target, field, value, note.
   set_line_year     move line `target` so its earliest opening is `value`
   drop_line         remove line `target`
   set_headway       line `target` runs every `value` minutes from year `field`
+  through_route     line `target` and line `field` end at the same station (or two
+                    stations within THROUGH_SNAP_KM): run them as one line, keeping
+                    `target`'s id; `field` is removed. `value` (optional) is the new
+                    name. The junction keeps its park & ride (Line.pnr_stops).
+  add_express       add line `field`: a copy of line `target` that stops only at the
+                    `;`-separated stops in `value` (names or ids) and runs through the
+                    rest; set its headway with a later set_headway row
 """
 import collections
+import copy
 import csv
 import os
 from dataclasses import dataclass, field
@@ -28,6 +36,7 @@ from dataclasses import dataclass, field
 from . import config, geo, growth
 
 NEVER = 9999
+THROUGH_SNAP_KM = 0.3   # through_route: termini this close count as one station
 csv.field_size_limit(1 << 28)  # long fitted alignments make large WKT cells
 TABLES = ("lines.csv", "stations.csv", "line_stops.csv", "line_segments.csv")
 OPTIONAL = ("service.csv", "transfers.csv", "stages.csv")
@@ -62,6 +71,7 @@ class Line:
     stop_years: list = field(default_factory=list)
     segments: list = field(default_factory=list)
     service: list = field(default_factory=list)   # [(from_year, headway_min)], sorted
+    pnr_stops: list = field(default_factory=list)  # former termini (through-routed) that keep a garage
 
     def headway_at(self, year):
         hw = self.headway
@@ -202,6 +212,10 @@ class Network:
                 ln.service = sorted([x for x in ln.service if x[0] != int(e["field"] or 0)] + [(int(e["field"] or 0), float(e["value"]))])
             elif op == "set_line":
                 setattr(ln, e["field"], float(e["value"]) if e["field"] == "headway" else e["value"])
+            elif op == "through_route":
+                self._through_route(ln, e["field"], e.get("value") or "")
+            elif op == "add_express":
+                self._add_express(ln, e["field"], e["value"])
             elif op in ("shift_line_years", "set_line_year"):
                 delta = int(e["value"]) if op == "shift_line_years" else int(e["value"]) - self._first_new_year(ln)
                 ex = self.cfg["existing_year"]
@@ -211,6 +225,70 @@ class Network:
                         s.year += delta
             else:
                 raise ValueError(f"unknown scenario op {op}")
+
+    @staticmethod
+    def _reversed(ln):
+        ln.stop_ids.reverse()
+        ln.stop_years.reverse()
+        ln.segments.reverse()
+        for s in ln.segments:
+            s.pts = s.pts[::-1]
+
+    def _through_route(self, a, b_id, name):
+        """Join line b onto line a where their termini meet (see module doc)."""
+        if b_id not in self.lines:
+            raise KeyError(f"through_route: unknown line {b_id}")
+        b = self.lines[b_id]
+        if a.mode != b.mode:
+            raise ValueError(f"through_route {a.id}+{b_id}: modes differ ({a.mode}, {b.mode})")
+        st = self.stations
+
+        def gap(s1, s2):
+            return 0.0 if s1 == s2 else geo.hav_km(st[s1].lat, st[s1].lon, st[s2].lat, st[s2].lon)
+        options = [(gap(a.stop_ids[ia], b.stop_ids[ib]), ia, ib) for ia in (0, -1) for ib in (0, -1)]
+        d, ia, ib = min(options)
+        if d > THROUGH_SNAP_KM:
+            raise ValueError(f"through_route {a.id}+{b_id}: no shared terminus (closest {d:.2f} km)")
+        if ia == 0:
+            self._reversed(a)        # junction at the end of a
+        if ib == -1:
+            self._reversed(b)        # junction at the start of b
+        junction = a.stop_ids[-1]
+        # the joined line runs as often as the more frequent of the parts already running
+        years = sorted({y for y, _ in a.service + b.service} | {a.first_year, b.first_year})
+
+        def hw(y):
+            on = [p.headway_at(y) for p in (a, b) if p.first_year <= y]
+            return min(on) if on else a.headway_at(y)
+        a.service = [(y, hw(y)) for y in years]
+        a.headway = min(a.headway, b.headway)
+        a.stop_years[-1] = min(a.stop_years[-1], b.stop_years[0])
+        a.stop_ids += b.stop_ids[1:]
+        a.stop_years += b.stop_years[1:]
+        a.segments += b.segments
+        # both old termini had a garage; keep them (a through station still has its lot)
+        a.pnr_stops = list(dict.fromkeys(a.pnr_stops + b.pnr_stops + [junction]))
+        if name:
+            a.name = name
+        if a.status != b.status:
+            a.status = "proposed"
+        del self.lines[b_id]
+        self.variants.pop(b_id, None)
+        self.variants.pop(a.id, None)
+
+    def _add_express(self, base, new_id, stops):
+        """A skip-stop copy of `base` (see module doc)."""
+        from .staging import resolve
+        if new_id in self.lines:
+            raise ValueError(f"add_express: line {new_id} already exists")
+        names = {k: s.name for k, s in self.stations.items()}
+        keep = {resolve(s, base.stop_ids, names) for s in stops.split(";") if s.strip()}
+        keep |= {0, len(base.stop_ids) - 1}
+        ex = copy.deepcopy(base)
+        ex.id, ex.name, ex.service = new_id, base.name + " Express", []   # own headways (set_headway)
+        ex.stop_years = [y if i in keep else NEVER for i, y in enumerate(base.stop_years)]
+        ex.pnr_stops = []
+        self.lines[new_id] = ex
 
     def _first_new_year(self, ln):
         ex = self.cfg["existing_year"]

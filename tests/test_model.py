@@ -50,6 +50,40 @@ class NetworkTests(unittest.TestCase):
         net.apply_edits([{"op": "shift_line_years", "target": "E28", "field": "", "value": "10"}])
         self.assertEqual(ln.first_year, before + 10)
 
+    def test_through_route_joins_two_lines_at_their_shared_terminus(self):
+        net = Network.load()
+        a, b = net.lines["F02"], net.lines["E22"]
+        n_stops = len(a.stop_ids) + len(b.stop_ids) - 1
+        km = a.km + b.km
+        net.apply_edits([{"op": "through_route", "target": "F02", "field": "E22", "value": "Blue / I-30"}])
+        ln = net.lines["F02"]
+        self.assertNotIn("E22", net.lines)
+        self.assertEqual(len(ln.stop_ids), n_stops)
+        self.assertEqual(len(ln.segments), len(ln.stop_ids) - 1)
+        self.assertAlmostEqual(ln.km, km, places=6)
+        self.assertEqual(net.stations[ln.stop_ids[0]].name, "Ridgmar Mall / BRT Transfer")
+        self.assertIn("Handley", [net.stations[s].name for s in ln.pnr_stops])
+        # one continuous run once both halves are open
+        self.assertEqual(len([r for r in net.runs(2070) if r.line is ln]), 1)
+
+    def test_through_route_keeps_the_better_headway(self):
+        net = Network.load()
+        net.apply_edits([{"op": "through_route", "target": "E10", "field": "E30", "value": ""}])
+        tre = net.lines["E10"]
+        self.assertEqual(tre.headway_at(2025), 30)   # Alvarado not open yet: TRE as today
+        self.assertEqual(tre.headway_at(2040), 15)   # TRE's 15 beats Alvarado's default 20
+
+    def test_add_express_skips_stops_but_runs_the_same_track(self):
+        net = Network.load()
+        net.apply_edits([{"op": "add_express", "target": "E17", "field": "E17X", "value": "#10;#20"},
+                         {"op": "set_headway", "target": "E17X", "field": "2030", "value": "10"}])
+        loc = next(r for r in net.runs(2070) if r.line.id == "E17")
+        ex = next(r for r in net.runs(2070) if r.line.id == "E17X")
+        self.assertEqual(len(ex.stops), 4)
+        self.assertAlmostEqual(sum(ex.hop_km), sum(loc.hop_km), places=6)
+        self.assertLess(sum(ex.hop_min), sum(loc.hop_min))
+        self.assertEqual(net.lines["E17X"].headway_at(2070), 10)
+
 
 class ValidationTests(unittest.TestCase):
     def test_plan_has_no_errors_or_islands(self):

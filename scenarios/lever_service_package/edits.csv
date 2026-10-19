@@ -1,0 +1,57 @@
+op,target,field,value,note
+set_headway,E12,2035,7.5,DART LRT 7.5 min; needs D2 subway (mall would be 32 tph)
+set_headway,E12,2045,6,"DART LRT 6 min: mall 2 lines x 10 tph, D2 2 lines x 10 tph, CityPlace tunnel 30 tph"
+set_headway,E13,2035,7.5,DART LRT 7.5 min; needs D2 subway (mall would be 32 tph)
+set_headway,E13,2045,6,"DART LRT 6 min: mall 2 lines x 10 tph, D2 2 lines x 10 tph, CityPlace tunnel 30 tph"
+set_headway,E14,2035,7.5,DART LRT 7.5 min; needs D2 subway (mall would be 32 tph)
+set_headway,E14,2045,6,"DART LRT 6 min: mall 2 lines x 10 tph, D2 2 lines x 10 tph, CityPlace tunnel 30 tph"
+set_headway,E15,2035,7.5,DART LRT 7.5 min; needs D2 subway (mall would be 32 tph)
+set_headway,E15,2045,6,"DART LRT 6 min: mall 2 lines x 10 tph, D2 2 lines x 10 tph, CityPlace tunnel 30 tph"
+set_headway,E20,2045,7.5,Silver Line 7.5 min with added passing sidings
+set_headway,E09,2035,10,regional rail 10 min all day; full double track + PTC dispatching
+set_headway,E10,2035,10,regional rail 10 min all day; full double track + PTC dispatching
+set_headway,E11,2035,10,regional rail 10 min all day; full double track + PTC dispatching
+set_headway,E05,2030,15,15 min from opening (plan default 20)
+set_headway,E05,2045,10,regional rail 10 min all day
+set_headway,E07,2030,15,15 min from opening (plan default 20)
+set_headway,E07,2045,10,regional rail 10 min all day
+set_headway,E08,2030,15,15 min from opening (plan default 20)
+set_headway,E08,2045,10,regional rail 10 min all day
+set_headway,E25,2030,15,15 min from opening (plan default 20)
+set_headway,E25,2045,10,regional rail 10 min all day
+set_headway,E30,2030,15,15 min from opening (plan default 20)
+set_headway,E30,2045,10,regional rail 10 min all day
+set_headway,E34,2030,15,15 min from opening (plan default 20)
+set_headway,E34,2045,10,regional rail 10 min all day
+set_headway,E37,2030,15,15 min from opening (plan default 20)
+set_headway,E37,2045,10,regional rail 10 min all day
+set_headway,E31,2030,15,15 min clockface on long outer lines
+set_headway,E32,2030,15,15 min clockface on long outer lines
+set_headway,E33,2030,15,15 min clockface on long outer lines
+set_headway,E35,2030,15,15 min clockface on long outer lines
+set_headway,E36,2030,15,15 min clockface on long outer lines
+set_headway,E01,2030,6,BRT every 6 min (plan default 8)
+set_headway,E02,2030,6,BRT every 6 min (plan default 8)
+set_headway,E04,2030,6,BRT every 6 min (plan default 8)
+set_headway,E21,2030,6,BRT every 6 min (plan default 8)
+set_headway,E24,2030,6,BRT every 6 min (plan default 8)
+set_headway,E27,2030,6,BRT every 6 min (plan default 8)
+set_headway,E28,2030,6,BRT every 6 min (plan default 8)
+set_headway,E29,2030,6,BRT every 6 min (plan default 8)
+set_headway,E38,2030,6,BRT every 6 min (plan default 8)
+set_headway,F01,2050,5,metro every 5 min from 2050
+set_headway,F02,2050,5,metro every 5 min from 2050
+set_headway,F05,2050,5,metro every 5 min from 2050
+set_headway,F06,2050,5,metro every 5 min from 2050
+set_headway,E16,2050,5,metro every 5 min from 2050
+set_headway,E17,2050,5,metro every 5 min from 2050
+set_headway,E18,2050,5,metro every 5 min from 2050
+set_headway,E19,2050,5,metro every 5 min from 2050
+set_headway,E22,2050,5,metro every 5 min from 2050
+set_headway,E23,2050,5,metro every 5 min from 2050
+set_headway,E26,2050,5,metro every 5 min from 2050
+through_route,E10,E30,TRE,TRE runs through FW T&P to Alvarado
+through_route,E10,E34,TRE,"TRE runs through Union Station to Terrell (Dallas station 270 m away, one platform)"
+through_route,E09,E05,TEXRail,TEXRail runs through FW T&P to Primrose
+through_route,E07,E08,Mansfield-Denton,SE TexRail + FTW/Denton through FW Central
+through_route,E07,E11,Mansfield-Denton-Carrollton,and on over the A-train to Trinity Mills
