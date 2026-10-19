@@ -92,7 +92,7 @@
     "max_stub_years": 20
   },
   "geometry": {
-    "_doc": "Alignment design limits (dfwt/align.py, python -m dfwt align). Rmin = minimum curve radius (m); Lp = straight platform length (m); tol = how far the fitted alignment may leave the drawn/routed corridor (m) by grade; Ltmin = minimum tangent between curves; jerk/alat govern spiral length; station_move_auto_m = largest station move applied without review. check_radius_m = tightest curve the validator accepts on each mode (commuter trains run on existing freight track, where curves of ~175 m (10 degrees) are common and simply carry a speed limit). straighten_move_max_m = how far a proposed metro station may move onto the direct path between its neighbors to remove a detour (a 10-minute walk).",
+    "_doc": "Alignment design limits (dfwt/align.py, python -m dfwt align). Rmin = minimum curve radius (m); Lp = straight platform length (m); tol = how far the fitted alignment may leave the drawn/routed corridor (m) by grade; Ltmin = minimum tangent between curves; jerk/alat govern spiral length; station_move_auto_m = largest station move applied without review. check_radius_m = tightest curve the validator accepts on each mode (commuter trains run on existing freight track, where curves of ~175 m (10 degrees) are common and simply carry a speed limit). straighten_move_max_m = how far a proposed metro station may move onto the direct path between its neighbors to remove a detour (a 10-minute walk). straighten_move_far_m = the same for sharp jogs (60+ degrees). A stop the line would have to double back for (90+ degrees) is dropped from that line.",
     "metro": {
       "Rmin": 150,
       "Rmax": 3000,
@@ -129,6 +129,7 @@
     "station_move_auto_m": 100,
     "rail_max_turn_deg": 35,
     "check_radius_m": {"metro": 150, "commuter": 175, "brt": 25},
-    "straighten_move_max_m": 800
+    "straighten_move_max_m": 800,
+    "straighten_move_far_m": 1500
   }
 }
