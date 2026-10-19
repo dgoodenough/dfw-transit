@@ -135,6 +135,18 @@ class Network:
                 continue
             with open(p, encoding="utf-8-sig") as f:
                 tables[t] = list(csv.DictReader(f))
+            # <table>.add.csv appends rows to whatever the table is (the plan's, or the scenario's own);
+            # <table>.patch.csv replaces every row of the lines it names (line-keyed tables) and adds the rest
+            add = os.path.join(folder, t[:-4] + ".add.csv") if folder else None
+            if add and os.path.exists(add):
+                with open(add, encoding="utf-8-sig") as f:
+                    tables[t] = tables[t] + list(csv.DictReader(f))
+            patch = os.path.join(folder, t[:-4] + ".patch.csv") if folder else None
+            if patch and os.path.exists(patch):
+                with open(patch, encoding="utf-8-sig") as f:
+                    rows = list(csv.DictReader(f))
+                lines = {r["line_id"] for r in rows}
+                tables[t] = [r for r in tables[t] if r.get("line_id") not in lines] + rows
         edits = []
         if folder and os.path.exists(os.path.join(folder, "edits.csv")):
             with open(os.path.join(folder, "edits.csv"), encoding="utf-8-sig") as f:
@@ -147,7 +159,7 @@ class Network:
         tables, edits = cls.read_tables(scenario)
         if stage_rows is not None:
             tables["stages.csv"] = stage_rows
-        return cls.from_raw(tables, edits, cfg or config.load(), scenario or "plan")
+        return cls.from_raw(tables, edits, cfg or config.load(scenario=scenario), scenario or "plan")
 
     @classmethod
     def from_raw(cls, tables, edits, cfg, name):

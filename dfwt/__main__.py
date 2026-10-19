@@ -64,7 +64,7 @@ def cmd_build(args):
 
 def cmd_ridership(args):
     from .evaluate import Context, run_year
-    cfg = config.load()
+    cfg = config.load(scenario=args.scenario)
     ctx = Context(cfg)
     net = Network.load(args.scenario, cfg)
     years = [int(y) for y in args.years.split(",")]
