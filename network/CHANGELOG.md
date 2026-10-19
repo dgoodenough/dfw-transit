@@ -97,3 +97,35 @@ Applied by `tools/apply_v2_changes.py` to the migrated v1 tables. Step IDs match
 ### A5
 
 - 72 explicit transfer links between stations 400-800 m apart on different lines (walk time computed from distance; previously no transfer existed)
+
+## v2.1 (geometry and staging review)
+
+- **Teal** now starts at Woodhaven. The drawn line ran Haltom North -> Riverside / Race St ->
+  Woodhaven -> back to Riverside / Race St, so every train reversed on the Woodhaven spur
+  (the "east tail zigzag" from the original Phase One review). Haltom North stays served by
+  the FW Crosstown Loop.
+- Geometry: commuter rail routed on real track, metro curves fitted, BRT de-noised, 74
+  stations moved up to 100 m off bends (`python -m dfwt align`; details in
+  `reports/GEOMETRY.md`).
+- Staging: `stages.csv` added (inferred from the plan's years); Orange's Stockyards /
+  Panther Island leg is locked to 2035 at the owner's request.
+
+## v2.2 — downtown Fort Worth: Jones St trunk (owner's choice)
+
+The drawn downtown zigzagged every north-south line Courthouse -> Sundance Square -> east to
+Central Station -> back west to Convention Center -> south to T&P, with 67-84 degree turns
+between stations as little as 255 m apart. Three re-sequenced options were fitted and scored
+(`tools/downtown_options.py`); the owner chose the Jones St trunk:
+
+- **Orange / Pink**: Panther Island South -> Courthouse -> Central Station -> T&P -> S Main.
+  Every north-south line now meets TRE / TEXRail at Central Station.
+- **Blue**: east-west Butler Place -> Central Station -> Sundance Square -> TCC Trinity River
+  -> W 7th (direct Handley -> TCC, 24 min instead of 34 with a transfer).
+- **Teal**: Trinity Bluff -> Courthouse -> TCC Trinity River (Sundance Square is a 255 m walk).
+- **Purple**: Central Station -> T&P -> Magnolia.
+- **Convention Center** is no longer a metro stop (420 m from Central Station, 440 m from T&P).
+
+Scored against the previous downtown (2070): +2,400 competitive commutes, +$0.06B capital,
+Fort Worth metro curves tighter than 150 m: 25 -> 11 (the rest are outside the core).
+The Main St and Main St via Convention Center alternatives scored +1,300 / +900 commutes at
++$0.31B / +$0.52B; their tables can be regenerated with `tools/downtown_options.py`.

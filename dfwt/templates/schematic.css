@@ -1,0 +1,49 @@
+/* Diagram view: WMATA-style schematic (layout: dfwt/schematic.py, rendering: schematic.js). */
+:root{--water:#d3e6f3;--water-ink:#4f86ad;--st-fill:#ffffff;--st-ink:#18212b;--city:#9aa6b0}
+@media (prefers-color-scheme: dark){:root{--water:#1b3243;--water-ink:#86b3d3;--st-fill:#10161c;--st-ink:#e7ecef;--city:#5d6b77}}
+#schem{position:absolute;inset:0;display:none;background:var(--bg);touch-action:none;overflow:hidden;cursor:grab;outline:none}
+#schem.drag{cursor:grabbing}
+body.diagram #schem{display:block}
+body.diagram #map{visibility:hidden}
+#schem svg{position:absolute;inset:0;width:100%;height:100%;display:block}
+#schem .lake{fill:var(--water)}
+#schem .river{fill:none;stroke:var(--water);stroke-linecap:round;stroke-linejoin:round}
+#schem .city{fill:var(--city);font-family:var(--f-display);font-weight:700;letter-spacing:.12em;text-anchor:middle}
+#schem .ln{fill:none;stroke-linecap:round;stroke-linejoin:round}
+#schem .case{fill:none;stroke:var(--st-fill);stroke-linecap:round;stroke-linejoin:round}
+#schem .fut{opacity:.2}
+#schem #sch-st .fut,#schem #sch-conn .fut{opacity:.35}
+#schem .conn-o{stroke:var(--st-ink);stroke-linecap:round}
+#schem .conn-i{stroke:var(--st-fill);stroke-linecap:round}
+#schem .lbl{font-family:var(--f-ui);font-weight:500;fill:var(--ink);paint-order:stroke;stroke:var(--bg);stroke-linejoin:round}
+#schem .lbl.x{font-weight:600}
+#schem .lbl.fut{fill:var(--muted);font-weight:400}
+#schem .trip{fill:none;stroke-linecap:round;stroke-linejoin:round;opacity:.38}
+#schem .walk{fill:none;stroke:var(--ink);stroke-linecap:round;opacity:.7}
+#schem .ring{fill:none;stroke:var(--accent)}
+.viewtog{flex-shrink:0;display:flex;border:1px solid var(--rule);border-radius:7px;overflow:hidden;align-self:flex-start}
+.viewtog button{border:0;border-radius:0;padding:5px 16px;font-weight:600;background:var(--panel);color:var(--muted)}
+.viewtog button+button{border-left:1px solid var(--rule)}
+.viewtog button[aria-pressed="true"]{background:var(--ink);color:var(--panel)}
+#schZoom{position:absolute;z-index:900;top:max(12px,env(safe-area-inset-top));right:max(12px,env(safe-area-inset-right));display:none;flex-direction:column;
+  border:1px solid var(--rule);border-radius:6px;overflow:hidden;box-shadow:0 1px 6px rgba(0,0,0,.15)}
+body.diagram #schZoom{display:flex}
+#schZoom button{border:0;border-radius:0;width:34px;height:34px;padding:0;font-size:1.15rem;line-height:1}
+#schZoom button+button{border-top:1px solid var(--rule)}
+#schPop{position:absolute;z-index:950;display:none;background:var(--panel);color:var(--ink);border:1px solid var(--rule);border-radius:8px;
+  box-shadow:0 3px 14px rgba(0,0,0,.25);padding:9px 26px 9px 12px;max-width:260px;transform:translate(-50%,calc(-100% - 14px))}
+#schPop .x{position:absolute;top:2px;right:4px;border:0;background:none;padding:2px 6px;color:var(--muted);font-size:1rem}
+#schPop .pop .m{color:var(--muted)}
+#schTip{position:absolute;z-index:940;display:none;pointer-events:none;background:var(--panel);color:var(--ink);border:1px solid var(--rule);
+  border-radius:4px;padding:2px 7px;font-size:.8rem;white-space:nowrap;transform:translate(-50%,calc(-100% - 10px))}
+#legend{position:absolute;z-index:900;right:max(12px,env(safe-area-inset-right));bottom:max(26px,env(safe-area-inset-bottom));background:var(--panel);
+  border:1px solid var(--rule);border-radius:8px;box-shadow:0 1px 8px rgba(0,0,0,.15);padding:7px 10px;font-size:.76rem;color:var(--ink)}
+#legend summary{font-weight:600;font-size:.76rem;cursor:pointer}
+#legend[open] summary{margin-bottom:4px}
+#legend .r{display:grid;grid-template-columns:38px auto;gap:7px;align-items:center;line-height:1.55}
+#legend svg{width:38px;height:12px;display:block;overflow:visible}
+@media (max-width:640px){
+  #legend{bottom:auto;right:auto;top:max(12px,env(safe-area-inset-top));left:max(12px,env(safe-area-inset-left));padding:5px 8px;font-size:.7rem}
+  #legend .r{grid-template-columns:30px auto;gap:5px;line-height:1.4}
+  #legend svg{width:30px}
+}

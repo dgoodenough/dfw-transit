@@ -68,6 +68,9 @@ def evaluate(ctx, net, line_values=True, log=print):
     final = max(years)
     year_rows, results = [], {}
     owner = net.track_owner()
+    from . import staging
+    spend = staging.spend_by_year(net)
+    per_year = cfg["budget"]["musd_per_year"]
     for y in years:
         r = run_year(ctx, net, y, want_loads=(y == final))
         results[y] = r
@@ -89,6 +92,8 @@ def evaluate(ctx, net, line_values=True, log=print):
         row = {"year": y, "stations": g.n_st, "lines": len({run.line.id for run in g.runs}),
                "km_metro": round(km["metro"]), "km_brt": round(km["brt"]), "km_commuter": round(km["commuter"]),
                "capex_busd": round(capex / 1000, 1),
+               "spent_busd": round(sum(v for yy, v in spend.items() if yy <= y) / 1000, 1),
+               "budget_busd": round(per_year * (y - cfg["existing_year"]) / 1000, 1),
                "pop_covered_pct": round(pcov * 100, 1), "jobs_covered_pct": round(jcov * 100, 1),
                "competitive_commutes": round(r["competitive_commutes"]),
                "avg_transit_min": round(r["avg_transit_min"], 1)}
@@ -131,7 +136,7 @@ def evaluate(ctx, net, line_values=True, log=print):
                 for k in ("marginal_at_opening", "marginal_final", "value_per_musd"):
                     row[k] = ""
                 continue
-            sub = Network(net.stations, {k: v for k, v in net.lines.items() if k != row["line_id"]}, cfg, net.name, net.transfers)
+            sub = net.without(row["line_id"])
             y0 = min(y for y in years if y >= row["first_year"])
             m0 = base[y0] - run_year(ctx, sub, y0, want_loads=False)["competitive_commutes"]
             m1 = base[final] - run_year(ctx, sub, final, want_loads=False)["competitive_commutes"]

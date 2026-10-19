@@ -7,11 +7,15 @@ times, waits, transfer walks), so the in-page trip planner can't drift from it.
 import json
 import os
 
-from . import config
+from . import config, schematic
 
 TEMPLATE = os.path.join(os.path.dirname(__file__), "templates", "map.html")
+SCHEM_FILES = [os.path.join(os.path.dirname(__file__), "templates", n) for n in ("schematic.css", "schematic.js")]
 LABELS = {"plan": "v2 plan (recommended)", "v1_baseline": "v1 plan (before review)",
-          "right_sized": "v2, suburban metro as BRT"}
+          "right_sized": "v2, suburban metro as BRT", "staged": "v2, optimizer's build order",
+          "unstaged": "v2, lines open whole",
+          "downtown_main": "Downtown FW: Main St trunk", "downtown_jones": "Downtown FW: Jones St trunk",
+          "downtown_events": "Downtown FW: Main St via Convention Center"}
 
 
 def write(nets, evals, out_path):
@@ -40,7 +44,7 @@ def write(nets, evals, out_path):
                 "notes": ln.notes, "first": ln.first_year, "km": round(ln.km, 1),
                 "cost": m.get("cost_musd", 0), "value": m.get("value_per_musd", ""),
                 "load": m.get("peak_hour_load", 0),
-                "segs": [[s.year, geom_id(s.pts)] for s in ln.segments],
+                "segs": [[s.year, geom_id(s.pts), round(s.km, 2)] for s in ln.segments],
             })
         for sid, r in st_metrics.items():
             s = net.stations[sid]
@@ -64,12 +68,16 @@ def write(nets, evals, out_path):
                      "metrics": ev["years"],
                      "boardings": {r["station_id"]: r["boardings_final"] for r in ev["stations"]}}
     data = {"years": cfg["years"], "boardPenalty": cfg["transfer"]["penalty_min"],
+            "build": cfg["staging"]["construction_years"],
             "modes": {m: v["label"] for m, v in cfg["modes"].items()},
             "geoms": geoms, "stations": stations, "scen": scen,
             "order": [k for k in ("plan", "v1_baseline", "right_sized") if k in scen] +
                      [k for k in scen if k not in ("plan", "v1_baseline", "right_sized")]}
+    data["schem"] = schematic.build(nets)       # diagram view (dfwt/schematic.py)
     with open(TEMPLATE, encoding="utf-8") as f:
         html = f.read()
+    css, js = (open(p, encoding="utf-8").read() for p in SCHEM_FILES)
+    html = html.replace("<!--__SCHEMATIC__-->", f"<style>\n{css}</style>\n<script>\n{js}</script>")
     html = html.replace("/*__DATA__*/null", json.dumps(data, separators=(",", ":")))
     os.makedirs(os.path.dirname(out_path), exist_ok=True)
     with open(out_path, "w", encoding="utf-8") as f:

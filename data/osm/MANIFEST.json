@@ -1,0 +1,30 @@
+{
+  "source": "Overture Maps transportation/segment, release 2026-09-23.1",
+  "license": "\u00a9 OpenStreetMap contributors, ODbL 1.0 (via Overture Maps Foundation)",
+  "bbox": [
+    -98.0,
+    31.95,
+    -95.95,
+    33.45
+  ],
+  "files": {
+    "rail.parquet": {
+      "subtype": "rail",
+      "classes": null,
+      "rows": 4230,
+      "sha256": "b98e65f2bea5ee644991526b5e2d4fa2248ae4e9b14bff30a0bd788a56e0a762"
+    },
+    "roads.parquet": {
+      "subtype": "road",
+      "classes": [
+        "motorway",
+        "trunk",
+        "primary",
+        "secondary",
+        "tertiary"
+      ],
+      "rows": 171351,
+      "sha256": "35c9177886fec60ff38acbf156c2ce6d05ee23f5dd13834a45ea5334ed9b066c"
+    }
+  }
+}

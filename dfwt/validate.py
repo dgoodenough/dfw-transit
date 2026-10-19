@@ -116,7 +116,38 @@ def run(net):
             sids = {g.station_ids[i] for i in comp}
             lines = sorted({r.line.name for r in g.runs if sids & set(r.stops)})
             add("warn", "ISLAND", ", ".join(lines), f"{y}: {len(sids)} stations ({', '.join(lines)}) cannot reach the main network")
+    out.extend(_curves(net))
+    out.extend(_staging(net))
     return out
+
+
+def _curves(net):
+    """Distinct tight curves (radius below the mode minimum, measured on a 20 m
+    resampling so vertex noise doesn't count) on proposed lines."""
+    from . import align
+    out = []
+    g = net.cfg.get("geometry")
+    if not g:
+        return out
+    for ln in net.lines.values():
+        if ln.status == "existing":
+            continue
+        rmin = g["check_radius_m"][ln.mode]
+        pts = []
+        for s in ln.segments:
+            pts += s.pts if not pts else s.pts[1:]
+        R = align.chord_radii(pts)
+        tight = R < rmin * 0.9
+        n = int((tight[1:] & ~tight[:-1]).sum() + (1 if len(tight) and tight[0] else 0))
+        if n:
+            out.append(("warn", "CURVE_RADIUS", ln.name, f"{n} curves tighter than {rmin} m "
+                        f"(tightest {float(R.min()):.0f} m)"))
+    return out
+
+
+def _staging(net):
+    from . import staging
+    return staging.check(net)
 
 
 def summarize(findings):

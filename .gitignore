@@ -33,3 +33,7 @@ __pycache__/
 *.pyc
 # raw LODES OD (optional input, see data/README.md)
 data/raw/
+.claude/worktrees/
+
+# Overture/OSM extracts for alignment routing (reproducible: tools/fetch_osm.py)
+data/osm/*.parquet
