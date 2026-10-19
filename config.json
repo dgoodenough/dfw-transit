@@ -618,5 +618,6 @@
       "ride_bonus": 3.0
     },
     "pnr_asc_offset": -1.5
-  }
+  },
+  "default_scenario": "two_million"
 }

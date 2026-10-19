@@ -410,36 +410,38 @@ def _diverse_nearest(arr, run_cols, k):
 
 def _paths(acc, T, i0, i1, nz, ns):
     """Best door-to-door path for origin zones i0:i1 to every zone through `acc`:
-    (minutes, access station, egress station, access mode, egress mode, out-of-vehicle minutes)."""
+    (minutes, access station, egress station, access mode, egress mode, out-of-vehicle minutes).
+    Only the minutes and the winning connector index are kept per pass (in place);
+    stations, modes and out-of-vehicle minutes are looked up once at the end."""
     m = i1 - i0
     k = acc.acc_st.shape[1]
+    rows = np.arange(m)[:, None]
     # origin zone -> any station b, via best access station a
     R = np.full((m, ns), np.inf, dtype=np.float32)
-    Ra = np.zeros((m, ns), dtype=np.int32)
-    Rm = np.zeros((m, ns), dtype=np.int8)
-    Ro = np.zeros((m, ns), dtype=np.float32)     # out-of-vehicle minutes of the chosen access leg
+    Ja = np.zeros((m, ns), dtype=np.int8)
+    better = np.empty((m, ns), dtype=bool)
     for j in range(k):
-        a = acc.acc_st[i0:i1, j]
-        cand = acc.acc_t[i0:i1, j, None] + T[a]
-        better = cand < R
-        R = np.where(better, cand, R)
-        Ra = np.where(better, a[:, None], Ra)
-        Rm = np.where(better, acc.acc_mode[i0:i1, j, None], Rm)
-        Ro = np.where(better, acc.acc_o[i0:i1, j, None], Ro)
+        cand = acc.acc_t[i0:i1, j, None] + T[acc.acc_st[i0:i1, j]]
+        np.less(cand, R, out=better)
+        np.copyto(R, cand, where=better)
+        np.copyto(Ja, j, where=better)
+    Ra = acc.acc_st[i0:i1][rows, Ja]
+    Rm = acc.acc_mode[i0:i1][rows, Ja]
+    Ro = acc.acc_o[i0:i1][rows, Ja]
     # -> destination zone via best egress station b
     TT = np.full((m, nz), np.inf, dtype=np.float32)
-    Bst = np.zeros((m, nz), dtype=np.int32)
-    Em = np.zeros((m, nz), dtype=np.int8)
-    OVT = np.zeros((m, nz), dtype=np.float32)    # access + egress out-of-vehicle minutes
+    Jb = np.zeros((m, nz), dtype=np.int8)
+    better = np.empty((m, nz), dtype=bool)
     for j in range(k):
-        b = acc.egr_st[:, j]
-        cand = R[:, b] + acc.egr_t[None, :, j]
-        better = cand < TT
-        TT = np.where(better, cand, TT)
-        Bst = np.where(better, b[None, :], Bst)
-        Em = np.where(better, acc.egr_mode[None, :, j], Em)
-        OVT = np.where(better, Ro[:, b] + acc.egr_o[None, :, j], OVT)
-    rows = np.arange(m)[:, None]
+        cand = R[:, acc.egr_st[:, j]]
+        cand += acc.egr_t[None, :, j]
+        np.less(cand, TT, out=better)
+        np.copyto(TT, cand, where=better)
+        np.copyto(Jb, j, where=better)
+    cols = np.arange(nz)[None, :]
+    Bst = acc.egr_st[cols, Jb]
+    Em = acc.egr_mode[cols, Jb]
+    OVT = Ro[rows, Bst] + acc.egr_o[cols, Jb]
     return TT, Ra[rows, Bst], Bst, Rm[rows, Bst], Em, OVT
 
 
@@ -571,8 +573,12 @@ def _sweep(zones, od, T, segs, cfg, nz, ns, fixed, want_loads, light=False):
         else:
             ea = 0.0
 
+        cache = {}
+
         def pair_riders(acc, wgt, bon=0.0):
-            TT, Ast, Bst, Am, Em, OVT = _paths(acc, T, i0, i1, nz, ns)
+            if id(acc) not in cache:      # the walk-only connectors serve both car-free riders and garage overflow
+                cache[id(acc)] = _paths(acc, T, i0, i1, nz, ns)
+            TT, Ast, Bst, Am, Em, OVT = cache[id(acc)]
             # a trip must ride the network: feeder-in, feeder-out at one station is a bus trip
             usable = np.isfinite(TT) & (TT <= cc["max_min"]) & (dist > cc["min_km"]) & (Ast != Bst)
             ok = usable & (TT <= cc["ratio"] * drive + cc["slack_min"])
@@ -599,6 +605,8 @@ def _sweep(zones, od, T, segs, cfg, nz, ns, fixed, want_loads, light=False):
                 eb = ea * np.exp(bon)
                 act_w += float((odc * _rows(wgt, i0, i1) * eb / (1.0 + eb)).sum()) * rc["telework"]
         for si, (wgt, acc, alt, bon) in enumerate(segs):
+            if light and not acc.acc_pnr.any():
+                continue                  # only garage demand is needed, and this segment can't park
             TT, Ast, Bst, Am, Em, q, rq, tt = pair_riders(acc, wgt, bon)
             p = Am == PNR
             if light:

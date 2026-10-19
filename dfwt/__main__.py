@@ -19,9 +19,12 @@ from . import config, validate
 from .network import Network
 
 
-def scenarios():
+def scenarios(levers=False):
+    """Scenario folders. lever_* folders are analysis runs (tools/*_levers.py, the 2M study);
+    the build and the map leave them out unless asked."""
     d = config.path("scenarios")
-    return sorted(n for n in os.listdir(d) if os.path.isdir(os.path.join(d, n)))
+    return sorted(n for n in os.listdir(d) if os.path.isdir(os.path.join(d, n))
+                  and (levers or not n.startswith("lever_")))
 
 
 def cmd_validate(args):
@@ -39,11 +42,12 @@ def cmd_build(args):
     t0 = time.time()
     ctx = evaluate.Context()
     print(f"demand: {ctx.od_source} ({ctx.od.sum():,.0f} commutes, {ctx.zones.n} zones)")
-    names = [None] + scenarios()
+    names = [None] + scenarios(levers=args.all)
     evals, nets, findings = {}, {}, {}
     for sc in names:
         key = sc or "plan"
         net = Network.load(sc)
+        sctx = evaluate.Context(net.cfg) if config.has_overlay(sc) else ctx   # the scenario's own assumptions
         findings[key] = validate.run(net)
         errors = [f for f in findings[key] if f[0] == "error"]
         if errors and sc is None:
@@ -52,8 +56,8 @@ def cmd_build(args):
             print("the plan has data errors; fix them before building")
             return 1
         print(f"{key}: evaluating")
-        values = not args.quick and (sc is None or sc == "v1_baseline")
-        evals[key] = evaluate.evaluate(ctx, net, line_values=values)
+        values = not args.quick and (sc is None or sc == net.cfg.get("default_scenario"))
+        evals[key] = evaluate.evaluate(sctx, net, line_values=values)
         nets[key] = net
         evaluate.write(config.path("results", key), evals[key])
     report.write_all(ctx, nets, evals, findings)
@@ -218,6 +222,7 @@ def main(argv=None):
     v.add_argument("-v", "--verbose", action="store_true")
     b = sub.add_parser("build")
     b.add_argument("--quick", action="store_true", help="skip per-line leave-one-out values")
+    b.add_argument("--all", action="store_true", help="also evaluate the lever_* analysis scenarios")
     sc = sub.add_parser("schedule", help="move stages to the earliest year the flat budget allows (keeps the order)")
     sc.add_argument("--scenario")
     sc.add_argument("--write", action="store_true")

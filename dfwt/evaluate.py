@@ -155,7 +155,45 @@ def calibrate(ctx, net, log=None):
     return rc["asc"], rc.get("active", {}).get("asc")
 
 
-def evaluate(ctx, net, line_values=True, log=print):
+_POOL = {}
+
+
+def _slim(r, keep_loads):
+    """What the reports and the map need from a run_year result (no matrices)."""
+    out = {k: v for k, v in r.items() if k not in ("graph", "flows", "comp_from", "comp_to", "jobs_reach",
+                                                      "walk_min_dist", "hop_load", "boardings")}
+    out["n_st"] = r["graph"].n_st
+    out["n_lines"] = len({run.line.id for run in r["graph"].runs})
+    if keep_loads:
+        out["hop_load"], out["boardings"] = r["hop_load"], r["boardings"]
+    return out
+
+
+def _year_job(y):
+    ctx, net, final = _POOL["ctx"], _POOL["net"], _POOL["final"]
+    r = run_year(ctx, net, y, want_loads=True)  # loads every year: boardings per trip comes from them
+    out = _slim(r, y == final)
+    out["coverage"] = coverage(ctx, net, y)
+    return y, out
+
+
+def _without_job(args):
+    lid, y = args
+    r = run_year(_POOL["ctx"], _POOL["net"].without(lid), y, want_loads=False)
+    return lid, y, r["daily_trips"]
+
+
+def _pool_map(fn, items, ctx, net, final, procs):
+    """Map fn over items in forked workers that share ctx and net (or inline when procs <= 1)."""
+    _POOL.update(ctx=ctx, net=net, final=final)
+    if procs <= 1:
+        return [fn(x) for x in items]
+    import multiprocessing as mp
+    with mp.get_context("fork").Pool(procs) as pool:
+        return pool.map(fn, items, chunksize=1)
+
+
+def evaluate(ctx, net, line_values=True, log=print, procs=None):
     cfg = ctx.cfg
     years = cfg["years"]
     final = max(years)
@@ -164,11 +202,10 @@ def evaluate(ctx, net, line_values=True, log=print):
     from . import staging
     spend = staging.spend_by_year(net)
     per_year = cfg["budget"]["musd_per_year"]
-    for y in years:
-        r = run_year(ctx, net, y, want_loads=True)  # loads every year: boardings per trip comes from them
+    procs = procs or max(1, min(3, (os.cpu_count() or 2) - 1))
+    for y, r in sorted(_pool_map(_year_job, years, ctx, net, final, procs)):
         results[y] = r
-        g = r["graph"]
-        pcov, jcov = coverage(ctx, net, y)
+        pcov, jcov = r["coverage"]
         opened = [ln for ln in net.lines.values() if ln.status != "existing"]
         capex = sum(net.line_cost_musd(ln, by_year=y, owner=owner) for ln in opened)
         km = {m: 0.0 for m in cfg["modes"]}
@@ -182,7 +219,7 @@ def evaluate(ctx, net, line_values=True, log=print):
                         continue
                     seen.add(key)
                     km[ln.mode] += s.km
-        row = {"year": y, "stations": g.n_st, "lines": len({run.line.id for run in g.runs}),
+        row = {"year": y, "stations": r["n_st"], "lines": r["n_lines"],
                "km_metro": round(km["metro"]), "km_brt": round(km["brt"]), "km_commuter": round(km["commuter"]),
                "capex_busd": round(capex / 1000, 1),
                "spent_busd": round(sum(v for yy, v in spend.items() if yy <= y) / 1000, 1),
@@ -206,7 +243,7 @@ def evaluate(ctx, net, line_values=True, log=print):
             f"{row['jobs_45min']:,} jobs in 45 min, ${row['capex_busd']}B")
 
     fr = results[final]
-    g = fr["graph"]
+    g = YearGraph(net, final)       # same runs, in the same order, as the evaluated graph
     caps = {m: cfg["modes"][m]["capacity_pphpd"] for m in cfg["modes"]}
     line_rows = []
     for ln in net.lines.values():
@@ -232,16 +269,24 @@ def evaluate(ctx, net, line_values=True, log=print):
         #               (fair to trunks that later get shared with branches)
         #  final      - commutes lost if removed from the finished network
         #               (fair to lines whose value depends on what is built later)
-        base = {y: results[y]["competitive_commutes"] for y in years}
+        # measured in daily transit trips (each counted once)
+        base = {y: results[y]["daily_trips"] for y in years}
+        jobs = []
         for row in line_rows:
             if row["status"] == "existing" or row["first_year"] > final:  # existing, or opens after the horizon
                 for k in ("marginal_at_opening", "marginal_final", "value_per_musd"):
                     row[k] = ""
                 continue
-            sub = net.without(row["line_id"])
             y0 = min(y for y in years if y >= row["first_year"])
-            m0 = base[y0] - run_year(ctx, sub, y0, want_loads=False)["competitive_commutes"]
-            m1 = base[final] - run_year(ctx, sub, final, want_loads=False)["competitive_commutes"]
+            row["_y0"] = y0
+            jobs += [(row["line_id"], y0), (row["line_id"], final)]
+        without = {(lid, y): v for lid, y, v in _pool_map(_without_job, jobs, ctx, net, final, procs)}
+        for row in line_rows:
+            y0 = row.pop("_y0", None)
+            if y0 is None:
+                continue
+            m0 = base[y0] - without[(row["line_id"], y0)]
+            m1 = base[final] - without[(row["line_id"], final)]
             row["marginal_at_opening"] = round(m0)
             row["marginal_final"] = round(m1)
             best = max(m0, m1)

@@ -1072,6 +1072,18 @@ def to_json(lay):
             "rivers": rivers, "lakes": lakes, "labels": labels, "pitch": PITCH, "lead": label_groups(lay)}
 
 
+def diagram_nets(nets):
+    """The networks the diagram lays out: every scenario minus BRT lines it adds on top
+    of the plan (the 2M arterial grid lives on the map view only)."""
+    plan_lines = set(nets["plan"].lines) if "plan" in nets else set()
+    out = {}
+    for k, n in nets.items():
+        for lid in [l for l, ln in n.lines.items() if ln.mode == "brt" and l not in plan_lines and k != "plan"]:
+            n = n.without(lid)
+        out[k] = n
+    return out
+
+
 def build(nets, log=None):
     """Layout + page JSON + the geographic waterways layer, for webmap."""
     out = to_json(compute(nets, log=log))

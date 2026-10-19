@@ -68,6 +68,7 @@ a{color:var(--accent)}
   #panel{top:auto;bottom:0;left:0;right:0;width:auto;max-height:52%;border-radius:12px 12px 0 0;
     padding-left:max(16px,env(safe-area-inset-left));padding-right:max(16px,env(safe-area-inset-right));padding-bottom:max(16px,env(safe-area-inset-bottom))}
 }
+.goal{stroke:var(--muted,#888);stroke-dasharray:2 3;stroke-width:1;fill:var(--muted,#888);font-size:9px}
 </style>
 </head>
 <body>
@@ -88,7 +89,7 @@ a{color:var(--accent)}
   </div>
   <div class="metrics" id="metrics"></div>
   <div>
-    <label class="l">Transit-competitive commutes</label>
+    <label class="l">Daily transit trips</label>
     <svg class="spark" id="spark" viewBox="0 0 300 46" preserveAspectRatio="none" aria-hidden="true"></svg>
     <div class="hint" id="sparkKey"></div>
   </div>
@@ -107,6 +108,8 @@ a{color:var(--accent)}
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
 const D = /*__DATA__*/null;
+// each scenario stores its distinct routing graphs once; years point at them
+for (const S of Object.values(D.scen)) S.years = Object.fromEntries(Object.entries(S.yearGraph).map(([y, i]) => [y, S.graphs[i]]));
 const dark = window.matchMedia && matchMedia('(prefers-color-scheme: dark)').matches;
 const map = L.map('map', {zoomControl: false, preferCanvas: true}).setView([32.84, -97.03], 10);
 L.control.zoom({position: 'topright'}).addTo(map);
@@ -198,25 +201,32 @@ function intervalSummary(Y, prevY, state) {
 }
 function metrics() {
   const Y = D.years[yi], m = S.metrics.find(r => r.year === Y);
-  const base = scenKey !== 'v1_baseline' && D.scen.v1_baseline ? D.scen.v1_baseline.metrics.find(r => r.year === Y) : null;
+  // compare with the budget-constrained plan (or, for the plan itself, with v1)
+  const refKey = scenKey !== 'plan' && D.scen.plan ? 'plan' : (scenKey !== 'v1_baseline' && D.scen.v1_baseline ? 'v1_baseline' : null);
+  const ref = refKey ? D.scen[refKey] : null, refName = refKey === 'plan' ? 'plan' : 'v1';
+  const base = ref ? ref.metrics.find(r => r.year === Y) : null;
   const d = (k, unit = '') => { if (!base) return ''; const v = m[k] - base[k]; if (Math.abs(v) < 0.05) return ''; const s = v > 0 ? '+' : '−';
-    const a = Math.abs(v), good = unit === '$' ? v < 0 : v > 0; return ` <em class="${good ? 'up' : 'down'}">${s}${unit === '$' ? '$' + a.toFixed(1) + 'B' : unit === '%' ? a.toFixed(1) + ' pts' : fmt(Math.round(a))} vs v1</em>`; };
+    const a = Math.abs(v), good = unit === '$' ? v < 0 : v > 0; return ` <em class="${good ? 'up' : 'down'}">${s}${unit === '$' ? '$' + a.toFixed(1) + 'B' : unit === '%' ? a.toFixed(1) + ' pts' : fmt(Math.round(a))} vs ${refName}</em>`; };
+  const k = v => v >= 1e6 ? (v / 1e6).toFixed(2) + 'M' : Math.round(v / 1000) + 'k';
+  const modes = [['boardings_metro', 'metro'], ['boardings_commuter', 'regional rail'], ['boardings_brt', 'BRT'], ['boardings_feeder_bus', 'feeder bus']]
+    .filter(([c]) => m[c]).map(([c, n]) => `${k(m[c])} ${n}`).join(' · ');
   $('metrics').innerHTML = [
-    [fmt(m.competitive_commutes) + d('competitive_commutes'), 'daily commutes where transit competes with driving'],
+    [fmt(m.daily_trips) + d('daily_trips'), 'daily transit trips (each trip counted once)'],
+    [k(m.all_boardings), `boardings a day: ${modes}`],
     [fmt(m.jobs_45min) + d('jobs_45min'), 'jobs the average resident reaches in 45 min'],
-    [m.pop_covered_pct + '%' + d('pop_covered_pct', '%'), 'of residents near a station'],
     ['$' + m.capex_busd + 'B' + d('capex_busd', '$'), 'capital spent since 2025'],
   ].map(([a, b]) => `<div class="metric"><b>${a}</b><span>${b}</span></div>`).join('');
-  const series = sc => sc.metrics.map(r => r.competitive_commutes);
-  const all = series(S).concat(D.scen.v1_baseline ? series(D.scen.v1_baseline) : []), max = Math.max(...all) * 1.05;
-  const pts = s => s.map((v, i) => `${(i / (s.length - 1) * 296 + 2).toFixed(1)},${(44 - v / max * 40).toFixed(1)}`).join(' ');
-  let svg = '';
-  if (D.scen.v1_baseline && scenKey !== 'v1_baseline') svg += `<polyline class="ln2" points="${pts(series(D.scen.v1_baseline))}"/>`;
+  const series = sc => sc.metrics.map(r => r.daily_trips);
+  const all = series(S).concat(ref ? series(ref) : []).concat([2e6]), max = Math.max(...all) * 1.05;
+  const yv = v => (44 - v / max * 40).toFixed(1);
+  const pts = s => s.map((v, i) => `${(i / (s.length - 1) * 296 + 2).toFixed(1)},${yv(v)}`).join(' ');
+  let svg = `<line class="goal" x1="2" x2="298" y1="${yv(2e6)}" y2="${yv(2e6)}"/><text class="goal" x="296" y="${yv(2e6) - 2}" text-anchor="end">2M</text>`;
+  if (ref) svg += `<polyline class="ln2" points="${pts(series(ref))}"/>`;
   svg += `<polyline class="ln" points="${pts(series(S))}"/>`;
   const cv = series(S)[yi];
-  svg += `<circle class="now" r="4" cx="${(yi / (D.years.length - 1) * 296 + 2).toFixed(1)}" cy="${(44 - cv / max * 40).toFixed(1)}"/>`;
+  svg += `<circle class="now" r="4" cx="${(yi / (D.years.length - 1) * 296 + 2).toFixed(1)}" cy="${yv(cv)}"/>`;
   $('spark').innerHTML = svg;
-  $('sparkKey').textContent = scenKey !== 'v1_baseline' && D.scen.v1_baseline ? `Solid: this plan · dashed: v1 · ${D.years[0]}–${D.years[D.years.length - 1]}` : `${D.years[0]}–${D.years[D.years.length - 1]}`;
+  $('sparkKey').textContent = (ref ? `Daily trips. Solid: this plan · dashed: ${refName} · ` : 'Daily trips · ') + `${D.years[0]}–${D.years[D.years.length - 1]}`;
 }
 function lineList() {
   const Y = D.years[yi], groups = {metro: [], commuter: [], brt: []};

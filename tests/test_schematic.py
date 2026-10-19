@@ -14,14 +14,14 @@ from dfwt.network import Network  # noqa: E402
 
 
 def scenarios():
-    d = config.path("scenarios")
-    return sorted(n for n in os.listdir(d) if os.path.isdir(os.path.join(d, n)))
+    from dfwt.__main__ import scenarios as built
+    return built()
 
 
 class SchematicLayoutTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        cls.nets = {sc or "plan": Network.load(sc) for sc in [None] + scenarios()}
+        cls.nets = schematic.diagram_nets({sc or "plan": Network.load(sc) for sc in [None] + scenarios()})
         cls.lay = schematic.compute(cls.nets)
         cls.js = schematic.to_json(cls.lay)
 
