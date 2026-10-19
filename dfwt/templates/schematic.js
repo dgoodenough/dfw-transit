@@ -382,11 +382,13 @@ function placeLabels() {
     const dx = ex + gap, dy = ey + gap, dd = Math.min(ex, ey) * 0.72 + gap;
     const opts = [[s.x + dx, s.y - h / 2], [s.x - dx - w, s.y - h / 2], [s.x + dd, s.y - dd - h], [s.x + dd, s.y + dd],
       [s.x - dd - w, s.y - dd - h], [s.x - dd - w, s.y + dd], [s.x - w / 2, s.y - dy - h], [s.x - w / 2, s.y + dy]];
+    // an interchange may also stand a little further off (still clearly its own)
+    if (lines(n) > 1) { const f = fs * 0.9; opts.push([s.x + dx + f, s.y - h / 2], [s.x - dx - w - f, s.y - h / 2], [s.x - w / 2, s.y - dy - h - f * 0.6], [s.x - w / 2, s.y + dy + f * 0.6]); }
     let best = null, bc = 1e9, bl = 0;
     opts.forEach(([bx, by], i) => {
       const b = [bx, by, bx + w, by + h];
       if (hits(b) || !inView(b)) return;
-      const lcost = lineCost(b), c = lcost * 3 + i * 0.25;
+      const lcost = lineCost(b), c = lcost * 3 + i * 0.25 + (i >= 8 ? 2 : 0);
       if (c < bc) { bc = c; best = b; bl = lcost; }
     });
     if (!best) continue;
