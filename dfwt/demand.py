@@ -642,9 +642,11 @@ def _sweep(zones, od, T, segs, cfg, nz, ns, fixed, want_loads, light=False):
 
 def assign_loads(graph, flows):
     """Push station-pair flows along shortest paths. Returns per-run hop loads
-    (list per run of per-hop volumes, both directions summed) and per-station boardings."""
+    (list per run of per-hop volumes, both directions summed), per-station boardings
+    and per-run boardings."""
     hop_load = [np.zeros(max(len(r.stops) - 1, 0)) for r in graph.runs]
     boardings = np.zeros(graph.n_st)
+    run_board = np.zeros(len(graph.runs))
     info = graph.node_info
     stop_pos = []
     for r in graph.runs:
@@ -680,4 +682,5 @@ def assign_loads(graph, flows):
                 hop_load[ri][i] += v
             elif ku[0] == "L" and kp[0] == "P":
                 boardings[graph.sidx[kp[1]]] += v
-    return hop_load, boardings
+                run_board[ku[2]] += v
+    return hop_load, boardings, run_board

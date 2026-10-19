@@ -90,14 +90,26 @@ def run_year(ctx, net, year, want_loads=True):
     rc = ctx.cfg["ridership"]
     res["daily_trips"] = res["transit_commuters"] * rc["round_trip"] / rc["work_share_of_transit_trips"]
     if want_loads:
-        res["hop_load"], res["boardings"] = demand.assign_loads(g, res["flows"])
+        res["hop_load"], res["boardings"], run_board = demand.assign_loads(g, res["flows"])
         bpt = float(res["boardings"].sum()) / max(float(res["flows"].sum()), 1e-9)
         res["boardings_per_trip"] = bpt
+        share = {}
+        for run, b in zip(g.runs, run_board):
+            share[run.line.mode] = share.get(run.line.mode, 0.0) + float(b)
+        tot = sum(share.values()) or 1.0
+        share = {m: v / tot for m, v in share.items()}
     else:
         bpt = rc["boardings_per_trip"]
+        share = None
     res["daily_boardings"] = res["daily_trips"] * bpt
     # feeder bus legs (access.feeder) are local-bus boardings, kept apart from rail + BRT
     res["feeder_boardings"] = res["feeder_legs"] * rc["round_trip"] / rc["work_share_of_transit_trips"]
+    # boardings by mode (metro, commuter rail, BRT, feeder bus), their sum, and linked trips:
+    # each trip counted once however many lines and modes it uses
+    res["boardings_by_mode"] = {m: res["daily_boardings"] * share.get(m, 0.0) for m in ctx.cfg["modes"]} \
+        if share is not None else {}
+    res["boardings_by_mode"]["feeder_bus"] = res["feeder_boardings"]
+    res["all_boardings"] = res["daily_boardings"] + res["feeder_boardings"]
     return res
 
 
@@ -180,6 +192,9 @@ def evaluate(ctx, net, line_values=True, log=print):
                "competitive_commutes": round(r["competitive_commutes"]),
                "transit_commuters": round(r["transit_commuters"]),
                "daily_boardings": round(r["daily_boardings"]),
+               "daily_trips": round(r["daily_trips"]),
+               "all_boardings": round(r["all_boardings"]),
+               **{f"boardings_{m}": round(v) for m, v in r["boardings_by_mode"].items()},
                "boardings_per_trip": round(r["boardings_per_trip"], 2),
                "pnr_full_garages": r["pnr_full_garages"],
                "avg_transit_min": round(r["avg_transit_min"], 1)}

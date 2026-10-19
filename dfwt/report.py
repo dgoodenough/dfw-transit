@@ -44,7 +44,9 @@ def write_results(ctx, nets, evals):
 
     L += ["## Plan vs. scenarios", ""]
     hdr = ["Scenario"] + [f"{y}" for y in KEY_YEARS]
-    for metric, label, f in (("daily_boardings", "Daily boardings (rail + BRT)", lambda v: f"{v / 1000:.0f}k"),
+    for metric, label, f in (("daily_trips", "Daily transit trips (each counted once)", lambda v: f"{v / 1000:.0f}k"),
+                             ("all_boardings", "Daily boardings, all modes", lambda v: f"{v / 1000:.0f}k"),
+                             ("daily_boardings", "Daily boardings (rail + BRT)", lambda v: f"{v / 1000:.0f}k"),
                              ("competitive_commutes", "Competitive commutes", lambda v: f"{v / 1000:.0f}k"),
                              ("jobs_45min", "Jobs reachable in 45 min (avg resident)", lambda v: f"{v / 1000:.1f}k"),
                              ("pop_covered_pct", "Residents near a station", lambda v: f"{v}%"),
@@ -68,7 +70,8 @@ def write_results(ctx, nets, evals):
 
     L += ["## Plan by year", ""]
     cols = ["year", "pop_m", "jobs_m", "stations", "lines", "km_metro", "km_brt", "km_commuter", "capex_busd",
-            "pop_covered_pct", "competitive_commutes", "daily_boardings", "boardings_per_trip",
+            "pop_covered_pct", "competitive_commutes", "daily_trips", "boardings_metro", "boardings_commuter",
+            "boardings_brt", "boardings_feeder_bus", "all_boardings", "boardings_per_trip",
             "pnr_full_garages", "jobs_45min", "avg_transit_min"]
     L += [_table(cols, [[r[c] if c == "year" else _fmt(r[c]) for c in cols] for r in plan["years"]]), ""]
 

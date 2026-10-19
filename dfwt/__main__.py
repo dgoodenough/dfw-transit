@@ -67,13 +67,15 @@ def cmd_ridership(args):
     ctx = Context(cfg)
     net = Network.load(args.scenario, cfg)
     years = [int(y) for y in args.years.split(",")]
-    print("year   pop    jobs  stations  boardings  trips/day  commuters  competitive  per-trip  P&R  full garages")
+    modes = list(cfg["modes"]) + ["feeder_bus"]
+    print("year    pop   jobs stations  trips(dedup)  " + "  ".join(f"{m:>10}" for m in modes)
+          + "  all-boardings  full-garages")
     for y in years:
         r = run_year(ctx, net, y, want_loads=True)
-        print(f"{y}  {r['pop'] / 1e6:5.2f}M {r['jobs'] / 1e6:5.2f}M  {r['graph'].n_st:7d}  {r['daily_boardings']:9,.0f}  "
-              f"{r['daily_trips']:9,.0f}  {r['transit_commuters']:9,.0f}  {r['competitive_commutes']:11,.0f}  "
-              f"{r['boardings_per_trip']:8.2f}  {r['pnr_riders']:6,.0f}  {r['pnr_full_garages']:3d}"
-              + (f"  feeder bus {r['feeder_boardings']:,.0f}" if r["feeder_boardings"] else ""), flush=True)
+        bm = r["boardings_by_mode"]
+        print(f"{y} {r['pop'] / 1e6:5.2f}M {r['jobs'] / 1e6:5.2f}M {r['graph'].n_st:8d}  {r['daily_trips']:12,.0f}  "
+              + "  ".join(f"{bm.get(m, 0):10,.0f}" for m in modes)
+              + f"  {r['all_boardings']:13,.0f}  {r['pnr_full_garages']:12d}", flush=True)
     return 0
 
 
