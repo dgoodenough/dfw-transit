@@ -345,6 +345,10 @@ info NEAR_MISS: 13, info SPACING: 251, warn CURVE_RADIUS: 16, warn DANGLING: 11,
 
 info NEAR_MISS: 13, info SPACING: 325, warn CURVE_RADIUS: 13, warn DANGLING: 11, warn INTERVAL_TOO_BIG: 12, warn STAGE_TOO_BIG: 26
 
+## `staged`
+
+info LONG_STUB: 4, info NEAR_MISS: 13, info SPACING: 251, info STAGE_DRIFT: 29, warn CURVE_RADIUS: 16, warn DANGLING: 11, warn PAST_HORIZON: 8, warn STAGE_TOO_BIG: 13
+
 ## `v1_baseline`
 
 error DUP_NAME: 1, info NEAR_MISS: 52, info SPACING: 257, warn CURVE_RADIUS: 22, warn DANGLING: 11, warn GEOM_GAP: 3, warn HAIRPIN: 4, warn ISLAND: 10
