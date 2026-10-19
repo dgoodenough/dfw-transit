@@ -34,6 +34,16 @@ real population and jobs data, and an [interactive map](https://dgoodenough.gith
 with the plan's numbers alongside: commutes where transit beats driving, jobs
 reachable in 45 minutes, residents near a station, and capital spent.
 
+A **Map / Diagram** toggle switches the same page to a Washington-Metro-style
+schematic: octilinear lines, bundled corridors and capsule interchanges, laid
+out at build time by [`dfwt/schematic.py`](dfwt/schematic.py) (a density-equalizing
+cartogram, then octilinear least squares) so every slider, plan and trip works
+on it too.
+
+![The diagram view, 2070 network](docs/img/diagram-desktop.png)
+
+<img src="docs/img/diagram-phone.png" alt="The diagram view on a phone" width="260">
+
 ## v2: what a review changed
 
 I asked for a critique from five perspectives: two DFW commuters, a transit
@@ -130,7 +140,7 @@ results/    per-scenario CSV outputs (generated)
 reports/    RESULTS + VALIDATION (generated), panel review, design standards, known issues
 docs/       the interactive map (generated; published on GitHub Pages)
 index.html  redirect so the Pages site root opens the map
-tools/      migrate_v1.py and apply_v2_changes.py (how v2 was derived)
+tools/      migrate_v1.py and apply_v2_changes.py (how v2 was derived), fetch_waterways.py
 tests/      unit tests
 archive/v1/ the complete v1 project, frozen (PowerShell/C# pipeline, tables, maps, notes)
 ```
@@ -139,7 +149,8 @@ archive/v1/ the complete v1 project, frozen (PowerShell/C# pipeline, tables, map
 
 - **US Census Bureau:** 2020 Decennial (centers of population), 2022 LEHD LODES
   (jobs; origin-destination optional). Public domain.
-- **OpenStreetMap:** rail lines, stops, rivers, yards and place names.
+- **OpenStreetMap:** rail lines, stops, rivers, yards and place names; the
+  waterways layer comes from OpenStreetMap via Overture Maps.
   © OpenStreetMap contributors, [ODbL](https://www.openstreetmap.org/copyright).
 - **Map tiles:** Esri World Gray Canvas (© Esri, HERE, Garmin, OpenStreetMap contributors) and OpenStreetMap standard tiles; no API key needed.
 
