@@ -19,7 +19,9 @@ Editing tools (dry run unless `--write`):
 - `python -m dfwt stage F03 --split-at "Central Station,Medical City - Baylor" --years 2035,2040,2045`:
   re-stage a line and see it grow interval by interval, with the staging checks.
 - `python -m dfwt optimize --out staged`: suggest a build order for every proposed line under the
-  flat budget (`config.json` → `budget`), written as a scenario to compare and promote.
+  flat budget (`config.json` → `budget`), written as a scenario to compare and promote by copying
+  its `stages.csv` here. The current `stages.csv` is the optimizer's order (log:
+  `reports/build_order_log.csv`); stages kept with `locked=1` are never moved.
 - `python -m dfwt align --write`: route commuter rail on real track, fit metro curves, de-noise
   BRT, and slide stations up to 100 m off bends (`reports/GEOMETRY.md` lists everything).
 

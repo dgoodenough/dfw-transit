@@ -11,7 +11,7 @@ from . import config, schematic
 
 TEMPLATE = os.path.join(os.path.dirname(__file__), "templates", "map.html")
 SCHEM_FILES = [os.path.join(os.path.dirname(__file__), "templates", n) for n in ("schematic.css", "schematic.js")]
-LABELS = {"plan": "v2 plan (recommended)", "v1_baseline": "v1 plan (before review)",
+LABELS = {"plan": "v2 plan (recommended)", "v2_phasing": "v2, hand-set phasing (before the optimizer)", "v1_baseline": "v1 plan (before review)",
           "right_sized": "v2, suburban metro as BRT", "staged": "v2, optimizer's build order",
           "unstaged": "v2, lines open whole",
           "downtown_main": "Downtown FW: Main St trunk", "downtown_jones": "Downtown FW: Jones St trunk",

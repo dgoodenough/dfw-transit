@@ -132,7 +132,7 @@ def evaluate(ctx, net, line_values=True, log=print):
         #               (fair to lines whose value depends on what is built later)
         base = {y: results[y]["competitive_commutes"] for y in years}
         for row in line_rows:
-            if row["status"] == "existing":
+            if row["status"] == "existing" or row["first_year"] > final:  # existing, or opens after the horizon
                 for k in ("marginal_at_opening", "marginal_final", "value_per_musd"):
                     row[k] = ""
                 continue

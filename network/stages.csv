@@ -1,11 +1,10 @@
 line_id,stage,kind,from_stop,to_stop,year_opens,until_year,via_line,headway_min,locked,note
-E01,1,starter,Stockyards Main,Lockheed Gate,2070,,,,,
-E02,1,starter,Six Points,Forest Hill,2045,,,,,
-E02,2,extension,Forest Hill,Forest Hill E2,2050,,,,,
-E04,1,starter,Magnolia W,Lake Worth,2030,,,,,
-E05,1,starter,Fort Worth T&P,Primrose,2035,,,,,
-E07,1,starter,Mansfield,Fort Worth Central,2045,,,,,
-E08,1,starter,Downtown Denton Transit Center,Fort Worth Central,2045,,,,,
+E01,1,starter,Stockyards Main,Lockheed Gate,2075,,,,,after the 2070 horizon
+E02,1,starter,Six Points,Forest Hill E2,2030,,,,,optimizer
+E04,1,starter,Magnolia W,Lake Worth,2030,,,,,optimizer
+E05,1,starter,Fort Worth T&P,Primrose,2030,,,,,optimizer
+E07,1,starter,Mansfield,Fort Worth Central,2030,,,,,optimizer
+E08,1,starter,Downtown Denton Transit Center,Fort Worth Central,2045,,,,,optimizer
 E09,1,starter,Fort Worth T&P,DFW Airport Terminal B,2025,,,,,
 E10,1,starter,Union Station,Fort Worth T&P,2025,,,,,
 E11,1,starter,Trinity Mills,Downtown Denton Transit Center,2025,,,,,
@@ -13,34 +12,91 @@ E12,1,starter,DFW Airport Terminal B,Parker Road,2025,,,,,
 E13,1,starter,North Carrollton/Frankford,Buckner,2025,,,,,
 E14,1,starter,Parker Road,Westmoreland,2025,,,,,
 E15,1,starter,Downtown Rowlett,UNT Dallas,2025,,,,,
-E16,1,starter,Hebron,Wheatley Place Historic District,2040,,,,,
-E17,1,starter,Frisco,Rowlett,2045,,,,,
-E18,1,starter,Irving West,Mesquite NE,2050,,,,,
-E19,1,starter,Berry/Stalcup,Zacha Junction N2,2070,,,,,
+E16,1,starter,Forest and Marsh,Turtle Creek,2040,,,,,optimizer
+E16,2,extension,Turtle Creek,Wheatley Place Historic District,2040,,,,,optimizer
+E16,3,extension,Hebron,Forest and Marsh,2045,,,,,optimizer
+E17,1,starter,Addison Circle,First Baptist Medical Center,2035,,,,,optimizer
+E17,2,extension,First Baptist Medical Center,Pearl/Arts District,2035,,,,,optimizer
+E17,3,extension,Frisco,Legacy West,2040,,,,,optimizer
+E17,4,extension,Legacy West,Addison Circle,2040,,,,,optimizer
+E17,5,extension,Pearl/Arts District,Fair Park E10,2045,,,,,optimizer
+E17,6,extension,Fair Park E10,Rowlett,2045,,,,,optimizer
+E18,1,starter,Irving West,Bachman Lake,2045,,,,,optimizer
+E18,2,extension,Bachman Lake,Saint Paul,2045,,,,,optimizer
+E18,3,extension,Saint Paul,Fair Park E10,2050,,,,,optimizer
+E18,4,extension,Fair Park E10,Mesquite NE,2050,,,,,optimizer
+E19,1,starter,Trinity Groves South?,Uptown,2035,,,,,optimizer
+E19,2,extension,Uptown,Old East Dallas,2040,,,,,optimizer
+E19,3,extension,Duncanville SW,Bishop Arts District,2050,,,,,optimizer
+E19,4,extension,Bishop Arts District,Trinity Groves South?,2050,,,,,optimizer
+E19,5,extension,Old East Dallas,Lakewood,2050,,,,,optimizer
+E19,6,extension,Lakewood,Zacha Junction N2,2055,,,,,optimizer
+E19,7,extension,Parks Mall,Outlet Mall,2060,,,,,optimizer
+E19,8,extension,Outlet Mall,Duncanville SW,2060,,,,,optimizer
+E19,9,extension,Berry/Stalcup,Parks Mall,2065,,,,,optimizer
 E20,1,starter,DFW Airport Terminal B,Shiloh Road,2025,,,,,
-E21,1,starter,Mesquite NE,Mesquite SE,2065,,,,,
-E22,1,starter,Handley,Zacha Junction N2,2060,,,,,
-E23,1,starter,Mansfield,Lake Port Village,2065,,,,,
-E24,1,starter,#1,#31,2060,,,,,
-E25,1,starter,Parker Road,McKinney,2035,,,,,
-E26,1,starter,Frisco,Watters Creek,2050,,,,,
-E27,1,starter,Medical/Market Center,Swiss Avenue Historic District E,2030,,,,,
-E28,1,starter,Forest and Marsh,LBJ/Skillman,2030,,,,,
-E29,1,starter,Union Station,Cockrell Hill NW,2030,,,,,
-E30,1,starter,Fort Worth T&P,Alvarado,2035,,,,,
-E31,1,starter,Bowie,Fort Worth Central,2070,,,,,
-E32,1,starter,Gainesville,Fort Worth Central,2055,,,,,
-E33,1,starter,Trinity Mills,Sherman,2050,,,,,
-E34,1,starter,Dallas,Terrell,2040,,,,,
-E35,1,starter,Dallas,Ennis,2070,,,,,
-E36,1,starter,Mansfield,Waxahachie,2065,,,,,
-E37,1,starter,Midlothian,Westmoreland,2045,,,,,
-E38,1,starter,McKinney,Legacy West,2040,,,,,
-F01,1,starter,Woodhaven,Ridgmar Mall / BRT Transfer,2050,,,,,
-F02,1,starter,Handley,Ridgmar Mall / BRT Transfer,2040,,,,,
+E21,1,starter,Mesquite NE,Rowlett,2030,,,,,optimizer
+E21,2,extension,Rowlett,Garland NE,2035,,,,,optimizer
+E21,3,extension,Garland NE,Addison E,2040,,,,,optimizer
+E21,4,extension,Addison E,Downtown Carrollton,2040,,,,,optimizer
+E21,5,extension,Downtown Carrollton,Irving W,2045,,,,,optimizer
+E21,6,extension,Irving W,Grand Prairie SE,2050,,,,,optimizer
+E21,7,extension,Grand Prairie SE,Hillside Village W,2050,,,,,optimizer
+E21,8,extension,Hillside Village W,Wilmer,2065,,,,,optimizer
+E21,9,extension,Wilmer,Mesquite SE,2070,,,,,optimizer
+E22,1,starter,Cockrell Hill NW,Trinity Groves South?,2040,,,,,optimizer
+E22,2,extension,Trinity Groves South?,Reinhardt W2,2050,,,,,optimizer
+E22,3,extension,UTA W,Grand Prairie SE,2055,,,,,optimizer
+E22,4,extension,Grand Prairie SE,Cockrell Hill NW,2055,,,,,optimizer
+E22,5,extension,Handley,UTA W,2060,,,,,optimizer
+E22,6,extension,Reinhardt W2,Zacha Junction N2,2060,,,,,optimizer
+E23,1,starter,Irving W3,Great Southwest N,2055,,,,,optimizer
+E23,2,extension,Great Southwest N,Lake Port Village,2055,,,,,optimizer
+E23,3,extension,Cowboys/Rangers Stadiums,Estelle,2060,,,,,optimizer
+E23,4,extension,Estelle,Irving W3,2060,,,,,optimizer
+E23,5,extension,Mansfield,Parks Mall,2065,,,,,optimizer
+E23,6,extension,Parks Mall,Cowboys/Rangers Stadiums,2065,,,,,optimizer
+E24,1,starter,TCU E,Ridglea Hills,2030,,,,,optimizer
+E24,2,extension,Ridglea Hills,#31,2035,,,,,optimizer
+E24,3,extension,Berry/Riverside,TCU E,2040,,,,,optimizer
+E24,4,extension,Lindberg NW,Berry/Riverside,2050,,,,,optimizer
+E24,5,extension,#1,Marine Park,2075,,,,,after the 2070 horizon
+E24,6,extension,Marine Park,Lindberg NW,2075,,,,,after the 2070 horizon
+E25,1,starter,Parker Road,McKinney,2030,,,,,optimizer
+E26,1,starter,Frisco,Stonebriar,2035,,,,,optimizer
+E26,2,extension,Stonebriar,Watters Creek,2035,,,,,optimizer
+E27,1,starter,Medical/Market Center,Swiss Avenue Historic District E,2030,,,,,optimizer
+E28,1,starter,Forest and Marsh,LBJ/Skillman,2030,,,,,optimizer
+E29,1,starter,Union Station,Cockrell Hill NW,2030,,,,,optimizer
+E30,1,starter,Fort Worth T&P,Alvarado,2030,,,,,optimizer
+E31,1,starter,Decatur,Saginaw,2055,,,,,optimizer
+E31,2,extension,Saginaw,Fort Worth Central,2055,,,,,optimizer
+E31,3,extension,Bowie,Decatur,2075,,,,,after the 2070 horizon
+E32,1,starter,Saginaw,Fort Worth Central,2030,,,,,optimizer
+E32,2,extension,Gainesville,Saginaw,2075,,,,,after the 2070 horizon
+E33,1,starter,Trinity Mills,Frisco,2030,,,,,optimizer
+E33,2,extension,Frisco,Sherman,2055,,,,,optimizer
+E34,1,starter,Dallas,Mesquite E,2030,,,,,optimizer
+E34,2,extension,Mesquite E,Terrell,2030,,,,,optimizer
+E35,1,starter,Dallas,Hutchins,2075,,,,,after the 2070 horizon
+E35,2,extension,Hutchins,Ennis,2075,,,,,after the 2070 horizon
+E36,1,starter,Mansfield,Waxahachie,2060,,,,,optimizer
+E37,1,starter,Midlothian,Westmoreland,2030,,,,,optimizer
+E38,1,starter,McKinney,Riders Field,2030,,,,,optimizer
+E38,2,extension,Riders Field,Legacy West,2030,,,,,optimizer
+F01,1,starter,Courthouse,W 7th E,2035,,,,,optimizer
+F01,2,extension,Woodhaven,Courthouse,2040,,,,,optimizer
+F01,3,extension,W 7th E,Ridglea Hills,2050,,,,,optimizer
+F01,4,extension,Ridglea Hills,Ridgmar Mall / BRT Transfer,2075,,,,,after the 2070 horizon
+F02,1,starter,Central Station,W 7th E,2040,,,,,optimizer
+F02,2,extension,Handley,Central Station,2050,,,,,optimizer
+F02,3,extension,W 7th E,Ridgmar Mall / BRT Transfer,2050,,,,,optimizer
 F03,1,starter,Meacham / Mercado N,Medical City - Baylor,2035,,,,1,Stockyards/Panther Island leg pinned to 2035 by the owner (tourism + TOD demand LODES undercounts)
-F03,2,extension,Medical City - Baylor,Altamesa,2045,,,,,
-F04,1,starter,Meacham / Mercado N,Everman,2055,,,,,
-F05,1,starter,Lake Worth,Berry / Stalcup,2055,,,,,
-F06,1,starter,Benbrook,Museum Way,2070,,,,,
-F07,1,starter,Central Station,Bluebonnet Circle,2035,,,,,
+F03,2,extension,Medical City - Baylor,Waterside,2050,,,,,optimizer
+F03,3,extension,Waterside,Altamesa,2055,,,,,optimizer
+F04,1,starter,Meacham / Mercado N,John Peter Smith,2040,,,,,optimizer
+F04,2,extension,John Peter Smith,Everman,2060,,,,,optimizer
+F05,1,starter,Lake Worth,TCC Trinity River,2045,,,,,optimizer
+F05,2,extension,TCC Trinity River,Berry / Stalcup,2060,,,,,optimizer
+F06,1,starter,Benbrook,Museum Way,2050,,,,,optimizer
+F07,1,starter,Central Station,Bluebonnet Circle,2035,,,,,optimizer

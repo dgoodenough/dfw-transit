@@ -21,4 +21,5 @@ side-by-side comparison to `reports/SCENARIOS.md` and the map.
 | Scenario | What it is |
 |---|---|
 | `v1_baseline` | The v1 plan exactly as it was before the panel review (full copy of the migrated v1 tables, no service upgrades, no extra transfers). |
+| `v2_phasing` | The v2 plan's hand-set phasing from before the optimizer's build order was adopted (its `stages.csv`). |
 | `right_sized` | Step A8: the three long suburban metro lines (SH-360, I-30, I-20 Crosstown) built as BRT instead. |
