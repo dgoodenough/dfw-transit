@@ -97,10 +97,13 @@ class SchematicLayoutTests(unittest.TestCase):
             # the leader is the plain-named member when there is one
             if any(schematic.base_name(nodes[v]["name"]) == nodes[v]["name"] for v in vs):
                 self.assertEqual(schematic.base_name(nodes[k]["name"]), nodes[k]["name"])
-        uptown = [v for v, nd in enumerate(nodes) if nd["name"] == "Uptown"]
-        self.assertGreater(len(uptown), 1)
-        # the Uptown stations collapse to fewer labels than stations (how many depends on every scenario's layout)
-        self.assertLess(len({lead[v] for v in uptown}), len(uptown), "close Uptown stations share a label")
+        # and grouping is complete: close stations with the same base name always share a label
+        for a in range(len(nodes)):
+            for b in range(a + 1, len(nodes)):
+                A, B = nodes[a], nodes[b]
+                if schematic.base_name(A["name"]).lower() == schematic.base_name(B["name"]).lower() and \
+                        math.hypot(A["x"] - B["x"], A["y"] - B["y"]) <= schematic.LABEL_GROUP:
+                    self.assertEqual(lead[a], lead[b], f"{A['name']} / {B['name']}")
 
     def test_waterways_extract_is_small_and_complete(self):
         path = config.path("data", "waterways.geojson")

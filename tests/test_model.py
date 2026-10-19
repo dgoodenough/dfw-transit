@@ -370,7 +370,7 @@ class StagingTests(unittest.TestCase):
         rows += [
             {"line_id": "E17", "stage": "1", "kind": "starter", "from_stop": "Galleria",
              "to_stop": "Pearl/Arts District", "year_opens": "2045"},
-            {"line_id": "E17", "stage": "2", "kind": "extension", "from_stop": "Frisco",
+            {"line_id": "E17", "stage": "2", "kind": "extension", "from_stop": "All Stars / Frisco Street",
              "to_stop": "Galleria", "year_opens": "2050"},
             {"line_id": "E17", "stage": "3", "kind": "extension", "from_stop": "Pearl/Arts District",
              "to_stop": "Rowlett", "year_opens": "2055"},
