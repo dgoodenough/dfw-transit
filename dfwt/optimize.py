@@ -37,7 +37,7 @@ import time
 from . import config, geo, staging
 from .network import NEVER, Line, Network, Segment
 
-PAST = 2075  # "after the horizon"
+PAST = 2105  # "after the horizon" (rewritten to max(years) + 5 at run time)
 
 _CTX = _BASE = _PKGS = None
 
@@ -151,7 +151,12 @@ def optimize(out="staged", procs=3, log=print):
     base = Network.load()
     _BASE, _CTX = base, Context(cfg)
     names = {k: v.name for k, v in base.stations.items()}
-    years = cfg["years"]
+    global PAST
+    # decisions every staging.decision_step years (5); `python -m dfwt schedule` then moves
+    # each stage to its exact affordable year
+    step = cfg["staging"].get("decision_step", 5)
+    years = [y for y in cfg["years"] if (y - cfg["existing_year"]) % step == 0]
+    PAST = max(cfg["years"]) + 5
     ex = cfg["existing_year"]
     per_year = cfg["budget"]["musd_per_year"] * (1 + cfg["budget"]["tolerance"])
     nb = station_neighbors(base)
@@ -354,6 +359,6 @@ def to_stage_rows(base, sched, pkgs, fixed, locked, names, rules):
                          "from_stop": staging.stop_ref(ln.stop_ids, names, a),
                          "to_stop": staging.stop_ref(ln.stop_ids, names, b), "year_opens": y,
                          "locked": "1" if fx else "",
-                         "note": src["note"] if fx and src else ("after the 2070 horizon" if y == PAST else "optimizer")})
+                         "note": src["note"] if fx and src else (f"after the {PAST - 5} horizon" if y == PAST else "optimizer")})
     rows.sort(key=lambda r: (r["line_id"], int(r["stage"])))
     return rows
