@@ -191,6 +191,8 @@ def optimize(out="staged", procs=3, log=print):
         f"({sum(1 for f in fixed.values() for y in f if y)} locked)")
 
     sched = {lid: [y if y else NEVER for y in fixed[lid]] for lid in pkgs}
+    infill = {lid: [ln.stop_years[j] > min(ln.segments[k].year for k in (j - 1, j) if 0 <= k < len(ln.segments))
+                    for j in range(len(ln.stop_ids))] for lid, ln in ((l, base.lines[l]) for l in pkgs)}
 
     def spend_ok(s):
         net = apply_schedule(base, s, pkgs)
@@ -217,7 +219,8 @@ def optimize(out="staged", procs=3, log=print):
         if not built:
             mink, minst = rules["min_operable"][ln.mode]
             for i, (a, b) in enumerate(pkgs[lid]):
-                if not any(nb[x] & openst for x in ln.stop_ids[a:b + 1]):
+                # infill stops open later than their track, so they can't be the link to the network
+                if not any(nb[ln.stop_ids[j]] & openst for j in range(a, b + 1) if not infill[lid][j]):
                     continue
                 for grp in ([i], [i, i + 1], [i - 1, i]):
                     if min(grp) < 0 or max(grp) >= len(yrs) or any(yrs[k] < NEVER for k in grp):
@@ -264,7 +267,8 @@ def optimize(out="staged", procs=3, log=print):
             while heap:
                 neg, _, m, seen = heapq.heappop(heap)
                 lid, grp, km, s2 = m
-                if any(sched[lid][k] != NEVER for k in grp) or period_km[lid] + km > rules["max_km_per_interval"][base.lines[lid].mode]:
+                # a move scored earlier may no longer fit: the line may have opened elsewhere since
+                if grp not in {mv[1] for mv in moves_for(lid, sched, t, openst, period_km)}:
                     continue
                 s2 = {k: list(v) for k, v in sched.items()}
                 for k in grp:
