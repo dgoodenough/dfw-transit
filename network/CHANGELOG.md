@@ -97,3 +97,15 @@ Applied by `tools/apply_v2_changes.py` to the migrated v1 tables. Step IDs match
 ### A5
 
 - 72 explicit transfer links between stations 400-800 m apart on different lines (walk time computed from distance; previously no transfer existed)
+
+## v2.1 (geometry and staging review)
+
+- **Teal** now starts at Woodhaven. The drawn line ran Haltom North -> Riverside / Race St ->
+  Woodhaven -> back to Riverside / Race St, so every train reversed on the Woodhaven spur
+  (the "east tail zigzag" from the original Phase One review). Haltom North stays served by
+  the FW Crosstown Loop.
+- Geometry: commuter rail routed on real track, metro curves fitted, BRT de-noised, 74
+  stations moved up to 100 m off bends (`python -m dfwt align`; details in
+  `reports/GEOMETRY.md`).
+- Staging: `stages.csv` added (inferred from the plan's years); Orange's Stockyards /
+  Panther Island leg is locked to 2035 at the owner's request.

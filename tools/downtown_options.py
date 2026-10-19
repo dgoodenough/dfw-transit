@@ -152,7 +152,7 @@ def main():
                 w = csv.DictWriter(f, fieldnames=fields, lineterminator="\n", extrasaction="ignore")
                 w.writeheader()
                 w.writerows(sorted(tables[t], key=lambda r: (r["line_id"], int(r.get("seq") or r.get("stage")))))
-        print(name, {k: (round(v["min_radius"]), v["core_flags"]) for k, v in rep.items()})
+        print(name, {k: (v["min_radius"], v["core_flags"]) for k, v in rep.items()}, flush=True)
 
 
 if __name__ == "__main__":
