@@ -7,6 +7,7 @@
   python -m dfwt stage F03 --split-at "Central Station,Medical City - Baylor" --years 2035,2040,2045 [--write]
   python -m dfwt optimize [--out staged]                  suggest a staged build order (writes a scenario)
   python -m dfwt align [--lines F02,E10] [--write]        make alignments buildable (see dfwt/geometry.py)
+  python -m dfwt schedule [--scenario NAME] [--write]     stages to exact years under the flat budget
   python -m dfwt ridership [--scenario NAME] [--years 2050,2070,2100]   daily boardings, growth, garages
 """
 import argparse
@@ -76,6 +77,26 @@ def cmd_ridership(args):
         print(f"{y} {r['pop'] / 1e6:5.2f}M {r['jobs'] / 1e6:5.2f}M {r['graph'].n_st:8d}  {r['daily_trips']:12,.0f}  "
               + "  ".join(f"{bm.get(m, 0):10,.0f}" for m in modes)
               + f"  {r['all_boardings']:13,.0f}  {r['pnr_full_garages']:12d}", flush=True)
+    return 0
+
+
+def cmd_schedule(args):
+    import csv as _csv
+    from . import staging
+    net = Network.load(args.scenario)
+    rows = staging.schedule(args.scenario)
+    folder = config.path("scenarios", args.scenario) if args.scenario else config.path("network")
+    if args.write:
+        with open(os.path.join(folder, "stages.csv"), "w", newline="", encoding="utf-8") as f:
+            w = _csv.DictWriter(f, fieldnames=staging.STAGE_COLS, lineterminator="\n", extrasaction="ignore")
+            w.writeheader()
+            w.writerows(rows)
+        print(f"wrote {os.path.join(folder, 'stages.csv')}")
+    else:
+        for a, b in zip(net.stage_rows, rows):
+            if a["year_opens"] != b["year_opens"]:
+                print(f"  {a['line_id']} stage {a['stage']}: {a['from_stop']} -> {a['to_stop']}  {a['year_opens']} -> {b['year_opens']}")
+        print("dry run; add --write to save")
     return 0
 
 
@@ -197,6 +218,9 @@ def main(argv=None):
     v.add_argument("-v", "--verbose", action="store_true")
     b = sub.add_parser("build")
     b.add_argument("--quick", action="store_true", help="skip per-line leave-one-out values")
+    sc = sub.add_parser("schedule", help="move stages to the earliest year the flat budget allows (keeps the order)")
+    sc.add_argument("--scenario")
+    sc.add_argument("--write", action="store_true")
     rd = sub.add_parser("ridership", help="daily boardings and growth for chosen years (any year, e.g. 2100)")
     rd.add_argument("--scenario")
     rd.add_argument("--years", default="2025,2050,2070,2100")
@@ -223,7 +247,7 @@ def main(argv=None):
     args = p.parse_args(argv)
     return {"validate": cmd_validate, "build": cmd_build, "trip": cmd_trip, "stage": cmd_stage,
             "optimize": cmd_optimize, "align": cmd_align,
-            "ridership": cmd_ridership}[args.cmd](args)
+            "ridership": cmd_ridership, "schedule": cmd_schedule}[args.cmd](args)
 
 
 if __name__ == "__main__":

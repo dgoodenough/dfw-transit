@@ -101,20 +101,8 @@ def run(net):
                 add("info", "NEAR_MISS", "", f"{A.name} and {B.name} are {d * 1000:.0f} m apart with no transfer link")
 
     # every year's network should be one connected system
-    for y in cfg["years"]:
-        g = YearGraph(net, y)
-        comps, seen = [], set()
-        for start in range(g.n_st):
-            if start in seen:
-                continue
-            dist, _ = g.dijkstra(start)
-            comp = {i for i in range(g.n_st) if dist[i] < float("inf")}
-            seen |= comp
-            comps.append(comp)
-        comps.sort(key=len, reverse=True)
-        for comp in comps[1:]:
-            sids = {g.station_ids[i] for i in comp}
-            lines = sorted({r.line.name for r in g.runs if sids & set(r.stops)})
+    for y, comps in _components(net):
+        for sids, lines in comps[1:]:
             add("warn", "ISLAND", ", ".join(lines), f"{y}: {len(sids)} stations ({', '.join(lines)}) cannot reach the main network")
     out.extend(_curves(net))
     out.extend(_staging(net))
@@ -153,3 +141,45 @@ def _staging(net):
 def summarize(findings):
     c = collections.Counter((f[0], f[1]) for f in findings)
     return ", ".join(f"{sev}:{code}={n}" for (sev, code), n in sorted(c.items()))
+
+
+def _components(net):
+    """[(year, [(station_ids, line names), ...])] connected pieces per year, largest
+    first (union-find over runs and walk links)."""
+    out = []
+    for y in net.cfg["years"]:
+        g = YearGraph(net, y)
+        parent = list(range(g.n_st))
+
+        def find(v):
+            while parent[v] != v:
+                parent[v] = parent[parent[v]]
+                v = parent[v]
+            return v
+        for r in g.runs:
+            idx = [g.sidx[s] for s in r.stops]
+            for a, b in zip(idx, idx[1:]):
+                parent[find(a)] = find(b)
+        for i in range(g.n_st):
+            for j, _, kind in g.adj[i]:
+                if kind == "walk":
+                    parent[find(i)] = find(j)
+        groups = {}
+        for i in range(g.n_st):
+            groups.setdefault(find(i), set()).add(g.station_ids[i])
+        comps = sorted(groups.values(), key=len, reverse=True)
+        out.append((y, [(c, sorted({r.line.name for r in g.runs if c & set(r.stops)})) for c in comps]))
+    return out
+
+
+def islands(net):
+    """line_id -> the last year any of its stations sits in a piece cut off from the main network."""
+    name_to_id = {ln.name: ln.id for ln in net.lines.values()}
+    out = {}
+    for y, comps in _components(net):
+        for _, lines in comps[1:]:
+            for n in lines:
+                lid = name_to_id.get(n)
+                if lid:
+                    out[lid] = max(out.get(lid, 0), y)
+    return out
