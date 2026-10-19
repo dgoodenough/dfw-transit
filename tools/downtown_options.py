@@ -5,20 +5,21 @@
 Today every north-south line zigzags through downtown (Courthouse -> Sundance
 Square -> east to Central Station -> back west to Convention Center -> south to
 T&P), with 67-84 degree turns between stations ~430 m apart. No train can do that.
-Each option below re-sequences the downtown stops so the trunks run straight,
-then the curve fitter (dfwt/align.py) checks that the result is buildable.
+Each option re-sequences the downtown stops so the trunks run straight and no
+two consecutive stations are closer than ~500 m (a 150 m platform plus curve
+transitions needs that), then the curve fitter (dfwt/align.py) checks the result.
 
-  downtown_main   One north-south trunk straight down Main St (Courthouse, Sundance
-                  Square, Convention Center, T&P). Blue becomes an east-west line
-                  through Central Station and Sundance Square. Teal turns west at
-                  Courthouse. Sundance Square is the big interchange.
-  downtown_jones  The north-south trunk swings east under Jones St through Central
-                  Station (Courthouse, Central Station, T&P), so the TRE/TEXRail
-                  hub is on every line. Blue runs east-west through Central and
-                  Sundance Square. Convention Center is dropped (430 m from Central).
-  downtown_split  Two parallel north-south trunks: Orange/Pink straight down Main
-                  St, Purple from Central Station down Jones St to T&P. Blue
-                  east-west through Central and Sundance Square.
+  downtown_main   Orange/Pink straight down Main St: Panther Island, Sundance Square,
+                  T&P (TRE/TEXRail), S Main. Blue runs east-west: Butler Place, Central
+                  Station (TRE/TEXRail), Sundance Square, TCC Trinity River. Teal turns west
+                  at Courthouse (255 m walk to Sundance). Purple runs Central -> T&P.
+                  Convention Center is dropped (390 m from T&P, 420 m from Central).
+  downtown_jones  Orange/Pink swing east under Jones St: Panther Island, Courthouse,
+                  Central Station, T&P. Every north-south line meets TRE/TEXRail at Central.
+                  Blue east-west as above, so Sundance Square is Blue-only. Convention
+                  Center is dropped.
+  downtown_events Like downtown_main, but Orange/Pink stop at Convention Center instead
+                  of T&P (events and hotels on the line; TRE/TEXRail is a 440 m walk).
 
 Each writes scenarios/<name>/ (line_stops, line_segments, stages) with only the
 affected lines changed; new downtown links are drawn station to station in tunnel
@@ -38,9 +39,9 @@ ST = {"PIS": "S007", "TB": "S008", "CH": "S009", "SS": "S010", "TCC": "S016", "C
 
 OPTIONS = {
     "downtown_main": {
-        "F03": ("PIS", "SM", ["PIS", "CH", "SS", "CC", "TP", "SM"]),
-        "F04": ("PIS", "SM", ["PIS", "CH", "SS", "CC", "TP", "SM"]),
-        "F07": ("CS", "TP", ["SS", "CC", "TP"]),
+        "F03": ("PIS", "SM", ["PIS", "SS", "TP", "SM"]),
+        "F04": ("PIS", "SM", ["PIS", "SS", "TP", "SM"]),
+        "F07": ("CS", "TP", ["CS", "TP"]),
         "F02": ("BP", "CC", ["BP", "CS", "SS", "TCC"]),
         "F01": ("TB", "TCC", ["TB", "CH", "TCC"]),
     },
@@ -51,16 +52,15 @@ OPTIONS = {
         "F02": ("BP", "CC", ["BP", "CS", "SS", "TCC"]),
         "F01": ("TB", "TCC", ["TB", "CH", "TCC"]),
     },
-    "downtown_split": {
-        "F03": ("PIS", "SM", ["PIS", "CH", "SS", "CC", "TP", "SM"]),
-        "F04": ("PIS", "SM", ["PIS", "CH", "SS", "CC", "TP", "SM"]),
+    "downtown_events": {
+        "F03": ("PIS", "SM", ["PIS", "SS", "CC", "SM"]),
+        "F04": ("PIS", "SM", ["PIS", "SS", "CC", "SM"]),
         "F07": ("CS", "TP", ["CS", "TP"]),
         "F02": ("BP", "CC", ["BP", "CS", "SS", "TCC"]),
         "F01": ("TB", "TCC", ["TB", "CH", "TCC"]),
     },
 }
-# split: Purple gets its own Jones St tunnel (a distinct track key from Orange's Main St pair)
-OWN_TUNNEL = {"downtown_split": {"F07"}}
+OWN_TUNNEL = {}
 
 
 def resequence(tables, lid, a_key, b_key, new_keys, own_tunnel):

@@ -15,7 +15,7 @@ LABELS = {"plan": "v2 plan (recommended)", "v1_baseline": "v1 plan (before revie
           "right_sized": "v2, suburban metro as BRT", "staged": "v2, optimizer's build order",
           "unstaged": "v2, lines open whole",
           "downtown_main": "Downtown FW: Main St trunk", "downtown_jones": "Downtown FW: Jones St trunk",
-          "downtown_split": "Downtown FW: two trunks"}
+          "downtown_events": "Downtown FW: Main St via Convention Center"}
 
 
 def write(nets, evals, out_path):
