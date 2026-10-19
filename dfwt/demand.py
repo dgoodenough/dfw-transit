@@ -29,6 +29,7 @@ class Zones:
         self.n = len(rows)
         d = cfg["drive"]
         self.cfg = cfg
+        self._park_cache = {}   # shared with grown copies (parking_usd)
 
     def dist_rows(self, i0, i1):
         if getattr(self, "_dist", None) is None:   # all pairs, once (shared by grown copies)
@@ -37,19 +38,54 @@ class Zones:
             self._dist = np.sqrt(dx * dx + dy * dy).astype(np.float32)
         return self._dist[i0:i1]
 
+    def parking_usd(self):
+        """Per destination zone: (daily parking price $, parking cash-out $, share of
+        commuters offered cash-out), for this zones' year (growth.grown_zones sets
+        `year`; base zones have none and get today's prices).
+
+        Today's paid-parking districts are config.ridership.paid_parking. The policy
+        block config.ridership.parking_policy (off when absent) phases in linearly
+        from start_year to full_year: district prices rise by price_growth (fewer free
+        or cheap spaces), `priced_centers` charges usd_per_day wherever jobs within
+        800 m reach min_jobs_per_km2 (paid-parking districts follow density), and
+        `cashout` offers usd_per_day in lieu of free parking to `coverage` of the
+        commuters to other zones with at least min_jobs_per_km2."""
+        cache = self.__dict__.setdefault("_park_cache", {})
+        year = getattr(self, "year", None)
+        key = getattr(self, "tod_key", None)
+        if key in cache:
+            return cache[key]
+        rc = self.cfg["ridership"]
+        pol = rc.get("parking_policy") or {}
+        ramp = 0.0
+        if pol and year is not None:
+            ramp = float(np.clip((year - pol["start_year"]) / max(pol["full_year"] - pol["start_year"], 1), 0.0, 1.0))
+        mult = 1.0 + pol.get("price_growth", 0.0) * ramp
+        pj = geo.Projector()
+        usd = np.zeros(self.n)
+        for name, p in rc["paid_parking"].items():
+            if name.startswith("_"):
+                continue
+            px, py = pj.xy(p["lat"], p["lon"])
+            d = np.sqrt((self.x - px) ** 2 + (self.y - py) ** 2)
+            usd = np.maximum(usd, np.where(d <= p["radius_km"], p["usd_per_day"] * mult, 0.0))
+        cash, cov = np.zeros(self.n), np.zeros(self.n)
+        pc, co = pol.get("priced_centers"), pol.get("cashout")
+        if ramp > 0 and (pc or co):
+            dens = (self.dist_rows(0, self.n) <= 0.8) @ self.jobs / (np.pi * 0.64)
+            if pc:
+                usd = np.maximum(usd, np.where(dens >= pc["min_jobs_per_km2"], pc["usd_per_day"] * mult * ramp, 0.0))
+            if co:
+                m = (dens >= co["min_jobs_per_km2"]) & (usd <= 0)
+                cash = np.where(m, co["usd_per_day"], 0.0)
+                cov = np.where(m, co["coverage"] * ramp, 0.0)
+        cache[key] = (usd, cash, cov)
+        return cache[key]
+
     def paid_parking_utility(self):
         """Per destination zone: utility of not paying for parking there."""
-        if getattr(self, "_park", None) is None:
-            rc = self.cfg["ridership"]
-            u = np.zeros(self.n)
-            for name, p in rc["paid_parking"].items():
-                if name.startswith("_"):
-                    continue
-                px, py = geo.Projector().xy(p["lat"], p["lon"])
-                d = np.sqrt((self.x - px) ** 2 + (self.y - py) ** 2)
-                u = np.maximum(u, np.where(d <= p["radius_km"], rc["b_per_dollar"] * p["usd_per_day"] / 2, 0.0))
-            self._park = u.astype(np.float32)
-        return self._park
+        b = self.cfg["ridership"]["b_per_dollar"]
+        return (b * self.parking_usd()[0] / 2).astype(np.float32)
 
     cong = 1.0  # peak drive-time multiplier for the year (growth.grown_zones sets it)
 
@@ -439,6 +475,9 @@ def _sweep(zones, od, T, segs, cfg, nz, ns, fixed, want_loads, light=False):
     cc, rc = cfg["competitive"], cfg["ridership"]
     thresholds = cfg["accessibility"]["thresholds_min"]
     park = zones.paid_parking_utility()
+    _, cash_usd, cash_cov = zones.parking_usd()
+    cash_u = (rc["b_per_dollar"] * cash_usd / 2).astype(np.float32)
+    has_cash = bool(cash_cov.any())
     jobs_reach = {t: np.zeros(nz) for t in thresholds}
     # walk-access tallies, and per-garage park & ride tallies
     comp_w, rid_w, tt_w_sum, feed_w = 0.0, 0.0, 0.0, 0.0
@@ -480,6 +519,8 @@ def _sweep(zones, od, T, segs, cfg, nz, ns, fixed, want_loads, light=False):
             du = (rc["asc"] + rc["b_ivt_per_min"] * (drive - np.where(usable, TT, 0))
                   - rc["b_ovt_extra_per_min"] * OVT + park[None, :])
             share = 1.0 / (1.0 + np.exp(-du))
+            if has_cash:   # commuters offered parking cash-out see the cash as a price on parking
+                share = share + cash_cov[None, :] * (1.0 / (1.0 + np.exp(-(du + cash_u[None, :]))) - share)
             rq = np.where(usable, odc * wgt * share * rc["telework"], 0.0)
             return TT, Ast, Bst, Am, Em, q, rq, np.where(ok, TT, 0)
 

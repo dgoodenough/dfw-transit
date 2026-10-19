@@ -322,6 +322,7 @@
       "2090": 1.981,
       "2100": 2.018
     },
+    "case": "mid",
     "alt": {
       "low_pop": {
         "2020": 1.0,
@@ -376,7 +377,29 @@
         "commuter": 0.5,
         "brt": 0.7
       },
-      "net_new_share": 0.2
+      "net_new_share": 0.2,
+      "upzone_existing_year": null
+    },
+    "capture": {
+      "_doc": "Growth-capture land-use policy (dfwt/growth.capture), off while the shares are 0. From start_year, every step_years: job_centers.jobs_share of the region's job growth goes to the listed job centers (in proportion to the jobs there); then pop_share / jobs_share of the growth that would have landed outside station areas moves into zones within radius_m of open stations (include_existing: today's stations too), up to target_density_per_km2 (people + jobs, by station setting) x mode_factor over each station's own land (overlapping discs split by nearest station). Targets follow the Ontario Growth Plan MTSA minimums (200/ha subway, 160/ha LRT/BRT, 150/ha GO = 20,000/16,000/15,000 per km2) up to Rosslyn-Ballston (about 112 people+jobs per acre = 27,600/km2; Rosslyn 162/acre = 40,000/km2). Within a station area growth is placed by distance (full within full_radius_m) x existing activity. What doesn't fit stays where it was; regional totals never change.",
+      "start_year": 2030,
+      "step_years": 5,
+      "pop_share": 0.0,
+      "jobs_share": 0.0,
+      "include_existing": true,
+      "radius_m": 800,
+      "full_radius_m": 400,
+      "weight_floor": 500,
+      "target_density_per_km2": {"downtown": 40000, "urban": 27500, "suburban": 16000},
+      "mode_factor": {"metro": 1.0, "commuter": 0.75, "brt": 0.8},
+      "job_centers": {
+        "jobs_share": 0.0,
+        "Dallas CBD": {"lat": 32.781, "lon": -96.799, "radius_km": 1.6},
+        "Uptown": {"lat": 32.8, "lon": -96.803, "radius_km": 1.2},
+        "Dallas Medical District": {"lat": 32.812, "lon": -96.84, "radius_km": 1.3},
+        "Fort Worth CBD": {"lat": 32.7555, "lon": -97.3308, "radius_km": 1.4},
+        "Fort Worth Medical District": {"lat": 32.733, "lon": -97.34, "radius_km": 1.0}
+      }
     }
   },
   "ridership": {
@@ -444,6 +467,14 @@
         "radius_km": 0.9,
         "usd_per_day": 4
       }
+    },
+    "parking_policy": {
+      "_doc": "Parking pricing policy (Zones.parking_usd), off while price_growth is 0 and priced_centers/cashout are null. Phases in linearly from start_year to full_year. price_growth: real rise in paid_parking district prices (fewer free or cheap spaces downtown, e.g. +1.0 = double). priced_centers: wherever jobs within 800 m reach min_jobs_per_km2, parking costs usd_per_day (x the same price growth): paid-parking districts spread as job centers densify. cashout: commuters to other zones with min_jobs_per_km2 are offered usd_per_day in lieu of free parking, at `coverage` of them (California-style parking cash-out; Shoup 1997: drive-alone share 76% -> 63%).",
+      "start_year": 2030,
+      "full_year": 2050,
+      "price_growth": 0.0,
+      "priced_centers": null,
+      "cashout": null
     }
   }
 }

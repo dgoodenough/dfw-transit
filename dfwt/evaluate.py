@@ -84,6 +84,9 @@ def run_year(ctx, net, year, want_loads=True):
     res = demand.evaluate(z, od, net, g, ctx.cfg, want_loads=want_loads)
     res["graph"] = g
     res["pop"], res["jobs"] = float(z.pop.sum()), float(z.jobs.sum())
+    near = growth.near_stations(z, net, year, 800)
+    res["pop_800m"], res["jobs_800m"] = float(z.pop[near].sum()), float(z.jobs[near].sum())
+    res["capture"] = getattr(z, "capture", {})
     rc = ctx.cfg["ridership"]
     res["daily_trips"] = res["transit_commuters"] * rc["round_trip"] / rc["work_share_of_transit_trips"]
     if want_loads:
