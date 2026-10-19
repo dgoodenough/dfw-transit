@@ -54,10 +54,14 @@ led to thirteen steps, and v2 implements the ones the data supports
 
 - **Run what exists more often, first.** TRE, TEXRail, A-train and the Silver
   Line every 15 minutes and DART light rail every 10 from 2030.
-- **The best BRT corridors open in 2030**: Forest Lane, Ross Avenue, Jacksboro,
-  and Jefferson. They're the highest-value lines in the plan per dollar.
-- **Fort Worth Phase One re-staged** around the Central Station–Medical District–TCU
-  core. Orange's southwest tail waits until 2045.
+- **An optimizer sets the build order** under a flat $2.3B/yr budget: each five-year
+  interval opens the pieces of lines that add the most competitive commutes per dollar
+  ([`reports/build_order_log.csv`](reports/build_order_log.csv)). The best BRT corridors
+  (Forest Lane, Ross Avenue, Jacksboro, Jefferson, SH-121) and the McKinney and Midlothian
+  commuter lines open in 2030. Lines that show no gain by 2070 (Gainesville, Ennis, Bowie)
+  wait for a later decade.
+- **Fort Worth Phase One** opens in 2035 around the Stockyards, Panther Island, Central
+  Station and Medical District; Orange's southwest tail follows by 2055.
 - **Every phase is connected.** v1 had lines that opened as islands (Midlothian
   for 25 years). There are now 72 explicit transfers between same-place stations.
 - **Collin County gets a line:** an SH-121 BRT from McKinney to Frisco and Legacy, and
@@ -68,13 +72,13 @@ led to thirteen steps, and v2 implements the ones the data supports
 
 | | v1 plan | v2 plan |
 |---|---|---|
-| Transit-competitive commutes, 2030 | 96k (nothing opens before 2035) | **174k** |
-| Transit-competitive commutes, 2070 | 343k | **416k** |
-| Jobs the average resident reaches in 45 min, 2070 | 77.8k | **89.9k** |
-| Capital through 2070 (2025 $) | $104.0B | **$103.3B** |
+| Transit-competitive commutes, 2030 | 96k (nothing opens before 2035) | **228k** |
+| Transit-competitive commutes, 2070 | 343k | **428k** |
+| Jobs the average resident reaches in 45 min, 2070 | 77.8k | **91.1k** |
+| Capital through 2070 (2025 $) | $104.0B | **$87.9B** |
 | Validation: errors / islands | 1 / 10 | **0 / 0** |
 
-Same money, about 20% more benefit, and most of it arrives a decade earlier.
+15% less money, 25% more benefit, and most of it arrives a decade or more earlier.
 Live numbers are in [`reports/RESULTS.md`](reports/RESULTS.md).
 
 ## Key product and technical decisions
@@ -87,8 +91,8 @@ Live numbers are in [`reports/RESULTS.md`](reports/RESULTS.md).
   [`config.json`](config.json). The map's trip planner uses the routing graph
   exported by the same model, so it can't disagree with the reports.
 - **Plans are scenarios.** [`scenarios/`](scenarios/README.md) holds alternatives
-  as overlays: the untouched v1 plan, and a "right-sized" version with suburban
-  metro as BRT. Every build compares them side by side.
+  as overlays: the untouched v1 plan, the v2 plan's hand-set phasing from before
+  the optimizer, and a "right-sized" version with suburban metro as BRT. Every build compares them side by side.
 - **Phasing follows demand.** Each line is valued by the commutes lost if it's
   removed, both in its opening year and in 2070, divided by its cost.
 - **Geometry stays buildable.** Commuter rail follows existing rail, metro follows

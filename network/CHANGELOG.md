@@ -141,3 +141,18 @@ The Main St and Main St via Convention Center alternatives scored +1,300 / +900 
 - Commuter lines with no usable track are straightened and fitted to commuter-rail
   curve limits; stations up to 800 m from real track move onto it.
 - Tight curves on proposed lines: 342 (as drawn) -> 41. See `reports/GEOMETRY.md`.
+
+## v2.4 — the optimizer's build order becomes the plan (owner's decision)
+
+- `stages.csv` is now the optimizer's build order under the flat $2.3B/yr budget
+  (`python -m dfwt optimize`; every opening and its gain per $M is in
+  `reports/build_order_log.csv`). Orange's Stockyards/Panther Island leg stays locked to 2035.
+- The previous hand-set phasing is kept as the `v2_phasing` scenario.
+- More opens early: the best BRT and commuter corridors in 2030, then the Dallas
+  crosstowns and Fort Worth metro from 2035.
+- Left past 2070, because no interval showed a measurable gain: the Gainesville (90 km),
+  Ennis (55 km) and Bowie (45 km) commuter lines, 41 km of the FW Crosstown Loop,
+  White Settlement BRT and a 2.4 km Teal tail. They stay in the network for a later decade.
+- Model fixes that came with it: park & ride sits at commuter stations and each line's
+  planned termini (not at temporary ends of partly built lines), and the optimizer
+  never opens a line in disconnected pieces.
