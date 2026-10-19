@@ -63,6 +63,68 @@ def _in_core(cfg, st):
     return False
 
 
+def straighten(net, ln, pos, fixed, max_move, log_moves):
+    """A real line runs straight along its corridor and the stations come to it.
+    Stations that force a detour (a turn of 35+ degrees) move onto the straight
+    path between their neighbors when that's within max_move m; between stations,
+    a drawn path that wanders (8%+ longer than direct, or far off it) is replaced
+    by the direct path. Returns (corridor points lon/lat, station index per point,
+    new station positions)."""
+    ids = ln.stop_ids
+    P = {k: np.array(_xy(pos[s])) for k, s in enumerate(ids)}
+    for _ in range(2):
+        for k in range(1, len(ids) - 1):
+            if fixed(ids[k]):
+                continue
+            a, b, c = P[k - 1], P[k], P[k + 1]
+            ac = c - a
+            L2 = float(ac @ ac)
+            if L2 < 1:
+                continue
+            t = min(1.0, max(0.0, float((b - a) @ ac) / L2))
+            q = a + t * ac
+            off = float(np.hypot(*(b - q)))
+            h1, h2 = math.atan2(*(b - a)[::-1]), math.atan2(*(c - b)[::-1])
+            turn = abs(math.degrees((h2 - h1 + math.pi) % (2 * math.pi) - math.pi))
+            if turn >= 35 and 1 < off <= max_move:
+                P[k] = q
+    moved = {}
+    for k, sid in enumerate(ids):
+        d = float(np.hypot(*(P[k] - np.array(_xy(pos[sid])))))
+        if d > 1:
+            moved[sid] = (*align.to_ll(*P[k]), d)
+        elif not fixed(sid):
+            # still a big detour that couldn't be fixed automatically
+            pass
+    for k in range(1, len(ids) - 1):
+        if ids[k] in moved:
+            continue
+        a, b, c = P[k - 1], P[k], P[k + 1]
+        h1, h2 = math.atan2(*(b - a)[::-1]), math.atan2(*(c - b)[::-1])
+        turn = abs(math.degrees((h2 - h1 + math.pi) % (2 * math.pi) - math.pi))
+        if turn >= 60:
+            why = "interchange or fixed stop" if fixed(ids[k]) else f"more than {max_move:.0f} m off the direct path"
+            log_moves.append((ln.name, net.stations[ids[k]].name, turn, why))
+    pts, ends = [], [0]
+    for i, seg in enumerate(ln.segments):
+        a, b = P[i], P[i + 1]
+        chord = float(np.hypot(*(b - a)))
+        xy = np.array([_xy(p) for p in seg.pts])
+        length = float(align.cumlen(xy)[-1])
+        dev = float(align.pt_to_poly(xy, np.array([a, b])).max()) if len(xy) > 2 else 0.0
+        wander = length > 1.08 * chord + 30 or dev > max(200.0, 0.2 * chord)
+        if ids[i] in moved or ids[i + 1] in moved or wander:
+            sub = [align.to_ll(*a), align.to_ll(*b)]
+        else:  # keep the drawn route but drop wiggles smaller than ~150 m
+            xy[0], xy[-1] = a, b
+            keep = {0, len(xy) - 1}
+            align.dp(xy, 150.0, 0, len(xy) - 1, keep)
+            sub = [align.to_ll(*xy[j]) for j in sorted(keep)]
+        pts += sub if not pts else sub[1:]
+        ends.append(len(pts) - 1)
+    return pts, ends, moved
+
+
 def _fit_job(args):
     lid, pts, ends, grades, stations, m = args
     segs, rep = align.fit_line(pts, ends, grades, stations, m)
@@ -133,16 +195,29 @@ def run(lines=None, write=False, procs=2, log=print):
             source.setdefault((ln.id, i + 1), "denoised")
         reports[ln.id] = dict(kind="de-noised", vertices_before=before, vertices_after=after)
 
-    # 3. proposed metro: slide stations off bends, then fit tangents/spirals/arcs
+    # 3. proposed metro: straighten detours, slide stations off bends, then fit tangents/spirals/arcs
     metro = lines_of_mode("metro", "proposed")
+    near_other = collections.defaultdict(set)
+    for a, b, _, _ in net.transfers:
+        near_other[a].add(b)
+        near_other[b].add(a)
+    detours = []
+
+    def fixed(sid):
+        st = net.stations[sid]
+        return (len(st_lines[sid]) > 1 or near_other[sid] or _in_core(cfg, st) or sid in moves
+                or any(net.lines[l].status == "existing" for l in st_lines[sid]))
     jobs = []
     for ln in metro:
         m = align.params(cfg, ln.mode)
-        pts, ends = [], [0]
-        for s in ln.segments:
-            pts += s.pts if not pts else s.pts[1:]
-            ends.append(len(pts) - 1)
-        movable = [not _in_core(cfg, net.stations[sid]) and sid not in moves
+        if ln.stop_ids[0] == ln.stop_ids[-1]:
+            continue
+        pts, ends, moved = straighten(net, ln, pos, lambda s: fixed(s) or s in (ln.stop_ids[0], ln.stop_ids[-1]),
+                                      gcfg["straighten_move_max_m"], detours)
+        for sid, (lon, lat, d) in moved.items():
+            moves[sid] = (lon, lat, d, ln.name + " (straightened)")
+            pos[sid] = (lon, lat)
+        movable = [not _in_core(cfg, net.stations[sid]) and (sid not in moves or sid in moved)
                    and all(net.lines[l].mode == "metro" and net.lines[l].status == "proposed" for l in st_lines[sid])
                    for sid in ln.stop_ids]
         for k, (lon, lat, d) in align.station_slides(pts, ends, m, auto, movable).items():
@@ -183,6 +258,9 @@ def run(lines=None, write=False, procs=2, log=print):
                 log(f"  {ln.name}: min radius {rep['min_radius_m']:.0f} m, {rep['curves_below_min']} curves below "
                     f"minimum, max deviation {rep['max_deviation_m']:.0f} m"
                     + (f"; flagged at {', '.join(rep['flag_stations'])}" if rep["flag_stations"] else ""))
+
+    for name, stn, turn, why in detours:
+        review.append((name, f"still turns {turn:.0f} degrees at {stn} ({why}); move or drop the stop, or accept the curve"))
 
     # 4. shared track: every line on a station pair uses the first-opening line's geometry
     owner = net.track_owner()
@@ -260,7 +338,7 @@ def write_report(net, moves, review, reports, cfg):
     if moves:
         L += [f"## Station moves (up to {cfg['geometry']['station_move_auto_m']} m, applied)", "",
               "| Station | Moved (m) | Because of |", "|---|---|---|"]
-        for sid, (lon, lat, d, why) in sorted(moves.items(), key=lambda kv: -kv[1][2]):
+        for sid, (lon, lat, d, why) in sorted(moves.items(), key=lambda kv: -kv[1][2]):  # noqa: B007
             L.append(f"| {net.stations[sid].name} | {d:.0f} | {why} |")
         L.append("")
     if review:
