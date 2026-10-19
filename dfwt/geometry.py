@@ -63,6 +63,97 @@ def _in_core(cfg, st):
     return False
 
 
+def _turn(a, b, c):
+    h1, h2 = math.atan2(*(b - a)[::-1]), math.atan2(*(c - b)[::-1])
+    return abs(math.degrees((h2 - h1 + math.pi) % (2 * math.pi) - math.pi))
+
+
+def _offset(a, b, c):
+    """Distance from b to segment a-c, and the nearest point on it."""
+    ac = c - a
+    L2 = float(ac @ ac)
+    t = 0.0 if L2 < 1 else min(1.0, max(0.0, float((b - a) @ ac) / L2))
+    q = a + t * ac
+    return float(np.hypot(*(b - q))), q
+
+
+def straighten(net, ln, pos, fixed, gcfg, log_moves):
+    """A real line runs straight along its corridor and the stations come to it.
+
+    - A stop the line has to double back for (turn of 90+ degrees) is dropped from
+      the line; no one builds a reversal to serve one stop.
+    - A stop that forces a detour (turn of 35+ degrees) moves onto the straight path
+      between its neighbors: up to straighten_move_max_m always, and up to
+      straighten_move_far_m for sharp jogs (60+ degrees).
+    - Between stations, a drawn path that wanders (8%+ longer than direct, or far
+      off it) becomes the direct path, and smaller wiggles (under ~150 m) are
+      smoothed out.
+    Fixed stops (interchanges, ends, existing stations, downtown cores) are never
+    moved or dropped. Returns (kept stop indices, corridor lon/lat points, vertex
+    index of each kept stop, moved {sid: (lon, lat, m)}, dropped [sid])."""
+    ids = ln.stop_ids
+    P = {k: np.array(_xy(pos[s])) for k, s in enumerate(ids)}
+    keep = list(range(len(ids)))
+    dropped = []
+    changed = True
+    while changed:
+        changed = False
+        for j in range(1, len(keep) - 1):
+            k = keep[j]
+            if not fixed(ids[k]) and _turn(P[keep[j - 1]], P[k], P[keep[j + 1]]) >= 90:
+                dropped.append(ids[k])
+                del keep[j]
+                changed = True
+                break
+    near, far = gcfg["straighten_move_max_m"], gcfg["straighten_move_far_m"]
+    for _ in range(2):
+        for j in range(1, len(keep) - 1):
+            k = keep[j]
+            if fixed(ids[k]):
+                continue
+            a, b, c = P[keep[j - 1]], P[k], P[keep[j + 1]]
+            off, q = _offset(a, b, c)
+            turn = _turn(a, b, c)
+            if 1 < off and ((turn >= 35 and off <= near) or (turn >= 60 and off <= far)):
+                P[k] = q
+    moved = {}
+    for k in keep:
+        d = float(np.hypot(*(P[k] - np.array(_xy(pos[ids[k]])))))
+        if d > 1:
+            moved[ids[k]] = (*align.to_ll(*P[k]), d)
+    for j in range(1, len(keep) - 1):
+        k = keep[j]
+        if ids[k] in moved:
+            continue
+        turn = _turn(P[keep[j - 1]], P[k], P[keep[j + 1]])
+        if turn >= 60:
+            why = "interchange or fixed stop" if fixed(ids[k]) else f"more than {far:.0f} m off the direct path"
+            log_moves.append((ln.name, net.stations[ids[k]].name, turn, why))
+    pts, ends = [], [0]
+    for j in range(len(keep) - 1):
+        i, i2 = keep[j], keep[j + 1]
+        a, b = P[i], P[i2]
+        chord = float(np.hypot(*(b - a)))
+        if i2 == i + 1:
+            seg = ln.segments[i]
+            xy = np.array([_xy(p) for p in seg.pts])
+            length = float(align.cumlen(xy)[-1])
+            dev = float(align.pt_to_poly(xy, np.array([a, b])).max()) if len(xy) > 2 else 0.0
+            direct = ids[i] in moved or ids[i2] in moved or length > 1.08 * chord + 30 or dev > max(200.0, 0.2 * chord)
+        else:
+            direct = True  # a dropped stop: run straight past
+        if direct:
+            sub = [align.to_ll(*a), align.to_ll(*b)]
+        else:  # keep the drawn route but drop wiggles smaller than ~150 m
+            xy[0], xy[-1] = a, b
+            kp = {0, len(xy) - 1}
+            align.dp(xy, 150.0, 0, len(xy) - 1, kp)
+            sub = [align.to_ll(*xy[q]) for q in sorted(kp)]
+        pts += sub if not pts else sub[1:]
+        ends.append(len(pts) - 1)
+    return keep, pts, ends, moved, dropped
+
+
 def _fit_job(args):
     lid, pts, ends, grades, stations, m = args
     segs, rep = align.fit_line(pts, ends, grades, stations, m)
@@ -88,14 +179,20 @@ def run(lines=None, write=False, procs=2, log=print):
 
     # 1. commuter rail on real track
     rail = lines_of_mode("commuter")
+    unrouted = []  # proposed commuter lines with no usable track: straightened and fitted below
+    rail_move = gcfg["straighten_move_max_m"]
     if rail:
         from . import osmroute
         G = osmroute.Graph("rail")
         for ln in rail:
             S = np.array([_xy(pos[s]) for s in ln.stop_ids])
-            P, why = osmroute.route(G, [tuple(p) for p in S], max_turn=gcfg["rail_max_turn_deg"])
+            P, why = osmroute.route(G, [tuple(p) for p in S], max_turn=gcfg["rail_max_turn_deg"], snap_r=1200)
             if P is None:
-                review.append((ln.name, f"kept drawn geometry: {why}"))
+                if ln.status == "proposed":
+                    unrouted.append(ln)
+                    review.append((ln.name, f"no usable track ({why}); straightened and fitted instead"))
+                else:
+                    review.append((ln.name, f"kept drawn geometry: {why}"))
                 continue
             xy = np.array(P)
             arcs, far, after = [], [], 0.0
@@ -103,11 +200,14 @@ def run(lines=None, write=False, procs=2, log=print):
                 s, d = _project(xy, p, after)
                 arcs.append(s)
                 after = s
-                if d > auto:
+                if d > rail_move:
                     far.append((net.stations[ln.stop_ids[k]].name, d))
             if far:
-                review.append((ln.name, "kept drawn geometry; stations too far from the track to move automatically: "
-                               + ", ".join(f"{n} {d:.0f} m" for n, d in far)))
+                if ln.status == "proposed":
+                    unrouted.append(ln)
+                review.append((ln.name, "stations too far from the track to move onto it: "
+                               + ", ".join(f"{n} {d:.0f} m" for n, d in far)
+                               + ("; straightened and fitted instead" if ln.status == "proposed" else "")))
                 continue
             for k, sid in enumerate(ln.stop_ids):
                 q = _cut(xy, arcs[k], arcs[k])[0]
@@ -133,23 +233,47 @@ def run(lines=None, write=False, procs=2, log=print):
             source.setdefault((ln.id, i + 1), "denoised")
         reports[ln.id] = dict(kind="de-noised", vertices_before=before, vertices_after=after)
 
-    # 3. proposed metro: slide stations off bends, then fit tangents/spirals/arcs
-    metro = lines_of_mode("metro", "proposed")
+    # 3. proposed metro: straighten detours, slide stations off bends, then fit tangents/spirals/arcs
+    metro = lines_of_mode("metro", "proposed") + unrouted
+    near_other = collections.defaultdict(set)
+    for a, b, _, _ in net.transfers:
+        near_other[a].add(b)
+        near_other[b].add(a)
+    detours, drops, rewritten = [], [], {}
+
+    def fixed(sid):
+        st = net.stations[sid]
+        return (len(st_lines[sid]) > 1 or near_other[sid] or _in_core(cfg, st) or sid in moves
+                or any(net.lines[l].status == "existing" for l in st_lines[sid]))
     jobs = []
     for ln in metro:
         m = align.params(cfg, ln.mode)
-        pts, ends = [], [0]
-        for s in ln.segments:
-            pts += s.pts if not pts else s.pts[1:]
-            ends.append(len(pts) - 1)
-        movable = [not _in_core(cfg, net.stations[sid]) and sid not in moves
+        if ln.stop_ids[0] == ln.stop_ids[-1]:
+            continue
+        keep, pts, ends, moved, dropped = straighten(
+            net, ln, pos, lambda s: fixed(s) or s in (ln.stop_ids[0], ln.stop_ids[-1]), gcfg, detours)
+        for sid, (lon, lat, d) in moved.items():
+            moves[sid] = (lon, lat, d, ln.name + " (straightened)")
+            pos[sid] = (lon, lat)
+        for sid in dropped:
+            drops.append((ln.name, net.stations[sid].name))
+        kept_ids = [ln.stop_ids[k] for k in keep]
+        if dropped:
+            # merged segments: open when the later piece opens; tunnel if any piece was
+            spans = list(zip(keep, keep[1:]))
+            rewritten[ln.id] = dict(
+                ids=kept_ids, stop_years=[ln.stop_years[k] for k in keep],
+                years=[max(s.year for s in ln.segments[a:b]) for a, b in spans],
+                grades=["tunnel" if any(s.grade == "tunnel" for s in ln.segments[a:b]) else ln.segments[a].grade
+                        for a, b in spans])
+        movable = [not _in_core(cfg, net.stations[sid]) and (sid not in moves or sid in moved)
                    and all(net.lines[l].mode == "metro" and net.lines[l].status == "proposed" for l in st_lines[sid])
-                   for sid in ln.stop_ids]
+                   for sid in kept_ids]
         for k, (lon, lat, d) in align.station_slides(pts, ends, m, auto, movable).items():
-            sid = ln.stop_ids[k]
+            sid = kept_ids[k]
             if sid not in moves:
                 moves[sid] = (lon, lat, d, ln.name)
-        stations = [moves[s][:2] if s in moves else pos[s] for s in ln.stop_ids]
+        stations = [moves[s][:2] if s in moves else pos[s] for s in kept_ids]
         # rebuild the corridor with moved stations inserted on it
         xy = np.array([_xy(p) for p in pts])
         arcs, after = [], 0.0
@@ -162,7 +286,8 @@ def run(lines=None, write=False, procs=2, log=print):
             seg = _cut(xy, arcs[k], arcs[k + 1])
             cpts += [align.to_ll(*p) for p in (seg if not cpts else seg[1:])]
             cends.append(len(cpts) - 1)
-        jobs.append((ln.id, cpts, cends, [s.grade for s in ln.segments], stations, m))
+        grades = rewritten[ln.id]["grades"] if ln.id in rewritten else [s.grade for s in ln.segments]
+        jobs.append((ln.id, cpts, cends, grades, stations, m))
     if jobs:
         log(f"  fitting {len(jobs)} metro lines ({procs} processes)...")
         with mp.get_context("fork").Pool(procs) as pool:
@@ -171,28 +296,44 @@ def run(lines=None, write=False, procs=2, log=print):
                 if rep.get("failed"):
                     review.append((ln.name, "kept drawn geometry: the curve fit failed (the drawn line probably "
                                    "doubles back on itself); redraw that stretch"))
-                    for i, pts in enumerate(segs):  # drawn line, re-ended at any moved stations
-                        new_geom[(lid, i + 1)] = pts
+                    if lid in rewritten:
+                        rewritten[lid]["segs"] = segs
+                    else:
+                        for i, pts in enumerate(segs):  # drawn line, re-ended at any moved stations
+                            new_geom[(lid, i + 1)] = pts
                     continue
-                for i, pts in enumerate(segs):
-                    new_geom[(lid, i + 1)] = pts
-                    source[(lid, i + 1)] = "fitted"
+                if lid in rewritten:
+                    rewritten[lid]["segs"] = segs
+                else:
+                    for i, pts in enumerate(segs):
+                        new_geom[(lid, i + 1)] = pts
+                        source[(lid, i + 1)] = "fitted"
                 rep["kind"] = "fitted"
-                rep["flag_stations"] = sorted({net.stations[ln.stop_ids[k]].name for k in rep.pop("flag_where")})
+                ids_used = rewritten[lid]["ids"] if lid in rewritten else ln.stop_ids
+                rep["flag_stations"] = sorted({net.stations[ids_used[k]].name for k in rep.pop("flag_where")})
                 reports[lid] = rep
                 log(f"  {ln.name}: min radius {rep['min_radius_m']:.0f} m, {rep['curves_below_min']} curves below "
                     f"minimum, max deviation {rep['max_deviation_m']:.0f} m"
                     + (f"; flagged at {', '.join(rep['flag_stations'])}" if rep["flag_stations"] else ""))
 
+    for name, stn in drops:
+        review.append((name, f"dropped the stop at {stn}: the line had to double back to reach it"))
+    for name, stn, turn, why in detours:
+        review.append((name, f"still turns {turn:.0f} degrees at {stn} ({why}); move or drop the stop, or accept the curve"))
+
     # 4. shared track: every line on a station pair uses the first-opening line's geometry
     owner = net.track_owner()
     by_pair = {}
     for ln in net.lines.values():
+        if ln.id in rewritten:
+            continue
         for i in range(len(ln.segments)):
             key = (ln.mode, frozenset((ln.stop_ids[i], ln.stop_ids[i + 1])))
             if owner[key][1] == ln.id and (ln.id, i + 1) in new_geom:
                 by_pair[key] = (ln.stop_ids[i], new_geom[(ln.id, i + 1)])
     for ln in net.lines.values():
+        if ln.id in rewritten:
+            continue
         for i in range(len(ln.segments)):
             key = (ln.mode, frozenset((ln.stop_ids[i], ln.stop_ids[i + 1])))
             if key in by_pair and owner[key][1] != ln.id and (ln.id, i + 1) not in locked:
@@ -202,6 +343,8 @@ def run(lines=None, write=False, procs=2, log=print):
 
     # 5. stations that moved: every segment touching them ends at the new spot
     for (lid, seq), r in seg_rows.items():
+        if lid in rewritten:
+            continue
         ln = net.lines[lid]
         a, b = ln.stop_ids[seq - 1], ln.stop_ids[seq]
         if (a in moves or b in moves) and (lid, seq) not in new_geom and (lid, seq) not in locked:
@@ -223,6 +366,21 @@ def run(lines=None, write=False, procs=2, log=print):
                 lon, lat = moves[r["station_id"]][:2]
                 r["lon"], r["lat"] = f"{lon:.6f}", f"{lat:.6f}"
         fields = ["line_id", "seq", "year_opens", "grade", "geometry_source", "locked", "geometry_wkt"]
+        for lid, rw in rewritten.items():  # lines that dropped a stop: rewrite their rows
+            if "segs" not in rw:
+                continue
+            tables["line_stops.csv"] = [r for r in tables["line_stops.csv"] if r["line_id"] != lid] + [
+                {"line_id": lid, "seq": str(k + 1), "station_id": sid, "year_opens": str(y)}
+                for k, (sid, y) in enumerate(zip(rw["ids"], rw["stop_years"]))]
+            tables["line_segments.csv"] = [r for r in tables["line_segments.csv"] if r["line_id"] != lid] + [
+                {"line_id": lid, "seq": str(k + 1), "year_opens": str(y), "grade": g, "geometry_source": "fitted",
+                 "locked": "", "geometry_wkt": geo.to_wkt(pts)}
+                for k, (y, g, pts) in enumerate(zip(rw["years"], rw["grades"], rw["segs"]))]
+        order = lambda r: (r["line_id"], int(r["seq"]))
+        tables["line_stops.csv"].sort(key=order)
+        tables["line_segments.csv"].sort(key=order)
+        _write(config.path("network", "line_stops.csv"), ["line_id", "seq", "station_id", "year_opens"],
+               tables["line_stops.csv"])
         for r in tables["line_segments.csv"]:
             r.setdefault("geometry_source", r.get("geometry_source") or "drawn")
             r.setdefault("locked", "")
@@ -260,7 +418,7 @@ def write_report(net, moves, review, reports, cfg):
     if moves:
         L += [f"## Station moves (up to {cfg['geometry']['station_move_auto_m']} m, applied)", "",
               "| Station | Moved (m) | Because of |", "|---|---|---|"]
-        for sid, (lon, lat, d, why) in sorted(moves.items(), key=lambda kv: -kv[1][2]):
+        for sid, (lon, lat, d, why) in sorted(moves.items(), key=lambda kv: -kv[1][2]):  # noqa: B007
             L.append(f"| {net.stations[sid].name} | {d:.0f} | {why} |")
         L.append("")
     if review:

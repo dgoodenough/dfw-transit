@@ -1,0 +1,98 @@
+year,line_id,line,from,to,km,commutes_gained,commutes_per_musd
+2030,E28,Forest Lane BRT,Forest and Marsh,LBJ/Skillman,16.1,16014,62.67
+2030,E04,Jacksboro BRT,Magnolia W,Lake Worth,14.0,12878,58.0
+2030,E27,Ross Avenue BRT,Medical/Market Center,Swiss Avenue Historic District E,12.5,10396,51.78
+2030,E25,McKinney Line,Parker Road,McKinney,20.6,7664,11.54
+2030,E38,SH-121 BRT,McKinney,Legacy West,25.9,5226,12.93
+2030,E33,Sherman Line,Trinity Mills,Frisco,26.9,7498,8.65
+2030,E05,TexPress Expansion,Fort Worth T&P,Primrose,19.8,5347,8.18
+2030,E34,Terrell Line,Dallas,Mesquite E,24.5,6187,7.93
+2030,E21,Beltline Line,Mesquite NE,Rowlett,5.4,567,6.53
+2030,E32,Gainesville Line,Saginaw,Fort Worth Central,17.6,3545,6.17
+2030,E29,Jefferson Blvd BRT,Union Station,Cockrell Hill NW,12.0,878,4.68
+2030,E37,Midlothian Line,Midlothian,Westmoreland,29.1,4110,4.48
+2030,E34,Terrell Line,Mesquite E,Terrell,30.8,3759,3.94
+2030,E07,SE TexRail,Mansfield,Fort Worth Central,30.4,3675,3.78
+2030,E02,Riverside-Forest Hill BRT,Six Points,Forest Hill E2,21.0,1167,3.56
+2030,E30,Alvarado Line,Fort Worth T&P,Alvarado,44.8,4821,3.43
+2030,E24,FW Crosstown Loop,TCU E,Ridglea Hills,10.1,32,0.2
+2035,F07,Purple,Central Station,Bluebonnet Circle,7.6,6012,8.08
+2035,E17,DNT East,Turtle Creek,Pearl/Arts District,2.8,4362,5.43
+2035,E19,I-20 Crosstown,Victory,Uptown,2.2,4750,4.71
+2035,E26,Legacy Line,Frisco,Stonebriar,7.2,4444,4.33
+2035,E26,Legacy Line,Stonebriar,Watters Creek,11.9,6141,3.77
+2035,E17,DNT East,Addison Circle,Turtle Creek,18.0,8956,3.67
+2035,F01,Teal,Courthouse,W 7th E,2.0,1617,3.05
+2035,E19,I-20 Crosstown,Trinity Groves South?,Victory,2.7,1204,3.01
+2035,E21,Beltline Line,Rowlett,Garland NE,13.0,313,1.53
+2035,E24,FW Crosstown Loop,Ridglea Hills,Ridgmar Mall / BRT Transfer,4.8,58,0.77
+2040,E17,DNT East,Stonebriar,Addison Circle,13.7,15197,8.42
+2040,E17,DNT East,Frisco,Stonebriar,8.3,6641,6.14
+2040,E21,Beltline Line,Garland NE,Downtown Carrollton,28.3,2953,6.57
+2040,E16,DNT West,Arts District,Wheatley Place Historic District,5.7,5831,3.31
+2040,E16,DNT West,Turtle Creek,Arts District,2.7,5608,8.48
+2040,E22,I-30 Line,Cockrell Hill NW,Trinity Groves South?,6.7,2810,3.34
+2040,E16,DNT West,Forest and Marsh,Turtle Creek,12.8,5608,3.31
+2040,F01,Teal,Woodhaven,Courthouse,10.7,6760,2.83
+2040,F02,Blue,Central Station,W 7th E,2.6,1060,1.74
+2040,F04,Pink,Panther Island - Lagrave,John Peter Smith,5.4,777,4.23
+2040,F04,Pink,Meacham / Mercado N,Panther Island - Lagrave,5.0,118,118.23
+2040,E19,I-20 Crosstown,Uptown,Old East Dallas,2.0,343,1.21
+2040,E24,FW Crosstown Loop,Berry/Riverside,TCU E,4.6,36,0.5
+2045,E16,DNT West,Hebron,Forest and Marsh,10.0,4992,3.68
+2045,E08,FTW/Denton,Downtown Denton Transit Center,Fort Worth Central,56.2,4105,2.35
+2045,F05,Berry Line,Lake Worth,TCC Trinity River,10.6,2912,2.22
+2045,E18,Las Colinas-Mesquite Line,Bachman Lake,Saint Paul,5.6,2966,2.08
+2045,E18,Las Colinas-Mesquite Line,Irving West,Bachman Lake,15.8,4592,2.15
+2045,E17,DNT East,Pearl/Arts District,South Side,2.3,1980,1.81
+2045,E17,DNT East,South Side,Fair Park E7,7.9,4362,4.26
+2045,E17,DNT East,Fair Park E7,Rowlett,11.4,10085,6.79
+2045,E21,Beltline Line,Downtown Carrollton,Las Colinas SW2,17.5,244,0.9
+2045,E21,Beltline Line,Las Colinas SW2,Irving W,3.6,820,14.64
+2050,E18,Las Colinas-Mesquite Line,Saint Paul,Fair Park E,6.2,2061,4.82
+2050,E18,Las Colinas-Mesquite Line,Fair Park E,Fair Park E10,6.1,512,512.27
+2050,E18,Las Colinas-Mesquite Line,Fair Park E10,Mesquite NE,9.0,6269,5.43
+2050,E22,I-30 Line,Trinity Groves South?,Uptown,4.6,1091,1.82
+2050,E19,I-20 Crosstown,Old East Dallas,Lakewood,3.9,937,1.72
+2050,E19,I-20 Crosstown,Bishop Arts District,Trinity Groves South?,3.8,1015,1.88
+2050,F02,Blue,Handley,Central Station,11.2,2634,1.5
+2050,F02,Blue,W 7th E,Ridglea Hills,6.8,1460,1.49
+2050,F02,Blue,Ridglea Hills,Ridgmar Mall / BRT Transfer,2.4,6237,16.89
+2050,F06,Red,Clearfork,Museum Way,6.2,3502,4.08
+2050,F06,Red,Benbrook,Clearfork,7.6,1850,1.87
+2050,E21,Beltline Line,Irving W,Hillside Village W,27.3,605,1.44
+2050,E19,I-20 Crosstown,Duncanville SW,Bishop Arts District,13.5,2705,1.42
+2050,F01,Teal,W 7th E,Ridglea Hills,6.8,113,112.57
+2050,E22,I-30 Line,Uptown,Lakewood,6.3,447,1.55
+2050,F03,Orange,Medical City - Baylor,Waterside,7.5,1126,6.34
+2050,E22,I-30 Line,Lakewood,Reinhardt W2,3.8,293,0.59
+2050,E24,FW Crosstown Loop,Lindberg NW,Berry/Riverside,4.4,11,0.17
+2055,E19,I-20 Crosstown,Lakewood,Reinhardt W2,3.8,223,222.51
+2055,F03,Orange,Waterside,Altamesa,6.6,2047,2.34
+2055,E33,Sherman Line,Frisco,Sherman,58.5,2338,1.31
+2055,E22,I-30 Line,Great Southwest N,Cockrell Hill NW,14.9,2172,1.14
+2055,E22,I-30 Line,Cowboys/Rangers Stadiums,Great Southwest N,3.8,827,1.53
+2055,E22,I-30 Line,UTA W,Cowboys/Rangers Stadiums,4.5,921,1.39
+2055,E23,SH-360 Line,Great Southwest N,Lake Port Village,14.5,2444,1.21
+2055,E23,SH-360 Line,Irving W3,Great Southwest N,10.0,2705,2.04
+2055,E19,I-20 Crosstown,Reinhardt W2,Zacha Junction,4.5,709,1.14
+2055,E19,I-20 Crosstown,Zacha Junction,Zacha Junction N2,1.8,6787,26.83
+2055,E31,Bowie Line,Decatur,Fort Worth Central,59.9,2129,1.13
+2060,E22,I-30 Line,Reinhardt W2,Zacha Junction,4.5,41,40.85
+2060,E22,I-30 Line,Zacha Junction,Zacha Junction N2,1.8,213,213.4
+2060,E22,I-30 Line,Handley,UTA W,9.2,6489,5.5
+2060,E23,SH-360 Line,Irving West,Irving W3,4.3,2255,4.07
+2060,E19,I-20 Crosstown,Outlet Mall,Duncanville SW,14.3,2124,1.09
+2060,E23,SH-360 Line,Estelle,Irving West,2.2,255,0.83
+2060,E23,SH-360 Line,Cowboys/Rangers Stadiums,Estelle,17.8,1680,0.72
+2060,F05,Berry Line,TCC Trinity River,Berry / Stalcup,14.8,1076,0.58
+2060,E36,Waxahachie Line,Mansfield,Waxahachie,35.6,569,0.52
+2060,E19,I-20 Crosstown,Parks Mall,Outlet Mall,7.8,414,0.38
+2060,F04,Pink,John Peter Smith,La Gran Plaza,4.7,579,0.95
+2060,F04,Pink,La Gran Plaza,Everman,6.5,2422,2.97
+2065,E23,SH-360 Line,UTA E,Cowboys/Rangers Stadiums,2.7,203,0.63
+2065,E23,SH-360 Line,Parks Mall,UTA E,7.8,890,0.84
+2065,E23,SH-360 Line,Mansfield,Parks Mall,12.9,3347,1.96
+2065,E19,I-20 Crosstown,Berry/Stalcup,Parks Mall,12.7,1018,0.58
+2065,E21,Beltline Line,Hillside Village W,Wilmer,27.3,50,0.12
+2070,E21,Beltline Line,Wilmer,Mesquite SE,24.8,765,2.03

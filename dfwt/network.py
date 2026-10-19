@@ -28,6 +28,7 @@ from dataclasses import dataclass, field
 from . import config, geo
 
 NEVER = 9999
+csv.field_size_limit(1 << 28)  # long fitted alignments make large WKT cells
 TABLES = ("lines.csv", "stations.csv", "line_stops.csv", "line_segments.csv")
 OPTIONAL = ("service.csv", "transfers.csv", "stages.csv")
 

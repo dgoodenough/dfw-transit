@@ -511,21 +511,15 @@ def _flag_where(F, f):
     return int(np.argmin(np.hypot(*(F.L["S"] - P).T)))
 
 
-def _thin(seg, tol=0.05):
-    """Drop interior points of straight runs (keeps curves dense, tangents as endpoints)."""
+def _thin(seg, tol=0.25):
+    """Douglas-Peucker at tol m: tangents keep only their ends, curves keep enough
+    points to stay within tol of the true arc (instead of one point per metre)."""
+    seg = np.asarray(seg, dtype=float)
     if len(seg) < 3:
         return seg
-    keep = [0]
-    for i in range(1, len(seg) - 1):
-        a, b, c = seg[keep[-1]], seg[i], seg[i + 1]
-        u, w = b - a, c - b
-        nu, nw = np.hypot(*u), np.hypot(*w)
-        if nu < 1e-9 or nw < 1e-9:
-            continue
-        if abs(u[0] * w[1] - u[1] * w[0]) / (nu * nw) > 1e-4 or nu > 500:
-            keep.append(i)
-    keep.append(len(seg) - 1)
-    return seg[keep]
+    keep = {0, len(seg) - 1}
+    dp(seg, tol, 0, len(seg) - 1, keep)
+    return seg[sorted(keep)]
 
 
 def chord_radii(pts_lonlat, step=20.0, half=60.0):
