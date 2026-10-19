@@ -1,0 +1,93 @@
+line_id,name,mode,status,color,headway_min,notes
+F01,Teal,metro,proposed,#00b251,,
+F02,Blue,metro,proposed,#0896d7,,
+F03,Orange,metro,proposed,#df8600,,
+F04,Pink,metro,proposed,#d63384,,
+F05,Berry Line,metro,proposed,#9aa0a6,,
+F06,Red,metro,proposed,#bd1038,,
+F07,Purple,metro,proposed,#7b2d8e,,
+E01,White Settlement BRT,brt,proposed,#00838f,,A7: long-range reserve; lowest value per $ in the v1 plan
+E02,Riverside-Forest Hill BRT,brt,proposed,#00838f,,
+E04,Jacksboro BRT,brt,proposed,#00838f,,
+E05,TexPress Expansion,commuter,proposed,#5b6770,,
+E07,SE TexRail,commuter,proposed,#5b6770,,
+E08,FTW/Denton,commuter,proposed,#5b6770,,
+E09,TEXRail,commuter,existing,#5b6770,30,
+E10,TRE,commuter,existing,#5b6770,30,
+E11,A-train,commuter,existing,#5b6770,30,
+E12,Orange Line,metro,existing,#F57C00,15,
+E13,Green Line,metro,existing,#097138,15,
+E14,Red Line,metro,existing,#A52714,15,
+E15,Blue Line,metro,existing,#A1C2FA,15,
+E16,DNT West,metro,proposed,#E6EE9C,,
+E17,DNT East,metro,proposed,#817717,,
+E18,Las Colinas-Mesquite Line,metro,proposed,#880E4F,,
+E19,I-20 Crosstown,metro,proposed,#6b7785,,
+E20,Silver Line,metro,existing,#8c969e,30,
+E21,Beltline Line,brt,proposed,#00838f,,
+E22,I-30 Line,metro,proposed,#01579B,,
+E23,SH-360 Line,metro,proposed,#9C27B0,,
+E24,FW Crosstown Loop,brt,proposed,#00838f,,
+E25,McKinney Line,commuter,proposed,#5b6770,,
+E26,Legacy Line,metro,proposed,#0d8a4f,,
+E27,Ross Avenue BRT,brt,proposed,#00838f,,
+E28,Forest Lane BRT,brt,proposed,#00838f,,
+E29,Jefferson Blvd BRT,brt,proposed,#00838f,,
+E30,Alvarado Line,commuter,proposed,#5b6770,,
+E31,Bowie Line,commuter,proposed,#5b6770,,A7: long-range reserve (already 2070); consider intercity bus first
+E32,Gainesville Line,commuter,proposed,#5b6770,,
+E33,Sherman Line,commuter,proposed,#5b6770,,
+E34,Terrell Line,commuter,proposed,#5b6770,,
+E35,Ennis Line,commuter,proposed,#5b6770,,A7: long-range reserve; lowest value per $ in the v1 plan
+E36,Waxahachie Line,commuter,proposed,#5b6770,,
+E37,Midlothian Line,commuter,proposed,#5b6770,,
+E38,SH-121 BRT,brt,proposed,#00838f,,A6: McKinney-Frisco-Legacy crosstown. Sketch alignment on SH-121 frontage roads; needs a real road-ROW routing pass.
+XP01,SH-114 Line,metro,proposed,#e65100,,"Expansion lever: Farmers Branch - Valwood - Freeport - DFW north - Grapevine - Southlake - Westlake, light metro on LBJ/SH-114 right-of-way"
+XP02,Coppell-Lewisville BRT,brt,proposed,#00838f,,Expansion lever: Cypress Waters - Coppell business parks - Vista Ridge - Old Town Lewisville
+XP05,Stemmons-Brookhollow BRT,brt,proposed,#00838f,,"Expansion lever: Inwood/Love Field - Brookhollow - Regal Row - Northwest Hwy - Royal/Luna - Valwood, the Stemmons/I-35E job corridor"
+XP06,Dallas Parkway BRT,brt,proposed,#00838f,,"Expansion lever: Legacy West - Stonebriar - The Star - Frisco Station, the Dallas Parkway office corridor"
+XB01,Northwest Highway BRT,brt,proposed,#00838f,,Expansion lever: arterial BRT grid (dedicated lanes)
+XB02,Buckner Boulevard BRT,brt,proposed,#00838f,,Expansion lever: arterial BRT grid (dedicated lanes)
+XB03,Illinois-Lake June BRT,brt,proposed,#00838f,,Expansion lever: arterial BRT grid (dedicated lanes)
+XB04,Abrams-Skillman BRT,brt,proposed,#00838f,,Expansion lever: arterial BRT grid (dedicated lanes)
+XB05,Marsh-Webb Chapel BRT,brt,proposed,#00838f,,Expansion lever: arterial BRT grid (dedicated lanes)
+XB06,Hampton-Westmoreland BRT,brt,proposed,#00838f,,Expansion lever: arterial BRT grid (dedicated lanes)
+XB07,Kiest-Ledbetter BRT,brt,proposed,#00838f,,Expansion lever: arterial BRT grid (dedicated lanes)
+XB08,Jupiter-Plano Road BRT,brt,proposed,#00838f,,Expansion lever: arterial BRT grid (dedicated lanes)
+XB09,Garland Broadway BRT,brt,proposed,#00838f,,Expansion lever: arterial BRT grid (dedicated lanes)
+XB10,Mesquite Town East BRT,brt,proposed,#00838f,,Expansion lever: arterial BRT grid (dedicated lanes)
+XB11,Park Boulevard BRT,brt,proposed,#00838f,,Expansion lever: arterial BRT grid (dedicated lanes)
+XB12,Coit Road BRT,brt,proposed,#00838f,,Expansion lever: arterial BRT grid (dedicated lanes)
+XB13,Preston Road BRT,brt,proposed,#00838f,,Expansion lever: arterial BRT grid (dedicated lanes)
+XB14,Spring Creek-Legacy BRT,brt,proposed,#00838f,,Expansion lever: arterial BRT grid (dedicated lanes)
+XB15,Frisco Main-Eldorado BRT,brt,proposed,#00838f,,Expansion lever: arterial BRT grid (dedicated lanes)
+XB16,McKinney Lake Forest BRT,brt,proposed,#00838f,,Expansion lever: arterial BRT grid (dedicated lanes)
+XB17,Independence Parkway BRT,brt,proposed,#00838f,,Expansion lever: arterial BRT grid (dedicated lanes)
+XB18,Frankford-Hebron BRT,brt,proposed,#00838f,,Expansion lever: arterial BRT grid (dedicated lanes)
+XB19,Flower Mound-Lewisville BRT,brt,proposed,#00838f,,Expansion lever: arterial BRT grid (dedicated lanes)
+XB20,Denton UNT-TWU BRT,brt,proposed,#00838f,,Expansion lever: arterial BRT grid (dedicated lanes)
+XB21,Hurst-Euless-Bedford BRT,brt,proposed,#00838f,,Expansion lever: arterial BRT grid (dedicated lanes)
+XB22,Story-MacArthur BRT,brt,proposed,#00838f,,Expansion lever: arterial BRT grid (dedicated lanes)
+XB23,Grand Prairie Carrier BRT,brt,proposed,#00838f,,Expansion lever: arterial BRT grid (dedicated lanes)
+XB24,Cooper Street BRT,brt,proposed,#00838f,,Expansion lever: arterial BRT grid (dedicated lanes)
+XB25,Pioneer Parkway BRT,brt,proposed,#00838f,,Expansion lever: arterial BRT grid (dedicated lanes)
+XB26,Collins-Center BRT,brt,proposed,#00838f,,Expansion lever: arterial BRT grid (dedicated lanes)
+XB27,Hulen-Altamesa BRT,brt,proposed,#00838f,,Expansion lever: arterial BRT grid (dedicated lanes)
+XB28,Beach Street-Keller BRT,brt,proposed,#00838f,,Expansion lever: arterial BRT grid (dedicated lanes)
+XB29,North Fort Worth-Alliance BRT,brt,proposed,#00838f,,Expansion lever: arterial BRT grid (dedicated lanes)
+XB30,Seminary-Wichita BRT,brt,proposed,#00838f,,Expansion lever: arterial BRT grid (dedicated lanes)
+XB31,DeSoto-Lancaster BRT,brt,proposed,#00838f,,Expansion lever: arterial BRT grid (dedicated lanes)
+XB32,Josey Lane BRT,brt,proposed,#00838f,,Expansion lever: arterial BRT grid phase 2
+XB33,Denton-Corinth BRT,brt,proposed,#00838f,,Expansion lever: arterial BRT grid phase 2
+XB34,Shiloh Road BRT,brt,proposed,#00838f,,Expansion lever: arterial BRT grid phase 2
+XB35,Lewisville Main Street BRT,brt,proposed,#00838f,,Expansion lever: arterial BRT grid phase 2
+XB36,Southwest Arlington BRT,brt,proposed,#00838f,,Expansion lever: arterial BRT grid phase 2
+XB37,Burleson-Crowley BRT,brt,proposed,#00838f,,Expansion lever: arterial BRT grid phase 2
+XB38,Mid-Cities Boulevard BRT,brt,proposed,#00838f,,Expansion lever: arterial BRT grid phase 2
+XB39,West Frisco BRT,brt,proposed,#00838f,,Expansion lever: arterial BRT grid phase 2
+XB40,McKinney Virginia Parkway BRT,brt,proposed,#00838f,,Expansion lever: arterial BRT grid phase 2
+XB41,Watauga-Keller BRT,brt,proposed,#00838f,,Expansion lever: arterial BRT grid phase 2
+XB42,Denton Tap BRT,brt,proposed,#00838f,,Expansion lever: arterial BRT grid phase 2
+XB43,West Dallas-Irving BRT,brt,proposed,#00838f,,Expansion lever: arterial BRT grid phase 2
+XB44,Sachse-Wylie BRT,brt,proposed,#00838f,,Expansion lever: arterial BRT grid phase 2
+XB45,Matlock-Mansfield BRT,brt,proposed,#00838f,,Expansion lever: arterial BRT grid phase 2
