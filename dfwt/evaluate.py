@@ -119,6 +119,30 @@ def calibrate_asc(ctx, net, lo=-4.0, hi=2.0, tol=0.01, log=None):
     return rc["asc"]
 
 
+def calibrate(ctx, net, log=None):
+    """Calibrate both constants for the calibration year: the walk/bike constant
+    so config.ridership.calibration.active_share of commuters walk or bike, then
+    the transit constant so the network carries the calibration rail boardings.
+    Two rounds (they barely interact). Returns (asc, active asc)."""
+    rc = ctx.cfg["ridership"]
+    cal = rc["calibration"]
+    for _ in range(2):
+        if rc.get("active") and cal.get("active_share"):
+            lo, hi = -8.0, 2.0
+            for _ in range(30):
+                rc["active"]["asc"] = round((lo + hi) / 2, 4)
+                z, od = ctx.year_inputs(net, cal["year"])
+                r = run_year(ctx, net, cal["year"], want_loads=False)
+                share = r["active_commuters"] / (float(od.sum()) * rc["telework"])
+                if log:
+                    log(f"  active asc {rc['active']['asc']:+.4f}: {share:.2%} walk or bike")
+                if abs(share / cal["active_share"] - 1) < 0.01:
+                    break
+                lo, hi = (rc["active"]["asc"], hi) if share < cal["active_share"] else (lo, rc["active"]["asc"])
+        calibrate_asc(ctx, net, log=log)
+    return rc["asc"], rc.get("active", {}).get("asc")
+
+
 def evaluate(ctx, net, line_values=True, log=print):
     cfg = ctx.cfg
     years = cfg["years"]

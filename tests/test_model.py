@@ -213,8 +213,10 @@ class AccessTests(unittest.TestCase):
         cfg["access"]["feeder"].update({"enabled": True, "min_density_per_km2": 0, **feeder})
         return cfg
 
-    def test_feeders_are_off_by_default(self):
-        acc = demand.Access(self.Z(), self.net, self.g, config.load())
+    def test_feeders_can_be_switched_off(self):
+        cfg = config.load()
+        cfg["access"]["feeder"]["enabled"] = False   # on by default: today's buses are the 2025 feeder grid
+        acc = demand.Access(self.Z(), self.net, self.g, cfg)
         self.assertFalse((acc.acc_mode == demand.FEEDER).any())
         self.assertFalse((acc.egr_mode == demand.FEEDER).any())
 
@@ -271,6 +273,27 @@ class AccessTests(unittest.TestCase):
         self.assertAlmostEqual(sum(w for w, _ in segs), 1.0)
         self.assertEqual(len(segs), 3)
         self.assertEqual(demand.access_segments(cfg, 2025), [(1.0, ())])  # before from_year
+
+
+class ModeChoiceTests(unittest.TestCase):
+    def test_no_car_share_rises_with_density(self):
+        cfg = config.load()
+
+        class Z:
+            n = 3
+            pop = np.array([100.0, 20000, 80000])
+            jobs = np.array([0.0, 0, 0])
+            x = np.array([0.0, 50, 100])
+            y = np.zeros(3)
+        nc = demand.no_car_share(Z(), cfg)
+        self.assertTrue(np.all(np.diff(nc) >= 0))
+        self.assertGreaterEqual(nc.min(), cfg["ridership"]["no_car"]["share_by_density"][0][1])
+
+    def test_calibration_constants_are_set(self):
+        rc = config.load()["ridership"]
+        self.assertLess(rc["pnr_asc_offset"], 0)      # drive-to-transit is less liked than walking in
+        self.assertGreater(rc["b_ratio"], 0)
+        self.assertLess(rc["active"]["asc"], 0)
 
 
 class LandUsePolicyTests(unittest.TestCase):

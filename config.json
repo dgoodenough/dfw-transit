@@ -37,10 +37,10 @@
     }
   },
   "wait": {
-    "_doc": "Expected wait = headway / 2, capped (riders time arrivals on long headways). weight = how many in-vehicle minutes a minute of waiting feels like (1 = calibrated plan; 2 is the usual planning value, a sensitivity that needs ridership.asc recalibrated: -0.195 with weight 2 and max_wait_min 15).",
+    "_doc": "Expected wait = headway / 2, capped (riders time arrivals on long headways). Waits count `weight` times in-vehicle minutes, as riders perceive them (planning practice 2-3x), in routing, the logit and the competitive-commute test.",
     "fraction_of_headway": 0.5,
     "max_wait_min": 12,
-    "weight": 1.0
+    "weight": 2.0
   },
   "transfer": {
     "walk_radius_m": 400,
@@ -48,7 +48,7 @@
     "penalty_min": 3
   },
   "access": {
-    "_doc": "How people reach stations. Walk to anything within walk_max_m; drive (park & ride) to commuter rail stations and each line's planned termini within pnr_max_km. Garages hold pnr_spaces cars (DART Parker Road ~2,000, TRE/TEXRail stations 175-1,000); each space serves pnr_people_per_space commuters a day (75% full x 1.1 per car x 1.15 with drop-offs). Riders beyond that are scaled away, or with pnr_overflow_fallback take their best access without parking (changes the 2025 calibration: asc -1.31 alone). circuity applies to drive access, walk_circuity to walking (better street grids and station entrances lower it). Park & ride is chosen whenever it is faster than walking (beyond ~0.4 km), so pnr_min_km can reserve garages for people beyond walking distance. The feeder, micromobility, kiss_ride and pnr_suburban blocks are access levers, all off by default.",
+    "_doc": "How people reach stations. Walk to anything within walk_max_m; drive (park & ride) to garages within pnr_max_km but not closer than pnr_min_km (people that close walk): commuter rail stations, each line's planned termini, today's lots at existing suburban stations (pnr_existing) and optional suburban garages (pnr_suburban). Garages hold pnr_spaces cars (DART Parker Road ~2,000, TRE/TEXRail stations 175-1,000); each space serves pnr_people_per_space commuters a day (75% full x 1.1 per car x 1.15 with drop-offs). Riders a full garage turns away take their best access without parking (pnr_overflow_fallback). Today's local buses are the feeder grid (30 min in denser areas); faster grids are a lever. Riders choose each station's access mode by perceived minutes (out-of-vehicle time weighs 2.5x). circuity applies to drive access, walk_circuity to walking. The micromobility, kiss_ride and pnr_suburban blocks are levers, off by default.",
     "walk_max_m": 1200,
     "walk_speed_kmh": 4.8,
     "circuity": 1.25,
@@ -62,8 +62,8 @@
       "commuter_station": 400
     },
     "pnr_people_per_space": 0.95,
-    "pnr_min_km": 0,
-    "pnr_overflow_fallback": false,
+    "pnr_min_km": 1.2,
+    "pnr_overflow_fallback": true,
     "pnr_suburban": {
       "_doc": "Lever (off by default): a structured garage of `spaces` at selected stations of `modes`, Wiehle-Reston East style (wrapped by development, so TOD uplift is unchanged): only where the station's setting (growth.setting, base-year density) is `setting`, at least min_core_km from a downtown and min_spacing_km from every other garage, outermost first, from from_year. No new parking at downtown or urban stations. Freeway/arterial access is not checked (no road data).",
       "enabled": false,
@@ -72,12 +72,16 @@
       "setting": "suburban",
       "min_core_km": 8,
       "min_spacing_km": 4,
-      "modes": ["metro"]
+      "modes": [
+        "metro"
+      ]
     },
     "feeder": {
       "_doc": "Lever (off by default): a frequent local bus grid as an access and egress mode. Zones whose activity density (people + jobs per km2 within 800 m) is at least min_density_per_km2 reach any station within max_km (straight line) by bus: stop_walk_min + half the headway (capped like rail waits) + distance x circuity / speed (slowed by road congestion) + transfer_penalty_min. Only the walk, wait and transfer count as out-of-vehicle time. headway_min is a {year: minutes} table, no feeder before its first year. The asc was calibrated without feeders (today's buses sit inside it), so either start the table after 2025 (an upper bound: today's bus-to-rail riders get counted twice) or include today's headway from 2025 and recalibrate (evaluate.calibrate_asc). Bus legs are not rail boardings: run_year reports them separately as feeder_boardings.",
-      "enabled": false,
-      "headway_min": {"2030": 15},
+      "enabled": true,
+      "headway_min": {
+        "2025": 30
+      },
       "speed_kmh": 19,
       "circuity": 1.3,
       "max_km": 5,
@@ -104,6 +108,14 @@
       "share": 0.1,
       "max_km": 6,
       "penalty_min": 6
+    },
+    "pnr_existing": {
+      "_doc": "Today's park & ride lots at existing rail stations outside the core (DART has lots at most suburban stations, roughly 100-2,000 spaces each; an approximation until the real inventory is loaded).",
+      "enabled": true,
+      "spaces": 500,
+      "settings": [
+        "suburban"
+      ]
     }
   },
   "drive": {
@@ -391,21 +403,49 @@
       "radius_m": 800,
       "full_radius_m": 400,
       "weight_floor": 500,
-      "target_density_per_km2": {"downtown": 40000, "urban": 27500, "suburban": 16000},
-      "mode_factor": {"metro": 1.0, "commuter": 0.75, "brt": 0.8},
+      "target_density_per_km2": {
+        "downtown": 40000,
+        "urban": 27500,
+        "suburban": 16000
+      },
+      "mode_factor": {
+        "metro": 1.0,
+        "commuter": 0.75,
+        "brt": 0.8
+      },
       "job_centers": {
         "jobs_share": 0.0,
-        "Dallas CBD": {"lat": 32.781, "lon": -96.799, "radius_km": 1.6},
-        "Uptown": {"lat": 32.8, "lon": -96.803, "radius_km": 1.2},
-        "Dallas Medical District": {"lat": 32.812, "lon": -96.84, "radius_km": 1.3},
-        "Fort Worth CBD": {"lat": 32.7555, "lon": -97.3308, "radius_km": 1.4},
-        "Fort Worth Medical District": {"lat": 32.733, "lon": -97.34, "radius_km": 1.0}
+        "Dallas CBD": {
+          "lat": 32.781,
+          "lon": -96.799,
+          "radius_km": 1.6
+        },
+        "Uptown": {
+          "lat": 32.8,
+          "lon": -96.803,
+          "radius_km": 1.2
+        },
+        "Dallas Medical District": {
+          "lat": 32.812,
+          "lon": -96.84,
+          "radius_km": 1.3
+        },
+        "Fort Worth CBD": {
+          "lat": 32.7555,
+          "lon": -97.3308,
+          "radius_km": 1.4
+        },
+        "Fort Worth Medical District": {
+          "lat": 32.733,
+          "lon": -97.34,
+          "radius_km": 1.0
+        }
       }
     }
   },
   "ridership": {
-    "_doc": "Daily riders from the commute model (dfwt/demand.py). Each commute's transit share is a binary logit: asc + b_ivt*(drive - transit door-to-door) - b_ovt_extra*(walk/drive access + egress) + 0.125/$ x parking avoided at paid-parking destinations (FTA/MWCOG ranges: IVT -0.02..-0.03/min, out-of-vehicle 2-3x). asc is calibrated so the 2025 network carries today's rail ridership. Transit commuters x telework; daily trips = commuters x round_trip / work_share_of_transit_trips; boardings = trips x boardings per trip (from the load assignment when computed).",
-    "asc": -1.11,
+    "_doc": "Daily riders from the commute model (dfwt/demand.py). Each commute chooses drive, transit or walk/bike the whole way (multinomial logit, drive is the reference). Transit utility: asc + b_ivt*(drive - transit door-to-door minutes) - b_ovt_extra*(access + egress minutes) - b_ratio*(how far transit exceeds 1x the drive time, as a ratio) + 0.125/$ x (driving cost avoided at drive_usd_per_km + parking avoided at paid-parking destinations). FTA/MWCOG ranges: IVT -0.02..-0.03/min, out-of-vehicle 2-3x. asc is calibrated so the 2025 network carries today's rail ridership with today's buses as feeders; active.asc so ~2% walk or bike. Transit commuters x telework; daily trips = commuters x round_trip / work_share_of_transit_trips; boardings = trips x boardings per trip (from the load assignment). Drive-to-transit has its own constant (pnr_asc_offset, as in MPO models: parking, walking in from the lot), set so about half of 2025 rail riders drive to a garage, near DART's on-board surveys; riders without a car (no_car) can't.",
+    "asc": -0.4141,
     "b_ivt_per_min": 0.025,
     "b_ovt_extra_per_min": 0.0375,
     "b_per_dollar": 0.125,
@@ -416,7 +456,8 @@
     "calibration": {
       "year": 2025,
       "rail_boardings": 80000,
-      "_doc": "DART light rail ~65k weekday + TRE + TEXRail + A-train (APTA/NTD 2024-25). Local buses are not modeled."
+      "_doc": "DART light rail ~65k weekday + TRE + TEXRail + A-train (APTA/NTD 2024-25). Local buses are not modeled.",
+      "active_share": 0.02
     },
     "paid_parking": {
       "_doc": "Destinations where parking costs money ($/day, approximate).",
@@ -476,6 +517,40 @@
       "price_growth": 0.0,
       "priced_centers": null,
       "cashout": null
-    }
+    },
+    "b_ratio": 1.0,
+    "drive_usd_per_km": 0.2,
+    "active": {
+      "_doc": "Walk/bike the whole way, an alternative in the logit for trips up to max_km: blended speed, effort per minute weighted like out-of-vehicle time, asc calibrated so ~2% of commuters walk or bike (ACS: DFW ~1.5-2%).",
+      "asc": -1.6719,
+      "max_km": 8,
+      "speed_kmh": 10,
+      "circuity": 1.3,
+      "b_per_min": 0.0625
+    },
+    "no_car": {
+      "_doc": "Commuters from households without a car, by the people+jobs density around their home zone (approximate, from ACS: ~5% of DFW households, ~9% in the city of Dallas, 15-25% in dense inner neighborhoods). They can't park & ride; their alternative to transit is getting a ride, which is ride_bonus less attractive than driving yourself.",
+      "enabled": true,
+      "share_by_density": [
+        [
+          0,
+          0.03
+        ],
+        [
+          2000,
+          0.06
+        ],
+        [
+          6000,
+          0.12
+        ],
+        [
+          15000,
+          0.22
+        ]
+      ],
+      "ride_bonus": 3.0
+    },
+    "pnr_asc_offset": -1.5
   }
 }
