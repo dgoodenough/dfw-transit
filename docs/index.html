@@ -103,8 +103,21 @@ const D = {"years":[2025,2030,2035,2040,2045,2050,2055,2060,2065,2070],"boardPen
 const dark = window.matchMedia && matchMedia('(prefers-color-scheme: dark)').matches;
 const map = L.map('map', {zoomControl: false, preferCanvas: true}).setView([32.84, -97.03], 10);
 L.control.zoom({position: 'topright'}).addTo(map);
-L.tileLayer(`https://{s}.basemaps.cartocdn.com/${dark ? 'dark_all' : 'light_all'}/{z}/{x}/{y}{r}.png`, {
-  attribution: '&copy; OpenStreetMap contributors &copy; CARTO', maxZoom: 18, subdomains: 'abcd'}).addTo(map);
+// Key-free basemaps: Esri's gray canvas (light/dark, with a labels overlay) and standard OpenStreetMap.
+map.createPane('labels').style.cssText = 'z-index:450;pointer-events:none';
+const esri = name => `https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/${name}/MapServer/tile/{z}/{y}/{x}`;
+const esriAttr = 'Tiles &copy; Esri &mdash; Esri, HERE, Garmin, &copy; OpenStreetMap contributors';
+const gray = (base, ref) => L.layerGroup([
+  L.tileLayer(esri(base), {attribution: esriAttr, maxZoom: 16}),
+  L.tileLayer(esri(ref), {maxZoom: 16, pane: 'labels'})]);
+const basemaps = {
+  'Light gray': gray('World_Light_Gray_Base', 'World_Light_Gray_Reference'),
+  'Dark gray': gray('World_Dark_Gray_Base', 'World_Dark_Gray_Reference'),
+  'OpenStreetMap': L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors', maxZoom: 18}),
+};
+basemaps[dark ? 'Dark gray' : 'Light gray'].addTo(map);
+L.control.layers(basemaps, null, {position: 'topright'}).addTo(map);
 const lineLayer = L.layerGroup().addTo(map), stLayer = L.layerGroup().addTo(map), tripLayer = L.layerGroup().addTo(map);
 const $ = id => document.getElementById(id);
 const fmt = n => n >= 10000 ? Math.round(n / 1000) + 'k' : n.toLocaleString();
