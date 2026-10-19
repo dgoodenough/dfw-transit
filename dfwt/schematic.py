@@ -4,47 +4,52 @@ Metro map: octilinear lines, uniform strokes, bundled shared corridors.
 The layout is computed once, at build time, over the *union* of every station
 and stop-to-stop edge in every scenario, so the diagram does not move when the
 page switches plan or year; the page only shows, hides or fades parts of it.
-It is deterministic (no randomness, everything iterated in sorted order).
+Everything is read from the loaded networks (stations, stop sequences, segment
+geometry, transfers); nothing is hard-coded. It is deterministic (no
+randomness, everything iterated in sorted order) and takes ~30 s.
 
 Method
 ------
-1. **Union graph.** Nodes are stations; edges are consecutive stops of any line
-   in any scenario, each carrying the set of lines that use it. Stations at the
-   same place (within 40 m, or the same name within 400 m, and never on a common
-   line) are merged into one node: on a diagram they are one interchange.
-2. **Density-equalizing pre-warp.** Stress majorization (SMACOF, localized
-   update) on all station pairs with target distance ``c * d**GAMMA`` (geographic
-   km, GAMMA < 1) and weight ``target**-2``, floored at a minimum spacing. The
-   power law expands the dense Fort Worth and Dallas cores and compresses the
-   long commuter-rail reaches while keeping the overall geography (it starts
-   from the true positions and is rotated back onto them with Procrustes).
+1. **Union graph.** Nodes are stations; stations at the same place (within
+   40 m, the same name within 400 m, or transfer-linked within 150 m) merge into
+   one interchange node, never two stops of one line and never above degree 8.
+   A line whose track (segment geometry) passes within 120 m of another station
+   is drawn *through* that node when that joins an existing corridor, so
+   express hops bundle with the local line instead of fanning out separately.
+2. **Density-equalizing pre-warp.** A diffusion cartogram (Gastner & Newman
+   2004; FFT on a grid) driven by "ink" density: stations plus samples along
+   every edge weighted by its number of lines. The flow is continuous, so it
+   cannot fold; it expands the Fort Worth and Dallas cores and compresses the
+   long commuter-rail reaches. The scale is set so the median hop is EDGE_MED.
 3. **Octilinear directions.** Chains of degree-2 stations between junctions or
    termini are the units of the drawing. At each junction the incident chains
-   get distinct ports (one of 8 directions) by exhaustive search over
-   cyclic-order-preserving assignments, so the cyclic order of neighbours is
-   kept. Along each chain a small dynamic program picks one direction per edge,
-   trading angular deviation from the current geometry against a penalty per
-   bend (45° bends cheap, 90° expensive, sharper ones forbidden). A change of
-   direction is moved off the station into the longer adjacent edge, which
-   then has exactly one bend.
+   get distinct ports (8 directions) by exhaustive search over assignments that
+   keep the cyclic order of neighbours. Along each chain a dynamic program picks
+   one direction per edge, trading squared angular deviation against a penalty
+   per bend (45° cheap, 90° dear, sharper forbidden). A change of direction is
+   moved off the station into the longer adjacent edge, which gets one bend.
 4. **Least-squares relaxation.** Positions (plus the two leg lengths of each
-   bent edge) solve a sparse linear least-squares problem: every straight edge
-   lies along its direction (perpendicular residual, weight ramped up),
-   has a target length (chain-smoothed, so stations are evenly spaced), and
-   every node is weakly anchored to its pre-warped position. Transfer pairs are
-   pulled together. Violated minimum distances (node–node and node–edge) are
-   linearized into separation terms on the next iteration (active set).
-   Steps 3–4 alternate a few times, then directions are frozen and the
-   relaxation continues until all spacing constraints hold.
-5. **Exact octilinearity.** A final least-norm projection makes every straight
-   edge exactly octilinear; any edge that still cannot be straight is drawn as
-   two octilinear legs (one bend).
-6. **Line ordering.** In each corridor the lines get one order per chain;
-   permutations are improved by local search that minimizes crossings at the
-   junctions, measured geometrically from the port positions of each line.
-7. **Waterways.** Rivers and lakes are carried along with a moving-least-squares
-   affine warp fitted to the station displacements (geographic -> layout),
-   then simplified and smoothed (rivers snapped towards octilinear runs).
+   bent edge) solve a linear least-squares problem: each straight edge lies
+   along its direction (perpendicular residual, weight ramped up), has a
+   chain-smoothed target length (even station spacing), and every node is
+   weakly anchored to its pre-warped position; transfer pairs are pulled
+   together. Node pairs and drawn pieces of different corridors that are too
+   close become linearized separation rows on the next solve (active set).
+   Directions are re-assigned for N_ASSIGN rounds, then frozen; edges that
+   still collapse or sit far off their direction, or that hold two stations
+   under the minimum spacing, get one bend.
+5. **Exact octilinearity and spacing.** A least-norm projection makes every
+   straight edge exactly octilinear; each bent edge is drawn as two octilinear
+   legs. If any two stations were still under MIN_SP, the whole layout is
+   scaled uniformly (angles unchanged) so the minimum spacing always holds.
+6. **Line ordering.** In each chain the lines get one order; permutations are
+   improved by local search minimizing crossings at the junctions, measured
+   geometrically from each line's port position.
+7. **Waterways.** Rivers ride the same cartogram flow plus the smoothed
+   displacement of nearby stations, are clipped to the network's surroundings,
+   simplified (Douglas-Peucker), snapped towards octilinear runs and smoothed
+   (Chaikin) into soft bands. Lakes keep their shape under a local affine fit
+   (geographic -> layout) at their centroid and are smoothed into blobs.
 
 Units: 1.0 = the minimum distance between station centres. y grows north here;
 the JSON for the page flips it (SVG y grows down).
@@ -65,6 +70,8 @@ PITCH = 0.30          # offset between parallel lines in a corridor
 MERGE_KM = 0.04       # always merge stations closer than this
 MERGE_NAME_KM = 0.40  # merge same-named stations closer than this
 MERGE_LINKED_KM = 0.15  # merge transfer-linked stations closer than this
+CONNECTOR_MAX = 1.6   # transfer pairs closer than this on the diagram get a connector
+LAKE_SCALE = 0.8      # lakes are drawn a little smaller than their local scale
 PASS_KM = 0.12        # a line passing this close to another station is drawn through it
 SIGMA_KM = 0.8        # station density smoothing for the cartogram
 BACKGROUND = 0.10     # uniform density added (relative to the mean); smaller = stronger equalization
@@ -75,7 +82,9 @@ B45, B90 = 0.35, 1.6
 N_ASSIGN, N_RELAX = 10, 14
 W_REP = 12.0
 W_LEN = 1.5
-W_ANC = 0.3
+W_ANC = 0.15
+DEV_BEND = 25.0       # a straight edge still this far (degrees) off its direction gets a bend
+SP_AIM = 1.2          # the relaxation aims this much above MIN_SP (the final scale guarantees MIN_SP)
 SHRINK = 0.45         # a straight edge shrunk below this fraction of its target gets a bend
 SEG_GAP = 0.45        # clear space between the outer strokes of two corridors  # bend penalties (squared radians of deviation they must save)
 DIRS = np.array([(math.cos(k * math.pi / 4), math.sin(k * math.pi / 4)) for k in range(8)])
@@ -376,7 +385,7 @@ def _chains(lay):
     return inc, key, chains
 
 
-def _ports(X, chains, key, inc_count):
+def _ports(X, chains):
     """Port (direction index 0..7) for each chain end at a junction: ends[(chain, 0|1)]."""
     at = collections.defaultdict(list)       # node -> [(chain idx, end)]
     for ci, (nodes, _) in enumerate(chains):
@@ -456,7 +465,7 @@ def _chain_dirs(X, nodes, p0, p1):
 
 def _assign(lay, X, chains, key, L):
     """Edge directions (canonical a->b) and bent edges {e: (d1 from a, d2 into b)}."""
-    ports = _ports(X, chains, key, None)
+    ports = _ports(X, chains)
     dirs, bent = {}, {}
     for ci, (nodes, es) in enumerate(chains):
         cd = _chain_dirs(X, nodes, ports.get((ci, 0)), ports.get((ci, 1)))
@@ -595,10 +604,10 @@ def _violations(lay, X, dirs, bent, legs, rad, margin=1.0):
     minimum spacing, and for drawn pieces of different edges that come closer
     than their bundle widths allow (collinear overlaps included). Proper
     crossings are left alone: some lines do cross."""
-    rows = []
+    rows, close = [], []
     diff = X[None, :, :] - X[:, None, :]
     dist = np.sqrt((diff ** 2).sum(-1))
-    need = np.maximum(MIN_SP, rad[:, None] + rad[None, :] + 0.6)
+    need = np.maximum(MIN_SP * SP_AIM, rad[:, None] + rad[None, :] + 0.6)
     bad = 0
     for i, k in zip(*np.nonzero(np.triu(dist < need * margin, 1))):
         g = diff[i, k] / dist[i, k] if dist[i, k] > 1e-6 else np.array([1.0, 0.0])
@@ -607,6 +616,8 @@ def _violations(lay, X, dirs, bent, legs, rad, margin=1.0):
             coefs[2 * k + c] = W_REP * g[c]
             coefs[2 * i + c] = -W_REP * g[c]
         rows.append((coefs, W_REP * need[i, k] * 1.05))
+        if dist[i, k] < 0.9 * need[i, k] / SP_AIM:
+            close.append((int(i), int(k)))
         bad += dist[i, k] < need[i, k] - 1e-6
     segs = _segments(lay, X, dirs, bent, legs)
     lo = np.array([np.minimum(p, q) for _, p, q, _ in segs])
@@ -642,7 +653,7 @@ def _violations(lay, X, dirs, bent, legs, rad, margin=1.0):
             coefs[2 * v + 1] -= W_REP * w * g[1]
         rows.append((dict(coefs), W_REP * (nd * 1.05 - g @ (k2 - k1))))
         bad += dd < nd - 1e-6
-    return rows, bad
+    return rows, bad, close
 
 
 def _targets(lay, A, chains):
@@ -712,17 +723,10 @@ def _order_lines(lay, X, chains, key):
             tgt = X[other]
         u = tgt - X[v]
         u = u / (np.linalg.norm(u) + 1e-9)
-        ca = X[ed["b"]] - X[ed["a"]] if ed["bend"] is None else None
-        # offset normal in canonical a->b orientation of the leg touching v
-        if ed["a"] == v:
-            t = u
-        else:
-            t = -u
-        nr = np.array([-t[1], t[0]])
+        t = u if ed["a"] == v else -u          # the leg touching v, in canonical a->b orientation
+        nr = np.array([-t[1], t[0]])           # offsets are to the left of a->b
         lines = order[chain_of[e]]
-        k = lines.index(lid)
-        off = (k - (len(lines) - 1) / 2) * PITCH
-        del ca
+        off = (lines.index(lid) - (len(lines) - 1) / 2) * PITCH
         return X[v] + 0.8 * u + off * nr
 
     def crossings(v):
@@ -880,8 +884,8 @@ def _water(lay, A, X, water, warped):
                 if np.sqrt(((X - Yc) ** 2).sum(1)).min() > 6:
                     continue
                 Z = _local_affine(G, X, c)(ring)
-                Z += Yc - Z.mean(0)
-                R = _dp(Z, 0.25)
+                Z = (Z - Z.mean(0)) * LAKE_SCALE + Yc
+                R = _dp(Z, 0.3)
                 if len(R) >= 4:
                     lay.water["lakes"].append({"name": name, "area": area,
                                                "pts": _chaikin(R[:-1], 3, closed=True)})
@@ -906,11 +910,13 @@ def compute(nets, log=None):
     dirs = bent = None
     legs = {}
 
+    close = []
+
     def step(wp, margin=1.1):
-        nonlocal X, legs, rep
+        nonlocal X, legs, rep, close
         X, legs = _solve(lay, X, A, dirs, bent, L, wp, rep, wanc)
         # active set: separation terms only for pairs that are (nearly) too close now
-        rep, bad = _violations(lay, X, dirs, bent, legs, rad, margin=margin)
+        rep, bad, close = _violations(lay, X, dirs, bent, legs, rad, margin=margin)
         return bad
     # phase 1: directions re-assigned from the current geometry, moderate weight
     for it in range(N_ASSIGN):
@@ -926,21 +932,38 @@ def compute(nets, log=None):
             v = X[ed["b"]] - X[ed["a"]]
             ln = np.linalg.norm(v)
             dev = math.degrees(_angdiff(math.atan2(v[1], v[0]), d * math.pi / 4))
-            if dev > 4.0 or v @ DIRS[d] < SHRINK * L[e]:
+            if dev > DEV_BEND or v @ DIRS[d] < SHRINK * L[e]:
                 (i, al), (j, be) = _decompose(v if ln > 1e-6 else DIRS[d])
-                if dev <= 4.0 or i == j:
+                if dev <= DEV_BEND or i == j:
                     i, j = d, (d + 1) % 8
                 bent[e] = (i, j) if al >= be else (j, i)
                 del dirs[e]
                 conv.append(e)
+        if it >= 4:      # stations still well under the minimum spacing: free one straight edge
+            for pair in close:
+                es = [e for v in pair for e in inc[v] if e in dirs]
+                if es:
+                    e = max(es, key=lambda e: (L[e], -e))
+                    d = dirs.pop(e)
+                    bent[e] = (d, (d + 1) % 8)
+                    conv.append(e)
         bad = step(min(6.0 * 1.6 ** it, 80.0))
         if log:
             log(f"relax {it}: {len(conv)} -> bent, {len(dirs)} straight, {len(bent)} bent, {bad} spacing violations")
         if it >= 4 and bad == 0 and not conv:
             break
-    lay.debug = (dirs, bent, legs, rad, L, A)
-    lay.Xpre = X.copy()
     X = _exact(lay, X, dirs)
+    # hard guarantee of the minimum spacing: a uniform scale keeps every angle
+    D = np.sqrt(((X[:, None, :] - X[None, :, :]) ** 2).sum(-1))
+    np.fill_diagonal(D, np.inf)
+    if D.min() < MIN_SP:
+        f = MIN_SP / D.min() * 1.0001
+        c = X.mean(0)
+        X = (X - c) * f + c
+        A = (A - c) * f + c
+        legs = {e: (a * f, b * f) for e, (a, b) in legs.items()}
+        if log:
+            log(f"scaled by {f:.3f} to keep the minimum spacing")
     for v, nd in enumerate(lay.nodes):
         nd["x"], nd["y"] = float(X[v, 0]), float(X[v, 1])
     for e, ed in enumerate(lay.edges):
@@ -994,8 +1017,20 @@ def to_json(lay):
     rivers = [{"n": r["name"], "p": [[r2(x), r2(-y)] for x, y in r["pts"]]} for r in lay.water["rivers"]]
     lakes = [{"n": r["name"], "a": r["area"], "p": [[r2(x), r2(-y)] for x, y in r["pts"]]} for r in lay.water["lakes"]]
     labels = [[t, r2(x), r2(-y), k] for t, x, y, k in lay.labels]
-    return {"nodes": nodes, "edges": edges, "transfers": [list(t) for t in lay.transfers],
+    paths = collections.defaultdict(dict)
+    for (key, lid), (path, stop_at) in sorted(lay.paths.items()):
+        paths[key][lid] = [path, stop_at]
+    near = [list(t) for t in lay.transfers
+            if math.hypot(lay.nodes[t[0]]["x"] - lay.nodes[t[1]]["x"], lay.nodes[t[0]]["y"] - lay.nodes[t[1]]["y"]) <= CONNECTOR_MAX]
+    return {"nodes": nodes, "edges": edges, "paths": paths, "transfers": near,
             "rivers": rivers, "lakes": lakes, "labels": labels, "pitch": PITCH}
+
+
+def build(nets, log=None):
+    """Layout + page JSON + the geographic waterways layer, for webmap."""
+    out = to_json(compute(nets, log=log))
+    out["geoWater"] = waterways_geo()
+    return out
 
 
 def waterways_geo():
@@ -1009,7 +1044,7 @@ def waterways_geo():
     for ft in gj["features"]:
         g = ft["geometry"]["coordinates"]
         if ft["properties"]["kind"] == "river":
-            out["rivers"] += [[[lat, lon] for lon, lat in line] for line in g]
+            out["rivers"] += [[[round(lat, 4), round(lon, 4)] for lon, lat in line] for line in g]
         else:
-            out["lakes"] += [[[lat, lon] for lon, lat in poly[0]] for poly in g]
+            out["lakes"] += [[[round(lat, 4), round(lon, 4)] for lon, lat in poly[0]] for poly in g]
     return out
