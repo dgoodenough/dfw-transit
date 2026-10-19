@@ -8,6 +8,8 @@ Source tables (network/ or a scenario folder):
   line_segments.csv  line_id, seq, year_opens, grade, geometry_wkt   (stop seq -> seq+1)
   service.csv        line_id, from_year, headway_min, note   (optional; frequency changes over time)
   transfers.csv      station_a, station_b, walk_min, note    (optional; walk links beyond the auto radius)
+  stages.csv         staged build-out per line (optional; see dfwt/staging.py). When a line
+                     has stages they set its segment and stop years.
 
 A scenario is a folder under scenarios/ holding any subset of those
 tables (each replaces the base table wholesale) and/or an edits.csv of small
@@ -27,7 +29,7 @@ from . import config, geo
 
 NEVER = 9999
 TABLES = ("lines.csv", "stations.csv", "line_stops.csv", "line_segments.csv")
-OPTIONAL = ("service.csv", "transfers.csv")
+OPTIONAL = ("service.csv", "transfers.csv", "stages.csv")
 
 
 @dataclass
@@ -102,13 +104,16 @@ class Network:
         self.stations = stations
         self.lines = lines
         self.transfers = transfers or []   # [(station_a, station_b, walk_min or None, note)]
+        self.variants = {}                 # line_id -> [(from_year, until_year, Line, interim)]
+        self.stage_rows = []
+        self.stage_findings = []
         self.cfg = cfg
         self.name = name
 
     # ---------- loading ----------
-    @classmethod
-    def load(cls, scenario=None, cfg=None):
-        cfg = cfg or config.load()
+    @staticmethod
+    def read_tables(scenario=None):
+        """Raw rows of every table for the plan or a scenario, plus its edits.csv rows."""
         base = config.path("network")
         folder = config.path("scenarios", scenario) if scenario else None
         tables = {}
@@ -123,9 +128,42 @@ class Network:
         if folder and os.path.exists(os.path.join(folder, "edits.csv")):
             with open(os.path.join(folder, "edits.csv"), encoding="utf-8-sig") as f:
                 edits = [r for r in csv.DictReader(f) if r.get("op") and not r["op"].startswith("#")]
-        net = cls.from_tables(tables, cfg, name=scenario or "plan")
+        return tables, edits
+
+    @classmethod
+    def load(cls, scenario=None, cfg=None, stage_rows=None):
+        """Load the plan or a scenario. `stage_rows` replaces its stages.csv (for previews)."""
+        tables, edits = cls.read_tables(scenario)
+        if stage_rows is not None:
+            tables["stages.csv"] = stage_rows
+        return cls.from_raw(tables, edits, cfg or config.load(), scenario or "plan")
+
+    @classmethod
+    def from_raw(cls, tables, edits, cfg, name):
+        from . import staging
+        tables = dict(tables)
+        stage_rows = tables.pop("stages.csv", [])
+        tables, interims, findings = staging.compile_stages(tables, stage_rows)
+        net = cls.from_tables(tables, cfg, name=name)
+        net.stage_rows, net.stage_findings = stage_rows, findings
+        net.variants = staging.build_variants(net, interims)
         net.apply_edits(edits)
         return net
+
+    def without(self, line_id):
+        """The same network with one line removed (for leave-one-out values)."""
+        net = Network(self.stations, {k: v for k, v in self.lines.items() if k != line_id},
+                      self.cfg, self.name, self.transfers)
+        net.variants = {k: v for k, v in self.variants.items()
+                        if k != line_id and all(it["via"] != line_id for *_, it in v)}
+        return net
+
+    def line_at(self, line_id, year):
+        """The line's routing in force in `year` (an interim via-routing, or itself)."""
+        for y0, y1, v, _ in self.variants.get(line_id, []):
+            if y0 <= year < y1:
+                return v
+        return self.lines[line_id]
 
     @classmethod
     def from_tables(cls, t, cfg, name="plan"):
@@ -182,7 +220,7 @@ class Network:
         """Every operating run in `year`. Track opens per segment; a stop is served
         once the stop is open and track reaches it; unopened stops are run through."""
         out = []
-        for ln in self.lines.values():
+        for ln in (self.line_at(k, year) for k in self.lines):
             mode = self.cfg["modes"][ln.mode]
             cur, acc, i0, i1 = None, 0.0, 0, 0
             for i, sid in enumerate(ln.stop_ids):

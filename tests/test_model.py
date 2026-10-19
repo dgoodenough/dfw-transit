@@ -119,3 +119,65 @@ class DemandTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class StagingTests(unittest.TestCase):
+    def test_inferred_stages_round_trip(self):
+        from dfwt import staging
+        tables, _ = Network.read_tables()
+        tables.pop("stages.csv")
+        rows = staging.infer_stages(tables)
+        t2, _, findings = staging.compile_stages(tables, rows)
+        self.assertEqual([r["year_opens"] for r in tables["line_segments.csv"]],
+                         [r["year_opens"] for r in t2["line_segments.csv"]])
+        self.assertEqual([f for f in findings if f[0] == "error"], [])
+
+    def test_a_staged_line_grows_per_interval(self):
+        tables, _ = Network.read_tables()
+        rows = [r for r in tables["stages.csv"] if r["line_id"] != "E17"]
+        rows += [
+            {"line_id": "E17", "stage": "1", "kind": "starter", "from_stop": "Galleria",
+             "to_stop": "Pearl/Arts District", "year_opens": "2045"},
+            {"line_id": "E17", "stage": "2", "kind": "extension", "from_stop": "Frisco",
+             "to_stop": "Galleria", "year_opens": "2050"},
+            {"line_id": "E17", "stage": "3", "kind": "extension", "from_stop": "Pearl/Arts District",
+             "to_stop": "Rowlett", "year_opens": "2055"},
+        ]
+        net = Network.load(stage_rows=rows)
+        km = {y: sum(sum(r.hop_km) for r in net.runs(y) if r.line.id == "E17") for y in (2045, 2050, 2055)}
+        self.assertTrue(0 < km[2045] < km[2050] < km[2055])
+
+    def test_spend_is_spread_before_opening(self):
+        from dfwt import staging
+        net = Network.load()
+        spend = staging.spend_by_year(net)
+        last_opening = max(y for l in net.lines.values() for y in l.stop_years + [s.year for s in l.segments])
+        self.assertLess(max(spend), last_opening)
+        self.assertAlmostEqual(sum(spend.values()),
+                               sum(net.line_cost_musd(l) for l in net.lines.values()), delta=1.0)
+
+
+class GeometryTests(unittest.TestCase):
+    def test_fitted_corner_meets_minimum_radius(self):
+        from dfwt import align
+        cfg = config.load()
+        m = align.params(cfg, "metro")
+        # an L-shaped corridor with a sharp 90 degree corner between two far-apart stations
+        a, corner, b = (-97.30, 32.75), (-97.30, 32.77), (-97.27, 32.77)
+        segs, rep = align.fit_line([a, corner, b], [0, 2], ["surface"], [a, b], m)
+        self.assertGreaterEqual(rep["min_radius_m"], m["Rmin"])
+        self.assertEqual(segs[0][0], a)
+        self.assertEqual(segs[-1][-1], b)
+
+    def test_denoise_removes_spike(self):
+        from dfwt import align
+        pts = [(-97.30, 32.75), (-97.29, 32.75), (-97.2895, 32.75), (-97.2899, 32.75), (-97.28, 32.75)]
+        out = align.denoise(pts)
+        lons = [p[0] for p in out]
+        self.assertEqual(lons, sorted(lons))
+
+    def test_wkb_linestring(self):
+        import struct
+        from dfwt import osmroute
+        buf = struct.pack("<BII4d", 1, 2, 2, -97.0, 32.0, -96.5, 32.5)
+        self.assertEqual(osmroute.wkb_linestring(buf), [(-97.0, 32.0), (-96.5, 32.5)])

@@ -1,28 +1,50 @@
 {
   "_doc": "Every tunable assumption in one place. The map, trip planner, demand model and reports all read this file, so they can never drift apart again.",
-
   "years": [2025, 2030, 2035, 2040, 2045, 2050, 2055, 2060, 2065, 2070],
   "existing_year": 2025,
-
   "modes": {
-    "metro":    {"cruise_kmh": 63, "stop_penalty_min": 1.2, "default_headway_min": 6,  "capacity_pphpd": 20000, "label": "Metro / light rail"},
-    "brt":      {"cruise_kmh": 38, "stop_penalty_min": 0.9, "default_headway_min": 8,  "capacity_pphpd": 4000,  "label": "Bus rapid transit"},
-    "commuter": {"cruise_kmh": 72, "stop_penalty_min": 1.4, "default_headway_min": 20, "capacity_pphpd": 6000,  "label": "Regional / commuter rail"}
+    "metro": {
+      "cruise_kmh": 63,
+      "stop_penalty_min": 1.2,
+      "default_headway_min": 6,
+      "capacity_pphpd": 20000,
+      "label": "Metro / light rail"
+    },
+    "brt": {"cruise_kmh": 38, "stop_penalty_min": 0.9, "default_headway_min": 8, "capacity_pphpd": 4000, "label": "Bus rapid transit"},
+    "commuter": {
+      "cruise_kmh": 72,
+      "stop_penalty_min": 1.4,
+      "default_headway_min": 20,
+      "capacity_pphpd": 6000,
+      "label": "Regional / commuter rail"
+    }
   },
   "wait": {"_doc": "Expected wait = headway / 2, capped (riders time arrivals on long headways).", "fraction_of_headway": 0.5, "max_wait_min": 12},
   "transfer": {"walk_radius_m": 400, "walk_speed_kmh": 4.8, "penalty_min": 3},
-
   "access": {
     "_doc": "How people reach stations. Walk to anything within walk_max_m; drive (park & ride) to commuter rail stations and line termini within pnr_max_km.",
-    "walk_max_m": 1200, "walk_speed_kmh": 4.8, "circuity": 1.25,
-    "pnr_max_km": 8, "pnr_speed_kmh": 35, "pnr_penalty_min": 5,
+    "walk_max_m": 1200,
+    "walk_speed_kmh": 4.8,
+    "circuity": 1.25,
+    "pnr_max_km": 8,
+    "pnr_speed_kmh": 35,
+    "pnr_penalty_min": 5,
     "max_access_stations": 8
   },
   "drive": {"_doc": "Peak-period door-to-door drive baseline (v1 calibration).", "speed_kmh": 38, "circuity": 1.35, "terminal_min": 8},
-  "competitive": {"_doc": "A commute is transit-competitive if transit <= ratio*drive + slack, under the cap, and longer than min_km.", "ratio": 1.3, "slack_min": 5, "max_min": 90, "min_km": 2},
-  "accessibility": {"thresholds_min": [30, 45, 60]},
-  "coverage": {"walkshed_m": {"metro": 800, "brt": 800, "commuter": 1600}},
-
+  "competitive": {
+    "_doc": "A commute is transit-competitive if transit <= ratio*drive + slack, under the cap, and longer than min_km.",
+    "ratio": 1.3,
+    "slack_min": 5,
+    "max_min": 90,
+    "min_km": 2
+  },
+  "accessibility": {
+    "thresholds_min": [30, 45, 60]
+  },
+  "coverage": {
+    "walkshed_m": {"metro": 800, "brt": 800, "commuter": 1600}
+  },
   "demand": {
     "_doc": "If data/raw/od_tracts.csv (LODES OD aggregated to tracts, see data/README.md) exists it is used directly. Otherwise a doubly-constrained gravity model is synthesized from tract population and jobs, with beta calibrated against the v1 LODES run.",
     "lodes_od_path": "data/raw/od_tracts.csv",
@@ -30,25 +52,82 @@
     "gravity_beta_per_min": 0.055,
     "gravity_iterations": 25
   },
-
   "cost_musd_per_km": {
     "_doc": "Capital cost per route-km by mode and grade, 2025 USD. Calibrated to recent US projects: DART Silver Line ~$45M/km (new track on freight ROW), TEXRail ~$24M/km, Houston/Indy BRT $5-25M/km, US light rail $100-200M/km, US subway $400M+/km.",
-    "brt":      {"surface": 15,  "elevated": 60,  "tunnel": 250},
-    "commuter": {"surface": 30,  "elevated": 90,  "tunnel": 350},
-    "metro":    {"surface": 120, "elevated": 200, "tunnel": 450}
+    "brt": {"surface": 15, "elevated": 60, "tunnel": 250},
+    "commuter": {"surface": 30, "elevated": 90, "tunnel": 350},
+    "metro": {"surface": 120, "elevated": 200, "tunnel": 450}
   },
   "station_cost_musd": {"brt": 2, "commuter": 15, "metro": 40},
-
   "standards": {
     "_doc": "Stop-spacing bands (km) used by validate. Sources in reports/DESIGN_STANDARDS.md.",
-    "spacing_km": {"metro": [0.5, 2.5], "brt": [0.3, 1.6], "commuter": [2.5, 16]},
+    "spacing_km": {
+      "metro": [0.5, 2.5],
+      "brt": [0.3, 1.6],
+      "commuter": [2.5, 16]
+    },
     "hairpin_deg": 25,
     "orphan_terminus_m": 600
   },
-
   "cores": {
     "_doc": "Downtown cores: proposed metro inside these radii is costed as tunnel.",
     "Fort Worth CBD": {"lat": 32.7555, "lon": -97.3308, "radius_km": 1.4},
-    "Dallas CBD":     {"lat": 32.7810, "lon": -96.7990, "radius_km": 1.6}
+    "Dallas CBD": {"lat": 32.781, "lon": -96.799, "radius_km": 1.6}
+  },
+  "budget": {
+    "_doc": "Flat capital budget (2025 $M per year) with carryover. Spending is spread over each piece's construction years (staging.construction_years). tolerance = share over budget before validation warns.",
+    "musd_per_year": 2300,
+    "tolerance": 0.05
+  },
+  "staging": {
+    "_doc": "Rules for staged build-out (dfwt/staging.py, python -m dfwt stage).",
+    "min_operable": {
+      "metro": [2.0, 3],
+      "brt": [3.0, 4],
+      "commuter": [15.0, 2]
+    },
+    "max_km_per_stage": {"metro": 15, "brt": 25, "commuter": 50},
+    "max_km_per_interval": {"metro": 25, "brt": 40, "commuter": 80},
+    "construction_years": {"metro": 5, "brt": 2, "commuter": 4},
+    "max_stub_years": 20
+  },
+  "geometry": {
+    "_doc": "Alignment design limits (dfwt/align.py, python -m dfwt align). Rmin = minimum curve radius (m); Lp = straight platform length (m); tol = how far the fitted alignment may leave the drawn/routed corridor (m) by grade; Ltmin = minimum tangent between curves; jerk/alat govern spiral length; station_move_auto_m = largest station move applied without review. check_radius_m = tightest curve the validator accepts on each mode (commuter trains run on existing freight track, where curves of ~175 m (10 degrees) are common and simply carry a speed limit).",
+    "metro": {
+      "Rmin": 150,
+      "Rmax": 3000,
+      "vmax_kmh": 90,
+      "alat": 1.0,
+      "jerk": 0.4,
+      "Lp": 150,
+      "Ltmin": 20,
+      "min_spiral_m": 10,
+      "tol": {"surface": 40, "elevated": 40, "tunnel": 150}
+    },
+    "commuter": {
+      "Rmin": 500,
+      "Rmax": 5000,
+      "vmax_kmh": 130,
+      "alat": 0.8,
+      "jerk": 0.35,
+      "Lp": 200,
+      "Ltmin": 30,
+      "min_spiral_m": 10,
+      "tol": {"surface": 25, "elevated": 25, "tunnel": 100}
+    },
+    "brt": {
+      "Rmin": 25,
+      "Rmax": 2000,
+      "vmax_kmh": 70,
+      "alat": 1.5,
+      "jerk": 0.6,
+      "Lp": 40,
+      "Ltmin": 0,
+      "min_spiral_m": 0,
+      "tol": {"surface": 12, "elevated": 12, "tunnel": 30}
+    },
+    "station_move_auto_m": 100,
+    "rail_max_turn_deg": 35,
+    "check_radius_m": {"metro": 150, "commuter": 175, "brt": 25}
   }
 }

@@ -50,6 +50,12 @@ summary{cursor:pointer;font-weight:600;font-size:.9rem}
 .li .nm{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .li .yr{color:var(--muted);font-variant-numeric:tabular-nums;font-size:.76rem}
 .li.future{opacity:.45}
+.interval{font-size:.82rem;line-height:1.45;border-top:1px solid var(--rule);padding-top:10px}
+.interval b{font-weight:600}
+.interval .op{display:grid;grid-template-columns:10px minmax(0,1fr) auto;gap:6px;align-items:center}
+.interval .op i{height:4px;border-radius:2px}
+.interval .op span:last-child{color:var(--muted);font-variant-numeric:tabular-nums}
+.interval .none{color:var(--muted)}
 #trip{font-size:.85rem;line-height:1.45}
 #trip .tot{font-weight:600;font-size:.95rem;margin:4px 0}
 #trip .leg{display:grid;grid-template-columns:8px minmax(0,1fr);gap:8px;margin:3px 0}
@@ -86,6 +92,7 @@ a{color:var(--accent)}
     <svg class="spark" id="spark" viewBox="0 0 300 46" preserveAspectRatio="none" aria-hidden="true"></svg>
     <div class="hint" id="sparkKey"></div>
   </div>
+  <div id="interval" class="interval" aria-live="polite"></div>
   <details open>
     <summary>Trip planner</summary>
     <div id="trip"><p class="hint">Click an origin station, then a destination.</p></div>
@@ -135,16 +142,23 @@ function draw() {
   const Y = D.years[yi];
   $('year').textContent = Y;
   lineLayer.clearLayers(); stLayer.clearLayers();
-  const drawn = new Set();
-  // future track faintly, open track solid; shared geometry drawn once per line color
-  for (const pass of [true, false]) for (const ln of S.lines) {
+  const drawn = new Set(), prevY = yi ? D.years[yi - 1] : -Infinity;
+  // track states this year: future (faint), under construction (dashed), open (solid),
+  // and newly opened since the last interval (solid on a glow)
+  const state = (ln, yr) => yr <= prevY ? 'open' : yr <= Y ? 'new' : yr - (D.build[ln.mode] || 0) < Y ? 'building' : 'future';
+  for (const pass of ['future', 'building', 'new', 'open']) for (const ln of S.lines) {
     if (hidden.has(ln.id)) continue;
     for (const [yr, gi] of ln.segs) {
-      const future = yr > Y; if (future !== pass) continue;
-      const k = gi + '|' + ln.color + '|' + future; if (drawn.has(k)) continue; drawn.add(k);
-      L.polyline(D.geoms[gi].map(p => [p[1], p[0]]), style(ln.mode, ln.color, future)).addTo(lineLayer);
+      const st = state(ln, yr); if (st !== pass) continue;
+      const k = gi + '|' + ln.color + '|' + st; if (drawn.has(k)) continue; drawn.add(k);
+      const ll = D.geoms[gi].map(p => [p[1], p[0]]);
+      if (st === 'new') L.polyline(ll, {color: '#ffd23f', weight: 13, opacity: .55, lineCap: 'round'}).addTo(lineLayer);
+      const sty = style(ln.mode, ln.color, st === 'future');
+      if (st === 'building') Object.assign(sty, {opacity: .7, dashArray: '1 8', weight: sty.weight + 1.5});
+      L.polyline(ll, sty).addTo(lineLayer);
     }
   }
+  intervalSummary(Y, prevY, state);
   const yd = S.years[Y], served = new Map();
   for (const [li, stops] of yd.runs) for (const s of stops) {
     if (!served.has(s)) served.set(s, []); served.get(s).push(li);
@@ -162,6 +176,23 @@ function draw() {
       (b ? `<br>${fmt(b)} competitive commuters board here in 2070` : '') + `</div></div>`);
   }
   metrics(); lineList(); if (pick.length === 2) route();
+}
+function intervalSummary(Y, prevY, state) {
+  const opened = [], building = [];
+  for (const ln of S.lines) {
+    let km = 0, bkm = 0, by = Infinity;
+    for (const [yr, , k] of ln.segs) {
+      const st = state(ln, yr);
+      if (st === 'new') km += k;
+      if (st === 'building') { bkm += k; by = Math.min(by, yr); }
+    }
+    if (km > 0.05) opened.push([ln, km]);
+    if (bkm > 0.05) building.push([ln, bkm, by]);
+  }
+  const row = ([ln, km, by]) => `<div class="op"><i style="background:${ln.color}"></i><span>${ln.name}</span><span>${km.toFixed(1)} km${by ? ' · ' + by : ''}</span></div>`;
+  const span = yi ? `${prevY + 1}–${Y}` : `by ${Y}`;
+  $('interval').innerHTML = `<b>Opened ${span}</b>` + (opened.length ? opened.sort((a, b) => b[1] - a[1]).map(row).join('') : '<div class="none">Nothing new</div>') +
+    (building.length ? `<b style="display:block;margin-top:6px">Under construction</b>` + building.sort((a, b) => a[2] - b[2]).map(row).join('') : '');
 }
 function metrics() {
   const Y = D.years[yi], m = S.metrics.find(r => r.year === Y);

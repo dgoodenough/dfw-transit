@@ -3,6 +3,10 @@
   python -m dfwt validate [--scenario NAME]
   python -m dfwt build [--quick]            evaluate plan + scenarios, write results/, reports/, docs/
   python -m dfwt trip "Handley" "JPS" --year 2040 [--scenario NAME]
+  python -m dfwt stage F03 [--show]                       how a line grows, interval by interval
+  python -m dfwt stage F03 --split-at "Central Station,Medical City - Baylor" --years 2035,2040,2045 [--write]
+  python -m dfwt optimize [--out staged]                  suggest a staged build order (writes a scenario)
+  python -m dfwt align [--lines F02,E10] [--write]        make alignments buildable (see dfwt/geometry.py)
 """
 import argparse
 import os
@@ -85,6 +89,87 @@ def cmd_trip(args):
     return 0
 
 
+def cmd_stage(args):
+    import csv
+    from . import staging
+    tables, _ = Network.read_tables(args.scenario)
+    rows = tables["stages.csv"]
+    net = Network.load(args.scenario)
+    if args.line not in net.lines:
+        sys.exit(f"unknown line {args.line}")
+    ln = net.lines[args.line]
+    names = {k: v.name for k, v in net.stations.items()}
+    if args.split_at:
+        try:
+            cuts = sorted(staging.resolve(c, ln.stop_ids, names) for c in args.split_at.split(",") if c.strip())
+        except KeyError as e:
+            sys.exit(f"{e}. Stops on {ln.name}: " + ", ".join(names[s] for s in ln.stop_ids))
+        idx = [0] + cuts + [len(ln.stop_ids) - 1]
+        pieces = list(zip(idx[:-1], idx[1:]))
+        years = [int(y) for y in args.years.split(",")] if args.years else []
+        if len(years) != len(pieces):
+            sys.exit(f"{len(cuts)} cut(s) make {len(pieces)} pieces; give {len(pieces)} years in line order")
+        hws = (args.headways or "").split(",")
+        new = []
+        for n, k in enumerate(sorted(range(len(pieces)), key=lambda k: (years[k], k)), 1):
+            a, b = pieces[k]
+            new.append({"line_id": ln.id, "stage": n, "kind": "starter" if n == 1 else "extension",
+                        "from_stop": staging.stop_ref(ln.stop_ids, names, a),
+                        "to_stop": staging.stop_ref(ln.stop_ids, names, b),
+                        "year_opens": years[k], "headway_min": hws[k] if k < len(hws) else "", "note": args.note or ""})
+        rows = sorted([r for r in rows if r["line_id"] != ln.id] + new, key=lambda r: (r["line_id"], int(r["stage"])))
+        net = Network.load(args.scenario, stage_rows=rows)
+        if args.write:
+            folder = config.path("scenarios", args.scenario) if args.scenario else config.path("network")
+            with open(os.path.join(folder, "stages.csv"), "w", newline="", encoding="utf-8") as f:
+                w = csv.DictWriter(f, fieldnames=staging.STAGE_COLS, lineterminator="\n", extrasaction="ignore")
+                w.writeheader()
+                w.writerows(rows)
+            print(f"wrote {len(new)} stages for {ln.name}")
+        else:
+            print("dry run; add --write to save:")
+            for r in new:
+                print(f"  {r['stage']}. {r['kind']:9} {r['from_stop']} -> {r['to_stop']}  {r['year_opens']}")
+    show_growth(net, args.line)
+    return 0
+
+
+def show_growth(net, line_id):
+    from . import staging
+    names = {k: v.name for k, v in net.stations.items()}
+    ln = net.lines[line_id]
+    print(f"{ln.name} ({ln.mode}, {ln.km:.1f} km)")
+    prev = None
+    for y in net.cfg["years"]:
+        runs = [r for r in net.runs(y) if r.line.id == ln.id]
+        if not runs:
+            continue
+        desc = "; ".join(f"{names[r.stops[0]]} - {names[r.stops[-1]]}" for r in runs)
+        if desc != prev:
+            km = sum(sum(r.hop_km) for r in runs)
+            print(f"  {y}: {km:5.1f} km  {desc}  (every {ln.headway_at(y):g} min)")
+        prev = desc
+    for f in staging.check(net):
+        if f[2] == ln.name:
+            print(f"  {f[0]} {f[1]}: {f[3]}")
+
+
+def cmd_align(args):
+    from . import geometry
+    reports, moves, review = geometry.run(lines=args.lines, write=args.write, procs=args.procs)
+    for n, msg in review:
+        print(f"review  {n}: {msg}")
+    print(f"{len(reports)} lines processed, {len(moves)} station moves, {len(review)} need review; "
+          f"see reports/GEOMETRY.md" + ("" if args.write else " (dry run; add --write to save)"))
+    return 0
+
+
+def cmd_optimize(args):
+    from . import optimize
+    optimize.optimize(out=args.out, procs=args.procs)
+    return 0
+
+
 def main(argv=None):
     p = argparse.ArgumentParser(prog="dfwt", description="DFW Transit network model")
     sub = p.add_subparsers(dest="cmd", required=True)
@@ -98,8 +183,24 @@ def main(argv=None):
     t.add_argument("dest")
     t.add_argument("--year", type=int, default=2070)
     t.add_argument("--scenario")
+    st = sub.add_parser("stage", help="show or re-stage how a line is built over time")
+    st.add_argument("line", help="line_id, e.g. F03")
+    st.add_argument("--split-at", help="comma-separated stops to cut the line at")
+    st.add_argument("--years", help="opening year of each piece, in line order")
+    st.add_argument("--headways", help="optional headway per piece, in line order")
+    st.add_argument("--note")
+    st.add_argument("--scenario")
+    st.add_argument("--write", action="store_true")
+    o = sub.add_parser("optimize", help="suggest a staged build order under the flat budget")
+    o.add_argument("--out", default="staged", help="scenario folder to write stages.csv into")
+    o.add_argument("--procs", type=int, default=3)
+    a = sub.add_parser("align", help="make alignments buildable (route rail on real track, fit metro curves)")
+    a.add_argument("--lines", help="comma-separated line_ids (default: all)")
+    a.add_argument("--procs", type=int, default=2)
+    a.add_argument("--write", action="store_true")
     args = p.parse_args(argv)
-    return {"validate": cmd_validate, "build": cmd_build, "trip": cmd_trip}[args.cmd](args)
+    return {"validate": cmd_validate, "build": cmd_build, "trip": cmd_trip, "stage": cmd_stage,
+            "optimize": cmd_optimize, "align": cmd_align}[args.cmd](args)
 
 
 if __name__ == "__main__":
