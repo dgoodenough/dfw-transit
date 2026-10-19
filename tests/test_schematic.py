@@ -73,6 +73,34 @@ class SchematicLayoutTests(unittest.TestCase):
         for ed in self.lay.edges:
             self.assertEqual(len(ed["lines"]), len(set(ed["lines"])))
 
+    def test_base_name_strips_only_a_compass_suffix(self):
+        self.assertEqual(schematic.base_name("Irving W3"), "Irving")
+        self.assertEqual(schematic.base_name("Fair Park E10"), "Fair Park")
+        self.assertEqual(schematic.base_name("UTA E"), "UTA")
+        self.assertEqual(schematic.base_name("Frisco Main St"), "Frisco Main St")
+        self.assertEqual(schematic.base_name("Northeast"), "Northeast")
+
+    def test_label_groups_join_close_same_named_stations(self):
+        lead = self.js["lead"]
+        self.assertEqual(len(lead), len(self.lay.nodes))
+        nodes = self.lay.nodes
+        groups = {}
+        for v, k in enumerate(lead):
+            self.assertEqual(lead[k], k, "a group's leader leads itself")
+            self.assertEqual(schematic.base_name(nodes[v]["name"]).lower(), schematic.base_name(nodes[k]["name"]).lower())
+            groups.setdefault(k, []).append(v)
+        for k, vs in groups.items():
+            for v in vs:     # every member is within LABEL_GROUP of another member (groups are chains of close stations)
+                if len(vs) > 1:
+                    self.assertTrue(any(math.hypot(nodes[v]["x"] - nodes[u]["x"], nodes[v]["y"] - nodes[u]["y"]) <= schematic.LABEL_GROUP
+                                        for u in vs if u != v))
+            # the leader is the plain-named member when there is one
+            if any(schematic.base_name(nodes[v]["name"]) == nodes[v]["name"] for v in vs):
+                self.assertEqual(schematic.base_name(nodes[k]["name"]), nodes[k]["name"])
+        uptown = [v for v, nd in enumerate(nodes) if nd["name"] == "Uptown"]
+        self.assertGreater(len(uptown), 1)
+        self.assertEqual(len({lead[v] for v in uptown}), 1, "the Uptown stations share one label")
+
     def test_waterways_extract_is_small_and_complete(self):
         path = config.path("data", "waterways.geojson")
         self.assertLess(os.path.getsize(path), 300 * 1024)
