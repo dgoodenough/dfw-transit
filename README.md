@@ -70,15 +70,25 @@ led to thirteen steps, and v2 implements the ones the data supports
   (two "Silver" lines, lines called "3" and "46", stations named after clinics).
 - **Honest costs:** U.S. unit costs, with shared track and stations charged once.
 
-| | v1 plan | v2 plan |
-|---|---|---|
-| Transit-competitive commutes, 2030 | 96k (nothing opens before 2035) | **228k** |
-| Transit-competitive commutes, 2070 | 343k | **428k** |
-| Jobs the average resident reaches in 45 min, 2070 | 77.8k | **91.1k** |
-| Capital through 2070 (2025 $) | $104.0B | **$87.9B** |
-| Validation: errors / islands | 1 / 10 | **0 / 0** |
+| | v1 plan | v2 plan (budget-constrained) | **2 million riders (default)** |
+|---|---|---|---|
+| Daily transit trips, 2050 (each trip counted once) | 352k | 472k | **1.01M** |
+| Daily transit trips, 2100 | 749k | 872k | **2.09M** (2M reached in 2086) |
+| Daily boardings, all modes, 2100 | 1.21M | 1.45M | **3.51M** |
+| Jobs the average resident reaches in 45 min, 2100 | 134k | 162k | **340k** |
+| Capital through 2100 (2025 $, lines and stations) | $104.0B | $94.5B | **$112.2B** |
+| Validation: errors / islands | 1 / 10 | 0 / 0 | 0 / 0 |
 
-15% less money, 25% more benefit, and most of it arrives a decade or more earlier.
+The **2 million riders** scenario adds an arterial BRT grid, an SH-114 metro, job-campus BRT and
+infill stations (2065-2090), frequent service, 15-minute feeder buses, bike and walk access,
+garages at selected suburban stations (Wiehle-Reston style), and moderate upzoning with 20% of
+growth steered to station areas. It stays within the flat $2.3B/yr budget for lines and stations;
+feeder buses, frequency and access are extra operating and capital costs (see the PR notes and
+`scenarios/two_million/config.json`). Parking pricing and cash-out work in the model but aren't
+needed to reach the target. Ridership is a model estimate calibrated to today's ~80k rail
+boardings; treat the long-range numbers as orders of magnitude.
+
+
 Live numbers are in [`reports/RESULTS.md`](reports/RESULTS.md).
 
 ## Key product and technical decisions
