@@ -54,3 +54,14 @@ body.diagram #schZoom{display:flex}
   #legend .r{grid-template-columns:30px auto;gap:5px;line-height:1.4}
   #legend svg{width:30px}
 }
+/* phone bottom sheet: collapsible (schematic.js starts it collapsed in the diagram view) */
+.sheet-handle{display:none}
+@media (max-width:640px){
+  .sheet-handle{display:flex;flex-direction:column;align-items:center;gap:3px;border:0;background:none;padding:0 0 2px;margin:-6px 0 -4px;
+    color:var(--muted);font-size:.72rem;font-weight:600;letter-spacing:.06em;text-transform:uppercase}
+  .sheet-handle span{width:38px;height:4px;border-radius:2px;background:var(--rule)}
+  #panel.min{gap:8px;padding-top:10px}
+  #panel.min>:not(.sheet-handle):not(.viewtog):not(.row){display:none}
+  #panel.min .viewtog{align-self:stretch;justify-content:center}
+  #panel.min .viewtog button{flex:1}
+}

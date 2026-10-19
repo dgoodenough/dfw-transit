@@ -135,8 +135,9 @@ for (const k of D.order) { const o = document.createElement('option'); o.value =
 $('slider').max = D.years.length - 1;
 
 function style(mode, color, future) {
-  const w = mode === 'commuter' ? 3 : mode === 'brt' ? 3 : 4.5;
-  return {color, weight: w, opacity: future ? .18 : .92, dashArray: mode === 'commuter' ? '8 5' : mode === 'brt' ? '2 5' : null, lineCap: 'round'};
+  // BRT: a solid, thinner line (dashes read as 'planned' on transit maps)
+  const w = mode === 'commuter' ? 3 : mode === 'brt' ? 2.2 : 4.5;
+  return {color, weight: w, opacity: future ? .18 : .92, dashArray: mode === 'commuter' ? '8 5' : null, lineCap: 'round'};
 }
 function draw() {
   const Y = D.years[yi];

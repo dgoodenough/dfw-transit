@@ -10,7 +10,7 @@
 const SD = D.schem;
 if (!SD) return;
 const NS = 'http://www.w3.org/2000/svg';
-const W = {metro: 0.24, commuter: 0.2, brt: 0.13};     // stroke widths, layout units (1 = min station spacing)
+const W = {metro: 0.24, commuter: 0.2, brt: 0.12};     // stroke widths, layout units (1 = min station spacing); BRT: solid, half weight
 const R_ST = 0.17, PITCH = SD.pitch;
 const el = (tag, attrs, parent) => {
   const e = document.createElementNS(NS, tag);
@@ -89,6 +89,22 @@ const tog = document.createElement('div');
 tog.className = 'viewtog'; tog.setAttribute('role', 'group'); tog.setAttribute('aria-label', 'View');
 tog.innerHTML = '<button type="button" data-v="map">Map</button><button type="button" data-v="diagram">Diagram</button>';
 panel.children[0].after(tog);
+
+// phone bottom sheet: in the diagram view it starts collapsed to the view toggle and
+// the year slider, so the diagram gets most of the screen; the handle opens it.
+const phone = matchMedia('(max-width: 640px)');
+const handle = document.createElement('button');
+handle.type = 'button'; handle.className = 'sheet-handle';
+handle.innerHTML = '<span aria-hidden="true"></span><b></b>';
+panel.prepend(handle);
+let sheetChosen = false;          // the reader opened or closed the sheet themselves
+function setSheet(min) {
+  panel.classList.toggle('min', min);
+  handle.setAttribute('aria-expanded', String(!min));
+  handle.lastChild.textContent = min ? 'Show details' : 'Hide details';
+  if (active && !userMoved) requestAnimationFrame(fit);
+}
+handle.addEventListener('click', () => { sheetChosen = true; setSheet(!panel.classList.contains('min')); });
 
 // legend (styles of whichever view is showing)
 const legend = document.createElement('details'); legend.id = 'legend';
@@ -253,8 +269,6 @@ function stroke(g, ln, pts, fut, grow) {
   const d = dstr(pts), w = W[ln.mode] || W.metro, col = lineColor(ln.color);
   if (fut) {
     el('path', {class: 'ln fut', d, stroke: col, style: sw(w * 0.45)}, g);
-  } else if (ln.mode === 'brt') {
-    el('path', {class: 'ln' + (grow ? ' fadein' : ''), d, stroke: col, style: sw(w), 'stroke-dasharray': '0.34 0.16', 'stroke-linecap': 'butt'}, g);
   } else if (ln.mode === 'commuter') {
     const grp = el('g', {class: grow ? 'fadein' : ''}, g);
     el('path', {class: 'ln', d, stroke: col, style: sw(w)}, grp);
@@ -485,6 +499,8 @@ function clickAt(px, py) {
   const sids = SD.nodes[n.v][2], sid = sids.find(s => sidLines.has(s)) || sids[0];
   showPop(n.v);
   choose(sid);
+  // a finished trip is read in the sheet: open it
+  if (pick.length === 2 && panel.classList.contains('min')) { sheetChosen = true; setSheet(false); }
 }
 
 // ---------------------------------------------------------------- zoom & pan
@@ -510,7 +526,14 @@ function freeArea() {
   return [r.right + 12, 12, w - 56, h - 12];
 }
 function fit() {
-  const [x0, y0, x1, y1] = bounds(), [a0, b0, a1, b1] = freeArea();
+  let [x0, y0, x1, y1] = bounds();
+  const [a0, b0, a1, b1] = freeArea();
+  // a tall, narrow screen (phone): let the long east-west tails run off the sides
+  // (pan to reach them) so the two downtowns get room; the height still fits
+  if ((b1 - b0) / (a1 - a0) > 1.3 * (y1 - y0) / (x1 - x0)) {
+    const xs = SD.nodes.map(n => n[0]).sort((a, b) => a - b), q = p => xs[Math.round(p * (xs.length - 1))];
+    x0 = Math.max(x0, q(0.07) - 1.5); x1 = Math.min(x1, q(0.93) + 1.5);
+  }
   view.k = fitK = Math.min((a1 - a0) / (x1 - x0), (b1 - b0) / (y1 - y0));
   view.tx = (a0 + a1) / 2 - (x0 + x1) / 2 * view.k;
   view.ty = (b0 + b1) / 2 - (y0 + y1) / 2 * view.k;
@@ -600,7 +623,7 @@ function legendDraw() {
   if (active) {
     h += sample(`<line x1="1" y1="6" x2="37" y2="6" stroke="${grey}" stroke-width="5" stroke-linecap="round"/><circle cx="19" cy="6" r="3.6" fill="${fill}" stroke="${ink}" stroke-width="1.1"/>`, D.modes.metro);
     h += sample(`<line x1="1" y1="6" x2="37" y2="6" stroke="${grey}" stroke-width="4.2" stroke-linecap="round"/><line x1="1" y1="6" x2="37" y2="6" stroke="${fill}" stroke-width="1.5" stroke-dasharray="10 6"/>`, D.modes.commuter);
-    h += sample(`<line x1="1" y1="6" x2="37" y2="6" stroke="${grey}" stroke-width="2.8" stroke-dasharray="7 3.4"/>`, D.modes.brt);
+    h += sample(`<line x1="1" y1="6" x2="37" y2="6" stroke="${grey}" stroke-width="2.4" stroke-linecap="round"/>`, D.modes.brt);
     h += sample(`<line x1="1" y1="6" x2="37" y2="6" stroke="var(--glow)" stroke-width="11" stroke-linecap="round" opacity=".5"/><line x1="1" y1="6" x2="37" y2="6" stroke="${grey}" stroke-width="5" stroke-linecap="round"/>`, 'Opened this interval');
     h += sample(`<line x1="1" y1="6" x2="37" y2="6" stroke="${grey}" stroke-width="2.2" stroke-linecap="round" opacity=".4"/><circle cx="19" cy="6" r="2.2" fill="${fill}" stroke="${ink}" stroke-width=".9" opacity=".5"/>`, 'Not yet open');
     h += sample(`<line x1="1" y1="3" x2="37" y2="3" stroke="${grey}" stroke-width="2.6"/><line x1="1" y1="9" x2="37" y2="9" stroke="${grey}" stroke-width="2.6"/><rect x="15" y="-1" width="8" height="14" rx="4" fill="${fill}" stroke="${ink}" stroke-width="1.3"/>`, 'Interchange');
@@ -608,7 +631,7 @@ function legendDraw() {
   } else {
     h += sample(`<line x1="1" y1="6" x2="37" y2="6" stroke="${grey}" stroke-width="4.5" stroke-linecap="round"/>`, D.modes.metro);
     h += sample(`<line x1="1" y1="6" x2="37" y2="6" stroke="${grey}" stroke-width="3" stroke-dasharray="8 5"/>`, D.modes.commuter);
-    h += sample(`<line x1="1" y1="6" x2="37" y2="6" stroke="${grey}" stroke-width="3" stroke-dasharray="2 5" stroke-linecap="round"/>`, D.modes.brt);
+    h += sample(`<line x1="1" y1="6" x2="37" y2="6" stroke="${grey}" stroke-width="2.2" stroke-linecap="round"/>`, D.modes.brt);
     h += sample(`<line x1="1" y1="6" x2="37" y2="6" stroke="${grey}" stroke-width="4.5" stroke-linecap="round" opacity=".2"/>`, 'Not yet open');
     h += sample(`<line x1="1" y1="6" x2="37" y2="6" stroke="var(--water)" stroke-width="4" stroke-linecap="round"/>`, 'Waterways');
   }
@@ -636,6 +659,7 @@ function setView(v, save) {
     try { localStorage.setItem('dfwt.view', v); } catch (e) { /* storage unavailable */ }
     try { history.replaceState(null, '', '#' + v); } catch (e) { /* file:// or sandboxed */ }
   }
+  if (!sheetChosen) setSheet(active && phone.matches);
   if (active) {
     if (!fitted) { fitted = true; fit(); }
     draw();

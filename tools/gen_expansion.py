@@ -166,10 +166,16 @@ def compass(lat0, lon0, lat1, lon1):
     return ["N", "NE", "E", "SE", "S", "SW", "W", "NW"][int((b + 22.5) // 45) % 8]
 
 
-def place_name(lat, lon, gaz):
+def place_name(lat, lon, gaz, namer=None, taken=None):
+    """A new stop's name: cross streets / neighbourhood / landmark (dfwt/naming.py)
+    when the road extract is there, else the nearest place (plus a compass point
+    if it is over 800 m away, which tools/rename_stations.py --propose fixes)."""
     best = min(gaz, key=lambda p: geo.hav_km(lat, lon, p[0], p[1]))
     d = geo.hav_km(lat, lon, best[0], best[1])
-    return best[2] if d < 0.8 else f"{best[2]} {compass(best[0], best[1], lat, lon)}"
+    fallback = best[2] if d < 0.8 else f"{best[2]} {compass(best[0], best[1], lat, lon)}"
+    if namer is None or not namer.segs:
+        return fallback
+    return namer.name(lat, lon, taken, fallback)[0]
 
 
 def in_core(lat, lon, cfg):
@@ -228,6 +234,9 @@ def build(name):
     st = {r["station_id"]: r for r in t["stations.csv"]}
     used = {r["station_id"] for r in t["line_stops.csv"]}
     gaz = places()
+    from dfwt.naming import Namer, keys
+    namer = Namer()
+    taken = set().union(*(keys(r["name"]) for r in t["stations.csv"]))
     counter = 1
     report = []
 
@@ -315,7 +324,7 @@ def build(name):
                 else:
                     sid = f"XS{counter:04d}"
                     counter += 1
-                    nm = nm or place_name(lat, lon, gaz)
+                    nm = nm or place_name(lat, lon, gaz, namer, taken)
                     st[sid] = {"station_id": sid, "name": nm, "lat": f"{lat:.6f}", "lon": f"{lon:.6f}"}
                     t["stations.csv"].append(st[sid])
                     new_ids.append(sid)
