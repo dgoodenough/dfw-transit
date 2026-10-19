@@ -71,6 +71,7 @@ MERGE_KM = 0.04       # always merge stations closer than this
 MERGE_NAME_KM = 0.40  # merge same-named stations closer than this
 MERGE_LINKED_KM = 0.15  # merge transfer-linked stations closer than this
 CONNECTOR_MAX = 1.6   # transfer pairs closer than this on the diagram get a connector
+LABEL_GROUP = 8.0     # same-named stations (ignoring a compass suffix) this close share one label when zoomed out
 LAKE_SCALE = 0.8      # lakes are drawn a little smaller than their local scale
 PASS_KM = 0.12        # a line passing this close to another station is drawn through it
 SIGMA_KM = 0.8        # station density smoothing for the cartogram
@@ -95,6 +96,51 @@ CITIES = [("Fort Worth", 32.7555, -97.3308), ("Dallas", 32.7810, -96.7990), ("De
 def _norm_name(s):
     s = s.lower().replace("square", "sq")
     return re.sub(r"[^a-z0-9]", "", s)
+
+
+_SUFFIX = re.compile(r"\s+(?:N|S|E|W|NE|NW|SE|SW)\d*$")
+
+
+def base_name(s):
+    """A station name without a trailing compass suffix ("Irving W3" -> "Irving")."""
+    return _SUFFIX.sub("", s).strip()
+
+
+def label_groups(lay):
+    """Leader node per node: stations with the same base name that are close on
+    the diagram ("Uptown", "Uptown", "Design District W" ...) form one group, so
+    the page can label the group once when zoomed out. The leader is the member
+    without a suffix if there is one, then the one with the most lines."""
+    n = len(lay.nodes)
+    deg = collections.Counter()
+    for ed in lay.edges:
+        deg[ed["a"]] += len(ed["lines"])
+        deg[ed["b"]] += len(ed["lines"])
+    parent = list(range(n))
+
+    def find(v):
+        while parent[v] != v:
+            parent[v] = parent[parent[v]]
+            v = parent[v]
+        return v
+    by = collections.defaultdict(list)
+    for v, nd in enumerate(lay.nodes):
+        by[base_name(nd["name"]).lower()].append(v)
+    for vs in by.values():
+        for a, b in itertools.combinations(vs, 2):
+            A, B = lay.nodes[a], lay.nodes[b]
+            if math.hypot(A["x"] - B["x"], A["y"] - B["y"]) <= LABEL_GROUP:
+                parent[find(b)] = find(a)
+    groups = collections.defaultdict(list)
+    for v in range(n):
+        groups[find(v)].append(v)
+    lead = list(range(n))
+    for vs in groups.values():
+        k = min(vs, key=lambda v: (base_name(lay.nodes[v]["name"]) != lay.nodes[v]["name"], -deg[v],
+                                   len(lay.nodes[v]["name"]), v))
+        for v in vs:
+            lead[v] = k
+    return lead
 
 
 def _angdiff(a, b):
@@ -1023,7 +1069,7 @@ def to_json(lay):
     near = [list(t) for t in lay.transfers
             if math.hypot(lay.nodes[t[0]]["x"] - lay.nodes[t[1]]["x"], lay.nodes[t[0]]["y"] - lay.nodes[t[1]]["y"]) <= CONNECTOR_MAX]
     return {"nodes": nodes, "edges": edges, "paths": paths, "transfers": near,
-            "rivers": rivers, "lakes": lakes, "labels": labels, "pitch": PITCH}
+            "rivers": rivers, "lakes": lakes, "labels": labels, "pitch": PITCH, "lead": label_groups(lay)}
 
 
 def build(nets, log=None):
