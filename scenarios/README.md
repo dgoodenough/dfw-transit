@@ -5,6 +5,11 @@ A scenario is an alternative to the plan in `network/`. Each folder can hold:
 - any of the network tables (`lines.csv`, `stations.csv`, `line_stops.csv`,
   `line_segments.csv`, `service.csv`, `transfers.csv`); each one present
   replaces the base table wholesale, and
+- `<table>.add.csv`, rows appended to the plan's table (new lines, stations, stages);
+- `<table>.patch.csv`, rows that replace every row of the lines they name (for a line that
+  gains an infill stop) and add the rest;
+- `config.json`, assumptions merged over the main `config.json` for this scenario only
+  (land use, parking, access policies);
 - an `edits.csv` of small overrides applied on top:
 
 | op | target | field | value |
@@ -17,11 +22,12 @@ A scenario is an alternative to the plan in `network/`. Each folder can hold:
 | `through_route` | line_id | second line_id | new name (optional): run the two lines as one where their termini meet (same station or within 300 m); the joined line keeps the better headway and the junction keeps its park & ride |
 | `add_express` | line_id | new line_id | `;`-separated stops (names, ids or `#seq`) the skip-stop copy serves; set its headway with a later `set_headway` |
 
-`python -m dfwt build` evaluates the plan and every scenario and writes a
+`python -m dfwt build` evaluates the plan and every scenario (`lever_*` folders only with `--all`) and writes a
 side-by-side comparison to `reports/SCENARIOS.md` and the map.
 
 | Scenario | What it is |
 |---|---|
+| `two_million` | **The default on the map.** 2 million daily transit trips by 2100: the plan plus the expansion package (as add/patch tables), the frequent-service headways (`edits.csv`), and access and moderate land-use policies (`config.json`). |
 | `v1_baseline` | The v1 plan exactly as it was before the panel review (full copy of the migrated v1 tables, no service upgrades, no extra transfers). |
 | `v2_phasing` | The v2 plan's hand-set phasing from before the optimizer's build order was adopted (its `stages.csv`). |
 | `right_sized` | Step A8: the three long suburban metro lines (SH-360, I-30, I-20 Crosstown) built as BRT instead. |
