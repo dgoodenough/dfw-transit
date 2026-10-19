@@ -1,18 +1,25 @@
 /* Diagram view: WMATA-style schematic (layout: dfwt/schematic.py, rendering: schematic.js). */
-:root{--water:#d3e6f3;--water-ink:#4f86ad;--st-fill:#ffffff;--st-ink:#18212b;--city:#9aa6b0}
-@media (prefers-color-scheme: dark){:root{--water:#1b3243;--water-ink:#86b3d3;--st-fill:#10161c;--st-ink:#e7ecef;--city:#5d6b77}}
+:root{--water:#d3e6f3;--water-ink:#4f86ad;--st-fill:#ffffff;--st-ink:#18212b;--city:#8592a0;--glow:#ffd23f;--glow-o:.5}
+@media (prefers-color-scheme: dark){:root{--water:#172b39;--water-ink:#86b3d3;--st-fill:#10161c;--st-ink:#e7ecef;--city:#6c7b88;--glow:#f2c230;--glow-o:.26}}
 #schem{position:absolute;inset:0;display:none;background:var(--bg);touch-action:none;overflow:hidden;cursor:grab;outline:none}
 #schem.drag{cursor:grabbing}
 body.diagram #schem{display:block}
 body.diagram #map{visibility:hidden}
 #schem svg{position:absolute;inset:0;width:100%;height:100%;display:block}
 #schem .lake{fill:var(--water)}
-#schem .river{fill:none;stroke:var(--water);stroke-linecap:round;stroke-linejoin:round}
-#schem .city{fill:var(--city);font-family:var(--f-display);font-weight:700;letter-spacing:.12em;text-anchor:middle}
+#schem .river{fill:none;stroke:var(--water);stroke-width:var(--rw,.55);stroke-linecap:round;stroke-linejoin:round}
+#schem .city{fill:var(--city);font-family:var(--f-display);font-weight:700;letter-spacing:.14em;text-anchor:middle;paint-order:stroke;stroke:var(--bg);stroke-linejoin:round}
 #schem .ln{fill:none;stroke-linecap:round;stroke-linejoin:round}
 #schem .case{fill:none;stroke:var(--st-fill);stroke-linecap:round;stroke-linejoin:round}
-#schem .fut{opacity:.2}
-#schem #sch-st .fut,#schem #sch-conn .fut{opacity:.35}
+#schem .fut{opacity:.4}
+#schem #sch-st .fut,#schem #sch-conn .fut{opacity:.45}
+#schem .glow{fill:none;stroke:var(--glow);stroke-linecap:round;stroke-linejoin:round;opacity:var(--glow-o)}
+/* year change: new track draws itself in, new stations and glows fade in */
+#schem .grow{stroke-dasharray:1 1;animation:sch-grow .9s ease-out both}
+#schem .fadein{animation:sch-fade .7s ease-out both}
+@keyframes sch-grow{from{stroke-dashoffset:1}to{stroke-dashoffset:0}}
+@keyframes sch-fade{from{opacity:0}}
+@media (prefers-reduced-motion: reduce){#schem .grow,#schem .fadein{animation:none}}
 #schem .conn-o{stroke:var(--st-ink);stroke-linecap:round}
 #schem .conn-i{stroke:var(--st-fill);stroke-linecap:round}
 #schem .lbl{font-family:var(--f-ui);font-weight:500;fill:var(--ink);paint-order:stroke;stroke:var(--bg);stroke-linejoin:round}
@@ -46,4 +53,15 @@ body.diagram #schZoom{display:flex}
   #legend{bottom:auto;right:auto;top:max(12px,env(safe-area-inset-top));left:max(12px,env(safe-area-inset-left));padding:5px 8px;font-size:.7rem}
   #legend .r{grid-template-columns:30px auto;gap:5px;line-height:1.4}
   #legend svg{width:30px}
+}
+/* phone bottom sheet: collapsible (schematic.js starts it collapsed in the diagram view) */
+.sheet-handle{display:none}
+@media (max-width:640px){
+  .sheet-handle{display:flex;flex-direction:column;align-items:center;gap:3px;border:0;background:none;padding:0 0 2px;margin:-6px 0 -4px;
+    color:var(--muted);font-size:.72rem;font-weight:600;letter-spacing:.06em;text-transform:uppercase}
+  .sheet-handle span{width:38px;height:4px;border-radius:2px;background:var(--rule)}
+  #panel.min{gap:8px;padding-top:10px}
+  #panel.min>:not(.sheet-handle):not(.viewtog):not(.row){display:none}
+  #panel.min .viewtog{align-self:stretch;justify-content:center}
+  #panel.min .viewtog button{flex:1}
 }

@@ -156,3 +156,34 @@ The Main St and Main St via Convention Center alternatives scored +1,300 / +900 
 - Model fixes that came with it: park & ride sits at commuter stations and each line's
   planned termini (not at temporary ends of partly built lines), and the optimizer
   never opens a line in disconnected pieces.
+
+## v2.5 — growth, ridership, a yearly horizon to 2100, and the 2 million riders scenario
+
+Model (config.json; reports/RESULTS.md has the numbers):
+- Population and jobs grow by year (NCTCOG Mobility 2050 mid case, flattening toward 2100), plus
+  development near new stations (10-30% uplift by setting, mostly drawn from elsewhere).
+- Peak drive times grow 3% a decade (capped at +15%); BRT takes a quarter of that.
+- Daily ridership: commute mode choice (drive / transit / walk-bike, households without a car),
+  waits and out-of-vehicle time weighted as riders perceive them, driving cost and paid parking,
+  calibrated to today's ~80k rail boardings with today's buses as feeders and about half of
+  riders driving to a lot. Reported per mode (metro, regional rail, BRT, feeder bus), as an
+  all-mode total, and as daily trips with each trip counted once.
+- Park & ride garages hold real numbers of cars (1,500 at line ends, 400 at regional rail
+  stations, ~500 at today's suburban lots); people a full garage turns away walk or take the bus.
+- Every year from 2025 to 2100. Stages open in exact years: `python -m dfwt schedule` keeps the
+  build order and moves each stage to its earliest affordable year under the flat budget.
+
+Network:
+- Station names are real places (cross streets, neighbourhoods, landmarks) instead of generated
+  compass suffixes: network/station_renames.csv, tools/rename_stations.py. Today's stations keep
+  their names.
+- Line colors distinguishable (DNT West gold, Berry, I-20 brown, regional rail tints); BRT drawn
+  as a solid, thinner line.
+
+Scenarios:
+- `two_million` (the default on the map): the plan plus an arterial BRT grid, an SH-114 metro,
+  job-campus BRT and infill stations (2065-2090), frequent service, 15-minute feeder buses,
+  bike and walk access, Wiehle-Reston-style garages at selected suburban stations, and moderate
+  upzoning with 20% of growth steered to station areas. Reaches about 2 million daily trips by
+  2100. Parking pricing and cash-out are not included.
+- `lever_*` folders: the four planners' individual levers, kept for analysis (not on the map).

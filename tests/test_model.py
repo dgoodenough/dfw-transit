@@ -6,7 +6,7 @@ import numpy as np
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from dfwt import config, demand, validate  # noqa: E402
+from dfwt import config, demand, growth, validate  # noqa: E402
 from dfwt.graph import YearGraph  # noqa: E402
 from dfwt.network import Network  # noqa: E402
 
@@ -49,6 +49,40 @@ class NetworkTests(unittest.TestCase):
         before = ln.first_year
         net.apply_edits([{"op": "shift_line_years", "target": "E28", "field": "", "value": "10"}])
         self.assertEqual(ln.first_year, before + 10)
+
+    def test_through_route_joins_two_lines_at_their_shared_terminus(self):
+        net = Network.load()
+        a, b = net.lines["F02"], net.lines["E22"]
+        n_stops = len(a.stop_ids) + len(b.stop_ids) - 1
+        km = a.km + b.km
+        net.apply_edits([{"op": "through_route", "target": "F02", "field": "E22", "value": "Blue / I-30"}])
+        ln = net.lines["F02"]
+        self.assertNotIn("E22", net.lines)
+        self.assertEqual(len(ln.stop_ids), n_stops)
+        self.assertEqual(len(ln.segments), len(ln.stop_ids) - 1)
+        self.assertAlmostEqual(ln.km, km, places=6)
+        self.assertEqual(net.stations[ln.stop_ids[0]].name, "Ridgmar Mall / BRT Transfer")
+        self.assertIn("Handley", [net.stations[s].name for s in ln.pnr_stops])
+        # one continuous run once both halves are open
+        self.assertEqual(len([r for r in net.runs(2070) if r.line is ln]), 1)
+
+    def test_through_route_keeps_the_better_headway(self):
+        net = Network.load()
+        net.apply_edits([{"op": "through_route", "target": "E10", "field": "E30", "value": ""}])
+        tre = net.lines["E10"]
+        self.assertEqual(tre.headway_at(2025), 30)   # Alvarado not open yet: TRE as today
+        self.assertEqual(tre.headway_at(2040), 15)   # TRE's 15 beats Alvarado's default 20
+
+    def test_add_express_skips_stops_but_runs_the_same_track(self):
+        net = Network.load()
+        net.apply_edits([{"op": "add_express", "target": "E17", "field": "E17X", "value": "#10;#20"},
+                         {"op": "set_headway", "target": "E17X", "field": "2030", "value": "10"}])
+        loc = next(r for r in net.runs(2070) if r.line.id == "E17")
+        ex = next(r for r in net.runs(2070) if r.line.id == "E17X")
+        self.assertEqual(len(ex.stops), 4)
+        self.assertAlmostEqual(sum(ex.hop_km), sum(loc.hop_km), places=6)
+        self.assertLess(sum(ex.hop_min), sum(loc.hop_min))
+        self.assertEqual(net.lines["E17X"].headway_at(2070), 10)
 
 
 class ValidationTests(unittest.TestCase):
@@ -102,6 +136,7 @@ class DemandTests(unittest.TestCase):
             x = np.array([0.0, 5, 10, 20])
             y = np.zeros(4)
             cfg_ = cfg
+            cong = 1.0
 
             def dist_rows(self, i0, i1):
                 return np.abs(self.x[i0:i1, None] - self.x[None, :]).astype(np.float32)
@@ -115,6 +150,226 @@ class DemandTests(unittest.TestCase):
         total = cfg["demand"]["total_commutes"]
         np.testing.assert_allclose(od.sum(axis=1), z.pop / z.pop.sum() * total, rtol=1e-3)
         np.testing.assert_allclose(od.sum(axis=0), z.jobs / z.jobs.sum() * total, rtol=1e-3)
+
+    def test_growth_keeps_regional_totals_honest(self):
+        cfg = config.load()
+        base = np.array([100.0, 200, 300, 400])
+        up = np.array([0.5, 0.0, 0.0, 0.0])
+        g = growth._grow(base, 1.5, up, 0.2)
+        # only 20% of the uplift is new to the region; the rest comes from elsewhere
+        self.assertAlmostEqual(g.sum(), base.sum() * 1.5 + 0.2 * 100 * 1.5 * 0.5, places=6)
+        self.assertGreater(g[0], base[0] * 1.5)
+        self.assertLess(g[3], base[3] * 1.5)
+        self.assertAlmostEqual(growth.congestion(cfg, cfg["drive"]["congestion"]["base_year"]), 1.0)
+        self.assertLessEqual(growth.congestion(cfg, 2300), 1 + cfg["drive"]["congestion"]["cap"] + 1e-9)
+
+    def test_balance_hits_row_and_column_totals(self):
+        K = np.random.default_rng(1).random((5, 5)).astype(np.float32)
+        O = np.array([1.0, 2, 3, 4, 5])
+        D = np.array([3.0, 3, 3, 3, 3])
+        out = demand.balance(K, O, D, 50)
+        np.testing.assert_allclose(out.sum(axis=1), O, rtol=1e-3)
+        np.testing.assert_allclose(out.sum(axis=0), D, rtol=1e-3)
+
+
+class AccessTests(unittest.TestCase):
+    """Feeder bus and other optional access modes (config.access)."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls.net = Network.load()
+        cls.g = YearGraph(cls.net, 2025)
+        from dfwt import geo
+        pj = geo.Projector()
+        st = cls.net.stations[cls.g.station_ids[0]]
+        sx, sy = pj.xy(np.array([s_.lat for s_ in map(cls.net.stations.get, cls.g.station_ids)]),
+                       np.array([s_.lon for s_ in map(cls.net.stations.get, cls.g.station_ids)]))
+        x0, y0 = pj.xy(st.lat, st.lon)
+        # a zone on a station, and one 1.5-5 km from the nearest station
+        far = None
+        for ang in np.linspace(0, 2 * np.pi, 24, endpoint=False):
+            for r in (2.5, 3.0, 3.5, 4.0):
+                x, y = x0 + r * np.cos(ang), y0 + r * np.sin(ang)
+                dmin = float(np.sqrt((sx - x) ** 2 + (sy - y) ** 2).min())
+                if 1.5 < dmin < 4.5:
+                    far = (x, y, dmin)
+                    break
+            if far:
+                break
+        assert far, "no test point found"
+        cls.dmin = far[2]
+
+        class Z:
+            n = 2
+            x = np.array([x0, far[0]])
+            y = np.array([y0, far[1]])
+            pop = np.array([5000.0, 5000.0])
+            jobs = np.array([1000.0, 1000.0])
+            cong = 1.0
+        cls.Z = Z
+
+    def cfg(self, **feeder):
+        cfg = config.load()
+        cfg["access"]["feeder"].update({"enabled": True, "min_density_per_km2": 0, **feeder})
+        return cfg
+
+    def test_feeders_can_be_switched_off(self):
+        cfg = config.load()
+        cfg["access"]["feeder"]["enabled"] = False   # on by default: today's buses are the 2025 feeder grid
+        acc = demand.Access(self.Z(), self.net, self.g, cfg)
+        self.assertFalse((acc.acc_mode == demand.FEEDER).any())
+        self.assertFalse((acc.egr_mode == demand.FEEDER).any())
+
+    def test_feeder_reaches_a_zone_beyond_walking_distance(self):
+        cfg = self.cfg(headway_min={"2025": 10})
+        fd = cfg["access"]["feeder"]
+        acc = demand.Access(self.Z(), self.net, self.g, cfg, pnr=False)
+        # the zone on a station walks; the far zone rides the bus to its nearest station
+        self.assertEqual(acc.acc_mode[0, 0], demand.WALK)
+        self.assertEqual(acc.acc_mode[1, 0], demand.FEEDER)
+        self.assertEqual(acc.egr_mode[1, 0], demand.FEEDER)
+        ovt = fd["stop_walk_min"] + 10 * cfg["wait"]["fraction_of_headway"] + fd["transfer_penalty_min"]
+        t = ovt + self.dmin * fd["circuity"] / fd["speed_kmh"] * 60
+        self.assertAlmostEqual(float(acc.acc_t[1, 0]), t, places=3)
+        self.assertAlmostEqual(float(acc.acc_o[1, 0]), ovt, places=3)   # bus riding is in-vehicle time
+
+    def test_feeder_only_from_its_first_year_and_where_dense_enough(self):
+        acc = demand.Access(self.Z(), self.net, self.g, self.cfg(headway_min={"2030": 10}), pnr=False)
+        self.assertFalse((acc.acc_mode == demand.FEEDER).any())
+        acc = demand.Access(self.Z(), self.net, self.g,
+                            self.cfg(headway_min={"2025": 10}, min_density_per_km2=1e9), pnr=False)
+        self.assertFalse((acc.acc_mode == demand.FEEDER).any())
+
+    def test_suburban_garages_are_spaced_and_kept_out_of_downtowns(self):
+        from dfwt import geo
+        cfg = config.load()
+        sub = cfg["access"]["pnr_suburban"]
+        sub.update(enabled=True, from_year=2025, modes=["metro", "brt", "commuter"])
+        g = YearGraph(self.net, 2070)
+        before = demand.Access(self.Z(), self.net, g, config.load()).pnr_cap > 0
+        cap = demand.Access(self.Z(), self.net, g, cfg).pnr_cap
+        new = np.nonzero((cap > 0) & ~before)[0]
+        self.assertGreater(len(new), 0)
+        pts = [self.net.stations[g.station_ids[i]] for i in new]
+        for c in cfg["cores"].values():
+            if isinstance(c, dict):
+                for s in pts:
+                    self.assertGreaterEqual(geo.hav_km(s.lat, s.lon, c["lat"], c["lon"]), sub["min_core_km"] - 0.1)
+        for a in range(len(pts)):
+            for b in range(a + 1, len(pts)):
+                self.assertGreaterEqual(geo.hav_km(pts[a].lat, pts[a].lon, pts[b].lat, pts[b].lon),
+                                        sub["min_spacing_km"] - 0.1)
+        np.testing.assert_allclose(cap[new], sub["spaces"] * cfg["access"]["pnr_people_per_space"])
+
+    def test_year_tables_and_segments(self):
+        self.assertIsNone(demand.in_effect({"2030": 15}, 2025))
+        self.assertEqual(demand.in_effect({"2025": 30, "2030": 15}, 2027), 30)
+        self.assertEqual(demand.in_effect({"2025": 30, "2030": 15}, 2100), 15)
+        cfg = config.load()
+        self.assertEqual(demand.access_segments(cfg, 2050), [(1.0, ())])
+        cfg["access"]["micromobility"]["enabled"] = True
+        cfg["access"]["kiss_ride"]["enabled"] = True
+        segs = demand.access_segments(cfg, 2050)
+        self.assertAlmostEqual(sum(w for w, _ in segs), 1.0)
+        self.assertEqual(len(segs), 3)
+        self.assertEqual(demand.access_segments(cfg, 2025), [(1.0, ())])  # before from_year
+
+
+class ModeChoiceTests(unittest.TestCase):
+    def test_no_car_share_rises_with_density(self):
+        cfg = config.load()
+
+        class Z:
+            n = 3
+            pop = np.array([100.0, 20000, 80000])
+            jobs = np.array([0.0, 0, 0])
+            x = np.array([0.0, 50, 100])
+            y = np.zeros(3)
+        nc = demand.no_car_share(Z(), cfg)
+        self.assertTrue(np.all(np.diff(nc) >= 0))
+        self.assertGreaterEqual(nc.min(), cfg["ridership"]["no_car"]["share_by_density"][0][1])
+
+    def test_calibration_constants_are_set(self):
+        rc = config.load()["ridership"]
+        self.assertLess(rc["pnr_asc_offset"], 0)      # drive-to-transit is less liked than walking in
+        self.assertGreater(rc["b_ratio"], 0)
+        self.assertLess(rc["active"]["asc"], 0)
+
+
+class LandUsePolicyTests(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.cfg = config.load()
+        cls.zones = demand.Zones(cls.cfg)
+        cls.net = Network.load(None, cls.cfg)
+
+    def test_growth_capture_moves_growth_to_stations_without_changing_totals(self):
+        import copy as cp
+        cfg = cp.deepcopy(self.cfg)
+        base = growth.grown_zones(self.zones, self.net, 2050, cfg)
+        cfg["growth"]["capture"]["job_centers"]["jobs_share"] = 0.1
+        cen = growth.grown_zones(self.zones, self.net, 2050, cfg)
+        self.assertGreater(cen.capture["center_jobs"], 0)
+        self.assertAlmostEqual(cen.jobs.sum(), base.jobs.sum(), delta=1.0)
+        cfg["growth"]["capture"]["job_centers"]["jobs_share"] = 0.0
+        cfg["growth"]["capture"].update(pop_share=0.5, jobs_share=0.5)
+        pol = growth.grown_zones(self.zones, self.net, 2050, cfg)
+        self.assertAlmostEqual(pol.pop.sum(), base.pop.sum(), delta=1.0)
+        self.assertAlmostEqual(pol.jobs.sum(), base.jobs.sum(), delta=1.0)
+        near = growth.near_stations(base, self.net, 2050)
+        self.assertGreater(pol.pop[near].sum(), base.pop[near].sum() + 0.9 * pol.capture["captured_pop"])
+        self.assertTrue((pol.pop >= 0).all() and (pol.jobs >= 0).all())
+        # no station area is filled past its target density (unless it already was)
+        c = cfg["growth"]["capture"]
+        sa = growth.station_areas(self.zones, self.net, 2050, cfg, c["radius_m"])
+        ins = sa["zone_st"] >= 0
+        act = lambda z: np.bincount(sa["zone_st"][ins], weights=(z.pop + z.jobs)[ins], minlength=len(sa["sids"]))
+        cap = np.array([c["target_density_per_km2"][s] * c["mode_factor"][m]
+                        for s, m in zip(sa["setting"], sa["mode"])]) * sa["area"]
+        before, after = act(base), act(pol)
+        grew = after > before + 1
+        self.assertTrue(grew.any())
+        # (a station that opens next to an earlier one takes over land, and growth, placed
+        # under the earlier one's headroom, so allow a few over)
+        within = after[grew] <= np.maximum(cap[grew], before[grew]) * 1.15 + 1
+        self.assertGreater(within.mean(), 0.95)
+
+    def test_growth_cases_follow_the_alt_tables(self):
+        import copy as cp
+        cfg = cp.deepcopy(self.cfg)
+        mid_j = growth.regional(cfg, "jobs", 2070)
+        cfg["growth"]["case"] = "high"
+        hi = cfg["growth"]["alt"]["high_pop"]
+        self.assertAlmostEqual(growth.regional(cfg, "pop", 2070), hi["2070"])
+        ratio = hi["2070"] / cfg["growth"]["regional_pop"]["2070"]
+        self.assertAlmostEqual(growth.regional(cfg, "jobs", 2070), mid_j * ratio)
+
+    def test_upzoning_gives_existing_stations_tod(self):
+        import copy as cp
+        cfg = cp.deepcopy(self.cfg)
+        p0, _ = growth.tod_uplift(self.zones, self.net, 2025, cfg)
+        cfg["growth"]["tod"]["upzone_existing_year"] = 2020
+        p1, _ = growth.tod_uplift(self.zones, self.net, 2025, cfg)
+        self.assertEqual(p0.max(), 0.0)
+        self.assertGreater(p1.max(), 0.0)
+
+    def test_parking_policy_phases_in(self):
+        import copy as cp
+        cfg = cp.deepcopy(self.cfg)
+        pol = cfg["ridership"]["parking_policy"]
+        pol.update(price_growth=1.0, priced_centers={"min_jobs_per_km2": 10000, "usd_per_day": 8},
+                   cashout={"min_jobs_per_km2": 2000, "usd_per_day": 5, "coverage": 0.5})
+        z = demand.Zones(cfg)
+        z._dist = self.zones.dist_rows(0, self.zones.n)
+        today = z.parking_usd()
+        g = cp.copy(z)
+        g.year, g.tod_key = 2050, ("test", 2050)
+        usd, cash, cov = g.parking_usd()
+        self.assertAlmostEqual(usd.max(), 2 * today[0].max())       # prices doubled by full_year
+        self.assertGreater((usd > 0).sum(), (today[0] > 0).sum())    # more priced places
+        self.assertEqual(today[2].max(), 0.0)
+        self.assertAlmostEqual(cov.max(), 0.5)
+        self.assertEqual(float(cov[usd > 0].max()), 0.0)             # no cash-out where parking is priced
 
 
 if __name__ == "__main__":
@@ -138,7 +393,7 @@ class StagingTests(unittest.TestCase):
         rows += [
             {"line_id": "E17", "stage": "1", "kind": "starter", "from_stop": "Galleria",
              "to_stop": "Pearl/Arts District", "year_opens": "2045"},
-            {"line_id": "E17", "stage": "2", "kind": "extension", "from_stop": "Frisco",
+            {"line_id": "E17", "stage": "2", "kind": "extension", "from_stop": "All Stars / Frisco Street",
              "to_stop": "Galleria", "year_opens": "2050"},
             {"line_id": "E17", "stage": "3", "kind": "extension", "from_stop": "Pearl/Arts District",
              "to_stop": "Rowlett", "year_opens": "2055"},

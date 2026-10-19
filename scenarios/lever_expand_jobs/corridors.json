@@ -1,0 +1,291 @@
+{
+ "_doc": "Expansion lever: reach the suburban job campuses the 2070 plan misses. SH-114 light metro (Farmers Branch - Freeport - DFW north - Grapevine - Southlake - Westlake), four job-campus BRT links, and infill stops where existing track already passes a large job zone. Built by tools/gen_expansion.py.",
+ "infill": [
+  {
+   "line": "E12",
+   "name": "Freeport Parkway",
+   "lat": 32.9164,
+   "lon": -97.0171,
+   "year": 2075
+  },
+  {
+   "line": "E21",
+   "name": "Las Colinas North",
+   "lat": 32.8994,
+   "lon": -96.991,
+   "year": 2075
+  },
+  {
+   "line": "E14",
+   "name": "TI Boulevard",
+   "lat": 32.9278,
+   "lon": -96.7457,
+   "year": 2075
+  },
+  {
+   "line": "E14",
+   "name": "Collins / Campbell",
+   "lat": 32.9738,
+   "lon": -96.7163,
+   "year": 2075
+  },
+  {
+   "line": "E12",
+   "name": "Knox-Henderson",
+   "lat": 32.8176,
+   "lon": -96.7883,
+   "year": 2075
+  },
+  {
+   "line": "E11",
+   "name": "Hebron South",
+   "lat": 33.0194,
+   "lon": -96.9661,
+   "year": 2075
+  },
+  {
+   "line": "E20",
+   "name": "Plano Parkway / Jupiter",
+   "lat": 33.0033,
+   "lon": -96.7164,
+   "year": 2075
+  },
+  {
+   "line": "F04",
+   "name": "Everman North",
+   "lat": 32.6473,
+   "lon": -97.303,
+   "year": 2075
+  }
+ ],
+ "lines": [
+  {
+   "id": "XP01",
+   "name": "SH-114 Line",
+   "mode": "metro",
+   "color": "#e65100",
+   "grade": "surface",
+   "spacing_km": 1.4,
+   "notes": "Expansion lever: Farmers Branch - Valwood - Freeport - DFW north - Grapevine - Southlake - Westlake, light metro on LBJ/SH-114 right-of-way",
+   "stops": [
+    "X129",
+    {
+     "name": "Valwood Parkway",
+     "lat": 32.92,
+     "lon": -96.918
+    },
+    {
+     "name": "Luna / LBJ",
+     "lat": 32.908,
+     "lon": -96.943
+    },
+    {
+     "name": "Freeport",
+     "lat": 32.905,
+     "lon": -96.967
+    },
+    "X355",
+    {
+     "name": "Freeport North",
+     "lat": 32.918,
+     "lon": -97.012
+    },
+    {
+     "name": "DFW North Gate",
+     "lat": 32.93,
+     "lon": -97.033,
+     "grade": "elevated"
+    },
+    {
+     "via": true,
+     "lat": 32.9365,
+     "lon": -97.045
+    },
+    "X318",
+    {
+     "name": "Grapevine-Main",
+     "lat": 32.9337,
+     "lon": -97.0776,
+     "grade": "surface"
+    },
+    {
+     "name": "Grapevine South",
+     "lat": 32.925,
+     "lon": -97.094
+    },
+    {
+     "name": "Grapevine West",
+     "lat": 32.925,
+     "lon": -97.11
+    },
+    {
+     "name": "Southlake Town Square",
+     "lat": 32.9424,
+     "lon": -97.134
+    },
+    {
+     "name": "Kirkwood",
+     "lat": 32.964,
+     "lon": -97.165
+    },
+    {
+     "name": "Westlake Solana",
+     "lat": 32.969,
+     "lon": -97.192
+    }
+   ],
+   "stages": [
+    [
+     "X129",
+     "Freeport",
+     2075
+    ],
+    [
+     "Freeport",
+     "X318",
+     2080
+    ],
+    [
+     "X318",
+     "Southlake Town Square",
+     2085
+    ],
+    [
+     "Southlake Town Square",
+     "Westlake Solana",
+     2090
+    ]
+   ]
+  },
+  {
+   "id": "XP02",
+   "name": "Coppell-Lewisville BRT",
+   "mode": "brt",
+   "color": "#00838f",
+   "grade": "surface",
+   "spacing_km": 0.9,
+   "notes": "Expansion lever: Cypress Waters - Coppell business parks - Vista Ridge - Old Town Lewisville",
+   "stops": [
+    "X319",
+    {
+     "name": "Coppell Business Park",
+     "lat": 32.967,
+     "lon": -97.022
+    },
+    {
+     "name": "Coppell North",
+     "lat": 32.985,
+     "lon": -97.008
+    },
+    {
+     "name": "Vista Ridge",
+     "lat": 33.005,
+     "lon": -97.025
+    },
+    {
+     "name": "Lewisville South",
+     "lat": 33.023,
+     "lon": -97.005
+    },
+    "X092"
+   ],
+   "stages": [
+    [
+     "X319",
+     "X092",
+     2075
+    ]
+   ]
+  },
+  {
+   "id": "XP05",
+   "name": "Stemmons-Brookhollow BRT",
+   "mode": "brt",
+   "color": "#00838f",
+   "grade": "surface",
+   "spacing_km": 0.9,
+   "notes": "Expansion lever: Inwood/Love Field - Brookhollow - Regal Row - Northwest Hwy - Royal/Luna - Valwood, the Stemmons/I-35E job corridor",
+   "stops": [
+    "X134",
+    {
+     "name": "Brookhollow",
+     "lat": 32.8233,
+     "lon": -96.8608
+    },
+    {
+     "name": "Regal Row",
+     "lat": 32.84,
+     "lon": -96.88
+    },
+    {
+     "name": "Northwest Hwy / Stemmons",
+     "lat": 32.8607,
+     "lon": -96.8951
+    },
+    {
+     "name": "Walnut Hill / Stemmons",
+     "lat": 32.88,
+     "lon": -96.905
+    },
+    {
+     "name": "Royal / Luna",
+     "lat": 32.8986,
+     "lon": -96.9113
+    },
+    "Valwood Parkway"
+   ],
+   "stages": [
+    [
+     "X134",
+     "Valwood Parkway",
+     2075
+    ]
+   ]
+  },
+  {
+   "id": "XP06",
+   "name": "Dallas Parkway BRT",
+   "mode": "brt",
+   "color": "#00838f",
+   "grade": "surface",
+   "spacing_km": 0.8,
+   "notes": "Expansion lever: Legacy West - Stonebriar - The Star - Frisco Station, the Dallas Parkway office corridor",
+   "stops": [
+    "X220",
+    {
+     "name": "Parkwood / Headquarters",
+     "lat": 33.0751,
+     "lon": -96.8384
+    },
+    {
+     "name": "Stonebriar West",
+     "lat": 33.0795,
+     "lon": -96.8291
+    },
+    {
+     "name": "Dallas Pkwy / Warren",
+     "lat": 33.0962,
+     "lon": -96.8372
+    },
+    {
+     "name": "Frisco Station",
+     "lat": 33.1125,
+     "lon": -96.8111
+    },
+    {
+     "name": "The Star",
+     "lat": 33.1316,
+     "lon": -96.8
+    },
+    "X502"
+   ],
+   "stages": [
+    [
+     "X220",
+     "X502",
+     2075
+    ]
+   ]
+  }
+ ]
+}

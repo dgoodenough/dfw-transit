@@ -1,0 +1,48 @@
+{
+  "_doc": "Expansion lever: densify the urban-core metro grid 2075-2095 (Dallas inner circumferential, a second north-south Dallas downtown trunk, an Arlington north-south line). Built by tools/gen_expansion.py.",
+  "lines": [
+    {"id": "XC01", "name": "Dallas Inner Loop", "mode": "metro", "color": "#ff6f00", "grade": "elevated", "spacing_km": 1.2,
+     "notes": "Expansion lever: crosstown circumferential ~6 km from downtown, Love Field - SMU - Lakewood - Fair Park - Oak Cliff - West Dallas - Stemmons",
+     "stops": [
+       "X205", "X233", "X113",
+       {"name": "Mockingbird / Abrams", "lat": 32.8280, "lon": -96.7520},
+       "X420",
+       {"name": "East Grand", "lat": 32.7960, "lon": -96.7240},
+       "X242", "X146", "X572",
+       {"name": "Cedar Crest", "lat": 32.7370, "lon": -96.7720},
+       "X190", "X302", "X531", "X411",
+       {"name": "Bataan", "lat": 32.7850, "lon": -96.8640},
+       {"name": "Irving Boulevard", "lat": 32.7990, "lon": -96.8620},
+       "X257", "X258"
+     ],
+     "stages": [["X205", "X420", 2075], ["X420", "X572", 2080],
+                ["X572", "X531", 2085],
+                ["X531", "X258", 2090]]},
+    {"id": "XC02", "name": "Polk-Greenville Trunk", "mode": "metro", "color": "#5d4037", "grade": "elevated", "spacing_km": 1.1,
+     "notes": "Expansion lever: second north-south trunk through downtown Dallas (tunnel in the core), Polk St - Bishop Arts - Union Station - Deep Ellum - Old East Dallas - Lakewood - Lake Highlands",
+     "stops": [
+       {"name": "Polk / Camp Wisdom", "lat": 32.6650, "lon": -96.8300},
+       {"name": "Polk / Ledbetter", "lat": 32.6880, "lon": -96.8300},
+       "X301", "X302",
+       {"name": "Reunion", "lat": 32.7620, "lon": -96.8110, "grade": "tunnel"},
+       "X187", "X139", "X142", "X517",
+       {"name": "Greenville Avenue / Richmond", "lat": 32.8170, "lon": -96.7700, "grade": "elevated"},
+       "X420",
+       {"name": "Abrams / Northwest Hwy", "lat": 32.8450, "lon": -96.7400},
+       "X180", "X179"
+     ],
+     "stages": [["X302", "X517", 2080], ["X517", "X179", 2085],
+                ["Polk / Camp Wisdom", "X302", 2090]]},
+    {"id": "XC03", "name": "Collins Street Line", "mode": "metro", "color": "#6a1b9a", "grade": "surface", "spacing_km": 1.1,
+     "notes": "Expansion lever: Arlington north-south light metro, Viridian - stadiums - east Arlington - Highlands",
+     "stops": [
+       "X438", "X437", "X399",
+       {"name": "Collins / Abram", "lat": 32.7360, "lon": -97.0880},
+       {"name": "Collins / Park Row", "lat": 32.7215, "lon": -97.0860},
+       {"name": "Arkansas / New York", "lat": 32.7070, "lon": -97.0820},
+       {"name": "Arbrook", "lat": 32.6950, "lon": -97.0900},
+       "X284"
+     ],
+     "stages": [["X438", "X399", 2075], ["X399", "X284", 2080]]}
+  ]
+}

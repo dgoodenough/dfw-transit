@@ -10,14 +10,57 @@
 const SD = D.schem;
 if (!SD) return;
 const NS = 'http://www.w3.org/2000/svg';
-const W = {metro: 0.24, commuter: 0.2, brt: 0.13};     // stroke widths, layout units (1 = min station spacing)
+const W = {metro: 0.24, commuter: 0.2, brt: 0.12};     // stroke widths, layout units (1 = min station spacing); BRT: solid, half weight
 const R_ST = 0.17, PITCH = SD.pitch;
 const el = (tag, attrs, parent) => {
   const e = document.createElementNS(NS, tag);
-  for (const k in attrs) e.setAttribute(k, attrs[k]);
+  for (const k in attrs) if (attrs[k] !== null) e.setAttribute(k, attrs[k]);
   if (parent) parent.appendChild(e);
   return e;
 };
+const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)');
+
+// Colour guard: a line colour too close to the page background (a pale yellow on
+// the light theme, a deep purple on the dark one) is darkened or lightened just
+// enough to read as a line. Hue and saturation are kept; most colours pass as is.
+const lineColor = (() => {
+  const memo = new Map();
+  const lin = c => { c /= 255; return c <= 0.04045 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4; };
+  const lum = ([r, g, b]) => 0.2126 * lin(r) + 0.7152 * lin(g) + 0.0722 * lin(b);
+  const rgb = h => { h = h.replace('#', ''); if (h.length === 3) h = [...h].map(c => c + c).join(''); return [0, 2, 4].map(i => parseInt(h.slice(i, i + 2), 16)); };
+  const toHsl = ([r, g, b]) => {
+    r /= 255; g /= 255; b /= 255;
+    const mx = Math.max(r, g, b), mn = Math.min(r, g, b), l = (mx + mn) / 2, d = mx - mn;
+    if (!d) return [0, 0, l];
+    const s = d / (1 - Math.abs(2 * l - 1));
+    const h = mx === r ? ((g - b) / d) % 6 : mx === g ? (b - r) / d + 2 : (r - g) / d + 4;
+    return [(h * 60 + 360) % 360, s, l];
+  };
+  const toRgb = ([h, s, l]) => {
+    const c = (1 - Math.abs(2 * l - 1)) * s, x = c * (1 - Math.abs((h / 60) % 2 - 1)), m = l - c / 2;
+    const [r, g, b] = h < 60 ? [c, x, 0] : h < 120 ? [x, c, 0] : h < 180 ? [0, c, x] : h < 240 ? [0, x, c] : h < 300 ? [x, 0, c] : [c, 0, x];
+    return [r, g, b].map(v => Math.round((v + m) * 255));
+  };
+  return hex => {
+    const bgHex = getComputedStyle(document.documentElement).getPropertyValue('--bg').trim() || '#f4f6f5';
+    const key = hex + bgHex;
+    if (memo.has(key)) return memo.get(key);
+    let out = hex;
+    try {
+      const bg = lum(rgb(bgHex)), darkBg = bg < 0.2, need = darkBg ? 2.6 : 2.0;
+      const ratio = c => { const L = lum(c); return (Math.max(L, bg) + 0.05) / (Math.min(L, bg) + 0.05); };
+      let c = rgb(hex);
+      if (ratio(c) < need) {
+        const hsl = toHsl(c);
+        for (let i = 0; i < 50 && ratio(c) < need; i++) { hsl[2] = Math.max(0, Math.min(1, hsl[2] + (darkBg ? 0.015 : -0.015))); c = toRgb(hsl); }
+        out = '#' + c.map(v => v.toString(16).padStart(2, '0')).join('');
+      }
+    } catch (e) { /* unparseable colour: use as given */ }
+    memo.set(key, out);
+    return out;
+  };
+})();
+
 const nodeOf = new Map();
 SD.nodes.forEach((n, i) => n[2].forEach(s => nodeOf.set(s, i)));
 const eidx = new Map();
@@ -34,7 +77,7 @@ $('map').after(host);
 const svg = el('svg', {'aria-hidden': 'true'}, host);
 const vp = el('g', {}, svg);
 const G = {};
-for (const k of ['water', 'city', 'future', 'lines', 'trip', 'conn', 'st', 'ring', 'lbl']) G[k] = el('g', {id: 'sch-' + k}, vp);
+for (const k of ['water', 'city', 'future', 'glow', 'lines', 'trip', 'conn', 'st', 'ring', 'lbl']) G[k] = el('g', {id: 'sch-' + k}, vp);
 const pop = document.createElement('div'); pop.id = 'schPop'; host.appendChild(pop);
 const tip = document.createElement('div'); tip.id = 'schTip'; host.appendChild(tip);
 const zoomBox = document.createElement('div'); zoomBox.id = 'schZoom';
@@ -47,19 +90,31 @@ tog.className = 'viewtog'; tog.setAttribute('role', 'group'); tog.setAttribute('
 tog.innerHTML = '<button type="button" data-v="map">Map</button><button type="button" data-v="diagram">Diagram</button>';
 panel.children[0].after(tog);
 
+// phone bottom sheet: in the diagram view it starts collapsed to the view toggle and
+// the year slider, so the diagram gets most of the screen; the handle opens it.
+const phone = matchMedia('(max-width: 640px)');
+const handle = document.createElement('button');
+handle.type = 'button'; handle.className = 'sheet-handle';
+handle.innerHTML = '<span aria-hidden="true"></span><b></b>';
+panel.prepend(handle);
+let sheetChosen = false;          // the reader opened or closed the sheet themselves
+function setSheet(min) {
+  panel.classList.toggle('min', min);
+  handle.setAttribute('aria-expanded', String(!min));
+  handle.lastChild.textContent = min ? 'Show details' : 'Hide details';
+  if (active && !userMoved) requestAnimationFrame(fit);
+}
+handle.addEventListener('click', () => { sheetChosen = true; setSheet(!panel.classList.contains('min')); });
+
 // legend (styles of whichever view is showing)
 const legend = document.createElement('details'); legend.id = 'legend';
 legend.open = !matchMedia('(max-width: 640px)').matches;
 legend.innerHTML = '<summary>Legend</summary><div></div>';
 document.body.appendChild(legend);
 
-// ---------------------------------------------------------------- static layers: water, cities
+// ---------------------------------------------------------------- static layer: water
 for (const lk of SD.lakes) el('path', {class: 'lake', d: 'M' + lk.p.map(p => p.join(',')).join('L') + 'Z'}, G.water);
-for (const r of SD.rivers) el('path', {class: 'river', 'stroke-width': 0.55, d: 'M' + r.p.map(p => p.join(',')).join('L')}, G.water);
-for (const [t, x, y] of SD.labels) {
-  const e = el('text', {class: 'city', x, y, 'font-size': 1.35}, G.city);
-  e.textContent = t.toUpperCase();
-}
+for (const r of SD.rivers) el('path', {class: 'river', d: 'M' + r.p.map(p => p.join(',')).join('L')}, G.water);
 
 // ---------------------------------------------------------------- geometry
 function offsetPolyline(pieces) {
@@ -112,6 +167,10 @@ function linePath(lid) {
   const pr = SD.paths[scenKey] && SD.paths[scenKey][lid];
   if (!pr) return null;
   const [path, stopAt] = pr, pieces = [];
+  // ports[i]: where this line's stroke crosses node path[i], on each adjacent leg (offset
+  // from the node centre by its corridor slot) -- what the station marker has to cover
+  const ports = path.map(() => []);
+  const offAt = (a, b, d, at) => { const dx = b[0] - a[0], dy = b[1] - a[1], L = Math.hypot(dx, dy) || 1; return [at[0] + dy / L * d, at[1] - dx / L * d]; };
   for (let i = 0; i + 1 < path.length; i++) {
     const u = path[i], w = path[i + 1], ei = edgeOf(u, w);
     if (ei === undefined) continue;
@@ -120,22 +179,29 @@ function linePath(lid) {
     if (E[2]) pts.push(E[2]);
     pts.push([P(w)[0], P(w)[1]]);
     for (let k = 0; k + 1 < pts.length; k++) pieces.push({p: pts[k], q: pts[k + 1], d, node: k + 1 === pts.length - 1});
+    ports[i].push(offAt(pts[0], pts[1], d, pts[0]));
+    ports[i + 1].push(offAt(pts[pts.length - 2], pts[pts.length - 1], d, pts[pts.length - 1]));
   }
   if (!pieces.length) return null;
   const r = offsetPolyline(pieces);
-  return {pts: r.pts, at: r.at, path, stopAt};
+  return {pts: r.pts, at: r.at, path, stopAt, ports};
 }
 
 // ---------------------------------------------------------------- state & drawing
 let active = false, dirty = true, cache = new Map(), drawnNodes = [];
+let lastY = null, lastOpen = new Set(), drawnRuns = [];   // year and open stations of the previous draw (for the year-change animation)
 const sidLines = new Map();     // sid -> served line indices this year
 function draw() {
   if (!active) { dirty = true; return; }
   dirty = false;
-  const Y = D.years[yi], yd = S.years[Y];
+  // prevY: start of this interval; in the first year nothing counts as newly opened
+  const Y = D.years[yi], yd = S.years[Y], prevY = yi ? D.years[yi - 1] : Y;
+  // stepping forward in time: newly opened track draws itself in, new stations fade in
+  const anim = lastY !== null && Y > lastY && !reduceMotion.matches;
   computeSlots();
-  for (const g of [G.future, G.lines, G.conn, G.st]) g.textContent = '';
+  for (const g of [G.future, G.glow, G.lines, G.conn, G.st]) g.textContent = '';
   cache = new Map();
+  drawnRuns = [];
   sidLines.clear();
   for (const [li, stops] of yd.runs) for (const s of stops) {
     if (!sidLines.has(s)) sidLines.set(s, []);
@@ -150,18 +216,21 @@ function draw() {
     const lp = linePath(ln.id);
     if (!lp) continue;
     cache.set(ln.id, lp);
-    // group stop-to-stop segments into open / future runs
+    // group stop-to-stop segments into runs: open, opened this interval ('new', as on the map), future
     let runStart = 0, state = null;
     const flush = (k, st) => {
       if (st === null || k <= runStart) return;
       const a = lp.at[lp.stopAt[runStart]], b = lp.at[lp.stopAt[k]];
       if (a === undefined || b === undefined) return;
-      stroke(st ? G.future : G.lines, ln, lp.pts.slice(a, b + 1), st);
+      const pts = lp.pts.slice(a, b + 1);
+      drawnRuns.push({pts, fut: st === 'fut'});
+      if (st === 'new') el('path', {class: 'glow' + (anim ? ' fadein' : ''), d: dstr(pts), style: sw(2.7 * (W[ln.mode] || W.metro))}, G.glow);
+      stroke(st === 'fut' ? G.future : G.lines, ln, pts, st === 'fut', st === 'new' && anim);
     };
     for (let k = 0; k < ln.segs.length; k++) {
-      const fut = ln.segs[k][0] > Y;
-      if (state === null) { state = fut; runStart = k; }
-      else if (fut !== state) { flush(k, state); state = fut; runStart = k; }
+      const yr = ln.segs[k][0], s = yr > Y ? 'fut' : yr > prevY ? 'new' : 'open';
+      if (state === null) { state = s; runStart = k; }
+      else if (s !== state) { flush(k, state); state = s; runStart = k; }
     }
     flush(ln.segs.length, state);
     lp.stopAt.forEach((j, k) => {
@@ -183,118 +252,166 @@ function draw() {
   for (const [a, b] of SD.transfers) {
     const A = drawnNodes.find(n => n.v === a), B = drawnNodes.find(n => n.v === b);
     if (!A || !B) continue;
-    const cls = A.open && B.open ? '' : ' fut', xy = [P(a)[0], P(a)[1], P(b)[0], P(b)[1]];
+    const cls = A.open && B.open ? '' : ' fut', xy = [A.shape.x, A.shape.y, B.shape.x, B.shape.y];
     el('line', {class: 'conn-o' + cls, x1: xy[0], y1: xy[1], x2: xy[2], y2: xy[3], 'stroke-width': 0.24}, G.conn);
     el('line', {class: 'conn-i' + cls, x1: xy[0], y1: xy[1], x2: xy[2], y2: xy[3], 'stroke-width': 0.12}, G.conn);
   }
-  for (const n of drawnNodes) drawMarker(n, G.st);
+  for (const n of drawnNodes) drawMarker(n, G.st, anim && n.open && !lastOpen.has(n.v));
+  lastY = Y;
+  lastOpen = new Set(drawnNodes.filter(n => n.open).map(n => n.v));
   placeLabels();
   if (pick.length) rings();
   legendDraw();
 }
-function stroke(g, ln, pts, fut) {
-  const d = dstr(pts), w = W[ln.mode] || W.metro, cls = 'ln' + (fut ? ' fut' : '');
-  if (ln.mode === 'brt') {
-    el('path', {class: cls, d, stroke: ln.color, style: sw(w), 'stroke-dasharray': '0.34 0.16', 'stroke-linecap': 'butt'}, g);
+// future track: a thin, faint hairline of the line's colour (no casing, no dashes),
+// so the network still to come reads as a quiet plan behind the open one
+function stroke(g, ln, pts, fut, grow) {
+  const d = dstr(pts), w = W[ln.mode] || W.metro, col = lineColor(ln.color);
+  if (fut) {
+    el('path', {class: 'ln fut', d, stroke: col, style: sw(w * 0.45)}, g);
   } else if (ln.mode === 'commuter') {
-    const grp = el('g', {class: fut ? 'fut' : ''}, g);
-    el('path', {class: 'ln', d, stroke: ln.color, style: sw(w)}, grp);
+    const grp = el('g', {class: grow ? 'fadein' : ''}, g);
+    el('path', {class: 'ln', d, stroke: col, style: sw(w)}, grp);
     el('path', {class: 'case', d, style: sw(w * 0.36), 'stroke-dasharray': '0.5 0.3'}, grp);
   } else {
-    el('path', {class: cls, d, stroke: ln.color, style: sw(w)}, g);
+    el('path', {class: 'ln' + (grow ? ' grow' : ''), d, stroke: col, style: sw(w), pathLength: grow ? 1 : null}, g);
   }
 }
-// marker at node v: the rounded convex hull of the points where the lines cross
-// the station, so a straight bundle gets a capsule and a junction a compact blob
-function hull(pts) {
-  const P2 = [...pts].sort((a, b) => a[0] - b[0] || a[1] - b[1]), cr = (o, a, b) => (a[0] - o[0]) * (b[1] - o[1]) - (a[1] - o[1]) * (b[0] - o[0]);
-  const lo = [], hi = [];
-  for (const p of P2) { while (lo.length >= 2 && cr(lo[lo.length - 2], lo[lo.length - 1], p) <= 1e-9) lo.pop(); lo.push(p); }
-  for (const p of P2.reverse()) { while (hi.length >= 2 && cr(hi[hi.length - 2], hi[hi.length - 1], p) <= 1e-9) hi.pop(); hi.push(p); }
-  return lo.slice(0, -1).concat(hi.slice(0, -1));
-}
+// marker at node v: the smallest rounded rectangle, aligned to one of the four
+// octilinear axes, around the points where the stopping lines cross the station.
+// One line -> a dot; a bundle -> a capsule across it (WMATA); lines meeting from
+// several directions -> a compact rounded box, never a disc wider than the bundle.
+const AXES = [0, 1, 2, 3].map(k => [Math.cos(k * Math.PI / 4), Math.sin(k * Math.PI / 4)]);
 function marker(v) {
-  const pts = [[P(v)[0], P(v)[1]]];
-  for (const lp of cache.values()) lp.path.forEach((u, j) => { const k = lp.at[j]; if (u === v && k !== undefined) pts.push(lp.pts[k]); });
-  // miter joins can sit away from the node; keep the marker close to it
-  let h = hull(pts.filter(p => Math.hypot(p[0] - P(v)[0], p[1] - P(v)[1]) < 0.62));
-  if (h.length > 2) {
-    // nearly collinear -> capsule along the farthest pair; otherwise a round interchange
-    let a = h[0], b = h[1], best = -1;
-    for (const p of h) for (const q of h) { const d = Math.hypot(p[0] - q[0], p[1] - q[1]); if (d > best) { best = d; a = p; b = q; } }
-    const ux = (b[0] - a[0]) / best, uy = (b[1] - a[1]) / best;
-    const wide = Math.max(...h.map(p => Math.abs((p[0] - a[0]) * uy - (p[1] - a[1]) * ux)));
-    if (wide < 0.1) h = [a, b];
-    else {
-      const cx = h.reduce((t, p) => t + p[0], 0) / h.length, cy = h.reduce((t, p) => t + p[1], 0) / h.length;
-      const r = Math.max(...h.map(p => Math.hypot(p[0] - cx, p[1] - cy)));
-      h = [[cx, cy]];
-      const R = r + 0.035;
-      return {hull: h, rad: r, x: cx, y: cy, box: [cx - R - R_ST, cy - R - R_ST, cx + R + R_ST, cy + R + R_ST]};
-    }
-  }
+  const pts = [];
+  for (const lp of cache.values()) lp.stopAt.forEach(j => { if (lp.path[j] === v) pts.push(...lp.ports[j]); });
+  if (!pts.length) pts.push([P(v)[0], P(v)[1]]);
+  let best = null;
+  AXES.forEach(([ux, uy], k) => {
+    let a0 = Infinity, a1 = -Infinity, b0 = Infinity, b1 = -Infinity;
+    for (const [x, y] of pts) { const a = x * ux + y * uy, b = -x * uy + y * ux; a0 = Math.min(a0, a); a1 = Math.max(a1, a); b0 = Math.min(b0, b); b1 = Math.max(b1, b); }
+    // snap sub-pixel spreads (rounding, miter noise) to a clean dot or capsule
+    if (a1 - a0 < 0.04) a0 = a1 = (a0 + a1) / 2;
+    if (b1 - b0 < 0.04) b0 = b1 = (b0 + b1) / 2;
+    const area = (a1 - a0 + 2 * R_ST) * (b1 - b0 + 2 * R_ST) + (k % 2) * 1e-3;     // ties -> horizontal/vertical
+    if (!best || area < best.area - 1e-9) best = {area, ux, uy, a0, a1, b0, b1};
+  });
+  const {ux, uy, a0, a1, b0, b1} = best;
+  const at = (a, b) => [a * ux - b * uy, a * uy + b * ux];
+  const corners = [at(a0, b0), at(a1, b0), at(a1, b1), at(a0, b1)];
+  // drop repeated corners: 1 point (dot), 2 (capsule) or 4 (box)
+  const hull = corners.filter((p, i) => corners.findIndex(q => Math.abs(q[0] - p[0]) + Math.abs(q[1] - p[1]) < 1e-6) === i);
   let x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity;
-  for (const p of h) { x0 = Math.min(x0, p[0]); y0 = Math.min(y0, p[1]); x1 = Math.max(x1, p[0]); y1 = Math.max(y1, p[1]); }
+  for (const p of hull) { x0 = Math.min(x0, p[0]); y0 = Math.min(y0, p[1]); x1 = Math.max(x1, p[0]); y1 = Math.max(y1, p[1]); }
   const r = R_ST + 0.035;
-  return {hull: h, x: (x0 + x1) / 2, y: (y0 + y1) / 2, box: [x0 - r, y0 - r, x1 + r, y1 + r]};
+  return {hull, x: (x0 + x1) / 2, y: (y0 + y1) / 2, box: [x0 - r, y0 - r, x1 + r, y1 + r]};
 }
-function drawMarker(n, g) {
-  const s = n.shape, big = n.st.open.size + n.st.fut.size > 1 || SD.nodes[n.v][2].length > 1, ow = big ? 0.07 : 0.05;
+function drawMarker(n, g, fadeIn) {
+  const s = n.shape, big = n.st.open.size + n.st.fut.size > 1 || SD.nodes[n.v][2].length > 1, ow = big ? 0.075 : 0.05;
   const d = 'M' + s.hull.map(p => p[0].toFixed(3) + ',' + p[1].toFixed(3)).join('L') + (s.hull.length > 2 ? 'Z' : (s.hull.length === 1 ? 'l0,0' : ''));
-  const grp = el('g', {class: n.open ? '' : 'fut'}, g);
-  if (s.rad) {          // round interchange
-    el('circle', {cx: s.x, cy: s.y, r: s.rad + R_ST, fill: 'var(--st-fill)', stroke: 'var(--st-ink)', 'stroke-width': ow * 1.3}, grp);
-    return;
-  }
-  el('path', {d, fill: 'var(--st-ink)', stroke: 'var(--st-ink)', style: `stroke-width:calc(var(--f) * ${2 * R_ST} + ${2 * ow})`, 'stroke-linejoin': 'round', 'stroke-linecap': 'round'}, grp);
-  el('path', {d, fill: 'var(--st-fill)', stroke: 'var(--st-fill)', style: sw(2 * R_ST), 'stroke-linejoin': 'round', 'stroke-linecap': 'round'}, grp);
+  const grp = el('g', {class: n.open ? (fadeIn ? 'fadein' : '') : 'fut'}, g);
+  // a station that only opens later: a small faint dot, not a full white marker
+  const r = n.open ? R_ST : R_ST * 0.62;
+  el('path', {d, fill: 'var(--st-ink)', stroke: 'var(--st-ink)', style: `stroke-width:calc(var(--f) * ${2 * r} + ${2 * ow})`, 'stroke-linejoin': 'round', 'stroke-linecap': 'round'}, grp);
+  el('path', {d, fill: 'var(--st-fill)', stroke: 'var(--st-fill)', style: sw(2 * r), 'stroke-linejoin': 'round', 'stroke-linecap': 'round'}, grp);
 }
 
 // ---------------------------------------------------------------- labels (greedy, 8 positions, redone per zoom)
+// Station markers are hard obstacles, other labels are hard obstacles with a
+// little air around them, drawn lines are a cost (zoomed out, a minor station
+// whose label would sit on lines is left for the hover tooltip). Stations sharing a name
+// (SD.lead groups "Uptown", "Uptown", "Irving W3", ...) are labelled once while
+// they are close together on screen. Area names are placed first, at the
+// overview only, in the nearest clear space to their spot.
 const meas = document.createElement('canvas').getContext('2d');
 let lblK = -1;
 function placeLabels() {
   G.lbl.textContent = '';
+  G.city.textContent = '';
   lblK = view.k;
   const small = host.clientWidth <= 640;
-  const k = view.k, px = Math.max(9.5, Math.min(small ? 11.5 : 13, (small ? 8 : 9) + Math.log2(k / (fitK || k)) * 1.6 + 1.5)), fs = px / k;
+  const k = view.k, kf = k / (fitK || k), px = Math.max(9.5, Math.min(small ? 11.5 : 13, (small ? 8 : 9) + Math.log2(kf) * 1.6 + 1.5)), fs = px / k;
   meas.font = `500 ${px}px Barlow, "Helvetica Neue", Arial, sans-serif`;
-  const cell = fs * 1.2, grid = new Map(), lineGrid = new Set();
+  const cell = fs * 1.2, grid = new Map(), lineGrid = new Set(), openGrid = new Set(), lc = fs * 0.5;
   const key = (i, j) => i + ',' + j;
-  const boxes = [];
-  const addBox = b => { boxes.push(b); for (let i = Math.floor(b[0] / cell); i <= Math.floor(b[2] / cell); i++) for (let j = Math.floor(b[1] / cell); j <= Math.floor(b[3] / cell); j++) { const kk = key(i, j); if (!grid.has(kk)) grid.set(kk, []); grid.get(kk).push(b); } };
+  const addBox = b => { for (let i = Math.floor(b[0] / cell); i <= Math.floor(b[2] / cell); i++) for (let j = Math.floor(b[1] / cell); j <= Math.floor(b[3] / cell); j++) { const kk = key(i, j); if (!grid.has(kk)) grid.set(kk, []); grid.get(kk).push(b); } };
   const hits = b => { for (let i = Math.floor(b[0] / cell); i <= Math.floor(b[2] / cell); i++) for (let j = Math.floor(b[1] / cell); j <= Math.floor(b[3] / cell); j++) for (const o of grid.get(key(i, j)) || []) if (o[0] < b[2] && b[0] < o[2] && o[1] < b[3] && b[1] < o[3]) return true; return false; };
-  const lineCost = b => { let c = 0; for (let i = Math.floor(b[0] / cell); i <= Math.floor(b[2] / cell); i++) for (let j = Math.floor(b[1] / cell); j <= Math.floor(b[3] / cell); j++) if (lineGrid.has(key(i, j))) c++; return c; };
-  // rasterize drawn lines into the coarse grid (cost only), markers as hard boxes
-  for (const lp of cache.values()) for (let i = 0; i + 1 < lp.pts.length; i++) {
-    const [a, b] = [lp.pts[i], lp.pts[i + 1]], L = Math.hypot(b[0] - a[0], b[1] - a[1]), n = Math.ceil(L / (cell / 2)) + 1;
-    for (let s = 0; s <= n; s++) lineGrid.add(key(Math.floor((a[0] + (b[0] - a[0]) * s / n) / cell), Math.floor((a[1] + (b[1] - a[1]) * s / n) / cell)));
+  const lineCost = (b, g = lineGrid) => { let c = 0; for (let i = Math.floor(b[0] / lc); i <= Math.floor(b[2] / lc); i++) for (let j = Math.floor(b[1] / lc); j <= Math.floor(b[3] / lc); j++) if (g.has(key(i, j))) c++; return c; };
+  // rasterize drawn lines into a fine grid (cost only): all of them, and the open ones
+  for (const {pts, fut} of drawnRuns) for (let i = 0; i + 1 < pts.length; i++) {
+    const [a, b] = [pts[i], pts[i + 1]], L = Math.hypot(b[0] - a[0], b[1] - a[1]), n = Math.ceil(L / (lc / 2)) + 1;
+    for (let s = 0; s <= n; s++) {
+      const kk = key(Math.floor((a[0] + (b[0] - a[0]) * s / n) / lc), Math.floor((a[1] + (b[1] - a[1]) * s / n) / lc));
+      lineGrid.add(kk);
+      if (!fut) openGrid.add(kk);
+    }
   }
   for (const n of drawnNodes) addBox(n.shape.box);
   // viewport (in layout units) so off-screen labels don't block on-screen ones
   const fa = freeArea(), x0 = (fa[0] - view.tx) / k, y0 = (fa[1] - view.ty) / k, x1 = (Math.min(fa[2] + 44, host.clientWidth - 4) - view.tx) / k, y1 = (fa[3] - view.ty) / k, m = 6;
-  const showFut = k > (fitK || k) * 2.2;
+  const inView = b => b[0] >= x0 && b[2] <= x1 && b[1] >= y0 && b[3] <= y1;
+  // area names: overview only, nearest spot (spiral search) clear of stations and lines
+  if (kf < 2.4) {
+    const cpx = small ? 12 : 14.5, cfs = cpx / k;
+    meas.font = `700 ${cpx}px "Barlow Condensed", "Arial Narrow", Arial, sans-serif`;
+    for (const [t, cx, cy] of SD.labels) {
+      const T = t.toUpperCase(), w = (meas.measureText(T).width + 0.14 * cpx * T.length) / k, h = cfs;
+      // nearest spot clear of open lines (faint future ones may pass under it) within ~9% of the view's diagonal (an area name labels an
+      // area, not a point); failing that, one crossing a line or two (the label has a
+      // halo); failing that, no label rather than a misleading one
+      let best = null;
+      const reach = Math.max(60, Math.min(130, 0.09 * Math.hypot(fa[2] - fa[0], fa[3] - fa[1])));
+      for (const [maxR, maxCost] of [[reach, 0], [reach, 4], [45, 8]]) {
+        for (const r of [0, 8, 16, 24, 34, 45, 60, 75, 92, 110, 130]) {
+          if (best || r > maxR) break;
+          const nA = r ? 16 : 1;
+          for (let q = 0; q < nA && !best; q++) {
+            const ang = q / nA * 2 * Math.PI, x = cx + Math.cos(ang) * r / k, y = cy + Math.sin(ang) * r * 0.8 / k;
+            const bx = [x - w / 2 - cfs * 0.3, y - h * 0.85, x + w / 2 + cfs * 0.3, y + h * 0.3];
+            if (inView(bx) && !hits(bx) && lineCost(bx, openGrid) <= maxCost) best = [x, y, bx];
+          }
+        }
+      }
+      if (!best) continue;
+      addBox(best[2]);
+      const e = el('text', {class: 'city', x: best[0].toFixed(3), y: best[1].toFixed(3), 'font-size': cfs.toFixed(4), 'stroke-width': (3 / k).toFixed(4)}, G.city);
+      e.textContent = T;
+    }
+    meas.font = `500 ${px}px Barlow, "Helvetica Neue", Arial, sans-serif`;
+  }
+  const showFut = kf > 2.2;
+  const lead = v => SD.lead ? SD.lead[v] : v;
+  const lines = n => n.st.open.size + n.st.fut.size;
   const cand = drawnNodes.filter(n => { const s = n.shape; return (n.open || showFut) && s.x > x0 - m && s.x < x1 + m && s.y > y0 - m && s.y < y1 + m; });
-  cand.sort((a, b) => (b.open - a.open) || ((b.st.open.size + b.st.fut.size) - (a.st.open.size + a.st.fut.size)) || (b.st.term - a.st.term) || (a.v - b.v));
-  const gap = 3 / k;
+  cand.sort((a, b) => (b.open - a.open) || (lines(b) - lines(a)) || (b.st.term - a.st.term) || ((lead(a.v) !== a.v) - (lead(b.v) !== b.v)) || (a.v - b.v));
+  // a repeated name is skipped within 190 px; a variant ("Irving W3" near "Irving")
+  // only while zoomed out, so every distinct name shows when zoomed well in
+  const gap = 3 / k, padX = fs * 0.45, padY = fs * 0.12, near = 190 / k, nearVariant = near * Math.max(0, Math.min(1, (4 - kf) / 3));
+  const placed = new Map();       // group lead -> [[x, y, name]] of its placed labels
   for (const n of cand) {
-    const name = SD.nodes[n.v][3], w = meas.measureText(name).width / k, h = fs * 1.05, s = n.shape, bx = s.box;
+    const s = n.shape, g = lead(n.v), name = SD.nodes[n.v][3];
+    if ((placed.get(g) || []).some(([x, y, nm]) => Math.hypot(x - s.x, y - s.y) < (nm === name ? near : nearVariant))) continue;
+    const w = meas.measureText(name).width / k, h = fs * 1.05, bx = s.box;
     const ex = (bx[2] - bx[0]) / 2, ey = (bx[3] - bx[1]) / 2;
     const dx = ex + gap, dy = ey + gap, dd = Math.min(ex, ey) * 0.72 + gap;
     const opts = [[s.x + dx, s.y - h / 2], [s.x - dx - w, s.y - h / 2], [s.x + dd, s.y - dd - h], [s.x + dd, s.y + dd],
       [s.x - dd - w, s.y - dd - h], [s.x - dd - w, s.y + dd], [s.x - w / 2, s.y - dy - h], [s.x - w / 2, s.y + dy]];
-    let best = null, bc = 1e9;
+    // an interchange may also stand a little further off (still clearly its own)
+    if (lines(n) > 1) { const f = fs * 0.9; opts.push([s.x + dx + f, s.y - h / 2], [s.x - dx - w - f, s.y - h / 2], [s.x - w / 2, s.y - dy - h - f * 0.6], [s.x - w / 2, s.y + dy + f * 0.6]); }
+    let best = null, bc = 1e9, bl = 0;
     opts.forEach(([bx, by], i) => {
       const b = [bx, by, bx + w, by + h];
-      if (hits(b)) return;
-      const out = (b[0] < x0 ? x0 - b[0] : 0) + (b[2] > x1 ? b[2] - x1 : 0) + (b[1] < y0 ? y0 - b[1] : 0) + (b[3] > y1 ? b[3] - y1 : 0);
-      if (out > 0) return;
-      const c = lineCost(b) * 2 + i * 0.25;
-      if (c < bc) { bc = c; best = b; }
+      if (hits(b) || !inView(b)) return;
+      const lcost = lineCost(b), c = lcost * 3 + i * 0.25 + (i >= 8 ? 2 : 0);
+      if (c < bc) { bc = c; best = b; bl = lcost; }
     });
     if (!best) continue;
-    addBox(best);
-    const t = el('text', {class: 'lbl' + (n.open ? '' : ' fut') + (n.st.open.size + n.st.fut.size > 1 ? ' x' : ''), x: best[0].toFixed(3),
+    const minor = lines(n) <= 1 && !n.st.term;
+    if (minor && bl > (kf < 2.5 ? 2 : 5)) continue;      // zoomed well in, a name is worth crossing a line
+    addBox([best[0] - padX, best[1] - padY, best[2] + padX, best[3] + padY]);
+    if (!placed.has(g)) placed.set(g, []);
+    placed.get(g).push([s.x, s.y, name]);
+    const t = el('text', {class: 'lbl' + (n.open ? '' : ' fut') + (lines(n) > 1 ? ' x' : ''), x: best[0].toFixed(3),
       y: (best[1] + h * 0.8).toFixed(3), 'font-size': fs.toFixed(4), 'stroke-width': (2.6 / k).toFixed(4)}, G.lbl);
     t.textContent = name;
   }
@@ -382,6 +499,8 @@ function clickAt(px, py) {
   const sids = SD.nodes[n.v][2], sid = sids.find(s => sidLines.has(s)) || sids[0];
   showPop(n.v);
   choose(sid);
+  // a finished trip is read in the sheet: open it
+  if (pick.length === 2 && panel.classList.contains('min')) { sheetChosen = true; setSheet(false); }
 }
 
 // ---------------------------------------------------------------- zoom & pan
@@ -391,6 +510,8 @@ function apply(relabel) {
   vp.setAttribute('transform', `translate(${view.tx.toFixed(2)},${view.ty.toFixed(2)}) scale(${view.k.toFixed(5)})`);
   G.city.style.opacity = Math.max(0, Math.min(1, 2.6 - view.k / (fitK || view.k)));
   vp.style.setProperty('--f', Math.max(1, Math.min(1.35, 3.3 / (W.metro * view.k))).toFixed(3));
+  // rivers: a soft band at the overview, never wider than ~8 px when zoomed in
+  vp.style.setProperty('--rw', Math.min(0.55, 8 / view.k).toFixed(4));
   posPop();
   if (relabel !== false) { clearTimeout(lblTimer); lblTimer = setTimeout(() => { if (active) placeLabels(); }, 140); }
 }
@@ -405,7 +526,14 @@ function freeArea() {
   return [r.right + 12, 12, w - 56, h - 12];
 }
 function fit() {
-  const [x0, y0, x1, y1] = bounds(), [a0, b0, a1, b1] = freeArea();
+  let [x0, y0, x1, y1] = bounds();
+  const [a0, b0, a1, b1] = freeArea();
+  // a tall, narrow screen (phone): let the long east-west tails run off the sides
+  // (pan to reach them) so the two downtowns get room; the height still fits
+  if ((b1 - b0) / (a1 - a0) > 1.3 * (y1 - y0) / (x1 - x0)) {
+    const xs = SD.nodes.map(n => n[0]).sort((a, b) => a - b), q = p => xs[Math.round(p * (xs.length - 1))];
+    x0 = Math.max(x0, q(0.07) - 1.5); x1 = Math.min(x1, q(0.93) + 1.5);
+  }
   view.k = fitK = Math.min((a1 - a0) / (x1 - x0), (b1 - b0) / (y1 - y0));
   view.tx = (a0 + a1) / 2 - (x0 + x1) / 2 * view.k;
   view.ty = (b0 + b1) / 2 - (y0 + y1) / 2 * view.k;
@@ -495,13 +623,15 @@ function legendDraw() {
   if (active) {
     h += sample(`<line x1="1" y1="6" x2="37" y2="6" stroke="${grey}" stroke-width="5" stroke-linecap="round"/><circle cx="19" cy="6" r="3.6" fill="${fill}" stroke="${ink}" stroke-width="1.1"/>`, D.modes.metro);
     h += sample(`<line x1="1" y1="6" x2="37" y2="6" stroke="${grey}" stroke-width="4.2" stroke-linecap="round"/><line x1="1" y1="6" x2="37" y2="6" stroke="${fill}" stroke-width="1.5" stroke-dasharray="10 6"/>`, D.modes.commuter);
-    h += sample(`<line x1="1" y1="6" x2="37" y2="6" stroke="${grey}" stroke-width="2.8" stroke-dasharray="7 3.4"/>`, D.modes.brt);
-    h += sample(`<line x1="1" y1="6" x2="37" y2="6" stroke="${grey}" stroke-width="5" stroke-linecap="round" opacity=".22"/>`, 'Not yet open');
-    h += sample(`<line x1="1" y1="3" x2="37" y2="3" stroke="${grey}" stroke-width="2.6"/><line x1="1" y1="9" x2="37" y2="9" stroke="${grey}" stroke-width="2.6"/><rect x="15" y="-1" width="8" height="14" rx="4" fill="${fill}" stroke="${ink}" stroke-width="1.2"/>`, 'Interchange');
+    h += sample(`<line x1="1" y1="6" x2="37" y2="6" stroke="${grey}" stroke-width="2.4" stroke-linecap="round"/>`, D.modes.brt);
+    h += sample(`<line x1="1" y1="6" x2="37" y2="6" stroke="var(--glow)" stroke-width="11" stroke-linecap="round" opacity=".5"/><line x1="1" y1="6" x2="37" y2="6" stroke="${grey}" stroke-width="5" stroke-linecap="round"/>`, 'Opened this interval');
+    h += sample(`<line x1="1" y1="6" x2="37" y2="6" stroke="${grey}" stroke-width="2.2" stroke-linecap="round" opacity=".4"/><circle cx="19" cy="6" r="2.2" fill="${fill}" stroke="${ink}" stroke-width=".9" opacity=".5"/>`, 'Not yet open');
+    h += sample(`<line x1="1" y1="3" x2="37" y2="3" stroke="${grey}" stroke-width="2.6"/><line x1="1" y1="9" x2="37" y2="9" stroke="${grey}" stroke-width="2.6"/><rect x="15" y="-1" width="8" height="14" rx="4" fill="${fill}" stroke="${ink}" stroke-width="1.3"/>`, 'Interchange');
+    h += sample(`<line x1="1" y1="6" x2="37" y2="6" stroke="var(--water)" stroke-width="4" stroke-linecap="round"/>`, 'Waterways');
   } else {
     h += sample(`<line x1="1" y1="6" x2="37" y2="6" stroke="${grey}" stroke-width="4.5" stroke-linecap="round"/>`, D.modes.metro);
     h += sample(`<line x1="1" y1="6" x2="37" y2="6" stroke="${grey}" stroke-width="3" stroke-dasharray="8 5"/>`, D.modes.commuter);
-    h += sample(`<line x1="1" y1="6" x2="37" y2="6" stroke="${grey}" stroke-width="3" stroke-dasharray="2 5" stroke-linecap="round"/>`, D.modes.brt);
+    h += sample(`<line x1="1" y1="6" x2="37" y2="6" stroke="${grey}" stroke-width="2.2" stroke-linecap="round"/>`, D.modes.brt);
     h += sample(`<line x1="1" y1="6" x2="37" y2="6" stroke="${grey}" stroke-width="4.5" stroke-linecap="round" opacity=".2"/>`, 'Not yet open');
     h += sample(`<line x1="1" y1="6" x2="37" y2="6" stroke="var(--water)" stroke-width="4" stroke-linecap="round"/>`, 'Waterways');
   }
@@ -529,6 +659,7 @@ function setView(v, save) {
     try { localStorage.setItem('dfwt.view', v); } catch (e) { /* storage unavailable */ }
     try { history.replaceState(null, '', '#' + v); } catch (e) { /* file:// or sandboxed */ }
   }
+  if (!sheetChosen) setSheet(active && phone.matches);
   if (active) {
     if (!fitted) { fitted = true; fit(); }
     draw();

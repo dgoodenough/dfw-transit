@@ -1,6 +1,83 @@
 {
   "_doc": "Every tunable assumption in one place. The map, trip planner, demand model and reports all read this file, so they can never drift apart again.",
-  "years": [2025, 2030, 2035, 2040, 2045, 2050, 2055, 2060, 2065, 2070],
+  "years": [
+    2025,
+    2026,
+    2027,
+    2028,
+    2029,
+    2030,
+    2031,
+    2032,
+    2033,
+    2034,
+    2035,
+    2036,
+    2037,
+    2038,
+    2039,
+    2040,
+    2041,
+    2042,
+    2043,
+    2044,
+    2045,
+    2046,
+    2047,
+    2048,
+    2049,
+    2050,
+    2051,
+    2052,
+    2053,
+    2054,
+    2055,
+    2056,
+    2057,
+    2058,
+    2059,
+    2060,
+    2061,
+    2062,
+    2063,
+    2064,
+    2065,
+    2066,
+    2067,
+    2068,
+    2069,
+    2070,
+    2071,
+    2072,
+    2073,
+    2074,
+    2075,
+    2076,
+    2077,
+    2078,
+    2079,
+    2080,
+    2081,
+    2082,
+    2083,
+    2084,
+    2085,
+    2086,
+    2087,
+    2088,
+    2089,
+    2090,
+    2091,
+    2092,
+    2093,
+    2094,
+    2095,
+    2096,
+    2097,
+    2098,
+    2099,
+    2100
+  ],
   "existing_year": 2025,
   "modes": {
     "metro": {
@@ -10,7 +87,13 @@
       "capacity_pphpd": 20000,
       "label": "Metro / light rail"
     },
-    "brt": {"cruise_kmh": 38, "stop_penalty_min": 0.9, "default_headway_min": 8, "capacity_pphpd": 4000, "label": "Bus rapid transit"},
+    "brt": {
+      "cruise_kmh": 38,
+      "stop_penalty_min": 0.9,
+      "default_headway_min": 8,
+      "capacity_pphpd": 4000,
+      "label": "Bus rapid transit"
+    },
     "commuter": {
       "cruise_kmh": 72,
       "stop_penalty_min": 1.4,
@@ -19,19 +102,101 @@
       "label": "Regional / commuter rail"
     }
   },
-  "wait": {"_doc": "Expected wait = headway / 2, capped (riders time arrivals on long headways).", "fraction_of_headway": 0.5, "max_wait_min": 12},
-  "transfer": {"walk_radius_m": 400, "walk_speed_kmh": 4.8, "penalty_min": 3},
+  "wait": {
+    "_doc": "Expected wait = headway / 2, capped (riders time arrivals on long headways). Waits count `weight` times in-vehicle minutes, as riders perceive them (planning practice 2-3x), in routing, the logit and the competitive-commute test.",
+    "fraction_of_headway": 0.5,
+    "max_wait_min": 12,
+    "weight": 2.0
+  },
+  "transfer": {
+    "walk_radius_m": 400,
+    "walk_speed_kmh": 4.8,
+    "penalty_min": 3
+  },
   "access": {
-    "_doc": "How people reach stations. Walk to anything within walk_max_m; drive (park & ride) to commuter rail stations and line termini within pnr_max_km.",
+    "_doc": "How people reach stations. Walk to anything within walk_max_m; drive (park & ride) to garages within pnr_max_km but not closer than pnr_min_km (people that close walk): commuter rail stations, each line's planned termini, today's lots at existing suburban stations (pnr_existing) and optional suburban garages (pnr_suburban). Garages hold pnr_spaces cars (DART Parker Road ~2,000, TRE/TEXRail stations 175-1,000); each space serves pnr_people_per_space commuters a day (75% full x 1.1 per car x 1.15 with drop-offs). Riders a full garage turns away take their best access without parking (pnr_overflow_fallback). Today's local buses are the feeder grid (30 min in denser areas); faster grids are a lever. Riders choose each station's access mode by perceived minutes (out-of-vehicle time weighs 2.5x). circuity applies to drive access, walk_circuity to walking. The micromobility, kiss_ride and pnr_suburban blocks are levers, off by default.",
     "walk_max_m": 1200,
     "walk_speed_kmh": 4.8,
     "circuity": 1.25,
+    "walk_circuity": 1.25,
     "pnr_max_km": 8,
     "pnr_speed_kmh": 35,
     "pnr_penalty_min": 5,
-    "max_access_stations": 8
+    "max_access_stations": 8,
+    "pnr_spaces": {
+      "terminus": 1500,
+      "commuter_station": 400
+    },
+    "pnr_people_per_space": 0.95,
+    "pnr_min_km": 1.2,
+    "pnr_overflow_fallback": true,
+    "pnr_suburban": {
+      "_doc": "Lever (off by default): a structured garage of `spaces` at selected stations of `modes`, Wiehle-Reston East style (wrapped by development, so TOD uplift is unchanged): only where the station's setting (growth.setting, base-year density) is `setting`, at least min_core_km from a downtown and min_spacing_km from every other garage, outermost first, from from_year. No new parking at downtown or urban stations. Freeway/arterial access is not checked (no road data).",
+      "enabled": false,
+      "from_year": 2030,
+      "spaces": 1500,
+      "setting": "suburban",
+      "min_core_km": 8,
+      "min_spacing_km": 4,
+      "modes": [
+        "metro"
+      ]
+    },
+    "feeder": {
+      "_doc": "Lever (off by default): a frequent local bus grid as an access and egress mode. Zones whose activity density (people + jobs per km2 within 800 m) is at least min_density_per_km2 reach any station within max_km (straight line) by bus: stop_walk_min + half the headway (capped like rail waits) + distance x circuity / speed (slowed by road congestion) + transfer_penalty_min. Only the walk, wait and transfer count as out-of-vehicle time. headway_min is a {year: minutes} table, no feeder before its first year. The asc was calibrated without feeders (today's buses sit inside it), so either start the table after 2025 (an upper bound: today's bus-to-rail riders get counted twice) or include today's headway from 2025 and recalibrate (evaluate.calibrate_asc). Bus legs are not rail boardings: run_year reports them separately as feeder_boardings.",
+      "enabled": true,
+      "headway_min": {
+        "2025": 30
+      },
+      "speed_kmh": 19,
+      "circuity": 1.3,
+      "max_km": 5,
+      "stop_walk_min": 4,
+      "transfer_penalty_min": 3,
+      "min_density_per_km2": 2000,
+      "egress": true
+    },
+    "micromobility": {
+      "_doc": "Lever (off by default): bike / e-scooter access. Only `share` of commuters will ride (a market segment, so it can't turn everyone into a cyclist); they reach stations within max_km at speed_kmh plus penalty_min (unlock, secure parking), and ride on to work if egress.",
+      "enabled": false,
+      "from_year": 2030,
+      "share": 0.15,
+      "max_km": 3,
+      "speed_kmh": 14,
+      "circuity": 1.3,
+      "penalty_min": 3,
+      "egress": true
+    },
+    "kiss_ride": {
+      "_doc": "Lever (off by default): drop-off or ride-hail to any station, no garage needed. Only `share` of commuters have a driver or will pay for a ride (a market segment); drive at pnr_speed_kmh within max_km, plus penalty_min (curb wait, and the fare expressed as minutes).",
+      "enabled": false,
+      "from_year": 2030,
+      "share": 0.1,
+      "max_km": 6,
+      "penalty_min": 6
+    },
+    "pnr_existing": {
+      "_doc": "Today's park & ride lots at existing rail stations outside the core (DART has lots at most suburban stations, roughly 100-2,000 spaces each; an approximation until the real inventory is loaded).",
+      "enabled": true,
+      "spaces": 500,
+      "settings": [
+        "suburban"
+      ]
+    }
   },
-  "drive": {"_doc": "Peak-period door-to-door drive baseline (v1 calibration).", "speed_kmh": 38, "circuity": 1.35, "terminal_min": 8},
+  "drive": {
+    "_doc": "Peak-period door-to-door drive baseline (v1 calibration).",
+    "speed_kmh": 38,
+    "circuity": 1.35,
+    "terminal_min": 8,
+    "congestion": {
+      "_doc": "Peak drive times (moving part) grow per_decade from base_year, capped; BRT running time takes brt_share of the increase. TTI travel-time index: about +3% per decade nationally and in DFW. Mild on purpose: congestion forecasts usually overshoot.",
+      "base_year": 2025,
+      "per_decade": 0.03,
+      "cap": 0.15,
+      "brt_share": 0.25
+    }
+  },
   "competitive": {
     "_doc": "A commute is transit-competitive if transit <= ratio*drive + slack, under the cap, and longer than min_km.",
     "ratio": 1.3,
@@ -40,10 +205,18 @@
     "min_km": 2
   },
   "accessibility": {
-    "thresholds_min": [30, 45, 60]
+    "thresholds_min": [
+      30,
+      45,
+      60
+    ]
   },
   "coverage": {
-    "walkshed_m": {"metro": 800, "brt": 800, "commuter": 1600}
+    "walkshed_m": {
+      "metro": 800,
+      "brt": 800,
+      "commuter": 1600
+    }
   },
   "demand": {
     "_doc": "If data/raw/od_tracts.csv (LODES OD aggregated to tracts, see data/README.md) exists it is used directly. Otherwise a doubly-constrained gravity model is synthesized from tract population and jobs, with beta calibrated against the v1 LODES run.",
@@ -54,25 +227,58 @@
   },
   "cost_musd_per_km": {
     "_doc": "Capital cost per route-km by mode and grade, 2025 USD. Calibrated to recent US projects: DART Silver Line ~$45M/km (new track on freight ROW), TEXRail ~$24M/km, Houston/Indy BRT $5-25M/km, US light rail $100-200M/km, US subway $400M+/km.",
-    "brt": {"surface": 15, "elevated": 60, "tunnel": 250},
-    "commuter": {"surface": 30, "elevated": 90, "tunnel": 350},
-    "metro": {"surface": 120, "elevated": 200, "tunnel": 450}
+    "brt": {
+      "surface": 15,
+      "elevated": 60,
+      "tunnel": 250
+    },
+    "commuter": {
+      "surface": 30,
+      "elevated": 90,
+      "tunnel": 350
+    },
+    "metro": {
+      "surface": 120,
+      "elevated": 200,
+      "tunnel": 450
+    }
   },
-  "station_cost_musd": {"brt": 2, "commuter": 15, "metro": 40},
+  "station_cost_musd": {
+    "brt": 2,
+    "commuter": 15,
+    "metro": 40
+  },
   "standards": {
     "_doc": "Stop-spacing bands (km) used by validate. Sources in reports/DESIGN_STANDARDS.md.",
     "spacing_km": {
-      "metro": [0.5, 2.5],
-      "brt": [0.3, 1.6],
-      "commuter": [2.5, 16]
+      "metro": [
+        0.5,
+        2.5
+      ],
+      "brt": [
+        0.3,
+        1.6
+      ],
+      "commuter": [
+        2.5,
+        16
+      ]
     },
     "hairpin_deg": 25,
     "orphan_terminus_m": 600
   },
   "cores": {
     "_doc": "Downtown cores: proposed metro inside these radii is costed as tunnel.",
-    "Fort Worth CBD": {"lat": 32.7555, "lon": -97.3308, "radius_km": 1.4},
-    "Dallas CBD": {"lat": 32.781, "lon": -96.799, "radius_km": 1.6}
+    "Fort Worth CBD": {
+      "lat": 32.7555,
+      "lon": -97.3308,
+      "radius_km": 1.4
+    },
+    "Dallas CBD": {
+      "lat": 32.781,
+      "lon": -96.799,
+      "radius_km": 1.6
+    }
   },
   "budget": {
     "_doc": "Flat capital budget (2025 $M per year) with carryover. Spending is spread over each piece's construction years (staging.construction_years). tolerance = share over budget before validation warns.",
@@ -82,13 +288,34 @@
   "staging": {
     "_doc": "Rules for staged build-out (dfwt/staging.py, python -m dfwt stage).",
     "min_operable": {
-      "metro": [2.0, 3],
-      "brt": [3.0, 4],
-      "commuter": [15.0, 2]
+      "metro": [
+        2.0,
+        3
+      ],
+      "brt": [
+        3.0,
+        4
+      ],
+      "commuter": [
+        15.0,
+        2
+      ]
     },
-    "max_km_per_stage": {"metro": 15, "brt": 25, "commuter": 50},
-    "max_km_per_interval": {"metro": 25, "brt": 40, "commuter": 80},
-    "construction_years": {"metro": 5, "brt": 2, "commuter": 4},
+    "max_km_per_stage": {
+      "metro": 15,
+      "brt": 25,
+      "commuter": 50
+    },
+    "max_km_per_interval": {
+      "metro": 25,
+      "brt": 40,
+      "commuter": 80
+    },
+    "construction_years": {
+      "metro": 5,
+      "brt": 2,
+      "commuter": 4
+    },
     "max_stub_years": 20
   },
   "geometry": {
@@ -102,7 +329,11 @@
       "Lp": 150,
       "Ltmin": 20,
       "min_spiral_m": 10,
-      "tol": {"surface": 40, "elevated": 40, "tunnel": 150}
+      "tol": {
+        "surface": 40,
+        "elevated": 40,
+        "tunnel": 150
+      }
     },
     "commuter": {
       "Rmin": 500,
@@ -113,7 +344,11 @@
       "Lp": 200,
       "Ltmin": 30,
       "min_spiral_m": 10,
-      "tol": {"surface": 25, "elevated": 25, "tunnel": 100}
+      "tol": {
+        "surface": 25,
+        "elevated": 25,
+        "tunnel": 100
+      }
     },
     "brt": {
       "Rmin": 25,
@@ -124,12 +359,265 @@
       "Lp": 40,
       "Ltmin": 0,
       "min_spiral_m": 0,
-      "tol": {"surface": 12, "elevated": 12, "tunnel": 30}
+      "tol": {
+        "surface": 12,
+        "elevated": 12,
+        "tunnel": 30
+      }
     },
     "station_move_auto_m": 100,
     "rail_max_turn_deg": 35,
-    "check_radius_m": {"metro": 150, "commuter": 175, "brt": 25},
+    "check_radius_m": {
+      "metro": 150,
+      "commuter": 175,
+      "brt": 25
+    },
     "straighten_move_max_m": 800,
     "straighten_move_far_m": 1500
-  }
+  },
+  "growth": {
+    "_doc": "Zone population and jobs by year (dfwt/growth.py). Multipliers are relative to the base data (2020 population, 2022 jobs) and interpolated between years; the mid case follows NCTCOG Mobility 2050 (12.4M in 2050) and flattens toward 2100 as national growth stalls (Census 2023 projections). low/high are alternatives for scenarios. TOD adds growth within radius_m of stations opened after existing_year (full within full_radius_m), ramping in along a logistic curve (half at ramp_mid_years, width ramp_width_years). Uplift depends on the station's setting (by people+jobs density within 800 m) times a mode factor; net_new_share of it is new to the region and the rest is drawn from elsewhere (rail mostly moves growth around: Cervero & Seskins; NITC station-area studies).",
+    "regional_pop": {
+      "2020": 1.0,
+      "2025": 1.11,
+      "2030": 1.217,
+      "2040": 1.427,
+      "2050": 1.623,
+      "2060": 1.78,
+      "2070": 1.911,
+      "2080": 2.003,
+      "2090": 2.068,
+      "2100": 2.107
+    },
+    "regional_jobs": {
+      "2022": 1.0,
+      "2025": 1.063,
+      "2030": 1.166,
+      "2040": 1.367,
+      "2050": 1.555,
+      "2060": 1.705,
+      "2070": 1.83,
+      "2080": 1.919,
+      "2090": 1.981,
+      "2100": 2.018
+    },
+    "case": "mid",
+    "alt": {
+      "low_pop": {
+        "2020": 1.0,
+        "2025": 1.11,
+        "2030": 1.191,
+        "2040": 1.309,
+        "2050": 1.401,
+        "2060": 1.453,
+        "2070": 1.492,
+        "2080": 1.492,
+        "2090": 1.479,
+        "2100": 1.44
+      },
+      "high_pop": {
+        "2020": 1.0,
+        "2025": 1.11,
+        "2030": 1.23,
+        "2040": 1.479,
+        "2050": 1.741,
+        "2060": 2.003,
+        "2070": 2.238,
+        "2080": 2.474,
+        "2090": 2.67,
+        "2100": 2.827
+      }
+    },
+    "tod": {
+      "radius_m": 800,
+      "full_radius_m": 400,
+      "ramp_mid_years": 10,
+      "ramp_width_years": 3,
+      "setting_density_per_km2": {
+        "urban": 3000
+      },
+      "pop_uplift": {
+        "downtown": 0.3,
+        "urban": 0.2,
+        "suburban": 0.1
+      },
+      "jobs_uplift": {
+        "downtown": 0.15,
+        "urban": 0.15,
+        "suburban": 0.05
+      },
+      "mode_factor_pop": {
+        "metro": 1.0,
+        "commuter": 0.5,
+        "brt": 0.4
+      },
+      "mode_factor_jobs": {
+        "metro": 1.0,
+        "commuter": 0.5,
+        "brt": 0.7
+      },
+      "net_new_share": 0.2,
+      "upzone_existing_year": null
+    },
+    "capture": {
+      "_doc": "Growth-capture land-use policy (dfwt/growth.capture), off while the shares are 0. From start_year, every step_years: job_centers.jobs_share of the region's job growth goes to the listed job centers (in proportion to the jobs there); then pop_share / jobs_share of the growth that would have landed outside station areas moves into zones within radius_m of open stations (include_existing: today's stations too), up to target_density_per_km2 (people + jobs, by station setting) x mode_factor over each station's own land (overlapping discs split by nearest station). Targets follow the Ontario Growth Plan MTSA minimums (200/ha subway, 160/ha LRT/BRT, 150/ha GO = 20,000/16,000/15,000 per km2) up to Rosslyn-Ballston (about 112 people+jobs per acre = 27,600/km2; Rosslyn 162/acre = 40,000/km2). Within a station area growth is placed by distance (full within full_radius_m) x existing activity. What doesn't fit stays where it was; regional totals never change.",
+      "start_year": 2030,
+      "step_years": 5,
+      "pop_share": 0.0,
+      "jobs_share": 0.0,
+      "include_existing": true,
+      "radius_m": 800,
+      "full_radius_m": 400,
+      "weight_floor": 500,
+      "target_density_per_km2": {
+        "downtown": 40000,
+        "urban": 27500,
+        "suburban": 16000
+      },
+      "mode_factor": {
+        "metro": 1.0,
+        "commuter": 0.75,
+        "brt": 0.8
+      },
+      "job_centers": {
+        "jobs_share": 0.0,
+        "Dallas CBD": {
+          "lat": 32.781,
+          "lon": -96.799,
+          "radius_km": 1.6
+        },
+        "Uptown": {
+          "lat": 32.8,
+          "lon": -96.803,
+          "radius_km": 1.2
+        },
+        "Dallas Medical District": {
+          "lat": 32.812,
+          "lon": -96.84,
+          "radius_km": 1.3
+        },
+        "Fort Worth CBD": {
+          "lat": 32.7555,
+          "lon": -97.3308,
+          "radius_km": 1.4
+        },
+        "Fort Worth Medical District": {
+          "lat": 32.733,
+          "lon": -97.34,
+          "radius_km": 1.0
+        }
+      }
+    }
+  },
+  "ridership": {
+    "_doc": "Daily riders from the commute model (dfwt/demand.py). Each commute chooses drive, transit or walk/bike the whole way (multinomial logit, drive is the reference). Transit utility: asc + b_ivt*(drive - transit door-to-door minutes) - b_ovt_extra*(access + egress minutes) - b_ratio*(how far transit exceeds 1x the drive time, as a ratio) + 0.125/$ x (driving cost avoided at drive_usd_per_km + parking avoided at paid-parking destinations). FTA/MWCOG ranges: IVT -0.02..-0.03/min, out-of-vehicle 2-3x. asc is calibrated so the 2025 network carries today's rail ridership with today's buses as feeders; active.asc so ~2% walk or bike. Transit commuters x telework; daily trips = commuters x round_trip / work_share_of_transit_trips; boardings = trips x boardings per trip (from the load assignment). Drive-to-transit has its own constant (pnr_asc_offset, as in MPO models: parking, walking in from the lot), set so about half of 2025 rail riders drive to a garage, near DART's on-board surveys; riders without a car (no_car) can't.",
+    "asc": -0.4141,
+    "b_ivt_per_min": 0.025,
+    "b_ovt_extra_per_min": 0.0375,
+    "b_per_dollar": 0.125,
+    "telework": 0.85,
+    "round_trip": 1.9,
+    "work_share_of_transit_trips": 0.5,
+    "boardings_per_trip": 1.4,
+    "calibration": {
+      "year": 2025,
+      "rail_boardings": 80000,
+      "_doc": "DART light rail ~65k weekday + TRE + TEXRail + A-train (APTA/NTD 2024-25). Local buses are not modeled.",
+      "active_share": 0.02
+    },
+    "paid_parking": {
+      "_doc": "Destinations where parking costs money ($/day, approximate).",
+      "Dallas CBD": {
+        "lat": 32.781,
+        "lon": -96.799,
+        "radius_km": 1.6,
+        "usd_per_day": 12
+      },
+      "Uptown": {
+        "lat": 32.8,
+        "lon": -96.803,
+        "radius_km": 1.2,
+        "usd_per_day": 8
+      },
+      "Dallas Medical District": {
+        "lat": 32.812,
+        "lon": -96.84,
+        "radius_km": 1.3,
+        "usd_per_day": 6
+      },
+      "Fort Worth CBD": {
+        "lat": 32.7555,
+        "lon": -97.3308,
+        "radius_km": 1.4,
+        "usd_per_day": 8
+      },
+      "Fort Worth Medical District": {
+        "lat": 32.733,
+        "lon": -97.34,
+        "radius_km": 1.0,
+        "usd_per_day": 5
+      },
+      "UT Arlington": {
+        "lat": 32.7299,
+        "lon": -97.114,
+        "radius_km": 1.0,
+        "usd_per_day": 4
+      },
+      "SMU": {
+        "lat": 32.8412,
+        "lon": -96.7845,
+        "radius_km": 0.9,
+        "usd_per_day": 4
+      },
+      "TCU": {
+        "lat": 32.7096,
+        "lon": -97.3628,
+        "radius_km": 0.9,
+        "usd_per_day": 4
+      }
+    },
+    "parking_policy": {
+      "_doc": "Parking pricing policy (Zones.parking_usd), off while price_growth is 0 and priced_centers/cashout are null. Phases in linearly from start_year to full_year. price_growth: real rise in paid_parking district prices (fewer free or cheap spaces downtown, e.g. +1.0 = double). priced_centers: wherever jobs within 800 m reach min_jobs_per_km2, parking costs usd_per_day (x the same price growth): paid-parking districts spread as job centers densify. cashout: commuters to other zones with min_jobs_per_km2 are offered usd_per_day in lieu of free parking, at `coverage` of them (California-style parking cash-out; Shoup 1997: drive-alone share 76% -> 63%).",
+      "start_year": 2030,
+      "full_year": 2050,
+      "price_growth": 0.0,
+      "priced_centers": null,
+      "cashout": null
+    },
+    "b_ratio": 1.0,
+    "drive_usd_per_km": 0.2,
+    "active": {
+      "_doc": "Walk/bike the whole way, an alternative in the logit for trips up to max_km: blended speed, effort per minute weighted like out-of-vehicle time, asc calibrated so ~2% of commuters walk or bike (ACS: DFW ~1.5-2%).",
+      "asc": -1.6719,
+      "max_km": 8,
+      "speed_kmh": 10,
+      "circuity": 1.3,
+      "b_per_min": 0.0625
+    },
+    "no_car": {
+      "_doc": "Commuters from households without a car, by the people+jobs density around their home zone (approximate, from ACS: ~5% of DFW households, ~9% in the city of Dallas, 15-25% in dense inner neighborhoods). They can't park & ride; their alternative to transit is getting a ride, which is ride_bonus less attractive than driving yourself.",
+      "enabled": true,
+      "share_by_density": [
+        [
+          0,
+          0.03
+        ],
+        [
+          2000,
+          0.06
+        ],
+        [
+          6000,
+          0.12
+        ],
+        [
+          15000,
+          0.22
+        ]
+      ],
+      "ride_bonus": 3.0
+    },
+    "pnr_asc_offset": -1.5
+  },
+  "default_scenario": "two_million"
 }

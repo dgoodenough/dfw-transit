@@ -1,0 +1,3 @@
+{"_doc": "Upper bound: everything in the recommended package plus the urban-core metro lever (Dallas inner loop, Polk-Greenville trunk, Collins St metro). What a $3B/yr budget could buy by 2100. Built by tools/gen_expansion.py.",
+ "include": ["lever_expand_package", "lever_expand_core"],
+ "lines": []}

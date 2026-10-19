@@ -28,6 +28,7 @@ class YearGraph:
         wcap = cfg["wait"]["max_wait_min"]
         for ri, run in enumerate(self.runs):
             wait = min(run.line.headway_at(year) * cfg["wait"]["fraction_of_headway"], wcap)
+            wait *= cfg["wait"].get("weight", 1.0)   # perceived wait (sensitivity; 1 = as before)
             prev = None
             for k, sid in enumerate(run.stops):
                 node = len(self.node_info)

@@ -8,10 +8,11 @@ import json
 import os
 
 from . import config, schematic
+from .graph import YearGraph
 
 TEMPLATE = os.path.join(os.path.dirname(__file__), "templates", "map.html")
 SCHEM_FILES = [os.path.join(os.path.dirname(__file__), "templates", n) for n in ("schematic.css", "schematic.js")]
-LABELS = {"plan": "v2 plan (recommended)", "v2_phasing": "v2, hand-set phasing (before the optimizer)", "v1_baseline": "v1 plan (before review)",
+LABELS = {"two_million": "2 million riders by 2100 (default)", "plan": "v2 plan, budget-constrained", "v2_phasing": "v2, hand-set phasing (before the optimizer)", "v1_baseline": "v1 plan (before review)",
           "right_sized": "v2, suburban metro as BRT", "staged": "v2, optimizer's build order",
           "unstaged": "v2, lines open whole",
           "downtown_main": "Downtown FW: Main St trunk", "downtown_jones": "Downtown FW: Jones St trunk",
@@ -50,9 +51,9 @@ def write(nets, evals, out_path):
             s = net.stations[sid]
             prev = stations.get(sid)
             stations[sid] = [s.name, round(s.lat, 5), round(s.lon, 5), r["pop_1km"], r["jobs_1km"]] if not prev else prev
-        years = {}
-        for y, res in ev["results"].items():
-            g = res["graph"]
+        graphs, gkey, years = [], {}, {}
+        for y in ev["results"]:
+            g = YearGraph(net, y)
             runs = []
             wcap = cfg["wait"]["max_wait_min"]
             for run in g.runs:
@@ -63,17 +64,25 @@ def write(nets, evals, out_path):
                 for j, w, kind in g.adj[i]:
                     if kind == "walk" and i < j:
                         walks.append([g.station_ids[i], g.station_ids[j], round(w, 1)])
-            years[y] = {"runs": runs, "walks": walks}
-        scen[key] = {"label": LABELS.get(key, key), "lines": lines, "years": years,
+            # most years change nothing: store each distinct routing graph once
+            k = json.dumps([runs, walks], separators=(",", ":"))
+            if k not in gkey:
+                gkey[k] = len(graphs)
+                graphs.append({"runs": runs, "walks": walks})
+            years[y] = gkey[k]
+        scen[key] = {"label": LABELS.get(key, key), "lines": lines, "graphs": graphs, "yearGraph": years,
                      "metrics": ev["years"],
                      "boardings": {r["station_id"]: r["boardings_final"] for r in ev["stations"]}}
     data = {"years": cfg["years"], "boardPenalty": cfg["transfer"]["penalty_min"],
             "build": cfg["staging"]["construction_years"],
             "modes": {m: v["label"] for m, v in cfg["modes"].items()},
             "geoms": geoms, "stations": stations, "scen": scen,
-            "order": [k for k in ("plan", "v1_baseline", "right_sized") if k in scen] +
-                     [k for k in scen if k not in ("plan", "v1_baseline", "right_sized")]}
-    data["schem"] = schematic.build(nets)       # diagram view (dfwt/schematic.py)
+            "order": [k for k in (cfg.get("default_scenario"), "plan", "v1_baseline", "right_sized") if k in scen] +
+                     [k for k in scen if k not in (cfg.get("default_scenario"), "plan", "v1_baseline", "right_sized")]}
+    # diagram view (dfwt/schematic.py): rail and the plan's BRT. BRT a scenario adds on top of the
+    # plan (the 2M arterial grid, ~1,000 stops) is shown on the map view only, as transit diagrams
+    # leave buses off; a layout over it would crumple.
+    data["schem"] = schematic.build(schematic.diagram_nets(nets))
     with open(TEMPLATE, encoding="utf-8") as f:
         html = f.read()
     css, js = (open(p, encoding="utf-8").read() for p in SCHEM_FILES)
