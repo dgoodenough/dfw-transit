@@ -14,7 +14,7 @@ import os
 
 import numpy as np
 
-from . import config, demand
+from . import config, demand, growth
 from .geo import Projector
 from .graph import YearGraph
 from .network import Network
@@ -27,6 +27,31 @@ class Context:
         self.cfg = cfg or config.load()
         self.zones = demand.Zones(self.cfg)
         self.od, self.od_source = demand.lodes_or_gravity(self.zones, self.cfg)
+        self._seed = (None, None)     # (congestion, gravity seed) for the last year asked
+        self._year = {}               # tod_key -> (zones, od), a couple of recent entries
+
+    def year_inputs(self, net, year):
+        """Zones grown to `year` (regional growth + TOD near this network's new
+        stations + congestion) and commute flows re-balanced to them."""
+        z = growth.grown_zones(self.zones, net, year, self.cfg)
+        hit = self._year.get(z.tod_key)
+        if hit:
+            return hit
+        dc = self.cfg["demand"]
+        total = dc["total_commutes"] * z.jobs.sum() / self.zones.jobs.sum()
+        O = z.pop / z.pop.sum() * total
+        D = z.jobs / z.jobs.sum() * total
+        if self.od_source == "lodes":
+            seed = self.od
+        else:
+            if self._seed[0] != z.cong:
+                self._seed = (z.cong, demand.gravity_seed(z, self.cfg))
+            seed = self._seed[1]
+        od = demand.balance(seed, O, D, dc["gravity_iterations"])
+        if len(self._year) >= 2:
+            self._year.pop(next(iter(self._year)))
+        self._year[z.tod_key] = (z, od)
+        return z, od
 
     def station_activity(self, net):
         """Population + jobs within 1 km of each station (block-group centroids)."""
@@ -41,7 +66,7 @@ class Context:
 
 def coverage(ctx, net, year):
     """Share of population and jobs within the walkshed of an open station."""
-    z, cfg = ctx.zones, ctx.cfg
+    z, cfg = ctx.year_inputs(net, year)[0], ctx.cfg
     pj = Projector()
     near = np.zeros(z.n, dtype=bool)
     for sid, modes in net.open_stations(year).items():
@@ -55,10 +80,19 @@ def coverage(ctx, net, year):
 def run_year(ctx, net, year, want_loads=True):
     g = YearGraph(net, year)
     g.skim()
-    res = demand.evaluate(ctx.zones, ctx.od, net, g, ctx.cfg, want_loads=want_loads)
+    z, od = ctx.year_inputs(net, year)
+    res = demand.evaluate(z, od, net, g, ctx.cfg, want_loads=want_loads)
     res["graph"] = g
+    res["pop"], res["jobs"] = float(z.pop.sum()), float(z.jobs.sum())
+    rc = ctx.cfg["ridership"]
+    res["daily_trips"] = res["transit_commuters"] * rc["round_trip"] / rc["work_share_of_transit_trips"]
     if want_loads:
         res["hop_load"], res["boardings"] = demand.assign_loads(g, res["flows"])
+        bpt = float(res["boardings"].sum()) / max(float(res["flows"].sum()), 1e-9)
+        res["boardings_per_trip"] = bpt
+    else:
+        bpt = rc["boardings_per_trip"]
+    res["daily_boardings"] = res["daily_trips"] * bpt
     return res
 
 
@@ -72,7 +106,7 @@ def evaluate(ctx, net, line_values=True, log=print):
     spend = staging.spend_by_year(net)
     per_year = cfg["budget"]["musd_per_year"]
     for y in years:
-        r = run_year(ctx, net, y, want_loads=(y == final))
+        r = run_year(ctx, net, y, want_loads=True)  # loads every year: boardings per trip comes from them
         results[y] = r
         g = r["graph"]
         pcov, jcov = coverage(ctx, net, y)
@@ -95,12 +129,18 @@ def evaluate(ctx, net, line_values=True, log=print):
                "spent_busd": round(sum(v for yy, v in spend.items() if yy <= y) / 1000, 1),
                "budget_busd": round(per_year * (y - cfg["existing_year"]) / 1000, 1),
                "pop_covered_pct": round(pcov * 100, 1), "jobs_covered_pct": round(jcov * 100, 1),
+               "pop_m": round(r["pop"] / 1e6, 2), "jobs_m": round(r["jobs"] / 1e6, 2),
                "competitive_commutes": round(r["competitive_commutes"]),
+               "transit_commuters": round(r["transit_commuters"]),
+               "daily_boardings": round(r["daily_boardings"]),
+               "boardings_per_trip": round(r["boardings_per_trip"], 2),
+               "pnr_full_garages": r["pnr_full_garages"],
                "avg_transit_min": round(r["avg_transit_min"], 1)}
         for t, v in r["access_jobs"].items():
             row[f"jobs_{t}min"] = round(v)
         year_rows.append(row)
-        log(f"  {net.name} {y}: {row['stations']} stations, {row['competitive_commutes']:,} competitive commutes, "
+        log(f"  {net.name} {y}: {row['stations']} stations, {row['daily_boardings']:,} daily boardings, "
+            f"{row['competitive_commutes']:,} competitive commutes, "
             f"{row['jobs_45min']:,} jobs in 45 min, ${row['capex_busd']}B")
 
     fr = results[final]

@@ -25,7 +25,7 @@ import csv
 import os
 from dataclasses import dataclass, field
 
-from . import config, geo
+from . import config, geo, growth
 
 NEVER = 9999
 csv.field_size_limit(1 << 28)  # long fitted alignments make large WKT cells
@@ -221,8 +221,12 @@ class Network:
         """Every operating run in `year`. Track opens per segment; a stop is served
         once the stop is open and track reaches it; unopened stops are run through."""
         out = []
+        # BRT shares some of the road congestion (dedicated lanes, but signals and crossings)
+        cg = self.cfg["drive"].get("congestion")
+        brt_slow = 1.0 + (growth.congestion(self.cfg, year) - 1.0) * cg["brt_share"] if cg else 1.0
         for ln in (self.line_at(k, year) for k in self.lines):
             mode = self.cfg["modes"][ln.mode]
+            slow = brt_slow if ln.mode == "brt" else 1.0
             cur, acc, i0, i1 = None, 0.0, 0, 0
             for i, sid in enumerate(ln.stop_ids):
                 if cur is not None:
@@ -232,7 +236,7 @@ class Network:
                         if ln.stop_years[i] <= year:
                             cur.stops.append(sid)
                             cur.hop_km.append(acc)
-                            cur.hop_min.append(acc / mode["cruise_kmh"] * 60 + mode["stop_penalty_min"])
+                            cur.hop_min.append(acc / mode["cruise_kmh"] * 60 * slow + mode["stop_penalty_min"])
                             acc, i1 = 0.0, i
                         continue
                     if len(cur.stops) > 1:

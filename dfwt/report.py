@@ -32,7 +32,11 @@ def write_results(ctx, nets, evals):
             "(gravity model from 2020 census population and 2022 LODES jobs, fitted to a ~17 km mean "
             "commute; drop LODES OD into `data/raw/od_tracts.csv` to use real flows). Trust comparisons "
             "between plans and lines more than absolute counts."),
-         "", "Definitions: *competitive commute* = transit door-to-door time no more than 1.3x the peak "
+         "", "Definitions: *daily boardings* = weekday boardings on the modeled rail and BRT network "
+         "(local buses are not modeled), estimated from the commute model with a mode-choice logit calibrated "
+         "to today's ~80k rail boardings; see `config.json` -> `ridership`. Population and jobs grow by year "
+         "(regional forecast plus development near new stations; `growth`), and peak drive times grow a "
+         "little (`drive.congestion`). *Competitive commute* = transit door-to-door time no more than 1.3x the peak "
          "drive + 5 min (under 90 min, over 2 km). *Jobs in 45 min* = jobs reachable by transit in 45 "
          "minutes, averaged over every resident of the nine counties. *Coverage* = residents within "
          "800 m of a metro/BRT stop or 1.6 km of a commuter rail station. Costs are 2025 USD; shared "
@@ -40,7 +44,8 @@ def write_results(ctx, nets, evals):
 
     L += ["## Plan vs. scenarios", ""]
     hdr = ["Scenario"] + [f"{y}" for y in KEY_YEARS]
-    for metric, label, f in (("competitive_commutes", "Competitive commutes", lambda v: f"{v / 1000:.0f}k"),
+    for metric, label, f in (("daily_boardings", "Daily boardings (rail + BRT)", lambda v: f"{v / 1000:.0f}k"),
+                             ("competitive_commutes", "Competitive commutes", lambda v: f"{v / 1000:.0f}k"),
                              ("jobs_45min", "Jobs reachable in 45 min (avg resident)", lambda v: f"{v / 1000:.1f}k"),
                              ("pop_covered_pct", "Residents near a station", lambda v: f"{v}%"),
                              ("capex_busd", "Capital spent, cumulative", lambda v: f"${v}B")):
@@ -62,8 +67,9 @@ def write_results(ctx, nets, evals):
               _table(["Year", "Competitive commutes vs v1", "Jobs in 45 min vs v1", "Capital vs v1 ($B)"], rows), ""]
 
     L += ["## Plan by year", ""]
-    cols = ["year", "stations", "lines", "km_metro", "km_brt", "km_commuter", "capex_busd",
-            "pop_covered_pct", "jobs_covered_pct", "competitive_commutes", "jobs_45min", "avg_transit_min"]
+    cols = ["year", "pop_m", "jobs_m", "stations", "lines", "km_metro", "km_brt", "km_commuter", "capex_busd",
+            "pop_covered_pct", "competitive_commutes", "daily_boardings", "boardings_per_trip",
+            "pnr_full_garages", "jobs_45min", "avg_transit_min"]
     L += [_table(cols, [[r[c] if c == "year" else _fmt(r[c]) for c in cols] for r in plan["years"]]), ""]
 
     L += ["## Proposed lines, by value", "",

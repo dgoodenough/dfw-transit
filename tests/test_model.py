@@ -6,7 +6,7 @@ import numpy as np
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from dfwt import config, demand, validate  # noqa: E402
+from dfwt import config, demand, growth, validate  # noqa: E402
 from dfwt.graph import YearGraph  # noqa: E402
 from dfwt.network import Network  # noqa: E402
 
@@ -102,6 +102,7 @@ class DemandTests(unittest.TestCase):
             x = np.array([0.0, 5, 10, 20])
             y = np.zeros(4)
             cfg_ = cfg
+            cong = 1.0
 
             def dist_rows(self, i0, i1):
                 return np.abs(self.x[i0:i1, None] - self.x[None, :]).astype(np.float32)
@@ -115,6 +116,26 @@ class DemandTests(unittest.TestCase):
         total = cfg["demand"]["total_commutes"]
         np.testing.assert_allclose(od.sum(axis=1), z.pop / z.pop.sum() * total, rtol=1e-3)
         np.testing.assert_allclose(od.sum(axis=0), z.jobs / z.jobs.sum() * total, rtol=1e-3)
+
+    def test_growth_keeps_regional_totals_honest(self):
+        cfg = config.load()
+        base = np.array([100.0, 200, 300, 400])
+        up = np.array([0.5, 0.0, 0.0, 0.0])
+        g = growth._grow(base, 1.5, up, 0.2)
+        # only 20% of the uplift is new to the region; the rest comes from elsewhere
+        self.assertAlmostEqual(g.sum(), base.sum() * 1.5 + 0.2 * 100 * 1.5 * 0.5, places=6)
+        self.assertGreater(g[0], base[0] * 1.5)
+        self.assertLess(g[3], base[3] * 1.5)
+        self.assertAlmostEqual(growth.congestion(cfg, cfg["drive"]["congestion"]["base_year"]), 1.0)
+        self.assertLessEqual(growth.congestion(cfg, 2300), 1 + cfg["drive"]["congestion"]["cap"] + 1e-9)
+
+    def test_balance_hits_row_and_column_totals(self):
+        K = np.random.default_rng(1).random((5, 5)).astype(np.float32)
+        O = np.array([1.0, 2, 3, 4, 5])
+        D = np.array([3.0, 3, 3, 3, 3])
+        out = demand.balance(K, O, D, 50)
+        np.testing.assert_allclose(out.sum(axis=1), O, rtol=1e-3)
+        np.testing.assert_allclose(out.sum(axis=0), D, rtol=1e-3)
 
 
 if __name__ == "__main__":

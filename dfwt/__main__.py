@@ -7,6 +7,7 @@
   python -m dfwt stage F03 --split-at "Central Station,Medical City - Baylor" --years 2035,2040,2045 [--write]
   python -m dfwt optimize [--out staged]                  suggest a staged build order (writes a scenario)
   python -m dfwt align [--lines F02,E10] [--write]        make alignments buildable (see dfwt/geometry.py)
+  python -m dfwt ridership [--scenario NAME] [--years 2050,2070,2100]   daily boardings, growth, garages
 """
 import argparse
 import os
@@ -57,6 +58,21 @@ def cmd_build(args):
     report.write_all(ctx, nets, evals, findings)
     webmap.write(nets, evals, config.path("docs", "index.html"))
     print(f"done in {time.time() - t0:.0f}s: results/, reports/RESULTS.md, reports/VALIDATION.md, docs/index.html")
+    return 0
+
+
+def cmd_ridership(args):
+    from .evaluate import Context, run_year
+    cfg = config.load()
+    ctx = Context(cfg)
+    net = Network.load(args.scenario, cfg)
+    years = [int(y) for y in args.years.split(",")]
+    print("year   pop    jobs  stations  boardings  trips/day  commuters  competitive  per-trip  P&R  full garages")
+    for y in years:
+        r = run_year(ctx, net, y, want_loads=True)
+        print(f"{y}  {r['pop'] / 1e6:5.2f}M {r['jobs'] / 1e6:5.2f}M  {r['graph'].n_st:7d}  {r['daily_boardings']:9,.0f}  "
+              f"{r['daily_trips']:9,.0f}  {r['transit_commuters']:9,.0f}  {r['competitive_commutes']:11,.0f}  "
+              f"{r['boardings_per_trip']:8.2f}  {r['pnr_riders']:6,.0f}  {r['pnr_full_garages']:3d}", flush=True)
     return 0
 
 
@@ -178,6 +194,9 @@ def main(argv=None):
     v.add_argument("-v", "--verbose", action="store_true")
     b = sub.add_parser("build")
     b.add_argument("--quick", action="store_true", help="skip per-line leave-one-out values")
+    rd = sub.add_parser("ridership", help="daily boardings and growth for chosen years (any year, e.g. 2100)")
+    rd.add_argument("--scenario")
+    rd.add_argument("--years", default="2025,2050,2070,2100")
     t = sub.add_parser("trip")
     t.add_argument("origin")
     t.add_argument("dest")
@@ -200,7 +219,8 @@ def main(argv=None):
     a.add_argument("--write", action="store_true")
     args = p.parse_args(argv)
     return {"validate": cmd_validate, "build": cmd_build, "trip": cmd_trip, "stage": cmd_stage,
-            "optimize": cmd_optimize, "align": cmd_align}[args.cmd](args)
+            "optimize": cmd_optimize, "align": cmd_align,
+            "ridership": cmd_ridership}[args.cmd](args)
 
 
 if __name__ == "__main__":
