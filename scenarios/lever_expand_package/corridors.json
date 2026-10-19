@@ -1,0 +1,433 @@
+{
+ "_doc": "Recommended expansion package: the job-campus lever (SH-114 light metro, job-campus BRT links, 8 infill stops) plus the arterial BRT grid (31 phase-1 corridors) and 14 phase-2 corridors, started in 2065 with the budget the 2025-2070 plan leaves unspent, finished by 2090. Built by tools/gen_expansion.py.",
+ "year_shift": -10,
+ "include": [
+  "lever_expand_jobs",
+  "lever_expand_brtgrid"
+ ],
+ "lines": [
+  {
+   "id": "XB32",
+   "name": "Josey Lane BRT",
+   "mode": "brt",
+   "color": "#00838f",
+   "grade": "surface",
+   "spacing_km": 0.8,
+   "notes": "Expansion lever: arterial BRT grid phase 2",
+   "stops": [
+    "X128",
+    {
+     "lat": 32.99,
+     "lon": -96.89,
+     "via": true
+    },
+    {
+     "lat": 33.03,
+     "lon": -96.89,
+     "via": true
+    },
+    {
+     "lat": 33.07,
+     "lon": -96.89,
+     "via": true
+    },
+    {
+     "lat": 33.1,
+     "lon": -96.88
+    }
+   ],
+   "year": 2090
+  },
+  {
+   "id": "XB33",
+   "name": "Denton-Corinth BRT",
+   "mode": "brt",
+   "color": "#00838f",
+   "grade": "surface",
+   "spacing_km": 0.8,
+   "notes": "Expansion lever: arterial BRT grid phase 2",
+   "stops": [
+    "X095",
+    {
+     "lat": 33.19,
+     "lon": -97.117,
+     "via": true
+    },
+    {
+     "lat": 33.17,
+     "lon": -97.1,
+     "via": true
+    },
+    {
+     "lat": 33.15,
+     "lon": -97.07
+    }
+   ],
+   "year": 2095
+  },
+  {
+   "id": "XB34",
+   "name": "Shiloh Road BRT",
+   "mode": "brt",
+   "color": "#00838f",
+   "grade": "surface",
+   "spacing_km": 0.8,
+   "notes": "Expansion lever: arterial BRT grid phase 2",
+   "stops": [
+    {
+     "lat": 32.8,
+     "lon": -96.66
+    },
+    {
+     "lat": 32.84,
+     "lon": -96.662,
+     "via": true
+    },
+    {
+     "lat": 32.88,
+     "lon": -96.663,
+     "via": true
+    },
+    {
+     "lat": 32.925,
+     "lon": -96.663,
+     "via": true
+    },
+    {
+     "lat": 32.965,
+     "lon": -96.66
+    }
+   ],
+   "year": 2090
+  },
+  {
+   "id": "XB35",
+   "name": "Lewisville Main Street BRT",
+   "mode": "brt",
+   "color": "#00838f",
+   "grade": "surface",
+   "spacing_km": 0.8,
+   "notes": "Expansion lever: arterial BRT grid phase 2",
+   "stops": [
+    {
+     "lat": 33.06,
+     "lon": -97.1
+    },
+    {
+     "lat": 33.058,
+     "lon": -97.045,
+     "via": true
+    },
+    {
+     "lat": 33.058,
+     "lon": -97.0175,
+     "via": true
+    },
+    "X092"
+   ],
+   "year": 2095
+  },
+  {
+   "id": "XB36",
+   "name": "Southwest Arlington BRT",
+   "mode": "brt",
+   "color": "#00838f",
+   "grade": "surface",
+   "spacing_km": 0.8,
+   "notes": "Expansion lever: arterial BRT grid phase 2",
+   "stops": [
+    {
+     "lat": 32.65,
+     "lon": -97.2
+    },
+    {
+     "lat": 32.652,
+     "lon": -97.176,
+     "via": true
+    },
+    {
+     "lat": 32.655,
+     "lon": -97.135,
+     "via": true
+    },
+    {
+     "lat": 32.6535,
+     "lon": -97.0757,
+     "via": true
+    },
+    "X464"
+   ],
+   "year": 2090
+  },
+  {
+   "id": "XB37",
+   "name": "Burleson-Crowley BRT",
+   "mode": "brt",
+   "color": "#00838f",
+   "grade": "surface",
+   "spacing_km": 0.8,
+   "notes": "Expansion lever: arterial BRT grid phase 2",
+   "stops": [
+    "X538",
+    {
+     "lat": 32.59,
+     "lon": -97.33,
+     "via": true
+    },
+    {
+     "lat": 32.56,
+     "lon": -97.335,
+     "via": true
+    },
+    {
+     "lat": 32.54,
+     "lon": -97.34,
+     "via": true
+    },
+    {
+     "lat": 32.52,
+     "lon": -97.335
+    }
+   ],
+   "year": 2095
+  },
+  {
+   "id": "XB38",
+   "name": "Mid-Cities Boulevard BRT",
+   "mode": "brt",
+   "color": "#00838f",
+   "grade": "surface",
+   "spacing_km": 0.8,
+   "notes": "Expansion lever: arterial BRT grid phase 2",
+   "stops": [
+    {
+     "lat": 32.87,
+     "lon": -97.28
+    },
+    {
+     "lat": 32.869,
+     "lon": -97.24,
+     "via": true
+    },
+    {
+     "lat": 32.868,
+     "lon": -97.2,
+     "via": true
+    },
+    {
+     "lat": 32.867,
+     "lon": -97.15,
+     "via": true
+    },
+    {
+     "lat": 32.866,
+     "lon": -97.11
+    }
+   ],
+   "year": 2090
+  },
+  {
+   "id": "XB39",
+   "name": "West Frisco BRT",
+   "mode": "brt",
+   "color": "#00838f",
+   "grade": "surface",
+   "spacing_km": 0.8,
+   "notes": "Expansion lever: arterial BRT grid phase 2",
+   "stops": [
+    "X215",
+    {
+     "lat": 33.15,
+     "lon": -96.885,
+     "via": true
+    },
+    {
+     "lat": 33.17,
+     "lon": -96.89,
+     "via": true
+    },
+    {
+     "lat": 33.2,
+     "lon": -96.885
+    }
+   ],
+   "year": 2095
+  },
+  {
+   "id": "XB40",
+   "name": "McKinney Virginia Parkway BRT",
+   "mode": "brt",
+   "color": "#00838f",
+   "grade": "surface",
+   "spacing_km": 0.8,
+   "notes": "Expansion lever: arterial BRT grid phase 2",
+   "stops": [
+    {
+     "lat": 33.195,
+     "lon": -96.77
+    },
+    {
+     "lat": 33.2,
+     "lon": -96.73,
+     "via": true
+    },
+    {
+     "lat": 33.205,
+     "lon": -96.69,
+     "via": true
+    },
+    {
+     "lat": 33.214,
+     "lon": -96.64,
+     "via": true
+    },
+    {
+     "lat": 33.197,
+     "lon": -96.615
+    }
+   ],
+   "year": 2095
+  },
+  {
+   "id": "XB41",
+   "name": "Watauga-Keller BRT",
+   "mode": "brt",
+   "color": "#00838f",
+   "grade": "surface",
+   "spacing_km": 0.8,
+   "notes": "Expansion lever: arterial BRT grid phase 2",
+   "stops": [
+    "X075",
+    {
+     "lat": 32.833,
+     "lon": -97.3035,
+     "via": true
+    },
+    {
+     "lat": 32.868,
+     "lon": -97.301,
+     "via": true
+    },
+    {
+     "lat": 32.896,
+     "lon": -97.302,
+     "via": true
+    },
+    {
+     "lat": 32.923,
+     "lon": -97.302
+    }
+   ],
+   "year": 2090
+  },
+  {
+   "id": "XB42",
+   "name": "Denton Tap BRT",
+   "mode": "brt",
+   "color": "#00838f",
+   "grade": "surface",
+   "spacing_km": 0.8,
+   "notes": "Expansion lever: arterial BRT grid phase 2",
+   "stops": [
+    "X319",
+    {
+     "lat": 32.973,
+     "lon": -96.99,
+     "via": true
+    },
+    {
+     "lat": 33.0,
+     "lon": -96.99,
+     "via": true
+    },
+    {
+     "lat": 33.03,
+     "lon": -96.995
+    }
+   ],
+   "year": 2095
+  },
+  {
+   "id": "XB43",
+   "name": "West Dallas-Irving BRT",
+   "mode": "brt",
+   "color": "#00838f",
+   "grade": "surface",
+   "spacing_km": 0.8,
+   "notes": "Expansion lever: arterial BRT grid phase 2",
+   "stops": [
+    "X412",
+    {
+     "lat": 32.785,
+     "lon": -96.889,
+     "via": true
+    },
+    {
+     "lat": 32.8,
+     "lon": -96.92,
+     "via": true
+    },
+    {
+     "lat": 32.814,
+     "lon": -96.948
+    }
+   ],
+   "year": 2090
+  },
+  {
+   "id": "XB44",
+   "name": "Sachse-Wylie BRT",
+   "mode": "brt",
+   "color": "#00838f",
+   "grade": "surface",
+   "spacing_km": 0.8,
+   "notes": "Expansion lever: arterial BRT grid phase 2",
+   "stops": [
+    {
+     "lat": 32.965,
+     "lon": -96.66
+    },
+    {
+     "lat": 32.99,
+     "lon": -96.6,
+     "via": true
+    },
+    {
+     "lat": 33.005,
+     "lon": -96.54
+    }
+   ],
+   "year": 2100
+  },
+  {
+   "id": "XB45",
+   "name": "Matlock-Mansfield BRT",
+   "mode": "brt",
+   "color": "#00838f",
+   "grade": "surface",
+   "spacing_km": 0.8,
+   "notes": "Expansion lever: arterial BRT grid phase 2",
+   "stops": [
+    {
+     "lat": 32.66,
+     "lon": -97.09
+    },
+    {
+     "lat": 32.624,
+     "lon": -97.08,
+     "via": true
+    },
+    {
+     "lat": 32.6,
+     "lon": -97.11,
+     "via": true
+    },
+    {
+     "lat": 32.57,
+     "lon": -97.129
+    }
+   ],
+   "year": 2100
+  }
+ ]
+}
