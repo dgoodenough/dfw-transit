@@ -98,14 +98,19 @@ class Access:
         slat = np.array([net.stations[s].lat for s in sids])
         slon = np.array([net.stations[s].lon for s in sids])
         sx, sy = geo.Projector().xy(slat, slon)
-        # which stations allow park & ride: commuter stations and line termini
+        # which stations allow park & ride: commuter stations and each line's planned
+        # termini (where the garage gets built). A temporary end of a partly built line
+        # gets none, or every stub would look like a park & ride hub.
         pnr = np.zeros(len(sids), dtype=bool)
         idx = graph.sidx
         for run in graph.runs:
             if run.line.mode == "commuter":
                 for s in run.stops:
                     pnr[idx[s]] = True
-            pnr[idx[run.stops[0]]] = pnr[idx[run.stops[-1]]] = True
+            full = net.lines.get(run.line.id, run.line)
+            for s in (full.stop_ids[0], full.stop_ids[-1]):
+                if s in idx:
+                    pnr[idx[s]] = True
         walk_km = ac["walk_max_m"] / 1000
         run_cols = [np.array(sorted({idx[s] for s in run.stops})) for run in graph.runs]
         k = min(k, len(run_cols))
