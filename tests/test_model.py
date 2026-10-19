@@ -138,6 +138,82 @@ class DemandTests(unittest.TestCase):
         np.testing.assert_allclose(out.sum(axis=0), D, rtol=1e-3)
 
 
+class LandUsePolicyTests(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.cfg = config.load()
+        cls.zones = demand.Zones(cls.cfg)
+        cls.net = Network.load(None, cls.cfg)
+
+    def test_growth_capture_moves_growth_to_stations_without_changing_totals(self):
+        import copy as cp
+        cfg = cp.deepcopy(self.cfg)
+        base = growth.grown_zones(self.zones, self.net, 2050, cfg)
+        cfg["growth"]["capture"]["job_centers"]["jobs_share"] = 0.1
+        cen = growth.grown_zones(self.zones, self.net, 2050, cfg)
+        self.assertGreater(cen.capture["center_jobs"], 0)
+        self.assertAlmostEqual(cen.jobs.sum(), base.jobs.sum(), delta=1.0)
+        cfg["growth"]["capture"]["job_centers"]["jobs_share"] = 0.0
+        cfg["growth"]["capture"].update(pop_share=0.5, jobs_share=0.5)
+        pol = growth.grown_zones(self.zones, self.net, 2050, cfg)
+        self.assertAlmostEqual(pol.pop.sum(), base.pop.sum(), delta=1.0)
+        self.assertAlmostEqual(pol.jobs.sum(), base.jobs.sum(), delta=1.0)
+        near = growth.near_stations(base, self.net, 2050)
+        self.assertGreater(pol.pop[near].sum(), base.pop[near].sum() + 0.9 * pol.capture["captured_pop"])
+        self.assertTrue((pol.pop >= 0).all() and (pol.jobs >= 0).all())
+        # no station area is filled past its target density (unless it already was)
+        c = cfg["growth"]["capture"]
+        sa = growth.station_areas(self.zones, self.net, 2050, cfg, c["radius_m"])
+        ins = sa["zone_st"] >= 0
+        act = lambda z: np.bincount(sa["zone_st"][ins], weights=(z.pop + z.jobs)[ins], minlength=len(sa["sids"]))
+        cap = np.array([c["target_density_per_km2"][s] * c["mode_factor"][m]
+                        for s, m in zip(sa["setting"], sa["mode"])]) * sa["area"]
+        before, after = act(base), act(pol)
+        grew = after > before + 1
+        self.assertTrue(grew.any())
+        # (a station that opens next to an earlier one takes over land, and growth, placed
+        # under the earlier one's headroom, so allow a few over)
+        within = after[grew] <= np.maximum(cap[grew], before[grew]) * 1.15 + 1
+        self.assertGreater(within.mean(), 0.95)
+
+    def test_growth_cases_follow_the_alt_tables(self):
+        import copy as cp
+        cfg = cp.deepcopy(self.cfg)
+        mid_j = growth.regional(cfg, "jobs", 2070)
+        cfg["growth"]["case"] = "high"
+        hi = cfg["growth"]["alt"]["high_pop"]
+        self.assertAlmostEqual(growth.regional(cfg, "pop", 2070), hi["2070"])
+        ratio = hi["2070"] / cfg["growth"]["regional_pop"]["2070"]
+        self.assertAlmostEqual(growth.regional(cfg, "jobs", 2070), mid_j * ratio)
+
+    def test_upzoning_gives_existing_stations_tod(self):
+        import copy as cp
+        cfg = cp.deepcopy(self.cfg)
+        p0, _ = growth.tod_uplift(self.zones, self.net, 2025, cfg)
+        cfg["growth"]["tod"]["upzone_existing_year"] = 2020
+        p1, _ = growth.tod_uplift(self.zones, self.net, 2025, cfg)
+        self.assertEqual(p0.max(), 0.0)
+        self.assertGreater(p1.max(), 0.0)
+
+    def test_parking_policy_phases_in(self):
+        import copy as cp
+        cfg = cp.deepcopy(self.cfg)
+        pol = cfg["ridership"]["parking_policy"]
+        pol.update(price_growth=1.0, priced_centers={"min_jobs_per_km2": 10000, "usd_per_day": 8},
+                   cashout={"min_jobs_per_km2": 2000, "usd_per_day": 5, "coverage": 0.5})
+        z = demand.Zones(cfg)
+        z._dist = self.zones.dist_rows(0, self.zones.n)
+        today = z.parking_usd()
+        g = cp.copy(z)
+        g.year, g.tod_key = 2050, ("test", 2050)
+        usd, cash, cov = g.parking_usd()
+        self.assertAlmostEqual(usd.max(), 2 * today[0].max())       # prices doubled by full_year
+        self.assertGreater((usd > 0).sum(), (today[0] > 0).sum())    # more priced places
+        self.assertEqual(today[2].max(), 0.0)
+        self.assertAlmostEqual(cov.max(), 0.5)
+        self.assertEqual(float(cov[usd > 0].max()), 0.0)             # no cash-out where parking is priced
+
+
 if __name__ == "__main__":
     unittest.main()
 
