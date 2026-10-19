@@ -138,6 +138,107 @@ class DemandTests(unittest.TestCase):
         np.testing.assert_allclose(out.sum(axis=0), D, rtol=1e-3)
 
 
+class AccessTests(unittest.TestCase):
+    """Feeder bus and other optional access modes (config.access)."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls.net = Network.load()
+        cls.g = YearGraph(cls.net, 2025)
+        from dfwt import geo
+        pj = geo.Projector()
+        st = cls.net.stations[cls.g.station_ids[0]]
+        sx, sy = pj.xy(np.array([s_.lat for s_ in map(cls.net.stations.get, cls.g.station_ids)]),
+                       np.array([s_.lon for s_ in map(cls.net.stations.get, cls.g.station_ids)]))
+        x0, y0 = pj.xy(st.lat, st.lon)
+        # a zone on a station, and one 1.5-5 km from the nearest station
+        far = None
+        for ang in np.linspace(0, 2 * np.pi, 24, endpoint=False):
+            for r in (2.5, 3.0, 3.5, 4.0):
+                x, y = x0 + r * np.cos(ang), y0 + r * np.sin(ang)
+                dmin = float(np.sqrt((sx - x) ** 2 + (sy - y) ** 2).min())
+                if 1.5 < dmin < 4.5:
+                    far = (x, y, dmin)
+                    break
+            if far:
+                break
+        assert far, "no test point found"
+        cls.dmin = far[2]
+
+        class Z:
+            n = 2
+            x = np.array([x0, far[0]])
+            y = np.array([y0, far[1]])
+            pop = np.array([5000.0, 5000.0])
+            jobs = np.array([1000.0, 1000.0])
+            cong = 1.0
+        cls.Z = Z
+
+    def cfg(self, **feeder):
+        cfg = config.load()
+        cfg["access"]["feeder"].update({"enabled": True, "min_density_per_km2": 0, **feeder})
+        return cfg
+
+    def test_feeders_are_off_by_default(self):
+        acc = demand.Access(self.Z(), self.net, self.g, config.load())
+        self.assertFalse((acc.acc_mode == demand.FEEDER).any())
+        self.assertFalse((acc.egr_mode == demand.FEEDER).any())
+
+    def test_feeder_reaches_a_zone_beyond_walking_distance(self):
+        cfg = self.cfg(headway_min={"2025": 10})
+        fd = cfg["access"]["feeder"]
+        acc = demand.Access(self.Z(), self.net, self.g, cfg, pnr=False)
+        # the zone on a station walks; the far zone rides the bus to its nearest station
+        self.assertEqual(acc.acc_mode[0, 0], demand.WALK)
+        self.assertEqual(acc.acc_mode[1, 0], demand.FEEDER)
+        self.assertEqual(acc.egr_mode[1, 0], demand.FEEDER)
+        ovt = fd["stop_walk_min"] + 10 * cfg["wait"]["fraction_of_headway"] + fd["transfer_penalty_min"]
+        t = ovt + self.dmin * fd["circuity"] / fd["speed_kmh"] * 60
+        self.assertAlmostEqual(float(acc.acc_t[1, 0]), t, places=3)
+        self.assertAlmostEqual(float(acc.acc_o[1, 0]), ovt, places=3)   # bus riding is in-vehicle time
+
+    def test_feeder_only_from_its_first_year_and_where_dense_enough(self):
+        acc = demand.Access(self.Z(), self.net, self.g, self.cfg(headway_min={"2030": 10}), pnr=False)
+        self.assertFalse((acc.acc_mode == demand.FEEDER).any())
+        acc = demand.Access(self.Z(), self.net, self.g,
+                            self.cfg(headway_min={"2025": 10}, min_density_per_km2=1e9), pnr=False)
+        self.assertFalse((acc.acc_mode == demand.FEEDER).any())
+
+    def test_suburban_garages_are_spaced_and_kept_out_of_downtowns(self):
+        from dfwt import geo
+        cfg = config.load()
+        sub = cfg["access"]["pnr_suburban"]
+        sub.update(enabled=True, from_year=2025, modes=["metro", "brt", "commuter"])
+        g = YearGraph(self.net, 2070)
+        before = demand.Access(self.Z(), self.net, g, config.load()).pnr_cap > 0
+        cap = demand.Access(self.Z(), self.net, g, cfg).pnr_cap
+        new = np.nonzero((cap > 0) & ~before)[0]
+        self.assertGreater(len(new), 0)
+        pts = [self.net.stations[g.station_ids[i]] for i in new]
+        for c in cfg["cores"].values():
+            if isinstance(c, dict):
+                for s in pts:
+                    self.assertGreaterEqual(geo.hav_km(s.lat, s.lon, c["lat"], c["lon"]), sub["min_core_km"] - 0.1)
+        for a in range(len(pts)):
+            for b in range(a + 1, len(pts)):
+                self.assertGreaterEqual(geo.hav_km(pts[a].lat, pts[a].lon, pts[b].lat, pts[b].lon),
+                                        sub["min_spacing_km"] - 0.1)
+        np.testing.assert_allclose(cap[new], sub["spaces"] * cfg["access"]["pnr_people_per_space"])
+
+    def test_year_tables_and_segments(self):
+        self.assertIsNone(demand.in_effect({"2030": 15}, 2025))
+        self.assertEqual(demand.in_effect({"2025": 30, "2030": 15}, 2027), 30)
+        self.assertEqual(demand.in_effect({"2025": 30, "2030": 15}, 2100), 15)
+        cfg = config.load()
+        self.assertEqual(demand.access_segments(cfg, 2050), [(1.0, ())])
+        cfg["access"]["micromobility"]["enabled"] = True
+        cfg["access"]["kiss_ride"]["enabled"] = True
+        segs = demand.access_segments(cfg, 2050)
+        self.assertAlmostEqual(sum(w for w, _ in segs), 1.0)
+        self.assertEqual(len(segs), 3)
+        self.assertEqual(demand.access_segments(cfg, 2025), [(1.0, ())])  # before from_year
+
+
 if __name__ == "__main__":
     unittest.main()
 

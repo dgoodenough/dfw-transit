@@ -103,6 +103,7 @@ def grown_zones(zones, net, year, cfg):
     g = cfg["growth"]
     up_p, up_j = tod_uplift(zones, net, year, cfg)
     z = copy.copy(zones)
+    z.base = getattr(zones, "base", zones)   # base-year data (e.g. for a station's setting)
     nn = g["tod"]["net_new_share"]
     z.pop = _grow(zones.pop, interp(g["regional_pop"], year), up_p, nn)
     z.jobs = _grow(zones.jobs, interp(g["regional_jobs"], year), up_j, nn)

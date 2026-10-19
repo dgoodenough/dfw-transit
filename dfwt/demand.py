@@ -129,11 +129,76 @@ def lodes_or_gravity(zones, cfg):
     return od, "lodes"
 
 
-class Access:
-    """Zone <-> station connectors for one year's open stations."""
+# Access modes. Walk and park & ride are the base model; feeder bus, micromobility
+# and kiss-and-ride are levers (config.access.feeder / micromobility / kiss_ride),
+# all off by default.
+WALK, PNR, FEEDER, BIKE, KISS = range(5)
+_SETTING = {}   # id(base zones) -> {station id: 'downtown' / 'urban' / 'suburban'}
+ACCESS_MODES = ("walk", "pnr", "feeder", "bike", "kiss")
 
-    def __init__(self, zones, net, graph, cfg):
+
+def in_effect(table, year):
+    """Value of a {year: value} table in `year`: the entry with the latest year
+    <= `year`, or None before the first. A plain number applies to every year."""
+    if not isinstance(table, dict):
+        return table
+    out = None
+    for y, v in sorted((int(k), v) for k, v in table.items() if not str(k).startswith("_")):
+        if y <= year:
+            out = v
+    return out
+
+
+def feeder_headway(cfg, year):
+    """Feeder bus headway (min) in `year`, or None where no feeder grid is assumed."""
+    f = cfg["access"].get("feeder") or {}
+    return in_effect(f.get("headway_min"), year) if f.get("enabled") else None
+
+
+def access_segments(cfg, year):
+    """[(weight, extra_modes)]: the commuter market split by which optional access
+    modes each part will use. Everyone can walk, park & ride (where a garage is) and
+    ride a feeder bus; only `share` of commuters will bike/scoot or be dropped off."""
+    ac = cfg["access"]
+    segs, rest = [], 1.0
+    for key, mode in (("micromobility", BIKE), ("kiss_ride", KISS)):
+        o = ac.get(key) or {}
+        if o.get("enabled") and o.get("share", 0) > 0 and year >= o.get("from_year", 0):
+            segs.append((float(o["share"]), (mode,)))
+            rest -= float(o["share"])
+    return [(rest, ())] + segs
+
+
+def activity_density(zones, r_km=0.8):
+    """People + jobs per km2 within r_km of each zone centroid (cached per zones object)."""
+    key = ("_density", r_km)
+    hit = zones.__dict__.get(key)
+    if hit is not None:
+        return hit
+    act = (zones.pop + zones.jobs).astype(np.float32)
+    out = np.empty(zones.n)
+    for i0 in range(0, zones.n, CHUNK):
+        i1 = min(zones.n, i0 + CHUNK)
+        d2 = (zones.x[i0:i1, None] - zones.x[None, :]) ** 2 + (zones.y[i0:i1, None] - zones.y[None, :]) ** 2
+        out[i0:i1] = (d2 <= r_km * r_km).astype(np.float32) @ act
+    out /= np.pi * r_km * r_km
+    zones.__dict__[key] = out
+    return out
+
+
+class Access:
+    """Zone <-> station connectors for one year's open stations.
+
+    Per zone, up to k access (origin end) and egress (destination end) stations,
+    each with door-to-platform minutes (`*_t`), the out-of-vehicle part of those
+    minutes (`*_o`, weighted extra in the mode-choice logit) and the access mode
+    (`*_mode`, one of ACCESS_MODES). `extra` adds the segment-only modes (BIKE,
+    KISS); `pnr=False` drops park & ride (the fallback for riders a full garage
+    turns away)."""
+
+    def __init__(self, zones, net, graph, cfg, extra=(), pnr=True):
         ac = cfg["access"]
+        year = graph.year
         k = ac["max_access_stations"]
         sids = graph.station_ids
         slat = np.array([net.stations[s].lat for s in sids])
@@ -142,44 +207,117 @@ class Access:
         # which stations allow park & ride: commuter stations and each line's planned
         # termini (where the garage gets built). A temporary end of a partly built line
         # gets none, or every stub would look like a park & ride hub.
-        pnr = np.zeros(len(sids), dtype=bool)
+        is_pnr = np.zeros(len(sids), dtype=bool)
         spaces = np.zeros(len(sids))
         sp = ac["pnr_spaces"]
         idx = graph.sidx
         for run in graph.runs:
             if run.line.mode == "commuter":
                 for s in run.stops:
-                    pnr[idx[s]] = True
+                    is_pnr[idx[s]] = True
                     spaces[idx[s]] = max(spaces[idx[s]], sp["commuter_station"])
             full = net.lines.get(run.line.id, run.line)
             for s in (full.stop_ids[0], full.stop_ids[-1]):
                 if s in idx:
-                    pnr[idx[s]] = True
+                    is_pnr[idx[s]] = True
                     spaces[idx[s]] = max(spaces[idx[s]], sp["terminus"])
+        # optional lever: garages at selected suburban stations (Wiehle-Reston East style:
+        # a structured garage wrapped by development, so TOD uplift is unchanged). Only
+        # stations whose setting is suburban (growth.setting on base-year density), at
+        # least min_core_km from a downtown, and min_spacing_km from every other garage;
+        # outermost candidates first.
+        sub = ac.get("pnr_suburban") or {}
+        if sub.get("enabled") and year >= sub.get("from_year", 0):
+            from . import growth
+            base = getattr(zones, "base", zones)
+            cores = [c for c in cfg["cores"].values() if isinstance(c, dict)]
+            core_km = np.full(len(sids), np.inf)
+            for c in cores:
+                cx, cy = geo.Projector().xy(c["lat"], c["lon"])
+                core_km = np.minimum(core_km, np.sqrt((sx - cx) ** 2 + (sy - cy) ** 2))
+            cand = sorted({idx[s] for run in graph.runs if run.line.mode in sub["modes"] for s in run.stops
+                           if core_km[idx[s]] >= sub["min_core_km"] and not is_pnr[idx[s]]},
+                          key=lambda i: (-core_km[i], i))
+            cache = _SETTING.setdefault(id(base), {})
+            gap = sub.get("min_spacing_km", 0)
+            for i in cand:
+                if sub.get("setting"):
+                    if sids[i] not in cache:
+                        st = net.stations[sids[i]]
+                        cache[sids[i]] = growth.setting(base, st.lat, st.lon, cfg)
+                    if cache[sids[i]] != sub["setting"]:
+                        continue
+                if gap and is_pnr.any() and np.sqrt((sx[is_pnr] - sx[i]) ** 2 + (sy[is_pnr] - sy[i]) ** 2).min() < gap:
+                    continue
+                is_pnr[i] = True
+                spaces[i] = sub["spaces"]
+        if not pnr:
+            is_pnr[:] = False
         # people a garage can serve per day (one car per commuter, plus drop-offs)
         self.pnr_cap = spaces * ac["pnr_people_per_space"]
         walk_km = ac["walk_max_m"] / 1000
+        cong = getattr(zones, "cong", 1.0)
+        # feeder bus: walk to the bus stop, wait half the headway, ride at bus speed
+        # in general traffic (it takes the congestion), transfer to the line.
+        fh = feeder_headway(cfg, year)
+        fd = ac.get("feeder") or {}
+        if fh:
+            wcap = cfg["wait"]["max_wait_min"]
+            f_ovt = fd["stop_walk_min"] + min(fh * cfg["wait"]["fraction_of_headway"], wcap) + fd["transfer_penalty_min"]
+            f_ivt = fd["circuity"] / fd["speed_kmh"] * 60 * cong   # minutes per straight-line km
+            f_zone = activity_density(zones) >= fd.get("min_density_per_km2", 0)
+        mm = ac.get("micromobility") or {}
+        kr = ac.get("kiss_ride") or {}
         run_cols = [np.array(sorted({idx[s] for s in run.stops})) for run in graph.runs]
         k = min(k, len(run_cols))
         nz = zones.n
         self.acc_st = np.zeros((nz, k), dtype=np.int32)
         self.acc_t = np.full((nz, k), np.inf, dtype=np.float32)
-        self.acc_pnr = np.zeros((nz, k), dtype=bool)
+        self.acc_o = np.full((nz, k), np.inf, dtype=np.float32)
+        self.acc_mode = np.zeros((nz, k), dtype=np.int8)
         self.egr_st = np.zeros((nz, k), dtype=np.int32)
         self.egr_t = np.full((nz, k), np.inf, dtype=np.float32)
+        self.egr_o = np.full((nz, k), np.inf, dtype=np.float32)
+        self.egr_mode = np.zeros((nz, k), dtype=np.int8)
         self.walk_min_dist = np.full(nz, np.inf, dtype=np.float32)
         for i0 in range(0, nz, CHUNK):
             i1 = min(nz, i0 + CHUNK)
             d = np.sqrt((zones.x[i0:i1, None] - sx[None, :]) ** 2 + (zones.y[i0:i1, None] - sy[None, :]) ** 2)
             self.walk_min_dist[i0:i1] = d.min(axis=1)
-            walk = np.where(d <= walk_km, d * ac["circuity"] / ac["walk_speed_kmh"] * 60, np.inf)
-            drive = np.where(pnr[None, :] & (d <= ac["pnr_max_km"]),
+            inf = np.full(d.shape, np.inf)
+            walk = np.where(d <= walk_km, d * ac.get("walk_circuity", ac["circuity"]) / ac["walk_speed_kmh"] * 60,
+                            np.inf)
+            drive = np.where(is_pnr[None, :] & (d <= ac["pnr_max_km"]) & (d >= ac.get("pnr_min_km", 0)),
                              d * ac["circuity"] / ac["pnr_speed_kmh"] * 60 + ac["pnr_penalty_min"], np.inf)
-            acc = np.minimum(walk, drive)
-            for arr, st, t in ((acc, self.acc_st, self.acc_t), (walk, self.egr_st, self.egr_t)):
+            # (minutes, out-of-vehicle minutes) per mode; park & ride counts all its minutes as access
+            acc_modes = [(walk, walk), (drive, drive), (inf, inf), (inf, inf), (inf, inf)]
+            egr_modes = [(walk, walk), (inf, inf), (inf, inf), (inf, inf), (inf, inf)]
+            if fh:
+                ok = f_zone[i0:i1, None] & (d <= fd["max_km"])
+                bus = np.where(ok, f_ovt + d * f_ivt, np.inf)
+                bus_o = np.where(ok, f_ovt, np.inf)
+                acc_modes[FEEDER] = (bus, bus_o)
+                if fd.get("egress", True):
+                    egr_modes[FEEDER] = (bus, bus_o)
+            if BIKE in extra:
+                bike = np.where(d <= mm["max_km"], d * mm["circuity"] / mm["speed_kmh"] * 60 + mm["penalty_min"], np.inf)
+                acc_modes[BIKE] = (bike, bike)
+                if mm.get("egress", True):
+                    egr_modes[BIKE] = (bike, bike)
+            if KISS in extra:
+                kiss = np.where(d <= kr["max_km"], d * ac["circuity"] / ac["pnr_speed_kmh"] * 60 + kr["penalty_min"],
+                                np.inf)
+                acc_modes[KISS] = (kiss, kiss)
+            for modes, st, t, o, md in ((acc_modes, self.acc_st, self.acc_t, self.acc_o, self.acc_mode),
+                                        (egr_modes, self.egr_st, self.egr_t, self.egr_o, self.egr_mode)):
+                tt = np.stack([m[0] for m in modes])
+                best = np.argmin(tt, axis=0)           # ties go to the earlier mode (walk first)
+                arr = np.take_along_axis(tt, best[None], axis=0)[0]
+                ovt = np.take_along_axis(np.stack([m[1] for m in modes]), best[None], axis=0)[0]
                 st[i0:i1], t[i0:i1] = _diverse_nearest(arr, run_cols, k)
-            wsel = np.take_along_axis(walk, self.acc_st[i0:i1], axis=1)
-            self.acc_pnr[i0:i1] = self.acc_t[i0:i1] < wsel - 1e-6
+                o[i0:i1] = np.take_along_axis(ovt, st[i0:i1], axis=1)
+                md[i0:i1] = np.take_along_axis(best, st[i0:i1], axis=1)
+        self.acc_pnr = self.acc_mode == PNR
 
 
 def _diverse_nearest(arr, run_cols, k):
@@ -197,6 +335,41 @@ def _diverse_nearest(arr, run_cols, k):
     return np.take_along_axis(cand_st, order, axis=1), np.take_along_axis(cand_t, order, axis=1)
 
 
+def _paths(acc, T, i0, i1, nz, ns):
+    """Best door-to-door path for origin zones i0:i1 to every zone through `acc`:
+    (minutes, access station, egress station, access mode, egress mode, out-of-vehicle minutes)."""
+    m = i1 - i0
+    k = acc.acc_st.shape[1]
+    # origin zone -> any station b, via best access station a
+    R = np.full((m, ns), np.inf, dtype=np.float32)
+    Ra = np.zeros((m, ns), dtype=np.int32)
+    Rm = np.zeros((m, ns), dtype=np.int8)
+    Ro = np.zeros((m, ns), dtype=np.float32)     # out-of-vehicle minutes of the chosen access leg
+    for j in range(k):
+        a = acc.acc_st[i0:i1, j]
+        cand = acc.acc_t[i0:i1, j, None] + T[a]
+        better = cand < R
+        R = np.where(better, cand, R)
+        Ra = np.where(better, a[:, None], Ra)
+        Rm = np.where(better, acc.acc_mode[i0:i1, j, None], Rm)
+        Ro = np.where(better, acc.acc_o[i0:i1, j, None], Ro)
+    # -> destination zone via best egress station b
+    TT = np.full((m, nz), np.inf, dtype=np.float32)
+    Bst = np.zeros((m, nz), dtype=np.int32)
+    Em = np.zeros((m, nz), dtype=np.int8)
+    OVT = np.zeros((m, nz), dtype=np.float32)    # access + egress out-of-vehicle minutes
+    for j in range(k):
+        b = acc.egr_st[:, j]
+        cand = R[:, b] + acc.egr_t[None, :, j]
+        better = cand < TT
+        TT = np.where(better, cand, TT)
+        Bst = np.where(better, b[None, :], Bst)
+        Em = np.where(better, acc.egr_mode[None, :, j], Em)
+        OVT = np.where(better, Ro[:, b] + acc.egr_o[None, :, j], OVT)
+    rows = np.arange(m)[:, None]
+    return TT, Ra[rows, Bst], Bst, Rm[rows, Bst], Em, OVT
+
+
 def evaluate(zones, od, net, graph, cfg, want_loads=True):
     """Run the year: transit times for every zone pair, competitive commutes,
     expected transit riders, accessibility, and (optionally) station-pair rider
@@ -204,110 +377,151 @@ def evaluate(zones, od, net, graph, cfg, want_loads=True):
 
     Park & ride garages hold a limited number of cars (config.access.pnr_spaces).
     Trips that reach transit by driving are tallied per garage; where a garage's
-    riders exceed its capacity, its trips are scaled down to fit.
+    riders exceed its capacity, its trips are scaled down to fit. With
+    access.pnr_overflow_fallback the riders a full garage turns away instead take
+    their best access without parking (walk, feeder bus, ...); that needs a first
+    pass to find the full garages.
     """
     T = graph.T
-    acc = Access(zones, net, graph, cfg)
-    cc = cfg["competitive"]
-    rc = cfg["ridership"]
-    thresholds = cfg["accessibility"]["thresholds_min"]
+    ac = cfg["access"]
     nz, ns = zones.n, graph.n_st
-    k = acc.acc_st.shape[1]
-    park = zones.paid_parking_utility()
-    jobs_reach = {t: np.zeros(nz) for t in thresholds}
-    # walk-access tallies, and per-garage park & ride tallies (scaled to capacity at the end)
-    comp_w, rid_w, tt_w_sum = 0.0, 0.0, 0.0
-    comp_from_w, comp_to_w = np.zeros(nz), np.zeros(nz)
-    comp_p, rid_p, tt_p_sum = np.zeros(ns), np.zeros(ns), np.zeros(ns)
-    comp_from_p, comp_to_p = np.zeros(ns * nz), np.zeros(ns * nz)
-    flows_w = np.zeros((ns, ns)) if want_loads else None
-    flows_p = np.zeros((ns, ns)) if want_loads else None
-    for i0 in range(0, nz, CHUNK):
-        i1 = min(nz, i0 + CHUNK)
-        m = i1 - i0
-        # origin zone -> any station b, via best access station a
-        R = np.full((m, ns), np.inf, dtype=np.float32)
-        Ra = np.zeros((m, ns), dtype=np.int32)
-        Rp = np.zeros((m, ns), dtype=bool)
-        Rt = np.zeros((m, ns), dtype=np.float32)     # access minutes of the chosen access leg
-        for j in range(k):
-            a = acc.acc_st[i0:i1, j]
-            cand = acc.acc_t[i0:i1, j, None] + T[a]
-            better = cand < R
-            R = np.where(better, cand, R)
-            Ra = np.where(better, a[:, None], Ra)
-            Rp = np.where(better, acc.acc_pnr[i0:i1, j, None], Rp)
-            Rt = np.where(better, acc.acc_t[i0:i1, j, None], Rt)
-        # -> destination zone via best egress station b
-        TT = np.full((m, nz), np.inf, dtype=np.float32)
-        Bst = np.zeros((m, nz), dtype=np.int32)
-        OVT = np.zeros((m, nz), dtype=np.float32)    # access + egress minutes
-        for j in range(k):
-            b = acc.egr_st[:, j]
-            cand = R[:, b] + acc.egr_t[None, :, j]
-            better = cand < TT
-            TT = np.where(better, cand, TT)
-            Bst = np.where(better, b[None, :], Bst)
-            OVT = np.where(better, Rt[:, b] + acc.egr_t[None, :, j], OVT)
-        rows = np.arange(m)[:, None]
-        Ast = Ra[rows, Bst]                       # access station of each pair
-        P = Rp[rows, Bst]                         # reached by park & ride?
-        dist = zones.dist_rows(i0, i1)
-        drive = zones.drive_min(dist)
-        for t in thresholds:
-            jobs_reach[t][i0:i1] = ((TT <= t) * zones.jobs[None, :]).sum(axis=1)
-        usable = np.isfinite(TT) & (TT <= cc["max_min"]) & (dist > cc["min_km"])
-        ok = usable & (TT <= cc["ratio"] * drive + cc["slack_min"])
-        odc = od[i0:i1]
-        q = np.where(ok, odc, 0.0)
-        # expected transit commuters: binary logit (config.ridership)
-        du = (rc["asc"] + rc["b_ivt_per_min"] * (drive - np.where(usable, TT, 0))
-              - rc["b_ovt_extra_per_min"] * OVT + park[None, :])
-        share = 1.0 / (1.0 + np.exp(-du))
-        rq = np.where(usable, odc * share * rc["telework"], 0.0)
-        tt = np.where(ok, TT, 0)
-        w, p = ~P, P
-        comp_w += float(q[w].sum())
-        rid_w += float(rq[w].sum())
-        tt_w_sum += float((tt * q)[w].sum())
-        comp_from_w[i0:i1] += np.where(w, q, 0).sum(axis=1)
-        comp_to_w += np.where(w, q, 0).sum(axis=0)
-        if p.any():
-            ap = Ast[p]
-            comp_p += np.bincount(ap, weights=q[p], minlength=ns)
-            rid_p += np.bincount(ap, weights=rq[p], minlength=ns)
-            tt_p_sum += np.bincount(ap, weights=(tt * q)[p], minlength=ns)
-            zi = np.broadcast_to(np.arange(i0, i1)[:, None], (m, nz))[p]
-            zj = np.broadcast_to(np.arange(nz)[None, :], (m, nz))[p]
-            comp_from_p += np.bincount(ap * nz + zi, weights=q[p], minlength=ns * nz)
-            comp_to_p += np.bincount(ap * nz + zj, weights=q[p], minlength=ns * nz)
-        if want_loads:
-            for mask, fl in ((w, flows_w), (p, flows_p)):
-                sel = mask & (rq > 0)
-                if sel.any():
-                    np.add.at(fl, (Ast[sel], Bst[sel]), rq[sel])
-    # garages over capacity: scale their park & ride trips down to fit
-    f = np.where(rid_p > acc.pnr_cap, acc.pnr_cap / np.maximum(rid_p, 1e-9), 1.0)
-    comp_total = comp_w + float((f * comp_p).sum())
-    riders = rid_w + float((f * rid_p).sum())
-    comp_from = comp_from_w + (f[:, None] * comp_from_p.reshape(ns, nz)).sum(axis=0)
-    comp_to = comp_to_w + (f[:, None] * comp_to_p.reshape(ns, nz)).sum(axis=0)
-    tt_sum = tt_w_sum + float((f * tt_p_sum).sum())
-    flows = flows_w + f[:, None] * flows_p if want_loads else None
+    fallback = bool(ac.get("pnr_overflow_fallback"))
+    segs = []
+    for w, extra in access_segments(cfg, graph.year):
+        main = Access(zones, net, graph, cfg, extra)
+        segs.append((w, main, Access(zones, net, graph, cfg, extra, pnr=False) if fallback else None))
+    cap = segs[0][1].pnr_cap
+    fixed = None
+    if fallback:
+        demand_p = _sweep(zones, od, T, segs, cfg, nz, ns, None, False, light=True)["rid_p"]
+        fixed = np.where(demand_p > cap, cap / np.maximum(demand_p, 1e-9), 1.0)
+    s = _sweep(zones, od, T, segs, cfg, nz, ns, fixed, want_loads)
+    rid_p = s["rid_p"]
+    # garages over capacity: scale their park & ride trips down to fit (already done when fixed)
+    f = np.where(rid_p > cap, cap / np.maximum(rid_p, 1e-9), 1.0) if fixed is None else np.zeros(ns)
+    comp_total = s["comp_w"] + float((f * s["comp_p"]).sum())
+    riders = s["rid_w"] + float((f * rid_p).sum())
+    comp_from = s["comp_from_w"] + (f[:, None] * s["comp_from_p"].reshape(ns, nz)).sum(axis=0)
+    comp_to = s["comp_to_w"] + (f[:, None] * s["comp_to_p"].reshape(ns, nz)).sum(axis=0)
+    tt_sum = s["tt_w_sum"] + float((f * s["tt_p_sum"]).sum())
+    flows = s["flows_w"] + f[:, None] * s["flows_p"] if want_loads else None
+    by_mode = s["mode_w"]
+    pnr_riders = float(np.minimum(rid_p, cap).sum())
+    by_mode[PNR] = pnr_riders
+    feeder_legs = s["feed_w"] + float((f * s["feed_p"]).sum())
     pop = zones.pop
+    jobs_reach = s["jobs_reach"]
     return {
         "competitive_commutes": comp_total,
         "transit_commuters": riders,
-        "pnr_riders": float(np.minimum(rid_p, acc.pnr_cap).sum()),
-        "pnr_full_garages": int((rid_p > acc.pnr_cap).sum()),
+        "pnr_riders": pnr_riders,
+        "pnr_demand": float(rid_p.sum()),
+        "pnr_full_garages": int((rid_p > cap).sum()),
+        "pnr_spaces": float(cap.sum() / ac["pnr_people_per_space"]),
+        "riders_by_access": {m: float(by_mode[i]) for i, m in enumerate(ACCESS_MODES)},
+        "feeder_legs": feeder_legs,
         "comp_from": comp_from,
         "comp_to": comp_to,
         "jobs_reach": jobs_reach,
-        "access_jobs": {t: float((jobs_reach[t] * pop).sum() / pop.sum()) for t in thresholds},
+        "access_jobs": {t: float((jobs_reach[t] * pop).sum() / pop.sum()) for t in jobs_reach},
         "avg_transit_min": tt_sum / comp_total if comp_total else 0.0,
         "flows": flows,
-        "walk_min_dist": acc.walk_min_dist,
+        "walk_min_dist": segs[0][1].walk_min_dist,
     }
+
+
+def _sweep(zones, od, T, segs, cfg, nz, ns, fixed, want_loads, light=False):
+    """Tally competitive commutes and logit riders over every zone pair and access
+    segment. Park & ride pairs are tallied per garage (to be scaled to capacity
+    afterwards) unless `fixed` gives each garage's share already; then the rest of
+    those riders fall back to the segment's no-parking access. `light` tallies only
+    garage demand."""
+    cc, rc = cfg["competitive"], cfg["ridership"]
+    thresholds = cfg["accessibility"]["thresholds_min"]
+    park = zones.paid_parking_utility()
+    jobs_reach = {t: np.zeros(nz) for t in thresholds}
+    # walk-access tallies, and per-garage park & ride tallies
+    comp_w, rid_w, tt_w_sum, feed_w = 0.0, 0.0, 0.0, 0.0
+    mode_w = np.zeros(len(ACCESS_MODES))
+    comp_from_w, comp_to_w = np.zeros(nz), np.zeros(nz)
+    comp_p, rid_p, tt_p_sum, feed_p = np.zeros(ns), np.zeros(ns), np.zeros(ns), np.zeros(ns)
+    comp_from_p, comp_to_p = np.zeros(ns * nz), np.zeros(ns * nz)
+    flows_w = np.zeros((ns, ns)) if want_loads else None
+    flows_p = np.zeros((ns, ns)) if want_loads else None
+
+    def free(q, rq, tt, Ast, Bst, Am, Em, i0, i1):
+        """Add pairs that need no garage space (weights already applied)."""
+        nonlocal comp_w, rid_w, tt_w_sum, feed_w
+        comp_w += float(q.sum())
+        rid_w += float(rq.sum())
+        tt_w_sum += float((tt * q).sum())
+        feed_w += float((rq * ((Am == FEEDER).astype(np.float32) + (Em == FEEDER))).sum())
+        mode_w[:] += np.bincount(Am.ravel(), weights=rq.ravel(), minlength=len(ACCESS_MODES))
+        comp_from_w[i0:i1] += q.sum(axis=1)
+        comp_to_w[:] += q.sum(axis=0)
+        if want_loads:
+            sel = rq > 0
+            if sel.any():
+                np.add.at(flows_w, (Ast[sel], Bst[sel]), rq[sel])
+
+    for i0 in range(0, nz, CHUNK):
+        i1 = min(nz, i0 + CHUNK)
+        m = i1 - i0
+        dist = zones.dist_rows(i0, i1)
+        drive = zones.drive_min(dist)
+        odc = od[i0:i1]
+
+        def pair_riders(acc, wgt):
+            TT, Ast, Bst, Am, Em, OVT = _paths(acc, T, i0, i1, nz, ns)
+            usable = np.isfinite(TT) & (TT <= cc["max_min"]) & (dist > cc["min_km"])
+            ok = usable & (TT <= cc["ratio"] * drive + cc["slack_min"])
+            q = np.where(ok, odc * wgt, 0.0)
+            # expected transit commuters: binary logit (config.ridership)
+            du = (rc["asc"] + rc["b_ivt_per_min"] * (drive - np.where(usable, TT, 0))
+                  - rc["b_ovt_extra_per_min"] * OVT + park[None, :])
+            share = 1.0 / (1.0 + np.exp(-du))
+            rq = np.where(usable, odc * wgt * share * rc["telework"], 0.0)
+            return TT, Ast, Bst, Am, Em, q, rq, np.where(ok, TT, 0)
+
+        for si, (wgt, acc, alt) in enumerate(segs):
+            TT, Ast, Bst, Am, Em, q, rq, tt = pair_riders(acc, wgt)
+            p = Am == PNR
+            if light:
+                if p.any():
+                    rid_p += np.bincount(Ast[p], weights=rq[p], minlength=ns)
+                continue
+            if si == 0:
+                for t in thresholds:
+                    jobs_reach[t][i0:i1] = ((TT <= t) * zones.jobs[None, :]).sum(axis=1)
+            if p.any():
+                rid_p += np.bincount(Ast[p], weights=rq[p], minlength=ns)
+            if fixed is not None:
+                g = np.where(p, fixed[Ast], 1.0).astype(np.float32)   # share that finds a space
+                free(q * g, rq * g, tt, Ast, Bst, Am, Em, i0, i1)
+                if alt is not None and p.any():
+                    h = np.where(p, 1.0 - g, 0.0)
+                    TT2, Ast2, Bst2, Am2, Em2, q2, rq2, tt2 = pair_riders(alt, wgt)
+                    free(q2 * h, rq2 * h, tt2, Ast2, Bst2, Am2, Em2, i0, i1)
+                continue
+            w = ~p
+            free(np.where(w, q, 0.0), np.where(w, rq, 0.0), tt, Ast, Bst, Am, Em, i0, i1)
+            if p.any():
+                ap = Ast[p]
+                comp_p += np.bincount(ap, weights=q[p], minlength=ns)
+                tt_p_sum += np.bincount(ap, weights=(tt * q)[p], minlength=ns)
+                feed_p += np.bincount(ap, weights=(rq * (Em == FEEDER))[p], minlength=ns)
+                zi = np.broadcast_to(np.arange(i0, i1)[:, None], (m, nz))[p]
+                zj = np.broadcast_to(np.arange(nz)[None, :], (m, nz))[p]
+                comp_from_p += np.bincount(ap * nz + zi, weights=q[p], minlength=ns * nz)
+                comp_to_p += np.bincount(ap * nz + zj, weights=q[p], minlength=ns * nz)
+                if want_loads:
+                    sel = p & (rq > 0)
+                    np.add.at(flows_p, (Ast[sel], Bst[sel]), rq[sel])
+    mode_w[PNR] = 0.0   # park & ride riders are reported after the capacity check
+    return {"comp_w": comp_w, "rid_w": rid_w, "tt_w_sum": tt_w_sum, "feed_w": feed_w, "mode_w": mode_w,
+            "comp_from_w": comp_from_w, "comp_to_w": comp_to_w, "comp_p": comp_p, "rid_p": rid_p,
+            "tt_p_sum": tt_p_sum, "feed_p": feed_p, "comp_from_p": comp_from_p, "comp_to_p": comp_to_p,
+            "flows_w": flows_w, "flows_p": flows_p, "jobs_reach": jobs_reach}
 
 
 def assign_loads(graph, flows):

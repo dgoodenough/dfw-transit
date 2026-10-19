@@ -93,7 +93,27 @@ def run_year(ctx, net, year, want_loads=True):
     else:
         bpt = rc["boardings_per_trip"]
     res["daily_boardings"] = res["daily_trips"] * bpt
+    # feeder bus legs (access.feeder) are local-bus boardings, kept apart from rail + BRT
+    res["feeder_boardings"] = res["feeder_legs"] * rc["round_trip"] / rc["work_share_of_transit_trips"]
     return res
+
+
+def calibrate_asc(ctx, net, lo=-4.0, hi=2.0, tol=0.01, log=None):
+    """Set ctx.cfg.ridership.asc so the calibration year's network carries the
+    calibration boardings (config.ridership.calibration), by bisection. Needed
+    when an access assumption that also applies to the calibration year changes
+    (e.g. a feeder bus table that starts in 2025). Returns the asc."""
+    rc = ctx.cfg["ridership"]
+    cal = rc["calibration"]
+    for _ in range(40):
+        rc["asc"] = round((lo + hi) / 2, 4)
+        b = run_year(ctx, net, cal["year"])["daily_boardings"]
+        if log:
+            log(f"  asc {rc['asc']:+.4f}: {b:,.0f} boardings in {cal['year']}")
+        if abs(b / cal["rail_boardings"] - 1) < tol:
+            break
+        lo, hi = (rc["asc"], hi) if b < cal["rail_boardings"] else (lo, rc["asc"])
+    return rc["asc"]
 
 
 def evaluate(ctx, net, line_values=True, log=print):

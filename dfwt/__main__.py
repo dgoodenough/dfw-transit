@@ -72,7 +72,8 @@ def cmd_ridership(args):
         r = run_year(ctx, net, y, want_loads=True)
         print(f"{y}  {r['pop'] / 1e6:5.2f}M {r['jobs'] / 1e6:5.2f}M  {r['graph'].n_st:7d}  {r['daily_boardings']:9,.0f}  "
               f"{r['daily_trips']:9,.0f}  {r['transit_commuters']:9,.0f}  {r['competitive_commutes']:11,.0f}  "
-              f"{r['boardings_per_trip']:8.2f}  {r['pnr_riders']:6,.0f}  {r['pnr_full_garages']:3d}", flush=True)
+              f"{r['boardings_per_trip']:8.2f}  {r['pnr_riders']:6,.0f}  {r['pnr_full_garages']:3d}"
+              + (f"  feeder bus {r['feeder_boardings']:,.0f}" if r["feeder_boardings"] else ""), flush=True)
     return 0
 
 

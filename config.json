@@ -47,10 +47,11 @@
     "penalty_min": 3
   },
   "access": {
-    "_doc": "How people reach stations. Walk to anything within walk_max_m; drive (park & ride) to commuter rail stations and each line's planned termini within pnr_max_km. Garages hold pnr_spaces cars (DART Parker Road ~2,000, TRE/TEXRail stations 175-1,000); each space serves pnr_people_per_space commuters a day (75% full x 1.1 per car x 1.15 with drop-offs). Riders beyond that are scaled away.",
+    "_doc": "How people reach stations. Walk to anything within walk_max_m; drive (park & ride) to commuter rail stations and each line's planned termini within pnr_max_km. Garages hold pnr_spaces cars (DART Parker Road ~2,000, TRE/TEXRail stations 175-1,000); each space serves pnr_people_per_space commuters a day (75% full x 1.1 per car x 1.15 with drop-offs). Riders beyond that are scaled away, or with pnr_overflow_fallback take their best access without parking (changes the 2025 calibration: asc -1.31 alone). circuity applies to drive access, walk_circuity to walking (better street grids and station entrances lower it). Park & ride is chosen whenever it is faster than walking (beyond ~0.4 km), so pnr_min_km can reserve garages for people beyond walking distance. The feeder, micromobility, kiss_ride and pnr_suburban blocks are access levers, all off by default.",
     "walk_max_m": 1200,
     "walk_speed_kmh": 4.8,
     "circuity": 1.25,
+    "walk_circuity": 1.25,
     "pnr_max_km": 8,
     "pnr_speed_kmh": 35,
     "pnr_penalty_min": 5,
@@ -59,7 +60,50 @@
       "terminus": 1500,
       "commuter_station": 400
     },
-    "pnr_people_per_space": 0.95
+    "pnr_people_per_space": 0.95,
+    "pnr_min_km": 0,
+    "pnr_overflow_fallback": false,
+    "pnr_suburban": {
+      "_doc": "Lever (off by default): a structured garage of `spaces` at selected stations of `modes`, Wiehle-Reston East style (wrapped by development, so TOD uplift is unchanged): only where the station's setting (growth.setting, base-year density) is `setting`, at least min_core_km from a downtown and min_spacing_km from every other garage, outermost first, from from_year. No new parking at downtown or urban stations. Freeway/arterial access is not checked (no road data).",
+      "enabled": false,
+      "from_year": 2030,
+      "spaces": 1500,
+      "setting": "suburban",
+      "min_core_km": 8,
+      "min_spacing_km": 4,
+      "modes": ["metro"]
+    },
+    "feeder": {
+      "_doc": "Lever (off by default): a frequent local bus grid as an access and egress mode. Zones whose activity density (people + jobs per km2 within 800 m) is at least min_density_per_km2 reach any station within max_km (straight line) by bus: stop_walk_min + half the headway (capped like rail waits) + distance x circuity / speed (slowed by road congestion) + transfer_penalty_min. Only the walk, wait and transfer count as out-of-vehicle time. headway_min is a {year: minutes} table, no feeder before its first year. The asc was calibrated without feeders (today's buses sit inside it), so either start the table after 2025 (an upper bound: today's bus-to-rail riders get counted twice) or include today's headway from 2025 and recalibrate (evaluate.calibrate_asc). Bus legs are not rail boardings: run_year reports them separately as feeder_boardings.",
+      "enabled": false,
+      "headway_min": {"2030": 15},
+      "speed_kmh": 19,
+      "circuity": 1.3,
+      "max_km": 5,
+      "stop_walk_min": 4,
+      "transfer_penalty_min": 3,
+      "min_density_per_km2": 2000,
+      "egress": true
+    },
+    "micromobility": {
+      "_doc": "Lever (off by default): bike / e-scooter access. Only `share` of commuters will ride (a market segment, so it can't turn everyone into a cyclist); they reach stations within max_km at speed_kmh plus penalty_min (unlock, secure parking), and ride on to work if egress.",
+      "enabled": false,
+      "from_year": 2030,
+      "share": 0.15,
+      "max_km": 3,
+      "speed_kmh": 14,
+      "circuity": 1.3,
+      "penalty_min": 3,
+      "egress": true
+    },
+    "kiss_ride": {
+      "_doc": "Lever (off by default): drop-off or ride-hail to any station, no garage needed. Only `share` of commuters have a driver or will pay for a ride (a market segment); drive at pnr_speed_kmh within max_km, plus penalty_min (curb wait, and the fare expressed as minutes).",
+      "enabled": false,
+      "from_year": 2030,
+      "share": 0.1,
+      "max_km": 6,
+      "penalty_min": 6
+    }
   },
   "drive": {
     "_doc": "Peak-period door-to-door drive baseline (v1 calibration).",
