@@ -129,3 +129,15 @@ Scored against the previous downtown (2070): +2,400 competitive commutes, +$0.06
 Fort Worth metro curves tighter than 150 m: 25 -> 11 (the rest are outside the core).
 The Main St and Main St via Convention Center alternatives scored +1,300 / +900 commutes at
 +$0.31B / +$0.52B; their tables can be regenerated with `tools/downtown_options.py`.
+
+## v2.3 — straight corridors (owner's "what would actually be built" review)
+
+- Metro lines run straight along their corridors and stations come to the line: stops
+  that forced a detour moved onto the direct path (up to 800 m, or 1.5 km for sharp jogs);
+  drawn paths that wandered became the direct route; small wiggles smoothed.
+- Stops the line had to double back for were dropped from that line: I-20 Crosstown
+  (Lindberg SW, Sunset Acres), SH-360 (Cypress Waters SW2/SW3, DFW Airport South,
+  Estelle W), Bowie (Haltom City), Gainesville (Melody Hills, Stockyards NHD NE3).
+- Commuter lines with no usable track are straightened and fitted to commuter-rail
+  curve limits; stations up to 800 m from real track move onto it.
+- Tight curves on proposed lines: 342 (as drawn) -> 41. See `reports/GEOMETRY.md`.

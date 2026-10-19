@@ -179,14 +179,20 @@ def run(lines=None, write=False, procs=2, log=print):
 
     # 1. commuter rail on real track
     rail = lines_of_mode("commuter")
+    unrouted = []  # proposed commuter lines with no usable track: straightened and fitted below
+    rail_move = gcfg["straighten_move_max_m"]
     if rail:
         from . import osmroute
         G = osmroute.Graph("rail")
         for ln in rail:
             S = np.array([_xy(pos[s]) for s in ln.stop_ids])
-            P, why = osmroute.route(G, [tuple(p) for p in S], max_turn=gcfg["rail_max_turn_deg"])
+            P, why = osmroute.route(G, [tuple(p) for p in S], max_turn=gcfg["rail_max_turn_deg"], snap_r=1200)
             if P is None:
-                review.append((ln.name, f"kept drawn geometry: {why}"))
+                if ln.status == "proposed":
+                    unrouted.append(ln)
+                    review.append((ln.name, f"no usable track ({why}); straightened and fitted instead"))
+                else:
+                    review.append((ln.name, f"kept drawn geometry: {why}"))
                 continue
             xy = np.array(P)
             arcs, far, after = [], [], 0.0
@@ -194,11 +200,14 @@ def run(lines=None, write=False, procs=2, log=print):
                 s, d = _project(xy, p, after)
                 arcs.append(s)
                 after = s
-                if d > auto:
+                if d > rail_move:
                     far.append((net.stations[ln.stop_ids[k]].name, d))
             if far:
-                review.append((ln.name, "kept drawn geometry; stations too far from the track to move automatically: "
-                               + ", ".join(f"{n} {d:.0f} m" for n, d in far)))
+                if ln.status == "proposed":
+                    unrouted.append(ln)
+                review.append((ln.name, "stations too far from the track to move onto it: "
+                               + ", ".join(f"{n} {d:.0f} m" for n, d in far)
+                               + ("; straightened and fitted instead" if ln.status == "proposed" else "")))
                 continue
             for k, sid in enumerate(ln.stop_ids):
                 q = _cut(xy, arcs[k], arcs[k])[0]
@@ -225,7 +234,7 @@ def run(lines=None, write=False, procs=2, log=print):
         reports[ln.id] = dict(kind="de-noised", vertices_before=before, vertices_after=after)
 
     # 3. proposed metro: straighten detours, slide stations off bends, then fit tangents/spirals/arcs
-    metro = lines_of_mode("metro", "proposed")
+    metro = lines_of_mode("metro", "proposed") + unrouted
     near_other = collections.defaultdict(set)
     for a, b, _, _ in net.transfers:
         near_other[a].add(b)
