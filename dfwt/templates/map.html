@@ -124,7 +124,7 @@ const basemaps = {
     attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors', maxZoom: 18}),
 };
 basemaps[dark ? 'Dark gray' : 'Light gray'].addTo(map);
-L.control.layers(basemaps, null, {position: 'topright'}).addTo(map);
+const layerCtl = L.control.layers(basemaps, null, {position: 'topright'}).addTo(map);  // schematic: adds the Waterways overlay
 const lineLayer = L.layerGroup().addTo(map), stLayer = L.layerGroup().addTo(map), tripLayer = L.layerGroup().addTo(map);
 const $ = id => document.getElementById(id);
 const fmt = n => n >= 10000 ? Math.round(n / 1000) + 'k' : n.toLocaleString();
@@ -176,6 +176,7 @@ function draw() {
       (b ? `<br>${fmt(b)} competitive commuters board here in 2070` : '') + `</div></div>`);
   }
   metrics(); lineList(); if (pick.length === 2) route();
+  if (window.Schem) Schem.draw();  // schematic: redraw the diagram view
 }
 function intervalSummary(Y, prevY, state) {
   const opened = [], building = [];
@@ -235,7 +236,7 @@ function lineList() {
 function choose(sid) {
   if (pick.length === 2) pick = [];
   pick.push(sid);
-  if (pick.length === 1) { tripLayer.clearLayers(); $('trip').innerHTML = `<p class="hint">From <b>${D.stations[sid][0]}</b>. Now click a destination.</p>`; }
+  if (pick.length === 1) { tripLayer.clearLayers(); if (window.Schem) Schem.trip(null, null, pick); $('trip').innerHTML = `<p class="hint">From <b>${D.stations[sid][0]}</b>. Now click a destination.</p>`; }
   else route();
 }
 function route() {
@@ -254,7 +255,7 @@ function route() {
     if (d > (dist.get(u) ?? Infinity)) continue; if (u === 'P' + b) break;
     for (const [v, w, info] of adj.get(u) || []) { const nd = d + w; if (nd < (dist.get(v) ?? Infinity)) { dist.set(v, nd); prev.set(v, [u, info]); heap.push([nd, v]); } }
   }
-  tripLayer.clearLayers();
+  tripLayer.clearLayers(); if (window.Schem) Schem.trip(null, null, pick);  // schematic: clear the diagram route
   const A = D.stations[a][0], B = D.stations[b][0];
   if (!dist.has('P' + b) || !D.stations[a] || a === b) { $('trip').innerHTML = `<p class="hint">No route from ${A} to ${B} in ${Y}. Try a later year.</p>`; return; }
   const path = []; let u = 'P' + b; while (prev.has(u)) { const [p, info] = prev.get(u); path.unshift([p, u, info]); u = p; }
@@ -276,7 +277,7 @@ function route() {
     else h += `<div class="leg"><i style="background:var(--rule)"></i><span class="hint">Wait about ${Math.round(l.min)} min</span></div>`;
   }
   for (const s of [a, b]) L.circleMarker([D.stations[s][1], D.stations[s][2]], {radius: 8, color: '#c96f00', weight: 3, fill: false}).addTo(tripLayer);
-  $('trip').innerHTML = h;
+  $('trip').innerHTML = h; if (window.Schem) Schem.trip(legs, yd, pick);  // schematic: highlight the route
 }
 $('slider').oninput = e => { yi = +e.target.value; draw(); };
 $('scen').onchange = e => { scenKey = e.target.value; S = D.scen[scenKey]; hidden.clear(); draw(); };
@@ -292,5 +293,6 @@ $('play').onclick = () => {
 };
 draw();
 </script>
+<!--__SCHEMATIC__-->
 </body>
 </html>
