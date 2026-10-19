@@ -1,0 +1,9 @@
+op,target,field,value,note
+set_line,E25,mode,metro,McKinney corridor (DART-owned) built as light rail instead of commuter rail
+through_route,E14,E25,Red Line,Red Line runs on from Parker Road to McKinney: no transfer
+set_line,E04,mode,metro,Jacksboro BRT rebuilt as light rail by 2050 (evaluate 2050+ only)
+set_line,E04,headway,6,light rail every 6 min
+set_line,E27,mode,metro,Ross Avenue BRT rebuilt as light rail by 2050 (evaluate 2050+ only)
+set_line,E27,headway,6,light rail every 6 min
+set_line,E28,mode,metro,Forest Lane BRT rebuilt as light rail by 2050 (evaluate 2050+ only)
+set_line,E28,headway,6,light rail every 6 min

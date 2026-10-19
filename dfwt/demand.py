@@ -152,7 +152,7 @@ class Access:
                     pnr[idx[s]] = True
                     spaces[idx[s]] = max(spaces[idx[s]], sp["commuter_station"])
             full = net.lines.get(run.line.id, run.line)
-            for s in (full.stop_ids[0], full.stop_ids[-1]):
+            for s in (full.stop_ids[0], full.stop_ids[-1], *full.pnr_stops):
                 if s in idx:
                     pnr[idx[s]] = True
                     spaces[idx[s]] = max(spaces[idx[s]], sp["terminus"])

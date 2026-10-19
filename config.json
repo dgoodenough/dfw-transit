@@ -37,9 +37,10 @@
     }
   },
   "wait": {
-    "_doc": "Expected wait = headway / 2, capped (riders time arrivals on long headways).",
+    "_doc": "Expected wait = headway / 2, capped (riders time arrivals on long headways). weight = how many in-vehicle minutes a minute of waiting feels like (1 = calibrated plan; 2 is the usual planning value, a sensitivity that needs ridership.asc recalibrated: -0.195 with weight 2 and max_wait_min 15).",
     "fraction_of_headway": 0.5,
-    "max_wait_min": 12
+    "max_wait_min": 12,
+    "weight": 1.0
   },
   "transfer": {
     "walk_radius_m": 400,

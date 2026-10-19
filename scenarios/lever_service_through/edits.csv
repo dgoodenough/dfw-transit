@@ -1,0 +1,8 @@
+op,target,field,value,note
+through_route,F02,E22,Blue / I-30,"Ridgmar Mall - FW - Handley - Arlington - Dallas, one train"
+through_route,F05,E19,Berry / I-20,"Lake Worth - Berry - I-20 - Dallas, one train"
+through_route,E10,E30,TRE,TRE runs through FW T&P to Alvarado
+through_route,E10,E34,TRE,"TRE runs through Union Station to Terrell (Dallas station 270 m away, one platform)"
+through_route,E09,E05,TEXRail,TEXRail runs through FW T&P to Primrose
+through_route,E07,E08,Mansfield-Denton,SE TexRail + FTW/Denton through FW Central
+through_route,E07,E11,Mansfield-Denton-Carrollton,and on over the A-train to Trinity Mills
