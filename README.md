@@ -141,7 +141,7 @@ archive/v1/ the complete v1 project, frozen (PowerShell/C# pipeline, tables, map
   (jobs; origin-destination optional). Public domain.
 - **OpenStreetMap:** rail lines, stops, rivers, yards and place names.
   © OpenStreetMap contributors, [ODbL](https://www.openstreetmap.org/copyright).
-- **Map tiles:** © CARTO.
+- **Map tiles:** Esri World Gray Canvas (© Esri, HERE, Garmin, OpenStreetMap contributors) and OpenStreetMap standard tiles; no API key needed.
 
 Large raw geodata and copyrighted design-standard PDFs (TCRP, ITDP, TxDOT, FRA)
 are `.gitignore`d. `refs/README.md` lists where to download each one.
