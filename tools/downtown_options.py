@@ -94,7 +94,13 @@ def resequence(tables, lid, a_key, b_key, new_keys, own_tunnel):
             pb = (float(st[b]["lon"]), float(st[b]["lat"]))
             mid.append({"line_id": lid, "year_opens": str(region_year), "grade": "tunnel",
                         "geometry_source": "downtown option", "locked": "", "geometry_wkt": geo.to_wkt([pa, pb])})
-    out_segs = segs[:ia] + mid + segs[ib:]
+    tail = [dict(r) for r in segs[ib:]]
+    if tail and new_ids[-1] != ids[ib]:  # the stop after the downtown run now starts from a different station
+        nxt = ids[ib + 1]
+        pa = (float(st[new_ids[-1]]["lon"]), float(st[new_ids[-1]]["lat"]))
+        pb = (float(st[nxt]["lon"]), float(st[nxt]["lat"]))
+        tail[0].update(geometry_wkt=geo.to_wkt([pa, pb]), geometry_source="downtown option")
+    out_segs = segs[:ia] + mid + tail
     for i, r in enumerate(out_stops):
         r["seq"] = str(i + 1)
     for i, r in enumerate(out_segs):
