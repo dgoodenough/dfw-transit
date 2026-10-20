@@ -48,9 +48,11 @@ def write(nets, evals, out_path):
                 "segs": [[s.year, round(s.km, 2)] for s in ln.segments],
             })
         # drawn geometry: shared-track pieces, each with its lines in side-by-side order
-        pieces = [[geom_id(pts), [list(u) for u in users]]
-                  for pts, users in bundle.pieces([(i, ln.mode, ln.status, ln.first_year, [(s.year, s.pts) for s in ln.segments])
-                                                   for i, ln in enumerate(net.lines.values())])]
+        raw = bundle.pieces([(i, ln.mode, ln.status, ln.first_year, [(s.year, s.pts) for s in ln.segments])
+                             for i, ln in enumerate(net.lines.values())])
+        pieces = [[geom_id(pts), [list(u) for u in users]] for pts, users in raw]
+        st_piece = bundle.station_pieces(raw, {sid: (st.lon, st.lat) for sid, st in net.stations.items()},
+                                         {ln_i: ln.stop_ids for ln_i, ln in enumerate(net.lines.values())})
         for sid, r in st_metrics.items():
             s = net.stations[sid]
             prev = stations.get(sid)
@@ -74,7 +76,7 @@ def write(nets, evals, out_path):
                 gkey[k] = len(graphs)
                 graphs.append({"runs": runs, "walks": walks})
             years[y] = gkey[k]
-        scen[key] = {"label": LABELS.get(key, key), "lines": lines, "pieces": pieces, "graphs": graphs, "yearGraph": years,
+        scen[key] = {"label": LABELS.get(key, key), "lines": lines, "pieces": pieces, "stPiece": st_piece, "graphs": graphs, "yearGraph": years,
                      "metrics": ev["years"],
                      "boardings": {r["station_id"]: r["boardings_final"] for r in ev["stations"]}}
     data = {"years": cfg["years"], "boardPenalty": cfg["transfer"]["penalty_min"],

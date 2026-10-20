@@ -137,77 +137,195 @@ let S = D.scen[scenKey];
 for (const k of D.order) { const o = document.createElement('option'); o.value = k; o.textContent = D.scen[k].label; $('scen').append(o); }
 $('slider').max = D.years.length - 1;
 
-function style(mode, color = null, future = false) {
-  // BRT: a solid, thinner line (dashes read as 'planned' on transit maps)
-  const w = mode === 'commuter' ? 3 : mode === 'brt' ? 2.2 : 4.5;
-  return {color, weight: w, opacity: future ? .18 : .92, dashArray: mode === 'commuter' ? '8 5' : null, lineCap: 'round'};
-}
-// a polyline shifted `px` screen pixels to its left (mitred corners), at the current zoom
-function offsetPath(ll, px) {
-  if (Math.abs(px) < 0.05 || ll.length < 2) return ll;
-  const P = ll.map(p => map.latLngToLayerPoint(p)), n = P.length, out = [];
+// Colour guard: a line colour too close to the page background (a pale yellow on
+// the light theme, a deep purple on the dark one) is darkened or lightened just
+// enough to read as a line. Hue and saturation are kept; most colours pass as is.
+const lineColor = (() => {
+  const memo = new Map();
+  const lin = c => { c /= 255; return c <= 0.04045 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4; };
+  const lum = ([r, g, b]) => 0.2126 * lin(r) + 0.7152 * lin(g) + 0.0722 * lin(b);
+  const rgb = h => { h = h.replace('#', ''); if (h.length === 3) h = [...h].map(c => c + c).join(''); return [0, 2, 4].map(i => parseInt(h.slice(i, i + 2), 16)); };
+  const toHsl = ([r, g, b]) => {
+    r /= 255; g /= 255; b /= 255;
+    const mx = Math.max(r, g, b), mn = Math.min(r, g, b), l = (mx + mn) / 2, d = mx - mn;
+    if (!d) return [0, 0, l];
+    const s = d / (1 - Math.abs(2 * l - 1));
+    const h = mx === r ? ((g - b) / d) % 6 : mx === g ? (b - r) / d + 2 : (r - g) / d + 4;
+    return [(h * 60 + 360) % 360, s, l];
+  };
+  const toRgb = ([h, s, l]) => {
+    const c = (1 - Math.abs(2 * l - 1)) * s, x = c * (1 - Math.abs((h / 60) % 2 - 1)), m = l - c / 2;
+    const [r, g, b] = h < 60 ? [c, x, 0] : h < 120 ? [x, c, 0] : h < 180 ? [0, c, x] : h < 240 ? [0, x, c] : h < 300 ? [x, 0, c] : [c, 0, x];
+    return [r, g, b].map(v => Math.round((v + m) * 255));
+  };
+  return (hex, mode) => {
+    const bgHex = getComputedStyle(document.documentElement).getPropertyValue('--bg').trim() || '#f4f6f5';
+    const key = hex + bgHex + (mode || '');
+    if (memo.has(key)) return memo.get(key);
+    let out = hex;
+    try {
+      const bg = lum(rgb(bgHex)), darkBg = bg < 0.2, need = darkBg ? (mode === 'commuter' ? 3.0 : 2.6) : 2.0;   // commuter's hollow stroke needs more
+      const ratio = c => { const L = lum(c); return (Math.max(L, bg) + 0.05) / (Math.min(L, bg) + 0.05); };
+      let c = rgb(hex);
+      if (ratio(c) < need) {
+        const hsl = toHsl(c);
+        for (let i = 0; i < 50 && ratio(c) < need; i++) { hsl[2] = Math.max(0, Math.min(1, hsl[2] + (darkBg ? 0.015 : -0.015))); c = toRgb(hsl); }
+        out = '#' + c.map(v => v.toString(16).padStart(2, '0')).join('');
+      }
+    } catch (e) { /* unparseable colour: use as given */ }
+    memo.set(key, out);
+    return out;
+  };
+})();
+
+// line weights grow with zoom (0.75x at z10 to 1.35x at z16)
+const zf = () => Math.max(.75, Math.min(1.35, .75 + .1 * (map.getZoom() - 10)));
+const W = {metro: 4.5, commuter: 4, brt: 2.4};
+const weightOf = mode => (W[mode] || W.metro) * zf();
+const bgColor = getComputedStyle(document.documentElement).getPropertyValue('--bg').trim() || '#f4f6f5';
+// "opened this interval" glows sit in their own pane, faded as a whole so overlaps don't darken
+map.createPane('glow').style.cssText = `z-index:390;opacity:${dark ? .32 : .5};pointer-events:none`;
+const glowR = L.canvas({pane: 'glow'}), glowLayer = L.layerGroup().addTo(map);
+// a polyline shifted to its left by a number of screen pixels at the current zoom: `px` along
+// the middle, easing from `px0` at the start and to `px1` at the end over the first and last
+// ~40 px, so a line meets its continuation on the next piece without a step
+function offsetPath(ll, px, px0 = px, px1 = px) {
+  if (ll.length < 2 || (Math.abs(px) < .05 && Math.abs(px0) < .05 && Math.abs(px1) < .05)) return ll;
+  let P = ll.map(p => map.latLngToLayerPoint(p));
+  const cum = [0];
+  for (let i = 1; i < P.length; i++) cum.push(cum[i - 1] + P[i].distanceTo(P[i - 1]));
+  const len = cum[cum.length - 1], R = Math.min(40, len / 2);
+  // add vertices where the easing starts and ends so it isn't spread over a long segment
+  const at = s => { let i = 1; while (i < P.length - 1 && cum[i] < s) i++; const t = (s - cum[i - 1]) / ((cum[i] - cum[i - 1]) || 1);
+    return [i, L.point(P[i - 1].x + t * (P[i].x - P[i - 1].x), P[i - 1].y + t * (P[i].y - P[i - 1].y))]; };
+  if (px0 !== px && R > 1) { const [i, q] = at(R); P.splice(i, 0, q); cum.splice(i, 0, R); }
+  if (px1 !== px && R > 1) { const [i, q] = at(len - R); P.splice(i, 0, q); cum.splice(i, 0, len - R); }
+  const off = s => s < R ? px0 + (px - px0) * s / R : s > len - R ? px1 + (px - px1) * (len - s) / R : px;
   const nrm = (a, b) => { const dx = b.x - a.x, dy = b.y - a.y, l = Math.hypot(dx, dy) || 1; return [dy / l, -dx / l]; };
-  for (let i = 0; i < n; i++) {
-    const a = i > 0 ? nrm(P[i - 1], P[i]) : null, b = i < n - 1 ? nrm(P[i], P[i + 1]) : null;
+  const out = [];
+  for (let i = 0; i < P.length; i++) {
+    const a = i > 0 ? nrm(P[i - 1], P[i]) : null, b = i < P.length - 1 ? nrm(P[i], P[i + 1]) : null;
     let [x, y] = a && b ? [a[0] + b[0], a[1] + b[1]] : (a || b);
     const l = Math.hypot(x, y) || 1; x /= l; y /= l;
-    const m = Math.min(2, 1 / Math.max(.5, x * (a || b)[0] + y * (a || b)[1]));
-    out.push(map.layerPointToLatLng(L.point(P[i].x + x * px * m, P[i].y + y * px * m)));
+    const m = Math.min(2, 1 / Math.max(.5, x * (a || b)[0] + y * (a || b)[1])), o = off(cum[i]);
+    out.push(map.layerPointToLatLng(L.point(P[i].x + x * o * m, P[i].y + y * o * m)));
   }
   return out;
 }
-// track states this year: future (faint), under construction (dashed), open (solid),
+// track states this year: future (faint), under construction (dotted), open (solid),
 // and newly opened since the last interval (solid on a glow)
 function stateFn() {
   const Y = D.years[yi], prevY = yi ? D.years[yi - 1] : -Infinity;
   return (ln, yr) => yr <= prevY ? 'open' : yr <= Y ? 'new' : yr - (D.build[ln.mode] || 0) < Y ? 'building' : 'future';
 }
+// piece ends that meet: endpoint -> [[piece, is its start]] (per scenario, built once)
+function pieceEnds() {
+  if (S._ends) return S._ends;
+  const m = new Map(), key = p => p[0].toFixed(5) + ',' + p[1].toFixed(5);
+  S.pieces.forEach(([gi], pi) => { const g = D.geoms[gi];
+    for (const [p, st] of [[g[0], true], [g[g.length - 1], false]]) { const k = key(p); if (!m.has(k)) m.set(k, []); m.get(k).push([pi, st]); } });
+  S._ends = S.pieces.map(([gi]) => { const g = D.geoms[gi]; return [m.get(key(g[0])), m.get(key(g[g.length - 1]))]; });
+  return S._ends;
+}
+let pieceOffs = [];   // per piece: Map line -> offset (px), for the station markers
 function drawLines() {
-  lineLayer.clearLayers();
-  const state = stateFn();
-  // shared track: lines side by side once zoomed in (fully apart from zoom 13), stacked when zoomed out
-  const apart = Math.max(0, Math.min(1, (map.getZoom() - 11) / 2));
-  for (const pass of ['future', 'building', 'new', 'open']) for (const [gi, users] of S.pieces) {
-    const vis = users.filter(([li]) => !hidden.has(S.lines[li].id));
-    if (!vis.length) continue;
-    const widths = vis.map(([li]) => style(S.lines[li].mode).weight + 1), total = widths.reduce((a, b) => a + b, 0);
-    let ll = null, at = -total / 2;
-    vis.forEach(([li, yr], k) => {
-      const ln = S.lines[li], off = (at + widths[k] / 2) * apart;
-      at += widths[k];
-      const st = state(ln, yr); if (st !== pass) return;
-      ll = ll || D.geoms[gi].map(p => [p[1], p[0]]);
-      const path = offsetPath(ll, off);
-      if (st === 'new') L.polyline(path, {color: '#ffd23f', weight: 13, opacity: .55, lineCap: 'round'}).addTo(lineLayer);
-      const sty = style(ln.mode, ln.color, st === 'future');
-      if (st === 'building') Object.assign(sty, {opacity: .7, dashArray: '1 8', weight: sty.weight + 1.5});
-      L.polyline(path, sty).addTo(lineLayer);
+  lineLayer.clearLayers(); glowLayer.clearLayers();
+  const state = stateFn(), apart = map.getZoom() >= 12 ? 1 : 0;   // shared track side by side from zoom 12
+  pieceOffs = S.pieces.map(([, users]) => {
+    const vis = users.filter(([li]) => !hidden.has(S.lines[li].id)), ws = vis.map(([li]) => weightOf(S.lines[li].mode) + 1);
+    let at = -ws.reduce((a, b) => a + b, 0) / 2;
+    const o = new Map();
+    vis.forEach(([li], k) => { o.set(li, (at + ws[k] / 2) * apart); at += ws[k]; });
+    return o;
+  });
+  const ends = pieceEnds();
+  // where two pieces meet, a line on both eases to the midpoint of its two offsets
+  const joint = (pi, end, li, own) => {
+    for (const [pj, st] of ends[pi][end] || []) {
+      if (pj === pi || !pieceOffs[pj].has(li)) continue;
+      const nb = pieceOffs[pj].get(li);
+      return (own + ((end === 0) !== st ? nb : -nb)) / 2;   // pieces running the same way share a left side
+    }
+    return own;
+  };
+  for (const pass of ['future', 'building', 'new', 'open']) {
+    const strokes = [];
+    S.pieces.forEach(([gi, users], pi) => {
+      let ll = null;
+      for (const [li, yr] of users) {
+        const ln = S.lines[li]; if (hidden.has(ln.id) || state(ln, yr) !== pass) continue;
+        ll = ll || D.geoms[gi].map(p => [p[1], p[0]]);
+        const off = pieceOffs[pi].get(li);
+        strokes.push([ln, offsetPath(ll, off, joint(pi, 0, li, off), joint(pi, 1, li, off))]);
+      }
     });
+    const opts = {lineCap: 'butt', lineJoin: 'round', interactive: false};
+    for (const [ln, path] of strokes) {
+      const w = weightOf(ln.mode), col = lineColor(ln.color, ln.mode);
+      if (pass === 'new') L.polyline(path, {...opts, renderer: glowR, pane: 'glow', color: dark ? '#f2c230' : '#ffd23f', weight: w + 6}).addTo(glowLayer);
+      if (pass !== 'future' && ln.mode !== 'brt')   // a casing in the background colour: crossings read as crossings
+        L.polyline(path, {...opts, color: bgColor, weight: w + 2.5, opacity: pass === 'building' ? .6 : 1}).addTo(lineLayer);
+    }
+    for (const [ln, path] of strokes) {
+      const w = weightOf(ln.mode), col = lineColor(ln.color, ln.mode);
+      if (pass === 'future') L.polyline(path, {...opts, color: col, weight: w, opacity: .18}).addTo(lineLayer);
+      else if (pass === 'building') L.polyline(path, {...opts, color: col, weight: w + 1.5, opacity: .7, dashArray: '1 8', lineCap: 'round'}).addTo(lineLayer);
+      else {
+        L.polyline(path, {...opts, color: col, weight: w, opacity: .95}).addTo(lineLayer);
+        if (ln.mode === 'commuter')   // railroad style, as on the diagram: a dashed line down the middle
+          L.polyline(path, {...opts, color: bgColor, weight: 1.3 * zf(), dashArray: '6 4'}).addTo(lineLayer);
+      }
+    }
   }
 }
-map.on('zoomend', drawLines);   // offsets are in screen pixels
-function draw() {
-  const Y = D.years[yi], prevY = yi ? D.years[yi - 1] : -Infinity;
-  $('year').textContent = Y;
+// station markers: interchanges always; rail stops from zoom 11; BRT stops from zoom 12.
+// An interchange on side-by-side track is a capsule across the lines it serves.
+function drawStations() {
   stLayer.clearLayers();
-  drawLines();
-  intervalSummary(Y, prevY, stateFn());
-  const yd = S.years[Y], served = new Map();
+  const Y = D.years[yi], z = map.getZoom(), yd = S.years[Y], served = new Map();
   for (const [li, stops] of yd.runs) for (const s of stops) {
-    if (!served.has(s)) served.set(s, []); served.get(s).push(li);
+    if (!served.has(s)) served.set(s, new Set()); served.get(s).add(li);
   }
+  const ink = dark ? '#e7ecef' : '#18212b', paper = dark ? '#18212a' : '#fff';
   for (const [sid, lis] of served) {
-    const vis = lis.filter(li => !hidden.has(S.lines[li].id)); if (!vis.length) continue;
-    const st = D.stations[sid], ln = S.lines[vis[0]], big = lis.length > 1;
-    const m = L.circleMarker([st[1], st[2]], {radius: big ? 5 : 3.5, color: dark ? '#e7ecef' : '#18212b', weight: big ? 2 : 1.2,
-      fillColor: big ? (dark ? '#18212a' : '#fff') : ln.color, fillOpacity: 1}).addTo(stLayer);
+    const vis = [...lis].filter(li => !hidden.has(S.lines[li].id)); if (!vis.length) continue;
+    const st = D.stations[sid], ln = S.lines[vis[0]], big = lis.size > 1, brt = vis.every(li => S.lines[li].mode === 'brt');
+    if (!big && (z < 11 || (brt && z < 12))) continue;
+    const at = S.stPiece && S.stPiece[sid], ll = at ? L.latLng(at[3], at[2]) : L.latLng(st[1], st[2]);   // on its line
+    let m;
+    if (at && pieceOffs[at[0]]) {   // offsets of the lines it serves on its piece, across the track
+      const os = vis.map(li => pieceOffs[at[0]].get(li)).filter(o => o !== undefined);
+      if (os.length) {
+        const p = map.latLngToLayerPoint(ll), a = at[1] * Math.PI / 180, n = [Math.sin(a), -Math.cos(a)];   // left normal, screen
+        const pt = o => map.layerPointToLatLng(L.point(p.x + n[0] * o, p.y + n[1] * o));
+        const lo = Math.min(...os), hi = Math.max(...os);
+        if (big && hi - lo > 1) {
+          const seg = [pt(lo), pt(hi)];
+          L.polyline(seg, {color: ink, weight: 10 * zf() + 3, lineCap: 'round', interactive: false}).addTo(stLayer);
+          m = L.polyline(seg, {color: paper, weight: 10 * zf(), lineCap: 'round'}).addTo(stLayer);
+        } else if (!big) {
+          ll.lat = pt(lo).lat; ll.lng = pt(lo).lng;   // a one-line stop sits on its own line
+        }
+      }
+    }
+    if (!m) m = L.circleMarker(ll, big ? {radius: z <= 10 ? 3 : 5, color: ink, weight: z <= 10 ? 1.5 : 2, fillColor: paper, fillOpacity: 1}
+      : brt ? {radius: 2.4 * zf(), color: dark ? '#11171d' : '#fff', weight: 1.2, fillColor: lineColor(ln.color, ln.mode), fillOpacity: 1}
+      : {radius: 3.5 * zf(), color: lineColor(ln.color, ln.mode), weight: 2, fillColor: paper, fillOpacity: 1}).addTo(stLayer);
     m.on('click', () => choose(sid));
-    const chips = [...new Set(lis)].map(li => `<span class="chip" style="background:${S.lines[li].color}">${S.lines[li].name}</span>`).join('');
+    const chips = [...lis].map(li => `<span class="chip" style="background:${S.lines[li].color}">${S.lines[li].name}</span>`).join('');
     const b = S.boardings[sid];
     m.bindTooltip(st[0]);
     m.bindPopup(`<div class="pop"><b>${st[0]}</b><div>${chips}</div><div class="m">${fmt(st[3])} residents · ${fmt(st[4])} jobs within 1 km` +
       (b ? `<br>${fmt(b)} competitive commuters board here in ${D.years[D.years.length - 1]}` : '') + `</div></div>`);
   }
+}
+map.on('zoomend', () => { drawLines(); drawStations(); });   // offsets and weights are in screen pixels
+function draw() {
+  const Y = D.years[yi], prevY = yi ? D.years[yi - 1] : -Infinity;
+  $('year').textContent = Y;
+  drawLines();
+  drawStations();
+  intervalSummary(Y, prevY, stateFn());
   metrics(); lineList(); if (pick.length === 2) route();
   if (window.Schem) Schem.draw();  // schematic: redraw the diagram view
 }

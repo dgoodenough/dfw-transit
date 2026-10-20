@@ -20,46 +20,7 @@ const el = (tag, attrs, parent) => {
 };
 const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)');
 
-// Colour guard: a line colour too close to the page background (a pale yellow on
-// the light theme, a deep purple on the dark one) is darkened or lightened just
-// enough to read as a line. Hue and saturation are kept; most colours pass as is.
-const lineColor = (() => {
-  const memo = new Map();
-  const lin = c => { c /= 255; return c <= 0.04045 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4; };
-  const lum = ([r, g, b]) => 0.2126 * lin(r) + 0.7152 * lin(g) + 0.0722 * lin(b);
-  const rgb = h => { h = h.replace('#', ''); if (h.length === 3) h = [...h].map(c => c + c).join(''); return [0, 2, 4].map(i => parseInt(h.slice(i, i + 2), 16)); };
-  const toHsl = ([r, g, b]) => {
-    r /= 255; g /= 255; b /= 255;
-    const mx = Math.max(r, g, b), mn = Math.min(r, g, b), l = (mx + mn) / 2, d = mx - mn;
-    if (!d) return [0, 0, l];
-    const s = d / (1 - Math.abs(2 * l - 1));
-    const h = mx === r ? ((g - b) / d) % 6 : mx === g ? (b - r) / d + 2 : (r - g) / d + 4;
-    return [(h * 60 + 360) % 360, s, l];
-  };
-  const toRgb = ([h, s, l]) => {
-    const c = (1 - Math.abs(2 * l - 1)) * s, x = c * (1 - Math.abs((h / 60) % 2 - 1)), m = l - c / 2;
-    const [r, g, b] = h < 60 ? [c, x, 0] : h < 120 ? [x, c, 0] : h < 180 ? [0, c, x] : h < 240 ? [0, x, c] : h < 300 ? [x, 0, c] : [c, 0, x];
-    return [r, g, b].map(v => Math.round((v + m) * 255));
-  };
-  return hex => {
-    const bgHex = getComputedStyle(document.documentElement).getPropertyValue('--bg').trim() || '#f4f6f5';
-    const key = hex + bgHex;
-    if (memo.has(key)) return memo.get(key);
-    let out = hex;
-    try {
-      const bg = lum(rgb(bgHex)), darkBg = bg < 0.2, need = darkBg ? 2.6 : 2.0;
-      const ratio = c => { const L = lum(c); return (Math.max(L, bg) + 0.05) / (Math.min(L, bg) + 0.05); };
-      let c = rgb(hex);
-      if (ratio(c) < need) {
-        const hsl = toHsl(c);
-        for (let i = 0; i < 50 && ratio(c) < need; i++) { hsl[2] = Math.max(0, Math.min(1, hsl[2] + (darkBg ? 0.015 : -0.015))); c = toRgb(hsl); }
-        out = '#' + c.map(v => v.toString(16).padStart(2, '0')).join('');
-      }
-    } catch (e) { /* unparseable colour: use as given */ }
-    memo.set(key, out);
-    return out;
-  };
-})();
+// lineColor (the colour guard) is defined in map.html
 
 const nodeOf = new Map();
 SD.nodes.forEach((n, i) => n[2].forEach(s => nodeOf.set(s, i)));
@@ -630,8 +591,10 @@ function legendDraw() {
     h += sample(`<line x1="1" y1="6" x2="37" y2="6" stroke="var(--water)" stroke-width="4" stroke-linecap="round"/>`, 'Waterways');
   } else {
     h += sample(`<line x1="1" y1="6" x2="37" y2="6" stroke="${grey}" stroke-width="4.5" stroke-linecap="round"/>`, D.modes.metro);
-    h += sample(`<line x1="1" y1="6" x2="37" y2="6" stroke="${grey}" stroke-width="3" stroke-dasharray="8 5"/>`, D.modes.commuter);
-    h += sample(`<line x1="1" y1="6" x2="37" y2="6" stroke="${grey}" stroke-width="2.2" stroke-linecap="round"/>`, D.modes.brt);
+    h += sample(`<line x1="1" y1="6" x2="37" y2="6" stroke="${grey}" stroke-width="4"/><line x1="1" y1="6" x2="37" y2="6" stroke="var(--bg)" stroke-width="1.3" stroke-dasharray="6 4"/>`, D.modes.commuter);
+    h += sample(`<line x1="1" y1="6" x2="37" y2="6" stroke="${grey}" stroke-width="2.4" stroke-linecap="round"/>`, D.modes.brt);
+    h += sample(`<line x1="1" y1="6" x2="37" y2="6" stroke="var(--glow)" stroke-width="10" opacity=".45"/><line x1="1" y1="6" x2="37" y2="6" stroke="${grey}" stroke-width="4.5"/>`, 'Opened this interval');
+    h += sample(`<line x1="1" y1="6" x2="37" y2="6" stroke="${grey}" stroke-width="6" stroke-dasharray="1 8" stroke-linecap="round" opacity=".7"/>`, 'Under construction');
     h += sample(`<line x1="1" y1="6" x2="37" y2="6" stroke="${grey}" stroke-width="4.5" stroke-linecap="round" opacity=".2"/>`, 'Not yet open');
     h += sample(`<line x1="1" y1="6" x2="37" y2="6" stroke="var(--water)" stroke-width="4" stroke-linecap="round"/>`, 'Waterways');
   }

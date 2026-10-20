@@ -6,8 +6,8 @@ Every line is sampled every STEP m, in priority order (existing first, then metr
 commuter rail, BRT, by opening year), and each sample snaps to an earlier line's track
 point when one lies within TOL m running the same way (either direction); otherwise
 it starts new track. Track used by the same lines (and opening years) end to end is
-merged into one piece, oriented the way its first line runs, with its lines in
-priority order; the page offsets them side by side when zoomed in. Display only: the
+merged into one piece, oriented the way its first line runs (lines that share track
+are first made to run the same way), with its lines in priority order; the page offsets them side by side when zoomed in. Display only: the
 model and the network tables are untouched.
 """
 import collections
@@ -54,7 +54,7 @@ def pieces(lines):
     grid = collections.defaultdict(list)
     chain = {}                            # (line, index) -> track point
     use = collections.defaultdict(dict)   # (u, v) with u < v -> {line: year}
-    walk = {}                             # (u, v) -> (line rank, line runs u->v)
+    runs = collections.defaultdict(dict)  # (u, v) -> {line: line runs u->v}
 
     for li, _, _, _, segs in order:
         n_own = 0
@@ -104,9 +104,21 @@ def pieces(lines):
                     for u, v in zip(path, path[1:]):
                         e = (min(u, v), max(u, v))
                         use[e][li] = min(use[e].get(li, year), year)
-                        if e not in walk or rank[li] < walk[e][0]:
-                            walk[e] = (rank[li], u < v)
+                        runs[e][li] = u < v
                 prev = node
+
+    # lines list their stops in either direction; flip some so lines sharing track run the
+    # same way (each line follows the majority of the higher-ranked lines it shares with).
+    # Pieces are then oriented the same way along a corridor, so a line keeps its side.
+    flip = {}
+    for li, *_ in order:
+        votes = 0
+        for e, us in runs.items():
+            if li in us:
+                for lj, fwd in us.items():
+                    if lj in flip:
+                        votes += 1 if (fwd != flip[lj]) == us[li] else -1
+        flip[li] = votes < 0
 
     # merge runs of edges with the same users into pieces
     adj = collections.defaultdict(list)
@@ -153,10 +165,44 @@ def pieces(lines):
             e = f
         # orient along the piece's first line
         a, b = nodes[0], nodes[1]
-        _, fwd = walk[key(a, b)]
-        if fwd != (a < b):
+        lead = min(use[e0], key=rank.get)
+        if (runs[key(a, b)][lead] != flip[lead]) != (a < b):
             nodes.reverse()
         pts = _dp([xy[n] for n in nodes], SIMPLIFY)
         users = sorted(use[e0].items(), key=lambda t: rank[t[0]])
         out.append(([osmroute.ll(p) for p in pts], users))
+    return out
+
+
+def station_pieces(pieces_, stations, stops, snap_m=300.0, snap_multi_m=60.0):
+    """Where the map draws each station: station_id -> [piece, screen angle of the piece there
+    (degrees, y down), lon, lat of the nearest point on it]. Only pieces of lines that stop
+    there count; a station farther than snap_m (one line) or snap_multi_m (several) is left out
+    and drawn where it is."""
+    by_line = collections.defaultdict(list)
+    for k, (_, users) in enumerate(pieces_):
+        for li, _ in users:
+            by_line[li].append(k)
+    lines_at = collections.defaultdict(set)
+    for li, ids in stops.items():
+        for sid in ids:
+            lines_at[sid].add(li)
+    proj = [[osmroute.xy(*p) for p in pts] for pts, _ in pieces_]
+    out = {}
+    for sid, lis in lines_at.items():
+        q = osmroute.xy(*stations[sid])
+        best = None
+        for k in {k for li in lis for k in by_line[li]}:
+            P = proj[k]
+            for a, b in zip(P, P[1:]):
+                dx, dy = b[0] - a[0], b[1] - a[1]
+                L2 = dx * dx + dy * dy
+                t = max(0.0, min(1.0, ((q[0] - a[0]) * dx + (q[1] - a[1]) * dy) / L2)) if L2 else 0.0
+                c = (a[0] + t * dx, a[1] + t * dy)
+                d = math.dist(c, q)
+                if best is None or d < best[0]:
+                    best = (d, k, math.degrees(math.atan2(-dy, dx)), c)
+        if best and best[0] <= (snap_m if len(lis) == 1 else snap_multi_m):
+            lon, lat = osmroute.ll(best[3])
+            out[sid] = [best[1], round(best[2], 1), round(lon, 6), round(lat, 6)]
     return out

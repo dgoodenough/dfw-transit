@@ -1,5 +1,5 @@
 line_id,name,mode,status,color,headway_min,notes
-XP01,SH-114 Line,metro,proposed,#e65100,,"Expansion lever: Farmers Branch - Valwood - Freeport - DFW north - Grapevine - Southlake - Westlake, light metro on LBJ/SH-114 right-of-way"
+XP01,SH-114 Line,metro,proposed,#7cb342,,"Expansion lever: Farmers Branch - Valwood - Freeport - DFW north - Grapevine - Southlake - Westlake, light metro on LBJ/SH-114 right-of-way"
 XP02,Coppell-Lewisville BRT,brt,proposed,#00838f,,Expansion lever: Cypress Waters - Coppell business parks - Vista Ridge - Old Town Lewisville
 XP05,Stemmons-Brookhollow BRT,brt,proposed,#00838f,,"Expansion lever: Inwood/Love Field - Brookhollow - Regal Row - Northwest Hwy - Royal/Luna - Valwood, the Stemmons/I-35E job corridor"
 XP06,Dallas Parkway BRT,brt,proposed,#00838f,,"Expansion lever: Legacy West - Stonebriar - The Star - Frisco Station, the Dallas Parkway office corridor"
