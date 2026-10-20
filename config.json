@@ -114,7 +114,7 @@
     "penalty_min": 3
   },
   "access": {
-    "_doc": "How people reach stations. Walk to anything within walk_max_m; drive (park & ride) to garages within pnr_max_km but not closer than pnr_min_km (people that close walk): commuter rail stations, each line's planned termini, today's lots at existing suburban stations (pnr_existing) and optional suburban garages (pnr_suburban). Garages hold pnr_spaces cars (DART Parker Road ~2,000, TRE/TEXRail stations 175-1,000); each space serves pnr_people_per_space commuters a day (75% full x 1.1 per car x 1.15 with drop-offs). Riders a full garage turns away take their best access without parking (pnr_overflow_fallback). Today's local buses are the feeder grid (30 min in denser areas); faster grids are a lever. Riders choose each station's access mode by perceived minutes (out-of-vehicle time weighs 2.5x). circuity applies to drive access, walk_circuity to walking. The micromobility, kiss_ride and pnr_suburban blocks are levers, off by default.",
+    "_doc": "How people reach stations. Walk to anything within walk_max_m; drive (park & ride) to garages within pnr_max_km but not closer than pnr_min_km (people that close walk): commuter rail stations, each line's planned termini, today's lots at existing suburban stations (pnr_existing) and optional suburban garages (pnr_suburban). Garages hold pnr_spaces cars (DART Parker Road ~2,000, TRE/TEXRail stations 175-1,000); each space serves pnr_people_per_space commuters a day (75% full x 1.1 per car x 1.15 with drop-offs). Riders a full garage turns away take their best access without parking (pnr_overflow_fallback). Today's local buses are the feeder grid (30 min in denser areas); faster grids are a lever. Riders choose their access mode, connector stations and route by perceived minutes: out-of-vehicle time weighs 2.5x and driving to a garage carries the drive-to-transit constant (ridership.pnr_asc_offset, in in-vehicle minutes), the same terms the mode choice uses. circuity applies to drive access, walk_circuity to walking. The micromobility, kiss_ride and pnr_suburban blocks are levers, off by default.",
     "walk_max_m": 1200,
     "walk_speed_kmh": 4.8,
     "circuity": 1.25,
@@ -511,7 +511,7 @@
   },
   "ridership": {
     "_doc": "Daily riders from the commute model (dfwt/demand.py). Each commute chooses drive, transit or walk/bike the whole way (multinomial logit, drive is the reference). Transit utility: asc + b_ivt*(drive - transit door-to-door minutes) - b_ovt_extra*(access + egress minutes) - b_ratio*(how far transit exceeds 1x the drive time, as a ratio) + 0.125/$ x (driving cost avoided at drive_usd_per_km + parking avoided at paid-parking destinations). FTA/MWCOG ranges: IVT -0.02..-0.03/min, out-of-vehicle 2-3x. asc is calibrated so the 2025 network carries today's rail ridership with today's buses as feeders; active.asc so ~2% walk or bike. Transit commuters x telework; daily trips = commuters x round_trip / work_share_of_transit_trips; boardings = trips x boardings per trip (from the load assignment). Drive-to-transit has its own constant (pnr_asc_offset, as in MPO models: parking, walking in from the lot), set so about half of 2025 rail riders drive to a garage, near DART's on-board surveys; riders without a car (no_car) can't.",
-    "asc": -0.375,
+    "asc": -0.7969,
     "b_ivt_per_min": 0.025,
     "b_ovt_extra_per_min": 0.0375,
     "b_per_dollar": 0.125,
@@ -617,7 +617,7 @@
       ],
       "ride_bonus": 3.0
     },
-    "pnr_asc_offset": -1.5
+    "pnr_asc_offset": -1.0
   },
   "default_scenario": "two_million"
 }

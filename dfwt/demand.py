@@ -322,7 +322,7 @@ class Access:
             is_pnr[:] = False
         # people a garage can serve per day (one car per commuter, plus drop-offs)
         self.pnr_cap = spaces * ac["pnr_people_per_space"]
-        walk_km = ac["walk_max_m"] / 1000
+        walk_km = in_effect(ac["walk_max_m"], year) / 1000   # walk settings may be year tables
         cong = getattr(zones, "cong", 1.0)
         rc = cfg["ridership"]
         ovt_w = rc["b_ovt_extra_per_min"] / rc["b_ivt_per_min"]
@@ -351,14 +351,16 @@ class Access:
         self.egr_o = np.full((nz, k), np.inf, dtype=np.float32)
         self.egr_mode = np.zeros((nz, k), dtype=np.int8)
         self.walk_min_dist = np.full(nz, np.inf, dtype=np.float32)
+        self.acc_g = np.full((nz, k), np.inf, dtype=np.float32)   # perceived minutes (what riders rank by)
+        self.egr_g = np.full((nz, k), np.inf, dtype=np.float32)
         for i0 in range(0, nz, CHUNK):
             i1 = min(nz, i0 + CHUNK)
             d = np.sqrt((zones.x[i0:i1, None] - sx[None, :]) ** 2 + (zones.y[i0:i1, None] - sy[None, :]) ** 2)
             self.walk_min_dist[i0:i1] = d.min(axis=1)
             inf = np.full(d.shape, np.inf)
-            walk = np.where(d <= walk_km, d * ac.get("walk_circuity", ac["circuity"]) / ac["walk_speed_kmh"] * 60,
+            walk = np.where(d <= walk_km, d * in_effect(ac.get("walk_circuity", ac["circuity"]), year) / ac["walk_speed_kmh"] * 60,
                             np.inf)
-            drive = np.where(is_pnr[None, :] & (d <= ac["pnr_max_km"]) & (d >= ac.get("pnr_min_km", 0)),
+            drive = np.where(is_pnr[None, :] & (d <= ac["pnr_max_km"]) & (d >= in_effect(ac.get("pnr_min_km", 0), year)),
                              d * ac["circuity"] / ac["pnr_speed_kmh"] * 60 * cong + ac["pnr_penalty_min"], np.inf)
             drive_o = np.where(np.isfinite(drive), ac["pnr_penalty_min"], np.inf)   # park + walk from the garage
             # (minutes, out-of-vehicle minutes) per mode; the drive itself is in-vehicle time
@@ -380,17 +382,21 @@ class Access:
                 kiss = np.where(d <= kr["max_km"], d * ac["circuity"] / ac["pnr_speed_kmh"] * 60 * cong + kr["penalty_min"],
                                 np.inf)
                 acc_modes[KISS] = (kiss, np.where(np.isfinite(kiss), kr["penalty_min"], np.inf))
-            for modes, st, t, o, md in ((acc_modes, self.acc_st, self.acc_t, self.acc_o, self.acc_mode),
-                                        (egr_modes, self.egr_st, self.egr_t, self.egr_o, self.egr_mode)):
+            for modes, st, t, o, md, g in ((acc_modes, self.acc_st, self.acc_t, self.acc_o, self.acc_mode, self.acc_g),
+                                           (egr_modes, self.egr_st, self.egr_t, self.egr_o, self.egr_mode, self.egr_g)):
                 tt = np.stack([m[0] for m in modes])
                 oo = np.stack([m[1] for m in modes])
                 # riders pick the access mode by perceived minutes (out-of-vehicle time weighs
                 # more, and driving to a garage carries its constant, pnr_asc_offset, in minutes),
                 # not raw minutes; ties go to the earlier mode (walk first)
-                best = np.argmin(tt + ovt_w * np.where(np.isfinite(oo), oo, 0) + pen, axis=0)
+                gen = tt + ovt_w * np.where(np.isfinite(oo), oo, 0) + pen
+                best = np.argmin(gen, axis=0)
                 arr = np.take_along_axis(tt, best[None], axis=0)[0]
+                garr = np.take_along_axis(gen, best[None], axis=0)[0]
                 ovt = np.take_along_axis(oo, best[None], axis=0)[0]
-                st[i0:i1], t[i0:i1] = _diverse_nearest(arr, run_cols, k)
+                # connector stations are ranked by the same perceived minutes (the path search too)
+                st[i0:i1], g[i0:i1] = _diverse_nearest(garr, run_cols, k)
+                t[i0:i1] = np.take_along_axis(arr, st[i0:i1], axis=1)
                 o[i0:i1] = np.take_along_axis(ovt, st[i0:i1], axis=1)
                 md[i0:i1] = np.take_along_axis(best, st[i0:i1], axis=1)
         self.acc_pnr = self.acc_mode == PNR
@@ -414,32 +420,39 @@ def _diverse_nearest(arr, run_cols, k):
 def _paths(acc, T, i0, i1, nz, ns):
     """Best door-to-door path for origin zones i0:i1 to every zone through `acc`:
     (minutes, access station, egress station, access mode, egress mode, out-of-vehicle minutes).
-    Only the minutes and the winning connector index are kept per pass (in place);
-    stations, modes and out-of-vehicle minutes are looked up once at the end."""
+    Paths are ranked by perceived minutes (in-vehicle + weighted out-of-vehicle + the
+    drive-to-transit constant, the terms the mode choice uses); the minutes returned are
+    the path's actual minutes. Only the minutes and the winning connector index are kept
+    per pass (in place); stations, modes and out-of-vehicle minutes are looked up at the end."""
     m = i1 - i0
     k = acc.acc_st.shape[1]
     rows = np.arange(m)[:, None]
     # origin zone -> any station b, via best access station a
     R = np.full((m, ns), np.inf, dtype=np.float32)
+    Rg = np.full((m, ns), np.inf, dtype=np.float32)
     Ja = np.zeros((m, ns), dtype=np.int8)
     better = np.empty((m, ns), dtype=bool)
     for j in range(k):
-        cand = acc.acc_t[i0:i1, j, None] + T[acc.acc_st[i0:i1, j]]
-        np.less(cand, R, out=better)
-        np.copyto(R, cand, where=better)
+        Tj = T[acc.acc_st[i0:i1, j]]
+        cand = acc.acc_g[i0:i1, j, None] + Tj
+        np.less(cand, Rg, out=better)
+        np.copyto(Rg, cand, where=better)
+        np.copyto(R, acc.acc_t[i0:i1, j, None] + Tj, where=better)
         np.copyto(Ja, j, where=better)
     Ra = acc.acc_st[i0:i1][rows, Ja]
     Rm = acc.acc_mode[i0:i1][rows, Ja]
     Ro = acc.acc_o[i0:i1][rows, Ja]
     # -> destination zone via best egress station b
     TT = np.full((m, nz), np.inf, dtype=np.float32)
+    TG = np.full((m, nz), np.inf, dtype=np.float32)
     Jb = np.zeros((m, nz), dtype=np.int8)
     better = np.empty((m, nz), dtype=bool)
     for j in range(k):
-        cand = R[:, acc.egr_st[:, j]]
-        cand += acc.egr_t[None, :, j]
-        np.less(cand, TT, out=better)
-        np.copyto(TT, cand, where=better)
+        cand = Rg[:, acc.egr_st[:, j]]
+        cand += acc.egr_g[None, :, j]
+        np.less(cand, TG, out=better)
+        np.copyto(TG, cand, where=better)
+        np.copyto(TT, R[:, acc.egr_st[:, j]] + acc.egr_t[None, :, j], where=better)
         np.copyto(Jb, j, where=better)
     cols = np.arange(nz)[None, :]
     Bst = acc.egr_st[cols, Jb]

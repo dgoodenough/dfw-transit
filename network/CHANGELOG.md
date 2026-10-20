@@ -218,3 +218,29 @@ Scenarios:
   Creek Parkway.
 - Map: lines on the same track are drawn side by side when zoomed in (dfwt/bundle.py), and the
   Lines panel has a checkbox per group (each mode, split into plan lines and scenario additions).
+
+## v2.9 — Review fixes
+
+Nine reviewers and a UX pass went over the project (reports/REVIEW.md lists what they found
+and what is left to decide). Fixed:
+
+- Model: riders rank access modes, connector stations and routes by the same perceived
+  minutes as the mode choice, including the drive-to-transit constant (garages had been
+  chosen on raw minutes and penalised afterwards, so a full garage could add riders).
+  Recalibrated to 2025: transit constant -0.797, drive-to-transit constant -1.0 (51% of
+  rail riders drive to a garage, 80.6k rail boardings). Walks between nearby platforms no
+  longer count as transit trips. Station-area growth ramps from each mode's arrival.
+- **The 2M scenario now reaches about 1.87M daily trips in 2100** (was 2.04M). The access
+  fix moves riders off garages (5% of 2100 riders, was 20%), and the scenario's
+  walkability package now starts in 2030 instead of applying to today's network (its 2025
+  run was 13% above calibration). Whether to add levers to reach 2M is an open decision.
+- Costs: platforms are charged per mode (a metro line at a BRT stop builds its own).
+- Network: new BRT stops at every station within 300 m of the route, so new corridors meet
+  the lines they cross (three had been cut off and pushed past 2100); Shiloh Road BRT
+  stops at SpringPark. The aligner no longer moves interchange stations.
+- Schedule: a local repair replaces shrinking the whole budget (100% used, was 97%);
+  `schedule --write` clears stale stage files; build stops on default-scenario errors.
+- Reports: peak-hour loads use daily riders (were ~3.8x low); light-rail capacity 12k/h.
+- Map: continuous side-by-side shared track, interchange capsules, stations by zoom,
+  contrast guard, recoloured clashing lines (SH-114, I-30, Gainesville, Bowie, SE TexRail,
+  Alvarado), trips drawn along their route, trip-planner messages, popup/panel/touch fixes.

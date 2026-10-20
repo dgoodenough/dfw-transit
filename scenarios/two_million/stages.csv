@@ -1,9 +1,9 @@
 line_id,stage,kind,from_stop,to_stop,year_opens,until_year,via_line,headway_min,locked,note
-E01,1,starter,Main / 28th Street,Lockheed Gate,2038,,,,,value per $
-E02,1,starter,Six Points,Melinda / California,2069,,,,,optimizer
-E04,1,starter,Rosedale / Henderson,Lake Worth,2029,,,,,optimizer
-E05,1,starter,Fort Worth T&P,Primrose,2054,,,,,optimizer
-E07,1,starter,Mansfield,Fort Worth Central,2062,,,,,optimizer
+E01,1,starter,Main / 28th Street,Lockheed Gate,2039,,,,,value per $
+E02,1,starter,Six Points,Melinda / California,2066,,,,,optimizer
+E04,1,starter,Rosedale / Henderson,Lake Worth,2030,,,,,optimizer
+E05,1,starter,Fort Worth T&P,Primrose,2053,,,,,optimizer
+E07,1,starter,Mansfield,Fort Worth Central,2058,,,,,optimizer
 E08,1,starter,Downtown Denton Transit Center,Fort Worth Central,2057,,,,,optimizer
 E09,1,starter,Fort Worth T&P,DFW Airport Terminal B,2025,,,,,
 E10,1,starter,Union Station,Fort Worth T&P,2025,,,,,
@@ -14,25 +14,25 @@ E14,1,starter,Parker Road,Westmoreland,2025,,,,,
 E15,1,starter,Downtown Rowlett,UNT Dallas,2025,,,,,
 E16,1,starter,Forest and Marsh,Turtle Creek,2063,,,,,optimizer
 E16,2,extension,Turtle Creek,Elsie Faye Heggins / M Wright,2064,,,,,optimizer
-E16,3,extension,Frankford / Vail,Forest and Marsh,2069,,,,,optimizer
-E17,1,starter,Addison Circle,First Baptist Medical Center,2033,,,,,optimizer
-E17,2,extension,First Baptist Medical Center,Pearl/Arts District,2033,,,,,optimizer
-E17,3,extension,Legacy West,Addison Circle,2035,,,,,optimizer
-E17,4,extension,All Stars / Frisco Street,Legacy West,2037,,,,,optimizer
-E17,5,extension,Pearl/Arts District,Buckner Boulevard / Forney Road,2037,,,,,optimizer
-E17,6,extension,Buckner Boulevard / Forney Road,Rowlett,2037,,,,,optimizer
+E16,3,extension,Frankford / Vail,Forest and Marsh,2064,,,,,optimizer
+E17,1,starter,Addison Circle,First Baptist Medical Center,2034,,,,,optimizer
+E17,2,extension,First Baptist Medical Center,Pearl/Arts District,2034,,,,,optimizer
+E17,3,extension,Legacy West,Addison Circle,2038,,,,,optimizer
+E17,4,extension,All Stars / Frisco Street,Legacy West,2038,,,,,optimizer
+E17,5,extension,Pearl/Arts District,Buckner Boulevard / Forney Road,2038,,,,,optimizer
+E17,6,extension,Buckner Boulevard / Forney Road,Rowlett,2039,,,,,optimizer
 E18,1,starter,Irving West,Bachman Lake,2044,,,,,optimizer
-E18,2,extension,Bachman Lake,Saint Paul,2044,,,,,optimizer
+E18,2,extension,Bachman Lake,Saint Paul,2045,,,,,optimizer
 E18,3,extension,Saint Paul,Buckner Boulevard / Forney Road,2045,,,,,optimizer
 E18,4,extension,Buckner Boulevard / Forney Road,Main / Galloway,2045,,,,,optimizer
-E19,1,starter,Commerce / Fort Worth Avenue,Central / Hall,2050,,,,,optimizer
-E19,2,extension,Central / Hall,Ross / Bennett,2050,,,,,optimizer
-E19,3,extension,Zang / 12th Street,Commerce / Fort Worth Avenue,2050,,,,,optimizer
-E19,4,extension,Ross / Bennett,Lakewood,2050,,,,,optimizer
-E19,5,extension,Center / Main,Zang / 12th Street,2053,,,,,optimizer
-E19,6,extension,Lakewood,Kingsley / Wood,2053,,,,,optimizer
-E19,7,extension,Outlet Mall,Center / Main,2053,,,,,optimizer
-E19,8,extension,Parks Mall,Outlet Mall,2054,,,,,optimizer
+E19,1,starter,Commerce / Fort Worth Avenue,Central / Hall,2051,,,,,optimizer
+E19,2,extension,Central / Hall,Ross / Bennett,2051,,,,,optimizer
+E19,3,extension,Zang / 12th Street,Commerce / Fort Worth Avenue,2051,,,,,optimizer
+E19,4,extension,Ross / Bennett,Lakewood,2051,,,,,optimizer
+E19,5,extension,Center / Main,Zang / 12th Street,2051,,,,,optimizer
+E19,6,extension,Lakewood,Kingsley / Wood,2051,,,,,optimizer
+E19,7,extension,Outlet Mall,Center / Main,2052,,,,,optimizer
+E19,8,extension,Parks Mall,Outlet Mall,2052,,,,,optimizer
 E19,9,extension,Berry / Stalcup,Parks Mall,2054,,,,,optimizer
 E20,1,starter,DFW Airport Terminal B,Shiloh Road,2025,,,,,
 E21,1,starter,Main / Galloway,Rowlett,2027,,,,,optimizer
@@ -42,108 +42,108 @@ E21,4,extension,Belt Line / Quorum,Downtown Carrollton,2027,,,,,optimizer
 E21,5,extension,Downtown Carrollton,Belt Line / Irving Boulevard,2027,,,,,optimizer
 E21,6,extension,Belt Line / Irving Boulevard,Jefferson / Belt Line,2027,,,,,optimizer
 E21,7,extension,Jefferson / Belt Line,FM 1382 / Old Straus,2027,,,,,optimizer
-E21,8,extension,FM 1382 / Old Straus,Wilmer,2027,,,,,optimizer
-E21,9,extension,Wilmer,Bryan-Belt Line / Davis,2029,,,,,optimizer
-E22,1,starter,Cockrell Hill Road,Commerce / Fort Worth Avenue,2042,,,,,optimizer
-E22,2,extension,Commerce / Fort Worth Avenue,Garland Road / Buckner Boulevard,2042,,,,,optimizer
-E22,3,extension,Jefferson / Belt Line,Cockrell Hill Road,2042,,,,,optimizer
+E21,8,extension,FM 1382 / Old Straus,Wilmer,2028,,,,,optimizer
+E21,9,extension,Wilmer,Bryan-Belt Line / Davis,2030,,,,,optimizer
+E22,1,starter,Cockrell Hill Road,Commerce / Fort Worth Avenue,2041,,,,,optimizer
+E22,2,extension,Commerce / Fort Worth Avenue,Garland Road / Buckner Boulevard,2041,,,,,optimizer
+E22,3,extension,Jefferson / Belt Line,Cockrell Hill Road,2041,,,,,optimizer
 E22,4,extension,Davis Drive,Jefferson / Belt Line,2042,,,,,optimizer
-E22,5,extension,Handley,Davis Drive,2043,,,,,optimizer
+E22,5,extension,Handley,Davis Drive,2042,,,,,optimizer
 E22,6,extension,Garland Road / Buckner Boulevard,Kingsley / Wood,2043,,,,,optimizer
 E23,1,starter,Jackson / Belt Line,Great Southwest Parkway,2046,,,,,optimizer
-E23,2,extension,Great Southwest Parkway,Lake Port Village,2046,,,,,optimizer
-E23,3,extension,Estelle,Jackson / Belt Line,2049,,,,,optimizer
-E23,4,extension,Cowboys/Rangers Stadiums,Estelle,2049,,,,,optimizer
+E23,2,extension,Great Southwest Parkway,Lake Port Village,2047,,,,,optimizer
+E23,3,extension,Estelle,Jackson / Belt Line,2048,,,,,optimizer
+E23,4,extension,Cowboys/Rangers Stadiums,Estelle,2048,,,,,optimizer
 E23,5,extension,Parks Mall,Cowboys/Rangers Stadiums,2049,,,,,optimizer
 E23,6,extension,Mansfield,Parks Mall,2050,,,,,optimizer
-E24,1,starter,Berry / McCart,Ridglea Hills,2056,,,,,optimizer
-E24,2,extension,Ridglea Hills,#31,2056,,,,,optimizer
-E24,3,extension,Berry / Riverside,Berry / McCart,2056,,,,,optimizer
+E24,1,starter,Berry / McCart,Ridglea Hills,2055,,,,,optimizer
+E24,2,extension,Ridglea Hills,#31,2055,,,,,optimizer
+E24,3,extension,Berry / Riverside,Berry / McCart,2055,,,,,optimizer
 E24,4,extension,Berry / Miller,Berry / Riverside,2056,,,,,optimizer
 E24,5,extension,Marine Park,Berry / Miller,2056,,,,,budget scheduler
-E24,6,extension,#1,Marine Park,2056,,,,,budget scheduler
+E24,6,extension,#1,Marine Park,2057,,,,,budget scheduler
 E25,1,starter,Parker Road,McKinney,2029,,,,,optimizer
-E26,1,starter,Frisco,Stonebriar,2061,,,,,optimizer
+E26,1,starter,Frisco,Stonebriar,2030,,,,,optimizer
 E26,2,extension,Stonebriar,Spring Creek Parkway,2061,,,,,optimizer
 E27,1,starter,Medical/Market Center,Abrams / La Vista,2029,,,,,optimizer
 E28,1,starter,Forest and Marsh,LBJ/Skillman,2027,,,,,optimizer
 E29,1,starter,Union Station,Cockrell Hill Road,2038,,,,,optimizer
 E30,1,starter,Fort Worth T&P,Alvarado,2058,,,,,optimizer
-E31,1,starter,Decatur,Saginaw,2072,,,,,optimizer
-E31,2,extension,Saginaw,Fort Worth Central,2072,,,,,optimizer
-E31,3,extension,Bowie,Decatur,2072,,,,,budget scheduler
+E31,1,starter,Decatur,Saginaw,2073,,,,,optimizer
+E31,2,extension,Saginaw,Fort Worth Central,2073,,,,,optimizer
+E31,3,extension,Bowie,Decatur,2073,,,,,budget scheduler
 E32,1,starter,Bailey Boswell / Basswood,Fort Worth Central,2071,,,,,optimizer
 E32,2,extension,Gainesville,Bailey Boswell / Basswood,2073,,,,,budget scheduler
-E33,1,starter,Trinity Mills,Main / Frisco Street,2064,,,,,optimizer
-E33,2,extension,Main / Frisco Street,Sherman,2069,,,,,optimizer
-E34,1,starter,Dallas,Main / Scyene,2061,,,,,optimizer
-E34,2,extension,Main / Scyene,Terrell,2061,,,,,optimizer
+E33,1,starter,Trinity Mills,Main / Frisco Street,2066,,,,,optimizer
+E33,2,extension,Main / Frisco Street,Sherman,2066,,,,,optimizer
+E34,1,starter,Dallas,Main / Scyene,2060,,,,,optimizer
+E34,2,extension,Main / Scyene,Terrell,2060,,,,,optimizer
 E35,1,starter,Dallas,Hutchins,2070,,,,,value per $
 E35,2,extension,Hutchins,Ennis,2070,,,,,value per $
-E36,1,starter,Mansfield,Waxahachie,2069,,,,,optimizer
-E37,1,starter,Midlothian,Westmoreland,2042,,,,,optimizer
+E36,1,starter,Mansfield,Waxahachie,2070,,,,,optimizer
+E37,1,starter,Midlothian,Westmoreland,2039,,,,,optimizer
 E38,1,starter,McKinney,Riders Field,2029,,,,,optimizer
 E38,2,extension,Riders Field,Legacy West,2029,,,,,optimizer
 F01,1,starter,Courthouse,7th Street / Carroll,2068,,,,,optimizer
 F01,2,extension,Woodhaven,Courthouse,2069,,,,,optimizer
 F01,3,extension,7th Street / Carroll,Ridglea Hills,2069,,,,,optimizer
 F01,4,extension,Ridglea Hills,Ridgmar Mall / BRT Transfer,2069,,,,,budget scheduler
-F02,1,starter,Central Station,7th Street / Carroll,2056,,,,,optimizer
+F02,1,starter,Central Station,7th Street / Carroll,2055,,,,,optimizer
 F02,2,extension,Handley,Central Station,2056,,,,,optimizer
 F02,3,extension,7th Street / Carroll,Ridgmar Mall / BRT Transfer,2056,,,,,optimizer
 F03,1,starter,Main / Terminal,Medical City - Baylor,2035,,,,1,Stockyards/Panther Island leg pinned to 2035 by the owner (tourism + TOD demand LODES undercounts)
 F03,2,extension,Medical City - Baylor,Waterside,2070,,,,,optimizer
-F03,3,extension,Waterside,Altamesa,2070,,,,,optimizer
-F04,1,starter,Main / Terminal,John Peter Smith,2061,,,,,optimizer
+F03,3,extension,Waterside,Altamesa,2072,,,,,optimizer
+F04,1,starter,Main / Terminal,John Peter Smith,2060,,,,,optimizer
 F04,2,extension,John Peter Smith,Everman,2061,,,,,optimizer
 F05,1,starter,Lake Worth,TCC Trinity River,2068,,,,,optimizer
 F05,2,extension,TCC Trinity River,Berry / Stalcup,2068,,,,,optimizer
-F06,1,starter,Benbrook,Museum Way,2068,,,,,optimizer
-F07,1,starter,Central Station,Bluebonnet Circle,2063,,,,,optimizer
-XB01,1,starter,X132,XS0079,2037,,,,,expansion lever (hand-staged)
-XB02,1,starter,XS0079,XS0088,2049,,,,,expansion lever (hand-staged)
+F06,1,starter,Benbrook,Museum Way,2065,,,,,optimizer
+F07,1,starter,Central Station,Bluebonnet Circle,2064,,,,,optimizer
+XB01,1,starter,X132,XS0079,2038,,,,,expansion lever (hand-staged)
+XB02,1,starter,XS0079,XS0088,2052,,,,,expansion lever (hand-staged)
 XB03,1,starter,XS0089,XS0101,2061,,,,,expansion lever (hand-staged)
 XB03,2,extension,XS0101,XS0107,2061,,,,,expansion lever (hand-staged)
-XB06,1,starter,XS0125,XS0133,2055,,,,,expansion lever (hand-staged)
-XB07,1,starter,XS0134,XS0145,2039,,,,,expansion lever (hand-staged)
-XB09,1,starter,XS0160,XS0171,2056,,,,,expansion lever (hand-staged)
+XB06,1,starter,XS0125,XS0133,2053,,,,,expansion lever (hand-staged)
+XB07,1,starter,XS0134,XS0145,2042,,,,,expansion lever (hand-staged)
+XB09,1,starter,XS0160,XS0171,2058,,,,,expansion lever (hand-staged)
 XB11,1,starter,XS0179,XS0190,2030,,,,,expansion lever (hand-staged)
-XB12,1,starter,XS0191,XS0206,2037,,,,,expansion lever (hand-staged)
-XB13,1,starter,XS0207,XS0223,2037,,,,,expansion lever (hand-staged)
+XB12,1,starter,XS0191,XS0206,2038,,,,,expansion lever (hand-staged)
+XB13,1,starter,XS0207,XS0223,2038,,,,,expansion lever (hand-staged)
 XB13,2,extension,XS0223,XS0224,2038,,,,,expansion lever (hand-staged)
 XB14,1,starter,XS0225,XS0237,2054,,,,,expansion lever (hand-staged)
 XB15,1,starter,XS0238,XS0251,2029,,,,,expansion lever (hand-staged)
 XB15,2,extension,XS0251,X500,2029,,,,,expansion lever (hand-staged)
-XB16,1,starter,XS0255,XS0266,2038,,,,,expansion lever (hand-staged)
-XB17,1,starter,XS0267,XS0281,2068,,,,,expansion lever (hand-staged)
-XB17,2,extension,XS0281,XS0283,2068,,,,,expansion lever (hand-staged)
+XB16,1,starter,XS0255,XS0266,2039,,,,,expansion lever (hand-staged)
+XB17,1,starter,XS0267,XS0281,2067,,,,,expansion lever (hand-staged)
+XB17,2,extension,XS0281,XS0283,2067,,,,,expansion lever (hand-staged)
 XB19,1,starter,XS0294,X092,2053,,,,,expansion lever (hand-staged)
-XB20,1,starter,XS0304,XS0316,2037,,,,,expansion lever (hand-staged)
-XB21,1,starter,XS0317,XS0328,2049,,,,,expansion lever (hand-staged)
-XB24,1,starter,XS0347,XS0359,2053,,,,,expansion lever (hand-staged)
-XB25,1,starter,XS0360,XS0371,2053,,,,,expansion lever (hand-staged)
-XB26,1,starter,XS0372,XS0382,2061,,,,,expansion lever (hand-staged)
+XB20,1,starter,XS0304,XS0316,2038,,,,,expansion lever (hand-staged)
+XB21,1,starter,XS0317,XS0328,2048,,,,,expansion lever (hand-staged)
+XB24,1,starter,XS0347,XS0359,2054,,,,,expansion lever (hand-staged)
+XB25,1,starter,XS0360,XS0371,2054,,,,,expansion lever (hand-staged)
+XB26,1,starter,XS0372,XS0382,2060,,,,,expansion lever (hand-staged)
 XB27,1,starter,S028,X538,2056,,,,,expansion lever (hand-staged)
 XB28,1,starter,XS0391,X065,2053,,,,,expansion lever (hand-staged)
 XB28,2,extension,X065,XS0404,2053,,,,,expansion lever (hand-staged)
-XB29,1,starter,X547,XS0418,2072,,,,,expansion lever (hand-staged)
-XB31,1,starter,X592,XS0437,2054,,,,,expansion lever (hand-staged)
-XB32,1,starter,X128,XS0450,2037,,,,,expansion lever (hand-staged)
+XB29,1,starter,X547,XS0418,2073,,,,,expansion lever (hand-staged)
+XB31,1,starter,X592,XS0437,2055,,,,,expansion lever (hand-staged)
+XB32,1,starter,X128,XS0450,2034,,,,,expansion lever (hand-staged)
 XB33,1,starter,X095,XS0456,2029,,,,,expansion lever (hand-staged)
-XB34,1,starter,XS0457,XS0471,2057,,,,,expansion lever (hand-staged)
-XB35,1,starter,XS0472,X092,2061,,,,,expansion lever (hand-staged)
-XB37,1,starter,X538,XS0495,2061,,,,,expansion lever (hand-staged)
-XB38,1,starter,XS0496,XS0507,2053,,,,,expansion lever (hand-staged)
+XB34,1,starter,XS0457,XS0471,2058,,,,,expansion lever (hand-staged)
+XB35,1,starter,XS0472,X092,2060,,,,,expansion lever (hand-staged)
+XB37,1,starter,X538,XS0495,2060,,,,,expansion lever (hand-staged)
+XB38,1,starter,XS0496,XS0507,2052,,,,,expansion lever (hand-staged)
 XB39,1,starter,X215,XS0513,2030,,,,,expansion lever (hand-staged)
 XB40,1,starter,XS0514,X500,2061,,,,,expansion lever (hand-staged)
-XB41,1,starter,X075,XS0532,2043,,,,,expansion lever (hand-staged)
+XB41,1,starter,X075,XS0532,2044,,,,,expansion lever (hand-staged)
 XB42,1,starter,X319,XS0537,2029,,,,,expansion lever (hand-staged)
-XB44,1,starter,XS0471,XS0555,2057,,,,,expansion lever (hand-staged)
-XB45,1,starter,XS0556,XS0564,2061,,,,,expansion lever (hand-staged)
-XP01,1,starter,X129,XS0013,2032,,,,,expansion lever (hand-staged)
-XP01,2,extension,XS0013,X318,2032,,,,,expansion lever (hand-staged)
-XP01,3,extension,X318,XS0023,2032,,,,,expansion lever (hand-staged)
-XP01,4,extension,XS0023,XS0028,2032,,,,,expansion lever (hand-staged)
-XP02,1,starter,X319,X092,2037,,,,,expansion lever (hand-staged)
+XB44,1,starter,XS0471,XS0555,2058,,,,,expansion lever (hand-staged)
+XB45,1,starter,XS0556,XS0564,2063,,,,,expansion lever (hand-staged)
+XP01,1,starter,X129,XS0013,2033,,,,,expansion lever (hand-staged)
+XP01,2,extension,XS0013,X318,2033,,,,,expansion lever (hand-staged)
+XP01,3,extension,X318,XS0023,2034,,,,,expansion lever (hand-staged)
+XP01,4,extension,XS0023,XS0028,2034,,,,,expansion lever (hand-staged)
+XP02,1,starter,X319,X092,2038,,,,,expansion lever (hand-staged)
 XP05,1,starter,X134,XS0009,2029,,,,,expansion lever (hand-staged)
 XP06,1,starter,X220,X502,2029,,,,,expansion lever (hand-staged)

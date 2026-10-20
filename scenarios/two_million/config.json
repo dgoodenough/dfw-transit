@@ -37,9 +37,9 @@
     "kiss_ride": {
       "enabled": true
     },
-    "walk_max_m": 1600,
-    "walk_circuity": 1.15,
-    "pnr_min_km": 1.6
+    "walk_max_m": {"2025": 1200, "2030": 1600},
+    "walk_circuity": {"2025": 1.25, "2030": 1.15},
+    "pnr_min_km": {"2025": 1.2, "2030": 1.6}
   },
   "staging": {
     "priority": "value_per_musd"

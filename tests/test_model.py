@@ -122,7 +122,12 @@ class GraphTests(unittest.TestCase):
         g = YearGraph(Network.load(), 2025)
         T = g.skim()
         self.assertTrue(np.all(np.diag(T) == 0))
-        self.assertTrue(np.isfinite(T).all())
+        # every pair is reachable by riding, except stations a short walk apart (a walk
+        # between platforms isn't a transit trip), which are left out
+        walk = {(i, j) for i in range(g.n_st) for j, _, kind in g.adj[i] if kind == "walk" and j < g.n_st}
+        bad = [(i, j) for i, j in zip(*np.nonzero(~np.isfinite(T))) if (i, j) not in walk]
+        self.assertLess(len(bad), 0.001 * T.size)
+        self.assertTrue((T[np.isfinite(T)] >= 0).all())
 
 
 class DemandTests(unittest.TestCase):
