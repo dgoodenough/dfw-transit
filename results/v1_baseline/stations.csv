@@ -267,7 +267,7 @@ X563,New Koreatown,32.978541,-96.878695,2050,Sherman Line (ROW),commuter,8438,25
 X272,Saint Augustine / Briggs,32.76295,-96.65676,2050,Line 76,metro,8570,1875,3094
 X275,Main / Galloway,32.766698,-96.59933,2050,Line 76;Beltline Line,brt;metro,5103,4155,3206
 X251,Irving,32.859056,-96.963966,2050,Line 76,metro,6138,3098,317
-X510,Country Place / Custer,33.053812,-96.731579,2050,Legacy Line,metro,6987,1530,238
+X510,Custer / Country Place,33.053812,-96.731579,2050,Legacy Line,metro,6987,1530,238
 X509,Spring Creek / Independence,33.056879,-96.754307,2050,Legacy Line,metro,6809,1284,402
 X507,Ohio / Tennyson,33.065622,-96.791817,2050,Legacy Line,metro,6341,1238,377
 X273,Military / Clary,32.769479,-96.6374,2050,Line 76,metro,4361,2746,1077
@@ -458,7 +458,7 @@ X465,Lake Port Village,32.627499,-97.039729,2065,Purple line,metro,0,0,912
 X479,Riverbend,32.794513,-97.22122,2065,FW Crosstown Loop,brt,0,0,5
 X411,Metrocare hillside adult mental health clinic and primary care,32.772777,-96.873934,2065,Blue Ctd,metro,0,0,108
 X026,1st Street,32.76654,-97.264264,2065,Woodhaven direct,brt,0,0,2
-X412,Commerce / Hampton,32.772788,-96.855792,2065,Blue Ctd,metro,0,0,56
+X412,Hampton / Commerce,32.772788,-96.855792,2065,Blue Ctd,metro,0,0,56
 X308,Central / Hall,32.797618,-96.793614,2070,Silver,metro,14673,59635,355
 X303,Canty / Tyler,32.751651,-96.835364,2070,Silver,metro,11167,12010,1050
 X547,Meacham / Terminal,32.822461,-97.329386,2070,Bowie Line (ROW),commuter,3856,11879,10

@@ -187,3 +187,12 @@ Scenarios:
   upzoning with 20% of growth steered to station areas. Reaches about 2 million daily trips by
   2100. Parking pricing and cash-out are not included.
 - `lever_*` folders: the four planners' individual levers, kept for analysis (not on the map).
+
+## v2.6 — BRT on the streets
+
+- Every BRT line follows real arterials (Overture roads; `tools/route_brt.py` for the plan's lines,
+  `tools/gen_expansion.py` for new corridors, whose stops are now placed along the routed street).
+  Bus-only stops moved onto the street; rail stations well off the street get a pull-in.
+- The 2M scenario leaves out 10 corridors that added under 5 daily trips per $M
+  (`scenarios/two_million/drop_lines.txt`, 137 km, $2.4B); it still reaches 2M daily trips (2089).
+- An extension never opens before the stage it attaches to (budget scheduler).

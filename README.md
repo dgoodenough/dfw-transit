@@ -72,14 +72,14 @@ led to thirteen steps, and v2 implements the ones the data supports
 
 | | v1 plan | v2 plan (budget-constrained) | **2 million riders (default)** |
 |---|---|---|---|
-| Daily transit trips, 2050 (each trip counted once) | 352k | 472k | **1.01M** |
-| Daily transit trips, 2100 | 749k | 872k | **2.09M** (2M reached in 2086) |
-| Daily boardings, all modes, 2100 | 1.21M | 1.45M | **3.51M** |
+| Daily transit trips, 2050 (each trip counted once) | 352k | 470k | **1.01M** |
+| Daily transit trips, 2100 | 749k | 870k | **2.06M** (2M reached in 2089) |
+| Daily boardings, all modes, 2100 | 1.21M | 1.44M | **3.46M** |
 | Jobs the average resident reaches in 45 min, 2100 | 134k | 162k | **340k** |
-| Capital through 2100 (2025 $, lines and stations) | $104.0B | $94.5B | **$112.2B** |
+| Capital through 2100 (2025 $, lines and stations) | $104.0B | $94.5B | **$112.0B** |
 | Validation: errors / islands | 1 / 10 | 0 / 0 | 0 / 0 |
 
-The **2 million riders** scenario adds an arterial BRT grid, an SH-114 metro, job-campus BRT and
+The **2 million riders** scenario adds an arterial BRT grid on real streets (10 weak corridors left out), an SH-114 metro, job-campus BRT and
 infill stations (2065-2090), frequent service, 15-minute feeder buses, bike and walk access,
 garages at selected suburban stations (Wiehle-Reston style), and moderate upzoning with 20% of
 growth steered to station areas. It stays within the flat $2.3B/yr budget for lines and stations;
