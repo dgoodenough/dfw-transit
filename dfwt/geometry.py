@@ -15,7 +15,7 @@ ones are listed for review and the line keeps its old geometry. Stations in the
 downtown cores (config.cores) are not moved automatically. Segments marked
 locked=1 in line_segments.csv are never touched. Track shared by several lines
 gets the geometry of the line that opens it first. Without --write nothing in
-network/ changes; reports/GEOMETRY.md is written either way.
+network/ changes; reports/GEOMETRY.md is written either way (on whole-network runs).
 """
 import collections
 import csv
@@ -355,7 +355,8 @@ def run(lines=None, write=False, procs=2, log=print):
             if b in moves:
                 pts[-1] = moves[b][:2]
             new_geom[(lid, seq)] = pts
-    write_report(net, moves, review, reports, cfg)
+    if lines is None:   # a run over a few lines would replace the whole-network report with a partial one
+        write_report(net, moves, review, reports, cfg)
     if write:
         for key, pts in new_geom.items():
             r = seg_rows[key]

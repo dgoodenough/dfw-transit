@@ -324,7 +324,7 @@ def spend_by_year(net):
             if ex < s.year < 9999 and owner[key][1] == ln.id:
                 items[(s.year, ln.id, ln.mode)] += s.km * per_km.get(s.grade, per_km["surface"])
         for sid, y in zip(ln.stop_ids, ln.stop_years):
-            if ex < y < 9999 and first.get(sid) == ln.id:
+            if ex < y < 9999 and first.get((sid, ln.mode)) == ln.id:
                 items[(y, ln.id, ln.mode)] += cfg["station_cost_musd"][ln.mode]
     return allocate_spending([(y, c, cy[m]) for (y, _, m), c in items.items()], cfg)
 
@@ -433,7 +433,7 @@ def stage_costs(net, rows):
         y = int(r["year_opens"])
         for i in range(a, b + 1):   # stations this line opens first, charged to the stage that first reaches them
             reach = min(ln.segments[k].year for k in (i - 1, i) if 0 <= k < len(ln.segments))
-            if first.get(ln.stop_ids[i]) == ln.id and reach == y and (i > a or i == 0 or ln.segments[i - 1].year != y):
+            if first.get((ln.stop_ids[i], ln.mode)) == ln.id and reach == y and (i > a or i == 0 or ln.segments[i - 1].year != y):
                 cost += cfg["station_cost_musd"][ln.mode]
         out[id(r)] = (cost, ln.mode)
     return out

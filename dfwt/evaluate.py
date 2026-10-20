@@ -343,6 +343,9 @@ def carry_line_values(out_dir, ev):
                 row[k] = float(v) if "." in v else int(v)
             except (TypeError, ValueError):
                 row[k] = ""
+        # the riders carry over; the cost is this build's (shared track moves with opening order)
+        if row["marginal_final"] != "" and row.get("cost_musd"):
+            row["value_per_musd"] = round(max(row["marginal_at_opening"] or 0, row["marginal_final"]) / row["cost_musd"], 2)
     if os.path.exists(stamp):
         with open(stamp, encoding="utf-8") as f:
             ev["line_values_from"] = json.load(f).get("full_build")

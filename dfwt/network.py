@@ -375,7 +375,7 @@ class Network:
     def line_cost_musd(self, ln, by_year=None, owner=None):
         """Capital cost of a line's new track and stations (2025 USD), opened by
         `by_year` if given. Track shared with an earlier line is not charged again;
-        a station is charged to the first line that opens it."""
+        a station is charged to the first line of its mode that opens it."""
         ex = self.cfg["existing_year"]
         if ln.status == "existing":
             return 0.0
@@ -389,13 +389,24 @@ class Network:
                 track += s.km * per_km.get(s.grade, per_km["surface"])
         first_line = self._station_first_line()
         stops = sum(1 for sid, y in zip(ln.stop_ids, ln.stop_years)
-                    if ex < y <= by_year and first_line.get(sid) == ln.id)
+                    if ex < y <= by_year and first_line.get((sid, ln.mode)) == ln.id)
         return track + stops * self.cfg["station_cost_musd"][ln.mode]
 
     def _station_first_line(self):
+        """(station_id, mode) -> the line that first serves that station in that mode: it
+        pays for the mode's platform (a metro line reaching a BRT stop builds its own)."""
         first = {}
         for ln in self.lines.values():
             for sid, y in zip(ln.stop_ids, ln.stop_years):
-                if sid not in first or (y, ln.id) < first[sid]:
-                    first[sid] = (y, ln.id)
+                k = (sid, ln.mode)
+                if k not in first or (y, ln.id) < first[k]:
+                    first[k] = (y, ln.id)
         return {k: v[1] for k, v in first.items()}
+
+    def station_mode_years(self):
+        """station_id -> {mode: first year a line of that mode serves it}."""
+        out = collections.defaultdict(dict)
+        for ln in self.lines.values():
+            for sid, y in zip(ln.stop_ids, ln.stop_years):
+                out[sid][ln.mode] = min(out[sid].get(ln.mode, NEVER), y)
+        return out
