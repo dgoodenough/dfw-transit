@@ -46,20 +46,23 @@ def _dp(P, tol):
 
 
 def pieces(lines):
-    """lines: [(line_index, mode, status, first_year, [(year, [(lon, lat), ...]), ...])].
-    Returns [([(lon, lat), ...], [(line_index, year), ...]), ...]."""
+    """lines: [(line_index, mode, status, first_year, [(year, [(lon, lat), ...][, until]), ...])];
+    a segment with `until` stops running that year (a rerouted line's old track).
+    Returns [([(lon, lat), ...], [(line_index, year, until or None), ...]), ...]."""
     order = sorted(lines, key=lambda l: (l[2] != "existing", MODE_RANK.get(l[1], 3), l[3], l[0]))
     rank = {l[0]: k for k, l in enumerate(order)}
     xy, head, owner = [], [], []          # track points: position, heading, (line, index on that line)
     grid = collections.defaultdict(list)
     chain = {}                            # (line, index) -> track point
     use = collections.defaultdict(dict)   # (u, v) with u < v -> {line: year}
+    ends = collections.defaultdict(dict)  # (u, v) -> {line: year it stops running there, or None}
     runs = collections.defaultdict(dict)  # (u, v) -> {line: line runs u->v}
 
     for li, _, _, _, segs in order:
         n_own = 0
         prev = None
-        for year, pts in segs:
+        for seg in segs:
+            year, pts, until = seg[0], seg[1], (seg[2] if len(seg) > 2 else None)
             P = []
             for q in (osmroute.xy(*p) for p in pts):   # repeated vertices give 0-length steps with no heading
                 if not P or math.dist(P[-1], q) > 0.5:
@@ -104,6 +107,7 @@ def pieces(lines):
                     for u, v in zip(path, path[1:]):
                         e = (min(u, v), max(u, v))
                         use[e][li] = min(use[e].get(li, year), year)
+                        ends[e][li] = None if (li in ends[e] and ends[e][li] is None) or until is None else max(ends[e].get(li) or 0, until)
                         runs[e][li] = u < v
                 prev = node
 
@@ -125,7 +129,7 @@ def pieces(lines):
     for (u, v) in use:
         adj[u].append(v)
         adj[v].append(u)
-    sig = {e: tuple(sorted(us.items())) for e, us in use.items()}
+    sig = {e: tuple(sorted((li, y, ends[e].get(li)) for li, y in us.items())) for e, us in use.items()}
 
     def key(u, v):
         return (min(u, v), max(u, v))
@@ -169,7 +173,7 @@ def pieces(lines):
         if (runs[key(a, b)][lead] != flip[lead]) != (a < b):
             nodes.reverse()
         pts = _dp([xy[n] for n in nodes], SIMPLIFY)
-        users = sorted(use[e0].items(), key=lambda t: rank[t[0]])
+        users = sorted(((li, y, ends[e0].get(li)) for li, y in use[e0].items()), key=lambda t: rank[t[0]])
         out.append(([osmroute.ll(p) for p in pts], users))
     return out
 
@@ -181,7 +185,7 @@ def station_pieces(pieces_, stations, stops, snap_m=300.0, snap_multi_m=60.0):
     and drawn where it is."""
     by_line = collections.defaultdict(list)
     for k, (_, users) in enumerate(pieces_):
-        for li, _ in users:
+        for li, *_ in users:
             by_line[li].append(k)
     lines_at = collections.defaultdict(set)
     for li, ids in stops.items():

@@ -206,7 +206,7 @@ def evaluate(ctx, net, line_values=True, log=print, procs=None):
     for y, r in sorted(_pool_map(_year_job, years, ctx, net, final, procs)):
         results[y] = r
         pcov, jcov = r["coverage"]
-        opened = [ln for ln in net.lines.values() if ln.status != "existing"]
+        opened = list(net.lines.values())   # today's track costs nothing (opened by existing_year)
         capex = sum(net.line_cost_musd(ln, by_year=y, owner=owner) for ln in opened)
         km = {m: 0.0 for m in cfg["modes"]}
         seen = set()  # count shared track once
@@ -222,6 +222,7 @@ def evaluate(ctx, net, line_values=True, log=print, procs=None):
         row = {"year": y, "stations": r["n_st"], "lines": r["n_lines"],
                "km_metro": round(km["metro"]), "km_brt": round(km["brt"]), "km_commuter": round(km["commuter"]),
                "capex_busd": round(capex / 1000, 1),
+               "opex_busd_per_year": round(sum(net.opex_musd(y).values()) / 1000, 2),
                "spent_busd": round(sum(v for yy, v in spend.items() if yy <= y) / 1000, 1),
                "budget_busd": round(per_year * (y - cfg["existing_year"]) / 1000, 1),
                "pop_covered_pct": round(pcov * 100, 1), "jobs_covered_pct": round(jcov * 100, 1),

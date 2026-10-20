@@ -85,6 +85,29 @@ class NetworkTests(unittest.TestCase):
         self.assertEqual(net.lines["E17X"].headway_at(2070), 10)
 
 
+class CostAndRerouteTests(unittest.TestCase):
+    def test_cost_factor_falls_as_the_program_matures(self):
+        from dfwt.network import cost_factor
+        cfg = {"cost_efficiency": {"2025": 1.0, "2040": 0.85, "2055": 0.75}, "staging": {"construction_years": {"metro": 0}}}
+        self.assertAlmostEqual(cost_factor(cfg, 2025, "metro"), 1.0)
+        self.assertAlmostEqual(cost_factor(cfg, 2032.5, "metro"), 0.925)
+        self.assertAlmostEqual(cost_factor(cfg, 2090, "metro"), 0.75)
+        self.assertEqual(cost_factor({"staging": {"construction_years": {}}}, 2050, "metro"), 1.0)
+
+    def test_reroute_keeps_the_old_routing_until_the_new_track_opens(self):
+        net = Network.load()
+        before = net.line_cost_musd(net.lines["E13"])
+        net.apply_edits([{"op": "reroute", "target": "E13", "field": "2035", "value": "tunnel|X137;@32.784,-96.80;X141"}])
+        ln = net.lines["E13"]
+        self.assertNotIn("X138", ln.stop_ids)          # West End is off the new routing
+        self.assertIn("X138", net.line_at("E13", 2030).stop_ids)
+        self.assertEqual(net.line_at("E13", 2035), ln)
+        self.assertGreater(net.line_cost_musd(ln), before + 500)   # a tunnel is built
+        served = lambda y: {s for r in net.runs(y) if r.line.id == "E13" for s in r.stops}
+        self.assertIn("X138", served(2030))
+        self.assertNotIn("X138", served(2040))
+
+
 class ValidationTests(unittest.TestCase):
     def test_plan_has_no_errors_or_islands(self):
         findings = validate.run(Network.load())

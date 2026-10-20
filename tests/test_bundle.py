@@ -24,9 +24,9 @@ class BundleTests(unittest.TestCase):
         shared = [(pts, u) for pts, u in P if len(u) == 2]
         self.assertEqual(sum(len(u) == 2 for _, u in P), len(shared))
         self.assertAlmostEqual(sum(km(p) for p, _ in shared), 3.0, delta=0.1)
-        self.assertEqual([li for li, _ in shared[0][1]], [0, 1])          # priority order
-        self.assertEqual({y for _, u in shared for _, y in u}, {2030, 2040})
-        self.assertAlmostEqual(sum(km(p) for p, u in P if [li for li, _ in u] == [1]), 2.3, delta=0.2)
+        self.assertEqual([li for li, *_ in shared[0][1]], [0, 1])          # priority order
+        self.assertEqual({y for _, u in shared for _, y, _ in u}, {2030, 2040})
+        self.assertAlmostEqual(sum(km(p) for p, u in P if [li for li, *_ in u] == [1]), 2.3, delta=0.2)
 
     def test_every_line_is_drawn_in_full(self):
         net = Network.load()
@@ -35,7 +35,7 @@ class BundleTests(unittest.TestCase):
                            for i, ln in enumerate(lines)])
         drawn = [0.0] * len(lines)
         for pts, users in P:
-            for li, _ in users:
+            for li, *_ in users:
                 drawn[li] += km(pts)
         for i, ln in enumerate(lines):
             self.assertGreater(drawn[i], 0.9 * ln.km - 0.3, ln.name)

@@ -222,7 +222,8 @@ def check(net):
             yo = int(r["year_opens"])
             if yo > max(years):
                 add("warn", "PAST_HORIZON", base.name, f"stage {r['stage']} opens {yo}, after {max(years)}")
-            if yo - rules["construction_years"][mode] < cfg["existing_year"] and base.status != "existing":
+            new_track = any(s.year > cfg["existing_year"] for s in base.segments[a:b])   # a through-routed line's old part isn't built
+            if yo - rules["construction_years"][mode] < cfg["existing_year"] and base.status != "existing" and new_track:
                 add("warn", "BUILD_STARTED", base.name, f"stage {r['stage']} opens {yo} but takes "
                     f"{rules['construction_years'][mode]} years to build")
             if km > rules["max_km_per_stage"][mode]:
@@ -256,6 +257,8 @@ def check(net):
                 if y - stub_since[sid] == rules["max_stub_years"]:
                     add("info", "LONG_STUB", base.name, f"{names[sid]} has been a temporary terminus since {stub_since[sid]}")
         for y0, y1, v, it in net.variants.get(lid, []):
+            if it.get("via") is None:   # a reroute's old routing, not a borrowed track
+                continue
             host = net.lines[it["via"]]
             for y in (yy for yy in years if y0 <= yy < y1):
                 if not all(s.year <= y for s in v.segments[it["a"]:it["a"] + it["n_mid"]]):
@@ -315,17 +318,14 @@ def spend_by_year(net):
     first = net._station_first_line()
     items = collections.defaultdict(float)     # (opening year, line, mode) -> cost: a piece is built as one project
 
-    for ln in net.lines.values():
-        if ln.status == "existing":
-            continue
-        per_km = cfg["cost_musd_per_km"][ln.mode]
+    for ln in net.lines.values():   # existing lines too: a rerouted line builds new track
         for i, s in enumerate(ln.segments):
             key = (ln.mode, frozenset((ln.stop_ids[i], ln.stop_ids[i + 1])))
             if ex < s.year < 9999 and owner[key][1] == ln.id:
-                items[(s.year, ln.id, ln.mode)] += s.km * per_km.get(s.grade, per_km["surface"])
-        for sid, y in zip(ln.stop_ids, ln.stop_years):
+                items[(s.year, ln.id, ln.mode)] += net.segment_cost(ln, i)
+        for i, (sid, y) in enumerate(zip(ln.stop_ids, ln.stop_years)):
             if ex < y < 9999 and first.get((sid, ln.mode)) == ln.id:
-                items[(y, ln.id, ln.mode)] += cfg["station_cost_musd"][ln.mode]
+                items[(y, ln.id, ln.mode)] += net.stop_cost(ln, i)
     return allocate_spending([(y, c, cy[m]) for (y, _, m), c in items.items()], cfg)
 
 
@@ -424,17 +424,15 @@ def stage_costs(net, rows):
         if ln is None or r["kind"] == "via" or ln.status == "existing":
             continue
         a, b = sorted((resolve(r["from_stop"], ln.stop_ids, names), resolve(r["to_stop"], ln.stop_ids, names)))
-        per_km = cfg["cost_musd_per_km"][ln.mode]
         cost = 0.0
         for i in range(a, b):
-            s = ln.segments[i]
             if owner[(ln.mode, frozenset((ln.stop_ids[i], ln.stop_ids[i + 1])))][1] == ln.id:
-                cost += s.km * per_km.get(s.grade, per_km["surface"])
+                cost += net.segment_cost(ln, i)
         y = int(r["year_opens"])
         for i in range(a, b + 1):   # stations this line opens first, charged to the stage that first reaches them
             reach = min(ln.segments[k].year for k in (i - 1, i) if 0 <= k < len(ln.segments))
             if first.get((ln.stop_ids[i], ln.mode)) == ln.id and reach == y and (i > a or i == 0 or ln.segments[i - 1].year != y):
-                cost += cfg["station_cost_musd"][ln.mode]
+                cost += net.stop_cost(ln, i)
         out[id(r)] = (cost, ln.mode)
     return out
 

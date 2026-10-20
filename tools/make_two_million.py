@@ -7,7 +7,8 @@ stored as additions: *.add.csv for new lines, stations, transfers; *.patch.csv f
 lines the package changes (infill stops); stages.csv (the plan's stages plus the new lines')
 is then rescheduled into exact years.
 Lines listed in scenarios/two_million/drop_lines.txt (weak corridors) are left out,
-with the stations and transfers only they used. Its config.json (policies) and
+with the stations and transfers only they used; hand-authored lines in
+scenarios/two_million/extra/ (full-table format) are added, or replace a plan line whole. Its config.json (policies) and
 edits.csv (service) are left as they are.
 """
 import csv
@@ -41,6 +42,21 @@ def main():
         drop = {ln.split("#")[0].strip() for ln in open(drop_path, encoding="utf-8")} - {""}
     for t in ("lines.csv", "line_stops.csv", "line_segments.csv", "stages.csv"):
         pkg[t] = [r for r in pkg[t] if r["line_id"] not in drop]
+    # hand-authored lines (scenarios/two_million/extra/, full-table format): new lines, or
+    # whole replacements of a plan line (its stops, segments and stages)
+    extra = {}
+    xdir = os.path.join(OUT, "extra")
+    for t in ("lines.csv", "stations.csv", "transfers.csv", "line_stops.csv", "line_segments.csv", "stages.csv"):
+        if os.path.exists(os.path.join(xdir, t)):
+            with open(os.path.join(xdir, t), encoding="utf-8-sig") as f:
+                extra[t] = list(csv.DictReader(f))
+    for t, rows in extra.items():
+        if t in KEYS:
+            keys = {tuple(r[x] for x in KEYS[t]) for r in rows}
+            pkg[t] = [r for r in pkg[t] if tuple(r[x] for x in KEYS[t]) not in keys] + rows
+        else:
+            ids = {r["line_id"] for r in rows}
+            pkg[t] = [r for r in pkg[t] if r["line_id"] not in ids] + rows
     used = {r["station_id"] for r in pkg["line_stops.csv"]}
     pkg["stations.csv"] = [r for r in pkg["stations.csv"] if r["station_id"] in used]
     pkg["transfers.csv"] = [r for r in pkg["transfers.csv"] if r["station_a"] in used and r["station_b"] in used]
@@ -56,8 +72,11 @@ def main():
         rows = [r for r in pkg[t] if r["line_id"] not in base_lines or r["line_id"] in changed]
         write(t[:-4] + ".patch.csv", rows, list(pkg[t][0].keys()))
     new_stages = [r for r in pkg["stages.csv"] if r["line_id"] not in base_lines]
+    restaged = {r["line_id"] for r in extra.get("stages.csv", []) if r["line_id"] in base_lines}
     # a full table (the plan's stages, then the new lines'), which `schedule --write` replaces in place
-    write("stages.csv", base["stages.csv"] + new_stages, list(pkg["stages.csv"][0].keys()))
+    write("stages.csv", [r for r in base["stages.csv"] if r["line_id"] not in restaged]
+          + [r for r in extra.get("stages.csv", []) if r["line_id"] in restaged] + new_stages,
+          list(pkg["stages.csv"][0].keys()))
     print(f"two_million: {len(new_stages)} new stages ({len(drop)} corridors left out); now run python -m dfwt schedule --scenario two_million --write")
 
 

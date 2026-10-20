@@ -61,6 +61,7 @@ summary{cursor:pointer;font-weight:600;font-size:.9rem}
 #trip .leg{display:grid;grid-template-columns:8px minmax(0,1fr);gap:8px;margin:3px 0}
 #trip .leg i{border-radius:2px}
 .hint{color:var(--muted);font-size:.8rem}
+.od{gap:6px;margin:6px 0}.od input{flex:1;min-width:0;padding:5px 7px;border:1px solid var(--rule);border-radius:6px;background:var(--panel);color:var(--ink);font:inherit;font-size:.85rem}
 .pop b{font-size:.95rem}.pop .m{color:var(--muted);font-size:.8rem;margin-top:3px;line-height:1.4}
 .chip{display:inline-block;padding:1px 7px;border-radius:9px;color:#fff;font-size:.72rem;margin:1px 3px 1px 0}
 a{color:var(--accent)}
@@ -100,7 +101,10 @@ a{color:var(--accent)}
   <div id="interval" class="interval" aria-live="polite"></div>
   <details open>
     <summary>Trip planner</summary>
-    <div id="trip"><p class="hint">Click an origin station, then a destination.</p></div>
+    <div class="row od"><input id="from" list="stlist" placeholder="From station" aria-label="From station" autocomplete="off">
+      <input id="to" list="stlist" placeholder="To station" aria-label="To station" autocomplete="off"></div>
+    <datalist id="stlist"></datalist>
+    <div id="trip"><p class="hint">Click an origin station, then a destination, or type their names.</p></div>
   </details>
   <details>
     <summary>Lines</summary>
@@ -245,11 +249,20 @@ let pieceOffs = [];   // per piece: Map line -> offset (px), for the station mar
 function drawLines() {
   lineLayer.clearLayers(); glowLayer.clearLayers();
   const state = stateFn(), apart = map.getZoom() >= 12 ? 1 : 0;   // shared track side by side from zoom 12
+  const Y = D.years[yi];
   pieceOffs = S.pieces.map(([, users]) => {
-    const vis = users.filter(([li]) => !hidden.has(S.lines[li].id)), ws = vis.map(([li]) => weightOf(S.lines[li].mode) + 1);
+    const vis = users.filter(([li, , until]) => !hidden.has(S.lines[li].id) && !(until && Y >= until));
+    // BRT routes sharing a street draw as one stroke: they take one slot between them
+    const slots = [], slotOf = new Map();
+    for (const [li] of vis) {
+      const ln = S.lines[li], k = ln.mode === 'brt' ? 'brt' + ln.color : 'l' + li;
+      if (!slotOf.has(k)) { slotOf.set(k, slots.length); slots.push([]); }
+      slots[slotOf.get(k)].push(li);
+    }
+    const ws = slots.map(g => weightOf(S.lines[g[0]].mode) + 1);
     let at = -ws.reduce((a, b) => a + b, 0) / 2;
     const o = new Map();
-    vis.forEach(([li], k) => { o.set(li, (at + ws[k] / 2) * apart); at += ws[k]; });
+    slots.forEach((g, k) => { for (const li of g) o.set(li, (at + ws[k] / 2) * apart); at += ws[k]; });
     return o;
   });
   const ends = pieceEnds();
@@ -266,8 +279,8 @@ function drawLines() {
     const strokes = [];
     S.pieces.forEach(([gi, users], pi) => {
       let ll = null;
-      for (const [li, yr] of users) {
-        const ln = S.lines[li]; if (hidden.has(ln.id) || state(ln, yr) !== pass) continue;
+      for (const [li, yr, until] of users) {
+        const ln = S.lines[li]; if (hidden.has(ln.id) || (until && D.years[yi] >= until) || state(ln, yr) !== pass) continue;
         ll = ll || D.geoms[gi].map(p => [p[1], p[0]]);
         const off = pieceOffs[pi].get(li);
         strokes.push([ln, offsetPath(ll, off, joint(pi, 0, li, off), joint(pi, 1, li, off))]);
@@ -285,7 +298,8 @@ function drawLines() {
       if (pass === 'future') L.polyline(path, {...opts, color: col, weight: w, opacity: .18}).addTo(lineLayer);
       else if (pass === 'building') L.polyline(path, {...opts, color: col, weight: w + 1.5, opacity: .7, dashArray: '1 8', lineCap: 'round'}).addTo(lineLayer);
       else {
-        L.polyline(path, {...opts, color: col, weight: w, opacity: .95}).addTo(lineLayer);
+        const pl = L.polyline(path, {...opts, color: col, weight: w, opacity: .95, interactive: true}).addTo(lineLayer);
+        pl.bindTooltip(ln.name, {sticky: true});   // which route is this (BRT routes share one colour)
         if (ln.mode === 'commuter')   // railroad style, as on the diagram: a dashed line down the middle
           L.polyline(path, {...opts, color: bgColor, weight: 1.3 * zf(), dashArray: '6 4'}).addTo(lineLayer);
       }
@@ -376,7 +390,7 @@ function metrics() {
     [(m.daily_trips >= 1e6 ? k(m.daily_trips) : fmt(m.daily_trips)) + d('daily_trips'), 'daily transit trips (each trip counted once)'],
     [k(m.all_boardings), `boardings a day: ${modes}`],
     [fmt(m.jobs_45min) + d('jobs_45min'), 'jobs the average resident reaches in 45 min'],
-    ['$' + m.capex_busd + 'B' + d('capex_busd', '$'), 'capital spent since 2025'],
+    ['$' + m.capex_busd + 'B' + d('capex_busd', '$'), 'capital spent since 2025' + (m.opex_busd_per_year != null ? ` · $${m.opex_busd_per_year.toFixed(1)}B a year to run the rail and BRT` : '')],
   ].map(([a, b]) => `<div class="metric"><b>${a}</b><span>${b}</span></div>`).join('');
   const series = sc => sc.metrics.map(r => r.daily_trips);
   const all = series(S).concat(ref ? series(ref) : []).concat([2e6]), max = Math.max(...all) * 1.05;
@@ -424,12 +438,14 @@ function lineList() {
 const pickMark = s => L.circleMarker([D.stations[s][1], D.stations[s][2]], {renderer: tripR, pane: 'trip', radius: 8, color: '#c96f00', weight: 3, fill: false}).addTo(tripLayer);
 const showTrip = () => { $('trip').closest('details').open = true; if (touch) $('trip').scrollIntoView({block: 'nearest', behavior: 'smooth'}); };
 function clearTrip() {
-  pick = []; tripLayer.clearLayers(); dimNetwork(false); if (window.Schem) Schem.trip(null, null, pick);
+  pick = []; $('from').value = $('to').value = ''; tripLayer.clearLayers(); dimNetwork(false); if (window.Schem) Schem.trip(null, null, pick);
   $('trip').innerHTML = '<p class="hint">Click an origin station, then a destination.</p>';
 }
 function choose(sid) {
   if (pick.length === 2) pick = [];
   pick.push(sid);
+  $(pick.length === 1 ? 'from' : 'to').value = D.stations[sid][0];
+  if (pick.length === 1) $('to').value = '';
   if (pick.length === 1) {
     tripLayer.clearLayers(); dimNetwork(false); pickMark(sid); if (window.Schem) Schem.trip(null, null, pick);
     $('trip').innerHTML = `<p class="hint">From <b>${D.stations[sid][0]}</b>. Now click a destination.</p>`; showTrip();
@@ -438,7 +454,7 @@ function choose(sid) {
 function route() {
   const Y = D.years[yi], yd = S.years[Y], [a, b] = pick;
   const adj = new Map(), add = (u, v, w, info) => { if (!adj.has(u)) adj.set(u, []); adj.get(u).push([v, w, info]); };
-  yd.runs.forEach(([li, stops, hops, wait], ri) => stops.forEach((s, k) => {
+  yd.runs.forEach(([li, stops, hops, wait], ri) => !hidden.has(S.lines[li].id) && stops.forEach((s, k) => {   // hidden lines: as if not built
     const n = `L${ri}:${k}`;
     add('P' + s, n, wait + D.boardPenalty, {t: 'board', ri}); add(n, 'P' + s, 0, {t: 'alight'});
     if (k) { const p = `L${ri}:${k - 1}`; add(p, n, hops[k - 1], {t: 'ride', ri}); add(n, p, hops[k - 1], {t: 'ride', ri}); }
@@ -471,7 +487,8 @@ function route() {
   }
   const sidOf = n => n[0] === 'P' ? n.slice(1) : yd.runs[+n.slice(1).split(':')[0]][1][+n.split(':')[1]];
   const total = dist.get('P' + b) - D.boardPenalty;
-  let h = `<div class="tot">${A} → ${B}: ${Math.round(total)} min</div><div class="hint">${Y} network, station to station.${clear}</div>`;
+  let h = `<div class="tot">${A} → ${B}: ${Math.round(total)} min</div><div class="hint">${Y} network, station to station` +
+    (hidden.size ? ', without the hidden lines' : '') + `.${clear}</div>`;
   const runPts = (ri, f, t) => { const k0 = +f.split(':')[1], k1 = +t.split(':')[1], st = yd.runs[ri][1];
     return (k0 <= k1 ? st.slice(k0, k1 + 1) : st.slice(k1, k0 + 1).reverse()).map(s => [D.stations[s][1], D.stations[s][2]]); };
   const tripW = 6 * zf();
@@ -488,8 +505,22 @@ function route() {
   dimNetwork(true);
   $('trip').innerHTML = h; showTrip(); if (window.Schem) Schem.trip(legs, yd, pick);  // schematic: highlight the route
 }
+// type-ahead station search for the trip planner (keyboard, screen readers, small screens)
+function stationList() {
+  const ids = new Set(Object.values(S.years).flatMap(g => g.runs.flatMap(r => r[1])));
+  const byName = new Map();
+  for (const s of ids) if (!byName.has(D.stations[s][0])) byName.set(D.stations[s][0], s);
+  S._byName = byName;
+  $('stlist').innerHTML = [...byName.keys()].sort().map(n => `<option value="${n.replace(/"/g, '&quot;')}">`).join('');
+}
+const odPick = () => {
+  const a = S._byName.get($('from').value.trim()), b = S._byName.get($('to').value.trim());
+  if (a && b) { pick = [a, b]; route(); } else if (a && !b && document.activeElement !== $('to')) { pick = []; choose(a); }
+};
+$('from').onchange = odPick; $('to').onchange = odPick;
+stationList();
 $('slider').oninput = e => { yi = +e.target.value; draw(); };
-$('scen').onchange = e => { scenKey = e.target.value; S = D.scen[scenKey]; draw(); };   // hidden lines stay hidden
+$('scen').onchange = e => { scenKey = e.target.value; S = D.scen[scenKey]; stationList(); draw(); };   // hidden lines stay hidden
 $('allOn').onclick = () => { hidden.clear(); draw(); };
 $('allOff').onclick = () => { S.lines.forEach(l => hidden.add(l.id)); draw(); };
 let timer = null;

@@ -48,8 +48,16 @@ def write(nets, evals, out_path):
                 "segs": [[s.year, round(s.km, 2)] for s in ln.segments],
             })
         # drawn geometry: shared-track pieces, each with its lines in side-by-side order
-        raw = bundle.pieces([(i, ln.mode, ln.status, ln.first_year, [(s.year, s.pts) for s in ln.segments])
-                             for i, ln in enumerate(net.lines.values())])
+        def drawn_segs(ln):
+            """The line's track, plus a rerouted line's old track until the new one opens."""
+            out = [(s.year, s.pts) for s in ln.segments]
+            have = {(tuple(s.pts[0]), tuple(s.pts[-1])) for s in ln.segments}
+            for _, until, old, it in net.variants.get(ln.id, []):
+                if it.get("reroute"):
+                    out += [(s.year, s.pts, until) for s in old.segments
+                            if (tuple(s.pts[0]), tuple(s.pts[-1])) not in have and (tuple(s.pts[-1]), tuple(s.pts[0])) not in have]
+            return out
+        raw = bundle.pieces([(i, ln.mode, ln.status, ln.first_year, drawn_segs(ln)) for i, ln in enumerate(net.lines.values())])
         pieces = [[geom_id(pts), [list(u) for u in users]] for pts, users in raw]
         st_piece = bundle.station_pieces(raw, {sid: (st.lon, st.lat) for sid, st in net.stations.items()},
                                          {ln_i: ln.stop_ids for ln_i, ln in enumerate(net.lines.values())})
