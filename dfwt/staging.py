@@ -485,7 +485,37 @@ def _exact_years(net, rows, log=print, scale=1.0, floor=None):
     moved = sum(1 for a, b in zip(old, rows) if a["year_opens"] != b["year_opens"])
     if log:
         log(f"{moved} of {len(rows)} stages moved to their earliest affordable year")
-    return renumber(rows)
+    return renumber(keep_attached(net, rows))
+
+
+def keep_attached(net, rows):
+    """An extension may not open before a stage it attaches to: each non-starter stage
+    opens no earlier than the earliest stage of its line that shares one of its end
+    stops (repeated until nothing moves)."""
+    names = {k: v.name for k, v in net.stations.items()}
+    by = collections.defaultdict(list)
+    for r in rows:
+        ln = net.lines.get(r["line_id"])
+        if ln is None or r["kind"] == "via":
+            continue
+        try:
+            a, b = sorted((resolve(r["from_stop"], ln.stop_ids, names), resolve(r["to_stop"], ln.stop_ids, names)))
+        except KeyError:
+            continue
+        by[r["line_id"]].append((r, a, b))
+    for stages in by.values():
+        first = min(stages, key=lambda x: (int(x[0]["year_opens"]), int(x[0]["stage"])))[0]
+        moved = True
+        while moved:
+            moved = False
+            for r, a, b in stages:
+                if r is first or r.get("locked") == "1":
+                    continue
+                touch = [int(o["year_opens"]) for o, c, d in stages if o is not r and (c in (a, b) or d in (a, b))]
+                if touch and int(r["year_opens"]) < min(touch):
+                    r["year_opens"] = str(min(touch))
+                    moved = True
+    return rows
 
 
 def renumber(rows):

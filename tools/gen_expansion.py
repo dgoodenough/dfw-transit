@@ -220,6 +220,77 @@ def fix_infill_years(t, want):
             r["year_opens"] = str(int(r["year_opens"]) + y - got[(r["line_id"], r["seq"])])
 
 
+_ROADS = None
+STREET_WORDS = ("lane", "boulevard", "blvd", "road", "parkway", "tap", "avenue", "drive", "freeway", "highway", "street",
+                "loop", "trail", "pike", "expressway")
+
+
+def street_hint(name):
+    """'Josey Lane BRT' -> 'Josey', 'Denton Tap BRT' -> 'Denton Tap': the street a BRT line
+    is named after, if its name says so (place-named lines get None)."""
+    words = [w for w in name.replace("BRT", "").split() if w]
+    for i, w in enumerate(words):
+        if w.lower().strip(",") in STREET_WORDS and i:
+            return " ".join(words[:i + (1 if w.lower() == "tap" else 0)])
+    return None
+
+
+def _cut_loops(P, near=80.0):
+    """Remove detours where the route comes back within `near` m of where it already
+    was (circling a block to touch a waypoint)."""
+    import math
+    out = list(P)
+    i = 0
+    while i < len(out):
+        cut = None
+        run = 0.0
+        for j in range(i + 1, len(out)):
+            run += math.dist(out[j - 1], out[j])
+            if run > 2500:   # only small loops (around a block or two), never a line that circles back
+                break
+            if run > 3 * near + 150 and math.dist(out[i], out[j]) < near:
+                cut = j
+        if cut is not None:
+            out = out[:i + 1] + out[cut:]
+        i += 1
+    return out
+
+
+def road_path(pts, name):
+    """Route a BRT corridor through its waypoints ((lat, lon) list) on the road network,
+    favoring arterials and the street it is named after. Returns (lat, lon) points, or
+    None if no route is found (the caller keeps the straight lines)."""
+    global _ROADS
+    from dfwt import osmroute
+    if _ROADS is None:
+        _ROADS = osmroute.Graph("road", classes={"primary", "secondary", "tertiary", "trunk", "motorway"})
+    w_cls = {"primary": 1.0, "secondary": 1.0, "trunk": 1.15, "tertiary": 1.35, "motorway": 1.6}
+    hint = street_hint(name)
+    xy = [osmroute.xy(lon, lat) for lat, lon in pts]
+    if len(xy) > 2:
+        # the waypoints are rough guesses: if the street route between the ends alone passes
+        # near every one of them and is no longer, the bus just stays on that street
+        import math
+        P2, _ = osmroute.route(_ROADS, [xy[0], xy[-1]], max_turn=100, snap_r=900, w_cls=w_cls, turn_pen=700.0,
+                               detour=2.5, snap_w=1.0, prefer=hint)
+        if P2 and all(min(math.dist(w, q) for q in P2) < 1200 for w in xy[1:-1]):
+            P1, _ = osmroute.route(_ROADS, xy, max_turn=100, snap_r=900, w_cls=w_cls, turn_pen=700.0, detour=2.5,
+                                   snap_w=1.0, prefer=hint)
+            L = lambda P: sum(math.dist(a, b) for a, b in zip(P, P[1:]))
+            if not P1 or L(P2) <= 1.1 * L(P1):
+                return [(lat, lon) for lon, lat in (osmroute.ll(p) for p in _cut_loops(P2))]
+    for snap, turn in ((900, 100), (1500, 135)):
+        # waypoints are loose guides (snap_w 1): a bus stays on its street rather than
+        # zigzagging to touch each one; turns cost extra so it changes street rarely
+        P, _ = osmroute.route(_ROADS, xy, max_turn=turn, snap_r=snap, w_cls=w_cls, turn_pen=700.0, detour=2.5,
+                              snap_w=1.0, prefer=hint)
+        if P:
+            P = _cut_loops(P)
+            out = [(lat, lon) for lon, lat in (osmroute.ll(p) for p in P)]
+            return out   # the station ends are joined later (a detour only if a station is off the street)
+    return None
+
+
 def build(name):
     cfg = config.load()
     base = config.path("network")
@@ -288,6 +359,12 @@ def build(name):
             if not w[4]:
                 continue
             pts = [(p[0], p[1]) for p in cur]
+            if mode == "brt":   # BRT runs in the street: follow the roads, stops placed along them
+                routed = road_path(pts, ln["name"])
+                if routed:
+                    pts = routed
+                else:
+                    report.append(f"{lid} {ln['name']}: no street route for a leg; kept straight")
             L = sum(geo.hav_km(*pts[i], *pts[i + 1]) for i in range(len(pts) - 1))
             n_extra = max(0, round(L / spacing) - 1) if L > 1.45 * spacing else 0
             cuts = [L * (k + 1) / (n_extra + 1) for k in range(n_extra)]
@@ -329,15 +406,25 @@ def build(name):
                     t["stations.csv"].append(st[sid])
                     new_ids.append(sid)
             if sid in sids:
-                raise SystemExit(f"{lid}: stop {st[sid]['name']} appears twice")
+                if s[4]:    # an explicit stop the spec asked for twice
+                    raise SystemExit(f"{lid}: stop {st[sid]['name']} appears twice")
+                # an added stop that snapped to a station this line already serves (the street
+                # passes it twice): drop it and join the legs on either side
+                k = len(sids)
+                legs[k - 1:k + 1] = [legs[k - 1] + legs[k][1:]]
+                leg_grades[k - 1:k + 1] = [leg_grades[k - 1]]
+                continue
             sids.append(sid)
             names.append(st[sid]["name"])
             used.add(sid)
         # snap leg ends onto the (possibly snapped) station coordinates
         for i, leg in enumerate(legs):
             a, b = st[sids[i]], st[sids[i + 1]]
-            leg[0] = (float(a["lat"]), float(a["lon"]))
-            leg[-1] = (float(b["lat"]), float(b["lon"]))
+            for end, s_ in ((0, a), (-1, b)):
+                at = (float(s_["lat"]), float(s_["lon"]))
+                if mode == "brt" and len(leg) > 2 and geo.hav_km(*leg[end], *at) <= 0.25:
+                    continue    # a station beside the street: the bus stops on the street, no detour
+                leg[end] = at
         # stage years per segment
         ref = {}
         for i, sid in enumerate(sids):

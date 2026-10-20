@@ -1,0 +1,12 @@
+# Expansion corridors left out of the 2M scenario: under 5 daily trips per $M
+# in the build of 2026-10-19 (tools/make_two_million.py reads this).
+XB04  # Abrams-Skillman BRT
+XB05  # Marsh-Webb Chapel BRT
+XB08  # Jupiter-Plano Road BRT
+XB10  # Mesquite Town East BRT
+XB18  # Frankford-Hebron BRT
+XB22  # Story-MacArthur BRT
+XB23  # Grand Prairie Carrier BRT
+XB30  # Seminary-Wichita BRT
+XB36  # Southwest Arlington BRT
+XB43  # West Dallas-Irving BRT
