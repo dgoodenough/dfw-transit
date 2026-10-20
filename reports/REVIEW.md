@@ -42,12 +42,23 @@ Bugs, fixed and committed (see network/CHANGELOG.md v2.9 for detail):
   met near-identical colours; trips drawn along their route; clearer trip-planner
   messages; popups, Lines panel, keyboard and touch fixes.
 
-## Decisions for the owner
+## Owner's decisions (v2.10)
+
+- Keep the 2M target and add levers: D2 subway, regional-rail through-running, parking pricing
+  (downtown prices double, $5/day at the densest job centers), Red Line to McKinney. The 2M
+  scenario reaches ~2.24M daily trips in 2100.
+- Take the cost concerns on board, with costs falling as a steady program matures
+  (config cost_efficiency): 2025 peer-level unit costs, garages charged, operating cost reported.
+- Add the Weatherford and Greenville lines by 2100 (and Cleburne): a complete-looking network
+  matters ("80% art, 20% science").
+- All the smaller decisions below (items 9-10) are taken.
+
+## Decisions for the owner (as reviewed)
 
 Ranked by how much they change the plan or its headline numbers.
 
 1. **Is 2M still the target, and on which assumptions?** After the fixes the 2M scenario
-   lands at __TRIPS_2100__ daily trips in 2100. The reviewers' sensitivity runs say the
+   lands at about 1.87M daily trips in 2100. The reviewers' sensitivity runs say the
    margin is thin and several assumptions are at the generous end:
    - population: 15.9M by 2100 is at or above the state demographer's high path after
      2060; on a mid path 2100 trips fall ~18% (land-use planner);

@@ -1,5 +1,5 @@
 {
-  "_doc": "The 2 million riders scenario: 2M daily transit trips (each trip counted once, all modes) by 2100. The plan plus the expansion package (arterial BRT grid, SH-114 metro, job-campus BRT, infill stations), the frequent-service package (edits.csv), better access (15-min feeder buses, bike/scooter to stations, walkable station areas, drop-off, Wiehle-Reston-style garages at selected suburban stations) and moderate land use (upzoning around stations, 20% of growth steered to station areas). Parking prices double in real terms by 2050 in today's paid districts and $8/day parking spreads to dense job centers (cash-out is left out). The D2 subway takes the Green and Orange lines off the downtown mall from 2035, and regional rail runs through Fort Worth and Dallas. Stages are scheduled by riders per dollar (staging.priority), so cheap high-value BRT comes early under the same $2.3B/yr budget. Merged over config.json for this scenario only.",
+  "_doc": "The 2 million riders scenario: 2M daily transit trips (each trip counted once, all modes) by 2100. The plan plus the expansion package (arterial BRT grid, SH-114 metro, job-campus BRT, infill stations), the D2 subway, the Red Line on to McKinney, regional rail to Weatherford, Greenville and Cleburne by the 2090s (scenarios/two_million/extra/), the frequent-service package (edits.csv), better access (15-min feeder buses, bike/scooter to stations, walkable station areas, drop-off) and moderate land use (upzoning around stations, 20% of growth steered to station areas). Parking prices double in real terms by 2050 in today's paid districts and $5/day parking spreads to the densest job centers (15,000+ jobs/km2; cash-out is left out). The D2 subway takes the Green and Orange lines off the downtown mall from 2035, and regional rail runs through Fort Worth and Dallas. Stages are scheduled by riders per dollar (staging.priority), so cheap high-value BRT comes early under the same $2.3B/yr budget. Merged over config.json for this scenario only.",
   "growth": {
     "tod": {
       "pop_uplift": {
@@ -57,8 +57,8 @@
     "parking_policy": {
       "price_growth": 1.0,
       "priced_centers": {
-        "min_jobs_per_km2": 10000,
-        "usd_per_day": 8
+        "min_jobs_per_km2": 15000,
+        "usd_per_day": 5
       }
     }
   }

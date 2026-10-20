@@ -244,3 +244,34 @@ and what is left to decide). Fixed:
 - Map: continuous side-by-side shared track, interchange capsules, stations by zoom,
   contrast guard, recoloured clashing lines (SH-114, I-30, Gainesville, Bowie, SE TexRail,
   Alvarado), trips drawn along their route, trip-planner messages, popup/panel/touch fixes.
+
+## v2.10 — Peer costs, D2, levers to 2M, Weatherford and Greenville
+
+- **Costs** at 2025 US peer levels (commuter rail $45M/km, arterial BRT $30M/km, light rail
+  $140M/km at grade, $600M/km in tunnel; stations $4-50M, $200M underground), garages charged
+  at ~$30k a space (BRT termini 400 spaces), falling with a steady program: 15% lower by 2040,
+  25% by 2055 (config cost_efficiency). Operating cost is reported per year. The plan costs
+  $103.6B (was $94.4B) and is rescheduled into the budget (last opening 2075).
+- **D2 subway** (2M): Green and Orange leave the downtown mall in 2035 for a tunnel under
+  Commerce Street (Victory - Metro Center - Commerce / Harwood, then Deep Ellum or Pearl); the
+  mall keeps Red and Blue. New `reroute` edit: the old routing runs until the new track opens.
+- **Levers** (2M): parking prices double downtown by 2050 and $5/day parking spreads to the
+  densest job centers; regional rail runs through Fort Worth and Dallas (TRE to Alvarado and
+  Terrell, TEXRail to Primrose, Mansfield-Denton-Carrollton); the Red Line runs on to McKinney
+  as light rail. The suburban Wiehle-Reston garages are dropped. **About 2.24M daily trips in
+  2100** (1.85M without the parking policy).
+- **New regional rail** (2M, locked by 2100 for a complete network): Weatherford Line (Fort
+  Worth T&P - Benbrook - Aledo - Hudson Oaks / Willow Park - Weatherford, 2090), Greenville
+  Line (Downtown Rowlett - Rockwall - Fate - Royse City - Caddo Mills - Greenville, 2095), Alvarado
+  Line on to Cleburne (2088). Hunt County is outside the model's zones, so Greenville's
+  ridership is understated.
+- **Network**: DNT East starts at Frisco Main St (Frisco Square); the Legacy Line runs as a DNT
+  East branch from Spring Creek Parkway via Legacy West to Pearl (each branch every 10 min);
+  FW Orange ends at Medical City - Baylor (FW Red serves the rest); Fort Worth metro lines are
+  named "FW Green / Blue / Orange / Pink / Berry / Red / Purple".
+- **Scheduler**: through-routed lines' stages price their part of the joined line; today's
+  service is never moved; new track no stage covers (D2) is reserved at its own year; lines
+  briefly cut off open when they connect.
+- **Map**: From/To station search; hidden lines are left out of trips (as if not built); BRT
+  routes on one street draw as one stroke with route names on hover; operating cost on the
+  capital card.
