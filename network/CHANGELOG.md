@@ -196,3 +196,12 @@ Scenarios:
 - The 2M scenario leaves out 10 corridors that added under 5 daily trips per $M
   (`scenarios/two_million/drop_lines.txt`, 137 km, $2.4B); it still reaches 2M daily trips (2089).
 - An extension never opens before the stage it attaches to (budget scheduler).
+
+## v2.7 — Fewer BRT stops, best value first
+
+- New BRT corridors stop every 1.2 km in dense areas and 1.6 km in suburban ones (was 0.8 km);
+  new corridors average 1.5 km between stops.
+- The 2M scenario schedules by riders per dollar (`"staging": {"priority": "value_per_musd"}`):
+  the strongest corridors are built first, whatever their mode. BRT now opens at a median of 2051
+  (was 2070), metro at 2045 (was 2037), commuter rail at 2058 (was 2030). Three weak BRT
+  corridors fall past 2100. 2.04M daily trips in 2100.

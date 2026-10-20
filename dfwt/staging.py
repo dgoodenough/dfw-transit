@@ -395,6 +395,21 @@ def stage_costs(net, rows):
     return out
 
 
+def _line_values(net):
+    """line_id -> daily trips per $M from the last full build of this scenario."""
+    import csv
+    import os
+    p = config.path("results", net.name, "lines.csv")
+    out = {}
+    if os.path.exists(p):
+        for r in csv.DictReader(open(p, encoding="utf-8")):
+            try:
+                out[r["line_id"]] = float(r["value_per_musd"])
+            except (TypeError, ValueError):
+                pass
+    return out
+
+
 def _priorities(net, rows):
     """Row index -> acceptance order from the optimizer's log (reports/build_order_log.csv,
     or the scenario's optimizer_log.csv), matched by line and the stage's first stop."""
@@ -439,10 +454,22 @@ def _exact_years(net, rows, log=print, scale=1.0, floor=None):
     priority = _priorities(net, rows)
     spend = [0.0] * (horizon - ex + 1)
     last = {}
-    # locked stages reserve their money first; then the rest in build order
-    order = sorted(range(len(rows)), key=lambda i: (rows[i].get("locked") != "1",
-                                                    int(rows[i]["year_opens"]) > end, int(rows[i]["year_opens"]),
-                                                    priority.get(i, 1e9), rows[i]["line_id"], int(rows[i]["stage"])))
+    # locked stages reserve their money first; then the rest in build order, or, with
+    # staging.priority = "value_per_musd", best riders per dollar first (line values from the
+    # last full build, results/<scenario>/lines.csv), each line's stages in their own order
+    by_value = cfg["staging"].get("priority") == "value_per_musd"
+    value = _line_values(net) if by_value else {}
+    if by_value:
+        first_year = {}
+        for r in rows:
+            first_year[r["line_id"]] = min(first_year.get(r["line_id"], 9999), int(r["year_opens"]))
+        order = sorted(range(len(rows)), key=lambda i: (rows[i].get("locked") != "1", -value.get(rows[i]["line_id"], 0.0),
+                                                        first_year[rows[i]["line_id"]], int(rows[i]["year_opens"]),
+                                                        int(rows[i]["stage"])))
+    else:
+        order = sorted(range(len(rows)), key=lambda i: (rows[i].get("locked") != "1",
+                                                        int(rows[i]["year_opens"]) > end, int(rows[i]["year_opens"]),
+                                                        priority.get(i, 1e9), rows[i]["line_id"], int(rows[i]["stage"])))
 
     placed = []
     bcfg = dict(cfg, budget=dict(cfg["budget"], musd_per_year=cfg["budget"]["musd_per_year"] * scale))
@@ -470,7 +497,7 @@ def _exact_years(net, rows, log=print, scale=1.0, floor=None):
             continue
         lo = max(ex + n, last.get(r["line_id"], 0))
         if r["kind"] == "starter":   # a new line needs the network it joins: never earlier than planned
-            lo = max(lo, y0 if y0 <= end else lo, floor.get(r["line_id"], 0))
+            lo = max(lo, y0 if (y0 <= end and not by_value) else lo, floor.get(r["line_id"], 0))
         hi = horizon - 10   # earlier if the money is there, later if it isn't
         y = next((t for t in range(lo, hi + 1) if ok(placed + [(t, cost, n)])), None)
         if y is None:

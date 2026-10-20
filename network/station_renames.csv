@@ -289,6 +289,7 @@ XS0007,Swiss Avenue Historic District E,Grand / La Vista,32.804597,-96.729929,cr
 XS0008,Meaders S,NW Highway / Devonshire,32.866381,-96.814896,cross streets NW Highway x Devonshire (205 m)
 XS0009,University Park NW,NW Highway / Westchester Drive,32.866458,-96.806494,cross streets NW Highway x Westchester Drive (106 m)
 XS0009,Wheatley Place Historic District SE,Elsie Faye Heggins / Malcolm X,32.755678,-96.747051,"nearest streets Elsie Faye Heggins (407 m), Malcolm X (555 m)"
+XS0010,C F Hawn / Lamar,Lamar / C F Hawn,32.741037,-96.762115,"same interchange, one spelling"
 XS0010,Gribble NW,Mercer / Valley View Lane,32.914000,-96.930500,cross streets Mercer x Valley View Lane (448 m)
 XS0010,Sargent E,C F Hawn / Lamar,32.741037,-96.762115,cross streets C F Hawn x Lamar (427 m)
 XS0010,University Park NW,NW Highway / Edgemere,32.866500,-96.798092,cross streets NW Highway x Edgemere (264 m)
@@ -330,6 +331,7 @@ XS0027,Reinhardt S,Saint Francis / Senate,32.800368,-96.693061,cross streets Sai
 XS0027,Westlake SE,Randol Mill Avenue,32.966500,-97.178500,street Randol Mill Avenue (36 m)
 XS0028,Lowest Greenville,Henderson / McMillan,32.809928,-96.775123,cross streets Henderson x McMillan (191 m)
 XS0028,Reinhardt S,Samuell / Saint Francis,32.793214,-96.692152,cross streets Samuell x Saint Francis (109 m)
+XS0029,Bethel Road / Denton Tap,Bethel Road,32.954525,-96.995081,street West Bethel Road (0 m)
 XS0029,Bethel SW,Bethel Road / Denton Tap,32.954054,-96.990658,cross streets Bethel Road x Denton Tap (261 m)
 XS0029,Lower Greenville,Greenville Avenue / Richmond,32.817000,-96.770000,cross streets Greenville Avenue x Richmond (109 m)
 XS0029,Reinhardt S,Saint Francis / Everglade,32.786057,-96.691257,cross streets Saint Francis x Everglade (101 m)
@@ -376,6 +378,7 @@ XS0046,Oak Cliff E,Rugged / Elmwood,32.727000,-96.846593,cross streets Rugged x 
 XS0046,Oak Lawn NW,Manor / Maple,32.822271,-96.842441,cross streets Manor x Maple (365 m)
 XS0047,Hi Line NW,Harry Hines Boulevard,32.822785,-96.851620,street Harry Hines Boulevard (40 m)
 XS0047,Oak Cliff E,Ferndale / Vernon,32.727000,-96.837911,cross streets Ferndale x Vernon (134 m)
+XS0048,NW Highway / Stemmons,NW Highway / Harry Hines,32.859127,-96.883924,"one station, one spelling (the plan's)"
 XS0048,Oak Cliff SW,Zang / Thornton,32.727000,-96.829230,"nearest streets Zang (8 m), Thornton (301 m)"
 XS0049,Oak Cliff SW,Beckley Avenue,32.727000,-96.820548,street South Beckley Avenue (210 m)
 XS0049,Oldham S,Brookriver / Empire Central,32.828867,-96.867200,cross streets Brookriver x Empire Central (321 m)
@@ -391,6 +394,7 @@ XS0054,Sargent S,Kiest / Southern Oaks,32.728368,-96.777199,"nearest streets Kie
 XS0055,Oldham W,Walton Walker / Lombardy,32.867133,-96.898400,cross streets Walton Walker x Lombardy (124 m)
 XS0055,Sargent SE,Julius Schepps / Overton,32.728888,-96.768539,"nearest streets Julius Schepps (438 m), Overton (571 m)"
 XS0056,Highland E,Manana / Stemmons,32.873567,-96.901700,cross streets Manana x Stemmons (397 m)
+XS0056,Manana / Stemmons,Stemmons / Manana,32.873567,-96.901700,"same interchange, one spelling"
 XS0056,Sargent SE,M Wright Freeway,32.729407,-96.759879,street S M Wright Freeway (165 m)
 XS0057,Joppa N,Bexar Street,32.729927,-96.751220,street Bexar Street (552 m)
 XS0058,Gribble S,Royal / Newkirk,32.889300,-96.908150,"nearest streets Royal (693 m), Newkirk (694 m)"
@@ -435,6 +439,7 @@ XS0075,Frisco SE,Brookhollow / Preston,33.132283,-96.807964,cross streets Brookh
 XS0075,Lakewood NW,Skillman / Mockingbird,32.834800,-96.761000,cross streets Skillman x Mockingbird (190 m)
 XS0076,Frisco S,Chapel Creek / Brookhollow,33.132966,-96.815927,cross streets Chapel Creek x Brookhollow (218 m)
 XS0076,University Crossing E,Skillman / Abrams,32.841296,-96.757699,"nearest streets Skillman (341 m), Abrams (442 m)"
+XS0077,Community / NW Highway,NW Highway / Community,32.857343,-96.870403,"same interchange, one spelling"
 XS0077,Oldham SE,Community / NW Highway,32.857343,-96.870403,cross streets Community x NW Highway (323 m)
 XS0077,The Village SE,Abrams / University,32.847738,-96.754247,cross streets Abrams x University (279 m)
 XS0078,Oldham SE,Larga / Webb Chapel Extension,32.861450,-96.863570,cross streets Larga x Webb Chapel Extension (250 m)
@@ -609,6 +614,7 @@ XS0153,The Village SE,Abrams / University,32.847738,-96.754247,cross streets Abr
 XS0153,Whispering Hills NE,Buckingham / Yale,32.932110,-96.695264,cross streets Buckingham x Yale (316 m)
 XS0154,The Village E,Abrams / Southwestern,32.854181,-96.750796,cross streets Abrams x Southwestern (128 m)
 XS0154,Whispering Hills NE,Spring Valley / Plano Road,32.939171,-96.696146,cross streets Spring Valley x Plano Road (354 m)
+XS0155,Coit / Stonehaven,Stonehaven / Coit,33.091016,-96.771586,"same interchange, one spelling"
 XS0155,Vickery Meadows E,Abrams / Park,32.867149,-96.744141,cross streets Abrams x Park (161 m)
 XS0155,Whispering Hills NE,Belt Line / Plano Road,32.946232,-96.697029,cross streets Belt Line x Plano Road (269 m)
 XS0156,Richardson E,Apollo / Plano Road,32.953293,-96.697912,cross streets Apollo x Plano Road (183 m)
@@ -628,6 +634,7 @@ XS0162,Plano S,Plano Road / Broadmoor,32.995800,-96.700000,cross streets Plano R
 XS0163,Oldham SE,Larga / Webb Chapel,32.865000,-96.860000,cross streets Larga x Webb Chapel (222 m)
 XS0163,Plano SW,Plano Road / K,33.002900,-96.700000,cross streets Plano Road x K (51 m)
 XS0164,Great Trinity Forest / Murdock,Murdock / Great Trinity Forest,32.712292,-96.685369,"same interchange, one spelling"
+XS0164,Larga / Park,Park / Larga,32.872304,-96.858748,"same interchange, one spelling"
 XS0164,Oldham E,Larga / Park,32.872304,-96.858748,cross streets Larga x Park (355 m)
 XS0164,Plano SW,K / Municipal,33.010000,-96.700000,cross streets K x Municipal (415 m)
 XS0165,Buckner Boulevard / Hillburn,Buckner Boulevard / Holcomb,32.725431,-96.682883,"nearest streets Buckner Boulevard (0 m), Holcomb (805 m)"
@@ -666,6 +673,7 @@ XS0180,Eagle Ford E,Canada / Bickers,32.790000,-96.865000,"nearest streets Canad
 XS0180,New Hope NW,Galloway / LBJ,32.830533,-96.630067,cross streets Galloway x LBJ (98 m)
 XS0181,Eagle Ford E,Kingbridge / Bickers,32.782647,-96.865000,cross streets Kingbridge x Bickers (304 m)
 XS0181,New Hope W,I-30 / LBJ,32.823745,-96.626872,cross streets I-30 x LBJ (44 m)
+XS0182,Dallas Parkway / Tennyson,Tennyson / Dallas Parkway,33.074269,-96.824051,"same interchange, one spelling"
 XS0182,Eagle Ford E,Kingbridge / Singleton,32.775294,-96.865000,cross streets Kingbridge x Singleton (385 m)
 XS0182,New Hope W,Childress / Emporium,32.816996,-96.623498,cross streets Childress x Emporium (331 m)
 XS0183,New Hope W,Town East / Towne Centre,32.810247,-96.620123,cross streets Town East x Towne Centre (342 m)
@@ -761,6 +769,7 @@ XS0220,Zacha Junction W,Plano Road / Rolling Rock,32.868300,-96.697170,"nearest 
 XS0221,Plano N,P / 18th Street,33.025500,-96.691250,cross streets P x 18th Street (179 m)
 XS0221,Zacha Junction NW,McCree / Rolling Rock,32.875374,-96.696463,cross streets McCree x Rolling Rock (279 m)
 XS0222,Bethard S,Mapleridge / Walnut Hill,32.882449,-96.695755,cross streets Mapleridge x Walnut Hill (405 m)
+XS0222,Coit / Stonehaven,Stonehaven / Coit,33.091016,-96.771586,"same interchange, one spelling"
 XS0222,Plano NE,Jupiter / 18th Street,33.025500,-96.682500,cross streets Jupiter x 18th Street (172 m)
 XS0223,Bethard S,Plano Road / Miller,32.889524,-96.695048,"nearest streets Plano Road (491 m), Miller (545 m)"
 XS0223,Plano NE,18th Street / Rigsbee,33.025500,-96.673750,cross streets 18th Street x Rigsbee (397 m)
@@ -818,6 +827,7 @@ XS0247,Garland S,5th Street / Miller,32.896155,-96.636868,cross streets 5th Stre
 XS0247,Watters Creek W,Stonehaven / Coit,33.093224,-96.769000,cross streets Stonehaven x Coit (238 m)
 XS0248,Centerville NW,5th Street / Briarwood,32.888847,-96.636346,cross streets 5th Street x Briarwood (190 m)
 XS0248,Frisco SE,McDermott / Coit,33.100321,-96.769000,cross streets McDermott x Coit (244 m)
+XS0249,Cemetery Hill / Rosemeade,Rosemeade / Cemetery Hill,33.010444,-96.891806,"same interchange, one spelling"
 XS0249,Centerville W,5th Street / Kingsley,32.881540,-96.635824,cross streets 5th Street x Kingsley (385 m)
 XS0249,Frisco SE,Ridgeview / Coit,33.107418,-96.769000,cross streets Ridgeview x Coit (66 m)
 XS0250,Centerville W,Glenbrook Drive,32.874232,-96.635302,street South Glenbrook Drive (88 m)
@@ -865,6 +875,7 @@ XS0267,Cowley W,Village Creek / Plano Parkway,33.014048,-96.800638,cross streets
 XS0267,Reinhardt SE,I-30 / Sorrento,32.810000,-96.655734,cross streets I-30 x Sorrento (90 m)
 XS0268,Cowley NW,Old Shepard / Ventura,33.021232,-96.800351,cross streets Old Shepard x Ventura (69 m)
 XS0268,Reinhardt SE,I-30 / Modlin,32.810000,-96.647168,cross streets I-30 x Modlin (389 m)
+XS0269,Bell / University,University / Bell,33.230926,-97.127215,"same interchange, one spelling"
 XS0269,Cowley NW,Ventura / Park,33.028417,-96.800063,cross streets Ventura x Park (87 m)
 XS0269,New Hope W,Edgebrook / Town East,32.810000,-96.638601,cross streets Edgebrook x Town East (187 m)
 XS0270,Cowley NW,Coventry / Ventura,33.035605,-96.800000,cross streets Coventry x Ventura (332 m)
@@ -897,11 +908,14 @@ XS0283,Frisco SE,Wade / Nancy Jane,33.129057,-96.800000,cross streets Wade x Nan
 XS0283,Hebron E,Park / Willow Bend,33.025500,-96.813750,cross streets Park x Willow Bend (259 m)
 XS0284,Cowley NW,Winding Hollow / Park,33.025500,-96.805000,cross streets Winding Hollow x Park (235 m)
 XS0284,Frisco SE,Preston Vineyard Drive,33.136246,-96.800000,street Preston Vineyard Drive (168 m)
+XS0284,Winding Hollow / Park,Winding Hollow Lane,33.025500,-96.805000,street Winding Hollow Lane (57 m)
 XS0285,Cowley NW,Preston / Park,33.025500,-96.796250,cross streets Preston x Park (218 m)
 XS0285,Frisco E,Hickory Street,33.143434,-96.800000,street Hickory Street (249 m)
+XS0285,Preston / Park,Preston / Old Shepard,33.025500,-96.796250,cross streets Preston x Old Shepard (441 m)
 XS0286,Cowley NW,Ohio / Park,33.025500,-96.787500,cross streets Ohio x Park (178 m)
 XS0286,Frisco E,Hutson / Preston,33.150623,-96.800000,cross streets Hutson x Preston (396 m)
 XS0286,Ohio / Park,Park / Ohio,33.025500,-96.787500,"same interchange, one spelling"
+XS0286,Park / Ohio,Preston Park Boulevard,33.025500,-96.787500,street Preston Park Boulevard (96 m)
 XS0287,Cowley N,Park Boulevard,33.025500,-96.778750,street West Park Boulevard (145 m)
 XS0287,Frisco E,Preston / Main,33.157811,-96.800000,"nearest streets Preston (297 m), Main (537 m)"
 XS0287,Park Boulevard,Park / Old Shepard,33.025500,-96.778750,"nearest streets Park (145 m), Old Shepard (857 m)"
@@ -940,6 +954,7 @@ XS0301,Bouchard N,Coit / Kit,32.930000,-96.770000,cross streets Coit x Kit (203 
 XS0301,Preston / Brookhollow,Brookhollow Boulevard,33.134196,-96.804153,street Brookhollow Boulevard (29 m)
 XS0301,Watters Creek SW,Legacy / Old Orchard,33.071179,-96.738210,cross streets Legacy x Old Orchard (267 m)
 XS0302,Bouchard N,Coit / Spring Valley,32.937095,-96.769823,cross streets Coit x Spring Valley (318 m)
+XS0302,Coit / Spring Valley,Peyton / Spring Valley,32.937095,-96.769823,cross streets Peyton x Spring Valley (316 m)
 XS0302,Preston / Stonebrook,Stonebrook / Preston,33.141454,-96.804550,"same interchange, one spelling"
 XS0302,Watters Creek SW,Legacy / Wesson,33.072036,-96.729637,cross streets Legacy x Wesson (220 m)
 XS0303,Richardson W,Coit / Haymeadow,32.944191,-96.769645,cross streets Coit x Haymeadow (92 m)
@@ -974,6 +989,7 @@ XS0316,Cowley N,Coit / Matterhorn,33.036447,-96.769000,cross streets Coit x Matt
 XS0316,Frisco NE,Preston Road,33.160850,-96.805555,street Preston Road (210 m)
 XS0316,Legacy / Marchman,Marchman Way,33.071669,-96.761284,street Marchman Way (214 m)
 XS0316,Park / Preston,Preston / Park,33.027411,-96.796131,"same interchange, one spelling"
+XS0317,Cemetery Hill / Rosemeade,Rosemeade / Cemetery Hill,33.010444,-96.891806,"same interchange, one spelling"
 XS0317,Cowley N,Coit / Parker Road,33.043544,-96.769000,cross streets Coit x Parker Road (249 m)
 XS0317,Frisco NE,Hillcrest / Eldorado,33.169098,-96.791533,"nearest streets Hillcrest (583 m), Eldorado (587 m)"
 XS0317,Independence Parkway,Legacy / San Simeon,33.071803,-96.752880,"nearest streets Legacy (0 m), San Simeon (509 m)"
@@ -985,6 +1001,7 @@ XS0319,Rockhill SE,Eldorado Parkway,33.171516,-96.774842,street Eldorado Parkway
 XS0320,Cowley N,Legacy Drive,33.071932,-96.769000,street Legacy Drive (7 m)
 XS0320,Rockhill SE,Coit / Eldorado,33.172367,-96.766332,cross streets Coit x Eldorado (263 m)
 XS0321,Cowley N,Hearst Castle / Coit,33.079029,-96.769000,cross streets Hearst Castle x Coit (265 m)
+XS0321,Hearst Castle / Coit,Coit / Quincy,33.079029,-96.769000,cross streets Coit x Quincy (266 m)
 XS0321,Rockhill SE,Eldorado / Independence,33.173218,-96.757823,"nearest streets Eldorado (120 m), Independence (696 m)"
 XS0322,Rockhill SE,Independence Parkway,33.174069,-96.749314,street Independence Parkway (75 m)
 XS0322,Watters Creek W,Hedgcoxe / Coit,33.086126,-96.769000,cross streets Hedgcoxe x Coit (246 m)
@@ -994,6 +1011,7 @@ XS0324,Frisco SE,McDermott / Coit,33.100321,-96.769000,cross streets McDermott x
 XS0324,The Meadows NW,Custer Road,33.175771,-96.732295,street South Custer Road (44 m)
 XS0325,Frisco SE,Ridgeview / Coit,33.107418,-96.769000,cross streets Ridgeview x Coit (66 m)
 XS0325,The Meadows NW,Eldorado / Stonebridge,33.176622,-96.723785,cross streets Eldorado x Stonebridge (223 m)
+XS0326,Coit / Lebanon Road,Lebanon Road,33.114515,-96.769000,street Lebanon Road (152 m)
 XS0326,Frisco SE,Coit / Lebanon Road,33.114515,-96.769000,cross streets Coit x Lebanon Road (169 m)
 XS0326,The Meadows NW,Alma / Eldorado,33.177472,-96.715275,cross streets Alma x Eldorado (348 m)
 XS0327,Frisco SE,Coit / Jereme,33.121612,-96.769000,cross streets Coit x Jereme (241 m)
@@ -1010,6 +1028,7 @@ XS0332,Buckner S,Winding / Hardin,33.185369,-96.664834,cross streets Winding x H
 XS0332,Inwood E,Preston / Alpha,32.935000,-96.803000,cross streets Preston x Alpha (237 m)
 XS0333,Buckner S,Hardin / Brook,33.187141,-96.656529,"nearest streets Hardin (610 m), Brook (707 m)"
 XS0333,Inwood NE,Preston / Hughes,32.942187,-96.802840,cross streets Preston x Hughes (140 m)
+XS0333,Preston / Hughes,Preston / Spring Valley,32.942187,-96.802840,cross streets Preston x Spring Valley (388 m)
 XS0334,Alexis / Preston,Preston / Alexis,32.949375,-96.802681,"same interchange, one spelling"
 XS0334,McKinney W,Brook Drive,33.188912,-96.648223,street North Brook Drive (328 m)
 XS0334,Prestonwood S,Alexis / Preston,32.949375,-96.802681,cross streets Alexis x Preston (86 m)
@@ -1043,10 +1062,12 @@ XS0347,The Woodlands N,Highlands / Columbus,33.164366,-96.674454,cross streets H
 XS0348,Cowley NW,Baywater / Silver Creek,33.049982,-96.800000,cross streets Baywater x Silver Creek (251 m)
 XS0348,The Woodlands N,Columbus / McKinney Ranch,33.157104,-96.675483,cross streets Columbus x McKinney Ranch (271 m)
 XS0349,Cowley NW,Spring Creek / Baywater,33.057171,-96.800000,cross streets Spring Creek x Baywater (71 m)
+XS0349,Hulen / Trail Lake,Trail Lake / Hulen,32.654633,-97.395875,"same interchange, one spelling"
 XS0349,The Woodlands N,Collin McKinney Parkway,33.149860,-96.676690,street Collin McKinney Parkway (8 m)
 XS0350,Camey E,Tennyson / Preston,33.064359,-96.800000,cross streets Tennyson x Preston (348 m)
 XS0351,Camey E,Legacy / Windcrest,33.071548,-96.800000,"nearest streets Legacy (2 m), Windcrest (378 m)"
 XS0351,Coit / Spring Creek,Spring Creek / Coit,33.057714,-96.770396,"same interchange, one spelling"
+XS0351,Legacy / Windcrest,Legacy / Quincy,33.071548,-96.800000,"nearest streets Legacy (2 m), Quincy (572 m)"
 XS0352,Camey E,Quincy / Dominion,33.078737,-96.800000,cross streets Quincy x Dominion (154 m)
 XS0353,Camey E,Ohio / Rasor,33.085925,-96.800000,cross streets Ohio x Rasor (334 m)
 XS0353,Coit / Hearst Castle,Hearst Castle / Coit,33.078711,-96.771801,"same interchange, one spelling"
@@ -1070,6 +1091,7 @@ XS0360,Frisco SE,Preston Vineyard Drive,33.136246,-96.800000,street Preston Vine
 XS0360,Plano W,Alma / 15th Street,33.021220,-96.716000,cross streets Alma x 15th Street (206 m)
 XS0361,Frisco E,Hickory Street,33.143434,-96.800000,street Hickory Street (249 m)
 XS0361,Plano NW,Chisholm Place / Park,33.028293,-96.716000,cross streets Chisholm Place x Park (311 m)
+XS0362,Beach / Fossil Vista,Fossil Vista / Beach,32.842673,-97.290461,"same interchange, one spelling"
 XS0362,Frisco E,Hutson / Preston,33.150623,-96.800000,cross streets Hutson x Preston (396 m)
 XS0362,Hutson / Preston,Hutson / Gary Burns,33.150623,-96.800000,cross streets Hutson x Gary Burns (416 m)
 XS0362,Plano NW,Alma / Lexington,33.035366,-96.716000,cross streets Alma x Lexington (298 m)
@@ -1145,6 +1167,7 @@ XS0391,Trinity Mills N,Eisenhower / Frankford,32.999246,-96.928357,cross streets
 XS0392,Frisco NE,Preston Road,33.160850,-96.805555,street Preston Road (210 m)
 XS0392,New Koreatown NW,Rosemeade / Frankford,33.000518,-96.919878,cross streets Rosemeade x Frankford (350 m)
 XS0392,Preston / Stonebrook,Stonebrook / Preston,33.141454,-96.804550,"same interchange, one spelling"
+XS0392,Preston Road,Preston / Rogers Road,33.160850,-96.805555,"nearest streets Preston (210 m), Rogers Road (617 m)"
 XS0393,Frisco NE,Hillcrest / Eldorado,33.169098,-96.791533,"nearest streets Hillcrest (583 m), Eldorado (587 m)"
 XS0393,Hillcrest / Eldorado,Hillcrest / Preston,33.169098,-96.791533,"nearest streets Hillcrest (583 m), Preston (1071 m)"
 XS0393,New Koreatown N,Old Denton / Peters Colony,33.001790,-96.911398,cross streets Old Denton x Peters Colony (167 m)
@@ -1156,10 +1179,12 @@ XS0395,Rockhill SE,Eldorado Parkway,33.171516,-96.774842,street Eldorado Parkway
 XS0396,Coit / Eldorado,Coit / Sutherland,33.172367,-96.766332,"nearest streets Coit (144 m), Sutherland (1166 m)"
 XS0396,New Koreatown NE,Josey / Peters Colony,33.006763,-96.886474,cross streets Josey x Peters Colony (139 m)
 XS0396,Rockhill SE,Coit / Eldorado,33.172367,-96.766332,cross streets Coit x Eldorado (263 m)
+XS0397,Eldorado / Independence,Eldorado / JFK,33.173218,-96.757823,"nearest streets Eldorado (120 m), JFK (1254 m)"
 XS0397,Hebron SW,Rosemeade / Furneaux,33.010463,-96.879074,cross streets Rosemeade x Furneaux (438 m)
 XS0397,Rockhill SE,Eldorado / Independence,33.173218,-96.757823,"nearest streets Eldorado (120 m), Independence (696 m)"
 XS0398,Hebron SW,Province / Rosemeade,33.014163,-96.871675,cross streets Province x Rosemeade (276 m)
 XS0398,Rockhill SE,Independence Parkway,33.174069,-96.749314,street Independence Parkway (75 m)
+XS0399,Eldorado / Custer,Eldorado / Stonebridge,33.174920,-96.740804,"nearest streets Eldorado (55 m), Stonebridge (1001 m)"
 XS0399,Hebron SW,Kelly Boulevard,33.017862,-96.864275,street Kelly Boulevard (106 m)
 XS0399,Rockhill SE,Eldorado / Custer,33.174920,-96.740804,"nearest streets Eldorado (55 m), Custer (729 m)"
 XS0400,Hebron,Marsh / Kelly Boulevard,33.020872,-96.856514,cross streets Marsh x Kelly Boulevard (354 m)
@@ -1199,6 +1224,7 @@ XS0413,McKinney SW,Louisiana / Virginia,33.194228,-96.623306,"nearest streets Lo
 XS0414,Buckner NW,Wilmeth / Taylor-Burk,33.230000,-96.670000,"nearest streets Wilmeth (303 m), Taylor-Burk (551 m)"
 XS0414,Lewisville SW,Purnell / Cowan,33.041070,-97.001550,cross streets Purnell x Cowan (104 m)
 XS0415,Buckner NW,University Drive,33.222686,-96.670000,street West University Drive (534 m)
+XS0415,Hulen / Trail Lake,Trail Lake / Hulen,32.654633,-97.395875,"same interchange, one spelling"
 XS0415,University Drive,University / Taft,33.222686,-96.670000,"nearest streets University (534 m), Taft (618 m)"
 XS0416,Buckner,University / Crowe,33.215372,-96.670000,"nearest streets University (260 m), Crowe (609 m)"
 XS0416,Minchin NW,Bonnie Brae / I-35,33.190000,-97.165000,"nearest streets Bonnie Brae (309 m), I-35 (493 m)"
@@ -1223,6 +1249,7 @@ XS0425,Denton NE,Mingo Road / Audra,33.226281,-97.112387,"nearest streets Mingo 
 XS0425,The Woodlands N,Collin McKinney Parkway,33.149860,-96.676690,street Collin McKinney Parkway (8 m)
 XS0426,Cooper Creek SW,Audra / Nottingham,33.225411,-97.103973,cross streets Audra x Nottingham (377 m)
 XS0427,Mayhill NW,Paisley / Mockingbird,33.221387,-97.098834,cross streets Paisley x Mockingbird (241 m)
+XS0428,Beach / Fossil Vista,Fossil Vista / Beach,32.842673,-97.290461,"same interchange, one spelling"
 XS0428,Mayhill NW,Mockingbird / McKinney Street,33.214540,-97.096626,cross streets Mockingbird x McKinney Street (109 m)
 XS0429,Cottonwood Creek SW,Bossy Boots / Stockton,33.121134,-96.677045,cross streets Bossy Boots x Stockton (328 m)
 XS0429,Mayhill W,Loop 288 / Shady Oaks,33.207693,-97.094417,cross streets Loop 288 x Shady Oaks (448 m)
@@ -1241,6 +1268,7 @@ XS0435,Plano W,Alma / Janwood,33.014147,-96.716000,cross streets Alma x Janwood 
 XS0436,Hurst N,Airport / Norwood,32.840000,-97.166667,cross streets Airport x Norwood (94 m)
 XS0436,Plano W,Alma / 15th Street,33.021220,-96.716000,cross streets Alma x 15th Street (206 m)
 XS0437,Bedford W,Airport / Brown,32.840000,-97.158333,cross streets Airport x Brown (104 m)
+XS0437,Chisholm Place / Park,Park / Chisholm Place,33.028293,-96.716000,"same interchange, one spelling"
 XS0437,Plano NW,Chisholm Place / Park,33.028293,-96.716000,cross streets Chisholm Place x Park (311 m)
 XS0438,Bedford,Bedford Road / Airport,32.840000,-97.150000,cross streets Bedford Road x Airport (64 m)
 XS0438,Plano NW,Alma / Lexington,33.035366,-96.716000,cross streets Alma x Lexington (298 m)
@@ -1262,6 +1290,7 @@ XS0446,Watters Creek W,Suncreek Drive,33.091953,-96.716000,street Suncreek Drive
 XS0447,Euless,Airport / Fuller-Wiser,32.840000,-97.075000,cross streets Airport x Fuller-Wiser (198 m)
 XS0447,Watters Creek W,McDermott Drive,33.099026,-96.716000,street West McDermott Drive (205 m)
 XS0448,Euless E,Airport / SH-360,32.840000,-97.066667,cross streets Airport x SH-360 (279 m)
+XS0448,Twin Creeks / McDermott,Twin Creeks Drive,33.106086,-96.716487,street Twin Creeks Drive (552 m)
 XS0448,Watters Creek NW,Twin Creeks / McDermott,33.106086,-96.716487,"nearest streets Twin Creeks (552 m), McDermott (565 m)"
 XS0449,Euless E,SH-360,32.840000,-97.058333,street State Highway 360 (110 m)
 XS0449,Watters Creek NW,Exchange / Shallowater,33.113143,-96.717051,"nearest streets Exchange (390 m), Shallowater (472 m)"
@@ -1294,6 +1323,7 @@ XS0461,Las Colinas S,MacArthur Boulevard,32.863333,-96.960000,street North MacAr
 XS0462,Bethel N,Vista Ridge Mall / Lake Vista,32.999828,-96.971389,cross streets Vista Ridge Mall x Lake Vista (351 m)
 XS0462,Las Colinas S,MacArthur / Hidden Ridge,32.870667,-96.960000,"nearest streets MacArthur (101 m), Hidden Ridge (713 m)"
 XS0463,Las Colinas S,MacArthur / Meadow Creek,32.878000,-96.960000,cross streets MacArthur x Meadow Creek (417 m)
+XS0463,SH-121,Sam Rayburn,32.999656,-96.962777,street Sam Rayburn Tollway (207 m)
 XS0463,Stemmons / SH-121,SH-121,32.999656,-96.962777,street East State Highway 121 (168 m)
 XS0463,Trinity Mills NW,Stemmons / SH-121,32.999656,-96.962777,cross streets Stemmons x SH-121 (239 m)
 XS0464,Bonnie Brae / Willowwood,Willowwood / Bonnie Brae,33.198092,-97.161382,"same interchange, one spelling"
@@ -1352,6 +1382,7 @@ XS0486,Lewisville SW,Bellaire / Old Orchard,33.030000,-97.031542,cross streets B
 XS0487,Arlington N,Cooper / Rocky Canyon,32.765714,-97.115000,cross streets Cooper x Rocky Canyon (401 m)
 XS0487,Bellaire / Valley,Valley / Bellaire,33.030000,-97.022985,"same interchange, one spelling"
 XS0487,Lewisville SW,Bellaire / Valley,33.030000,-97.022985,cross streets Bellaire x Valley (436 m)
+XS0487,Valley / Bellaire,Bellaire / Fox Avenue,33.030000,-97.022985,"nearest streets Bellaire (253 m), Fox Avenue (566 m)"
 XS0488,Arlington N,Cooper / I-30,32.758571,-97.115000,cross streets Cooper x I-30 (98 m)
 XS0488,Fox Avenue / Valley,Fox Avenue,33.032719,-97.015468,street Fox Avenue (245 m)
 XS0488,Lewisville SW,Fox Avenue / Valley,33.032719,-97.015468,cross streets Fox Avenue x Valley (406 m)
@@ -1445,7 +1476,9 @@ XS0532,Irving W,MacArthur / Grauwyler,32.826667,-96.960000,cross streets MacArth
 XS0532,Tarrant S,Brown Boulevard,32.775506,-97.089275,street Brown Boulevard (109 m)
 XS0533,Arlington NE,Randy Snow / Cantor,32.768258,-97.088913,cross streets Randy Snow x Cantor (117 m)
 XS0533,Irving W,Lane Street / MacArthur,32.834000,-96.960000,cross streets Lane Street x MacArthur (78 m)
+XS0533,Lane Street / MacArthur,MacArthur / Lane Street,32.834000,-96.960000,"same interchange, one spelling"
 XS0534,Arlington NE,Wet N Wild / Baird Farm,32.761011,-97.088551,cross streets Wet N Wild x Baird Farm (311 m)
+XS0534,Basswood / Silver Sage,Silver Sage / Basswood,32.870000,-97.280000,"same interchange, one spelling"
 XS0534,Corn Valley / Springdale,Corn Valley Road,32.705146,-97.002460,street Corn Valley Road (0 m)
 XS0534,Irving NW,MacArthur / Weathered,32.841333,-96.960000,cross streets MacArthur x Weathered (169 m)
 XS0535,Arlington NE,Cowboys / Stadium,32.746519,-97.087768,cross streets Cowboys x Stadium (444 m)
@@ -1454,8 +1487,10 @@ XS0536,Arlington E,AT&T / Division,32.739277,-97.087285,cross streets AT&T x Div
 XS0536,Irving NW,MacArthur / Northgate,32.856000,-96.960000,cross streets MacArthur x Northgate (340 m)
 XS0537,Arlington E,Abram / Browning,32.732035,-97.086802,cross streets Abram x Browning (440 m)
 XS0537,Las Colinas S,MacArthur Boulevard,32.863333,-96.960000,street North MacArthur Boulevard (5 m)
+XS0537,MacArthur Boulevard,MacArthur / Leland,32.863333,-96.960000,"nearest streets MacArthur (5 m), Leland (601 m)"
 XS0538,Arlington SE,Browning / Mitchell,32.724793,-97.086320,cross streets Browning x Mitchell (356 m)
 XS0538,Las Colinas S,MacArthur / Hidden Ridge,32.870667,-96.960000,"nearest streets MacArthur (101 m), Hidden Ridge (713 m)"
+XS0538,MacArthur / Hidden Ridge,MacArthur / Walnut Hill,32.870667,-96.960000,"nearest streets MacArthur (101 m), Walnut Hill (1003 m)"
 XS0539,Arlington SE,Browning Drive,32.717562,-97.086325,street Browning Drive (182 m)
 XS0539,Las Colinas S,MacArthur / Meadow Creek,32.878000,-96.960000,cross streets MacArthur x Meadow Creek (417 m)
 XS0540,Arlington SE,Browning / Pioneer,32.710354,-97.087286,cross streets Browning x Pioneer (231 m)
@@ -1519,6 +1554,7 @@ XS0567,Haltom City S,Haltom Road,32.788806,-97.273601,street Haltom Road (34 m)
 XS0568,Arlington SW,Cooper / Mitchell,32.730000,-97.115000,cross streets Cooper x Mitchell (306 m)
 XS0568,Haltom City,28th Street / Haltom,32.796007,-97.274501,cross streets 28th Street x Haltom (175 m)
 XS0569,Arlington SW,Cooper / Park Row,32.722857,-97.115000,cross streets Cooper x Park Row (187 m)
+XS0569,Cooper / Park Row,Park Row Drive,32.722857,-97.115000,street West Park Row Drive (186 m)
 XS0569,Haltom City,Fincher / Fossil,32.803077,-97.276154,cross streets Fincher x Fossil (146 m)
 XS0569,University / Nottingham,University / Glenwood,33.234529,-97.111120,"nearest streets University (0 m), Glenwood (485 m)"
 XS0570,Arlington S,Cooper Street,32.715714,-97.115000,street South Cooper Street (26 m)
@@ -1529,6 +1565,7 @@ XS0572,Dalworthington Gardens E,Matlock Road,32.701429,-97.115000,street Matlock
 XS0572,Matlock Road,Matlock / Colorado,32.701429,-97.115000,"nearest streets Matlock (6 m), Colorado (536 m)"
 XS0572,Melody Hills E,Meacham Boulevard,32.823796,-97.283923,street Meacham Boulevard (37 m)
 XS0573,Dalworthington Gardens E,Matlock / Mayfield,32.694286,-97.115000,cross streets Matlock x Mayfield (357 m)
+XS0573,Matlock / Mayfield,Matlock Road,32.694286,-97.115000,street Matlock Road (1 m)
 XS0573,Melody Hills E,McLean / Beach,32.830702,-97.286513,cross streets McLean x Beach (381 m)
 XS0573,Mockingbird / Paisley,Paisley / Mockingbird,33.219059,-97.096387,"same interchange, one spelling"
 XS0574,Dalworthington Gardens SE,Matlock / Waverly,32.687143,-97.115000,cross streets Matlock x Waverly (68 m)
@@ -1539,10 +1576,12 @@ XS0575,Matlock / I-20,High Point / Highlander,32.680000,-97.115000,cross streets
 XS0575,Melody Hills NE,Fossil Vista / Beach,32.844633,-97.288842,cross streets Fossil Vista x Beach (175 m)
 XS0576,Enchanted Creek NW,Matlock / Bardin,32.672857,-97.115000,cross streets Matlock x Bardin (268 m)
 XS0576,Watauga W,Fossil Creek / Fossil Ridge,32.851719,-97.287070,cross streets Fossil Creek x Fossil Ridge (263 m)
+XS0577,Denton Tap / SH-121,SH-121 / Denton Tap,32.986533,-96.993248,"same interchange, one spelling"
 XS0577,Enchanted Creek NW,Matlock / Juniper,32.665714,-97.115000,cross streets Matlock x Juniper (202 m)
 XS0577,Watauga W,Silver Sage / Western Center,32.858806,-97.285299,cross streets Silver Sage x Western Center (235 m)
 XS0578,Enchanted Creek NW,Matlock / Green Oaks,32.658571,-97.115000,cross streets Matlock x Green Oaks (114 m)
 XS0578,Watauga W,Silver Sage Drive,32.865892,-97.283527,street Silver Sage Drive (163 m)
+XS0579,Business 121 / Forestbrook,Forestbrook / Business 121,33.009111,-96.992976,"same interchange, one spelling"
 XS0579,Enchanted Creek W,Matlock / Cravens Park,32.651429,-97.115000,cross streets Matlock x Cravens Park (217 m)
 XS0579,Watauga NW,Silver Sage / Basswood,32.872979,-97.281755,cross streets Silver Sage x Basswood (201 m)
 XS0580,Ambercrest NW,Matlock / Sublett,32.644286,-97.115000,cross streets Matlock x Sublett (61 m)
@@ -1563,6 +1602,7 @@ XS0587,Dalworthington Gardens W,Arkansas / Spanish,32.705000,-97.165455,cross st
 XS0587,Keller W,Whitley Road,32.923757,-97.249370,street Whitley Road (235 m)
 XS0588,Dalworthington Gardens,Roosevelt / Arkansas,32.705000,-97.156818,cross streets Roosevelt x Arkansas (219 m)
 XS0588,Keller W,Bear Creek / Keller Parkway,32.930000,-97.245000,"nearest streets Bear Creek (330 m), Keller Parkway (480 m)"
+XS0588,Walton Walker Boulevard,Walton Walker / Loop 12,32.789830,-96.919458,"nearest streets Walton Walker (0 m), Loop 12 (494 m)"
 XS0589,Dalworthington Gardens,Bowen / Arkansas,32.705000,-97.148182,cross streets Bowen x Arkansas (222 m)
 XS0589,Melody Hills W,Great Southwest / Meacham,32.829618,-97.329478,"nearest streets Great Southwest (106 m), Meacham (520 m)"
 XS0590,Dalworthington Gardens E,Arkansas / Westchester Drive,32.705000,-97.139545,cross streets Arkansas x Westchester Drive (407 m)
@@ -1723,6 +1763,7 @@ XS0667,Blue Mound SE,Loop 820 / Cantrell Sansom,32.843933,-97.329663,"nearest st
 XS0668,Blue Mound SE,Cantrell Sansom / Mark IV,32.851090,-97.329756,"nearest streets Cantrell Sansom (351 m), Mark IV (531 m)"
 XS0669,Blue Mound E,Mark IV / Western Center,32.858247,-97.329848,cross streets Mark IV x Western Center (441 m)
 XS0670,Blue Mound NE,Robert W Downing / Mark IV,32.865405,-97.329941,"nearest streets Robert W Downing (280 m), Mark IV (530 m)"
+XS0671,Basswood Boulevard,Basswood / Horseman,32.872534,-97.330450,"nearest streets Basswood (153 m), Horseman (257 m)"
 XS0671,Blue Mound NE,Basswood Boulevard,32.872534,-97.330450,street Basswood Boulevard (153 m)
 XS0672,Blue Mound N,Horseman / Bailey Boswell,32.879613,-97.331709,"nearest streets Horseman (284 m), Bailey Boswell (458 m)"
 XS0673,Blue Mound N,Bailey Boswell / Harmon,32.886692,-97.332968,cross streets Bailey Boswell x Harmon (437 m)
@@ -1769,6 +1810,7 @@ XS0700,Forest Hill W,Campus Drive,32.680000,-97.303449,street Campus Drive (587 
 XS0701,Forest Hill W,Campus / Horton,32.680659,-97.294729,"nearest streets Campus (101 m), Horton (814 m)"
 XS0702,Forest Hill NW,Horton / Seminary,32.681744,-97.286047,cross streets Horton x Seminary (374 m)
 XS0702,Horton / Seminary,Seminary / Horton,32.681744,-97.286047,"same interchange, one spelling"
+XS0702,Seminary / Horton,Mansfield Highway / Seminary,32.681744,-97.286047,cross streets Mansfield Highway x Seminary (404 m)
 XS0703,Forest Hill NW,Mansfield Highway / Wichita,32.682829,-97.277365,cross streets Mansfield Highway x Wichita (266 m)
 XS0703,Hulen / Trail Lake,Trail Lake / Hulen,32.658047,-97.396711,"same interchange, one spelling"
 XS0704,Forest Hill N,Shackleford / Miller,32.683915,-97.268682,"nearest streets Shackleford (271 m), Miller (513 m)"
@@ -1785,6 +1827,7 @@ XS0711,Woodland Hills SE,Bolton Boone / Danieldale,32.630000,-96.877949,cross st
 XS0712,Woodland Hills E,Centre Park / Old Hickory,32.630000,-96.869274,cross streets Centre Park x Old Hickory (445 m)
 XS0713,Woodland Hills E,Northgate / Jo,32.630000,-96.860598,cross streets Northgate x Jo (187 m)
 XS0714,Woodland Hills E,Danieldale / Centre Park,32.630000,-96.851923,"nearest streets Danieldale (346 m), Centre Park (367 m)"
+XS0715,Danieldale / Polk,Polk / Centre Park,32.630000,-96.843248,"nearest streets Polk (295 m), Centre Park (658 m)"
 XS0715,Summit Parks NE,Danieldale / Polk,32.630000,-96.843248,cross streets Danieldale x Polk (449 m)
 XS0716,Danieldale Road,Polk Street,32.630000,-96.834573,street South Polk Street (504 m)
 XS0716,Summit Parks NE,Danieldale Road,32.630000,-96.834573,street West Danieldale Road (355 m)
@@ -1811,6 +1854,7 @@ XS0731,New Koreatown SE,McCoy / Trinity Mills Road,32.980401,-96.894818,"nearest
 XS0732,New Koreatown E,Josey / Trinity Mills Road,32.986992,-96.891510,cross streets Josey x Trinity Mills Road (130 m)
 XS0733,Basswood / Silver Sage,Silver Sage / Basswood,32.871453,-97.278467,"same interchange, one spelling"
 XS0733,New Koreatown NE,Josey Lane,32.993887,-96.890000,street North Josey Lane (39 m)
+XS0734,Frankford / Josey,Frankford Road,33.001037,-96.890000,street East Frankford Road (151 m)
 XS0734,New Koreatown NE,Frankford / Josey,33.001037,-96.890000,cross streets Frankford x Josey (314 m)
 XS0735,Cemetery Hill / Rosemeade,Rosemeade / Cemetery Hill,33.008188,-96.890000,"same interchange, one spelling"
 XS0735,New Koreatown NE,Cemetery Hill / Rosemeade,33.008188,-96.890000,cross streets Cemetery Hill x Rosemeade (428 m)
@@ -1821,6 +1865,7 @@ XS0738,Hebron W,Arbor Creek / Cheyenne,33.029640,-96.890000,cross streets Arbor 
 XS0739,Hebron W,King Arthur Boulevard,33.036791,-96.890000,street King Arthur Boulevard (19 m)
 XS0740,Hebron NW,Parker Road / King Arthur,33.043942,-96.890000,"nearest streets Parker Road (74 m), King Arthur (756 m)"
 XS0740,Main / Wall Price Keller,Main / Wall-Price-Keller,32.916545,-97.255193,"same interchange, one spelling"
+XS0741,Josey / Parker Road,Josey / Essex,33.051093,-96.890000,"nearest streets Josey (554 m), Essex (741 m)"
 XS0741,The Colony S,Josey / Parker Road,33.051093,-96.890000,"nearest streets Josey (554 m), Parker Road (600 m)"
 XS0742,The Colony S,Windhaven Parkway,33.058243,-96.890000,street Windhaven Parkway (237 m)
 XS0743,The Colony S,SH-121 / Main,33.065394,-96.890000,cross streets SH-121 x Main (108 m)
@@ -1856,10 +1901,12 @@ XS0773,Bethard SE,Miller / Shiloh,32.893286,-96.663000,cross streets Miller x Sh
 XS0773,Miller / Shiloh,Shiloh / Miller,32.893286,-96.663000,"same interchange, one spelling"
 XS0774,Garland SW,Marquis / Shiloh,32.900466,-96.663000,cross streets Marquis x Shiloh (245 m)
 XS0774,Marquis / Shiloh,Shiloh / Marquis,32.900466,-96.663000,"same interchange, one spelling"
+XS0774,Shiloh / Marquis,Marquis Drive,32.900466,-96.663000,street Marquis Drive (245 m)
 XS0775,Forest / Shiloh,Shiloh / Forest,32.907645,-96.663000,"same interchange, one spelling"
 XS0775,Garland W,Forest / Shiloh,32.907645,-96.663000,cross streets Forest x Shiloh (265 m)
 XS0776,Garland W,Shiloh / Walnut,32.914824,-96.663000,cross streets Shiloh x Walnut (266 m)
 XS0777,Garland NW,Shiloh / Western,32.922004,-96.663000,cross streets Shiloh x Western (258 m)
+XS0777,Shiloh / Western,Western Drive,32.922004,-96.663000,street Western Drive (258 m)
 XS0778,Buckingham / Shiloh,Shiloh / Buckingham,32.929175,-96.662687,"same interchange, one spelling"
 XS0778,Garland NW,Buckingham / Shiloh,32.929175,-96.662687,cross streets Buckingham x Shiloh (253 m)
 XS0779,Garland NW,Richoak / Shiloh,32.936340,-96.662150,cross streets Richoak x Shiloh (273 m)
@@ -1880,6 +1927,7 @@ XS0789,Highland Village S,Kirkpatrick / Timber Creek,33.058382,-97.055506,cross 
 XS0790,Highland Village S,Kirkpatrick / Lonebuck,33.058058,-97.046607,cross streets Kirkpatrick x Lonebuck (330 m)
 XS0791,Highland Village S,Valley / Garden Ridge,33.058000,-97.037701,cross streets Valley x Garden Ridge (212 m)
 XS0792,Lewisville W,Valley Ridge Boulevard,33.058000,-97.028794,street Valley Ridge Boulevard (23 m)
+XS0792,Valley Ridge Boulevard,Valley / McGee,33.058000,-97.028794,"nearest streets Valley (243 m), McGee (321 m)"
 XS0793,Lewisville NW,Summit / Valley Ridge Boulevard,33.058000,-97.019887,cross streets Summit x Valley Ridge Boulevard (184 m)
 XS0794,Lewisville NW,I-35,33.055997,-97.011433,street I 35E TEXpress (13 m)
 XS0795,Lewisville NW,Cowan Avenue,33.053262,-97.003146,street North Cowan Avenue (167 m)
@@ -1941,6 +1989,7 @@ XS0842,Colleyville SW,Hurstview / Mid Cities,32.867560,-97.178000,cross streets 
 XS0842,Hurstview / Mid Cities,Mid Cities / Hurstview,32.867560,-97.178000,"same interchange, one spelling"
 XS0843,Cheek-Sparger / Mid Cities,Mid Cities / Cheek-Sparger,32.867390,-97.169500,"same interchange, one spelling"
 XS0843,Colleyville SW,Cheek-Sparger / Mid Cities,32.867390,-97.169500,cross streets Cheek-Sparger x Mid Cities (207 m)
+XS0843,Mid Cities / Cheek-Sparger,Cheek-Sparger Road,32.867390,-97.169500,street Cheek-Sparger Road (15 m)
 XS0844,Brown / Cheek-Sparger,Cheek-Sparger / Brown,32.867220,-97.160999,"same interchange, one spelling"
 XS0844,Colleyville S,Brown / Cheek-Sparger,32.867220,-97.160999,cross streets Brown x Cheek-Sparger (155 m)
 XS0845,Bedford Road / Cheek-Sparger,Cheek-Sparger / Bedford Road,32.867050,-97.152498,"same interchange, one spelling"
@@ -1951,11 +2000,14 @@ XS0848,Bedford NE,Cheek-Sparger / Murphy Drive,32.866425,-97.126999,cross street
 XS0849,Bedford NE,Cheek-Sparger / Martin,32.866212,-97.118499,cross streets Cheek-Sparger x Martin (130 m)
 XS0850,Bedford NE,Cheek-Sparger / Heritage,32.866000,-97.110000,cross streets Cheek-Sparger x Heritage (106 m)
 XS0851,Hackberry E,Twin Falls / Main,33.150082,-96.877273,cross streets Twin Falls x Main (369 m)
+XS0851,Twin Falls / Main,Twin Falls Drive,33.150082,-96.877273,street Twin Falls Drive (129 m)
 XS0852,Hackberry E,Main / FM 423,33.150665,-96.885166,"nearest streets Main (288 m), FM 423 (526 m)"
 XS0853,Hackberry E,FM 423 / King,33.157662,-96.886916,"nearest streets FM 423 (353 m), King (571 m)"
+XS0854,FM 423 / Smotherman,Smotherman Road,33.164660,-96.888665,street Smotherman Road (162 m)
 XS0854,Hackberry NE,FM 423 / Smotherman,33.164660,-96.888665,cross streets FM 423 x Smotherman (245 m)
 XS0855,Hackberry NE,FM 423 / Little Elm Parkway,33.171677,-96.889720,cross streets FM 423 x Little Elm Parkway (373 m)
 XS0856,Eldorado / FM 423,FM 423 / Eldorado,33.178758,-96.888540,"same interchange, one spelling"
+XS0856,FM 423 / Eldorado,Eldorado / Walker,33.178758,-96.888540,cross streets Eldorado x Walker (224 m)
 XS0856,Hackberry NE,Eldorado / FM 423,33.178758,-96.888540,cross streets Eldorado x FM 423 (107 m)
 XS0857,Emerson Estates W,FM 423 / Sunflower,33.185839,-96.887360,cross streets FM 423 x Sunflower (155 m)
 XS0858,Emerson Estates W,FM 423 / Panther Creek,33.192919,-96.886180,cross streets FM 423 x Panther Creek (63 m)
@@ -1971,6 +2023,7 @@ XS0866,Saint Gabriel / Virginia,Virginia / Saint Gabriel,33.201412,-96.718705,"s
 XS0866,Whitley Place SE,Saint Gabriel / Virginia,33.201412,-96.718705,cross streets Saint Gabriel x Virginia (361 m)
 XS0867,Buckner W,Stonebridge / Virginia,33.202481,-96.710155,cross streets Stonebridge x Virginia (378 m)
 XS0867,Stonebridge / Virginia,Virginia / Stonebridge,33.202481,-96.710155,"same interchange, one spelling"
+XS0867,Virginia / Stonebridge,Stonebridge / Saint Gabriel,33.202481,-96.710155,"nearest streets Stonebridge (156 m), Saint Gabriel (505 m)"
 XS0868,Buckner SW,Ridge / Habersham,33.203549,-96.701606,cross streets Ridge x Habersham (405 m)
 XS0869,Buckner SW,Virginia / Raincrest,33.204618,-96.693056,"nearest streets Virginia (642 m), Raincrest (668 m)"
 XS0870,Buckner SW,Raincrest Drive,33.205977,-96.684570,street Raincrest Drive (190 m)
@@ -1992,6 +2045,7 @@ XS0883,Melody Hills N,Bayberry / Western Center,32.859307,-97.301621,cross stree
 XS0883,Valley Ridge Boulevard / Summit,Valley Ridge Boulevard / College,33.055935,-97.016182,"nearest streets Valley Ridge Boulevard (0 m), College (439 m)"
 XS0884,Blue Mound E,Longstraw / Riverside,32.866374,-97.301116,cross streets Longstraw x Riverside (294 m)
 XS0884,Longstraw / Riverside,Riverside / Longstraw,32.866374,-97.301116,"same interchange, one spelling"
+XS0884,Riverside / Longstraw,Buttonwood / Longstraw,32.866374,-97.301116,cross streets Buttonwood x Longstraw (362 m)
 XS0885,Blue Mound NE,Basswood / Riverside,32.873449,-97.301195,cross streets Basswood x Riverside (152 m)
 XS0886,Blue Mound NE,Riverside / Staghorn,32.880526,-97.301447,cross streets Riverside x Staghorn (399 m)
 XS0887,Blue Mound NE,Buttonwood / Summerfields,32.887603,-97.301700,cross streets Buttonwood x Summerfields (406 m)
@@ -2018,16 +2072,19 @@ XS0905,Eagle Ford E,Commerce / Singleton,32.774579,-96.867637,"nearest streets C
 XS0906,Eagle Ford E,Singleton / Westmoreland,32.778148,-96.874952,cross streets Singleton x Westmoreland (114 m)
 XS0906,Singleton / Westmoreland,Westmoreland / Singleton,32.778148,-96.874952,"same interchange, one spelling"
 XS0907,Eagle Ford E,Norwich / Singleton,32.781716,-96.882267,cross streets Norwich x Singleton (307 m)
+XS0908,Bernal Drive,Bernal / Canada,32.785282,-96.889584,"nearest streets Bernal (516 m), Canada (830 m)"
 XS0908,Eagle Ford E,Bernal Drive,32.785282,-96.889584,street Bernal Drive (516 m)
 XS0910,Eagle Ford N,Bernal / Shady Grove Road,32.792377,-96.904246,"nearest streets Bernal (913 m), Shady Grove Road (1090 m)"
 XS0911,Eagle Ford NW,Shady Grove Road,32.795924,-96.911577,street East Shady Grove Road (589 m)
 XS0912,Eagle Ford NW,Shady Grove Road / Wildwood,32.799471,-96.918908,cross streets Shady Grove Road x Wildwood (262 m)
 XS0913,Eagle Ford NW,Loop 12 / Shady Grove Road,32.803094,-96.926187,cross streets Loop 12 x Shady Grove Road (399 m)
+XS0913,Loop 12 / Shady Grove Road,Balleywood / Shady Grove Road,32.803094,-96.926187,cross streets Balleywood x Shady Grove Road (426 m)
 XS0914,Irving S,Nursery / 6th Street,32.806729,-96.933458,cross streets Nursery x 6th Street (229 m)
 XS0915,Irving S,2nd Street / Irving Boulevard,32.810365,-96.940729,cross streets 2nd Street x Irving Boulevard (407 m)
 XS0916,SpringPark SE,Holford / President George Bush,32.968224,-96.652263,cross streets Holford x President George Bush (335 m)
 XS0917,SpringPark E,Garland Avenue / Muirfield,32.971448,-96.644525,cross streets Garland Avenue x Muirfield (324 m)
 XS0918,SpringPark E,Garland Avenue,32.974672,-96.636788,street North Garland Avenue (396 m)
+XS0919,Campbell Road,Campbell / Brand,32.977896,-96.629051,"nearest streets Campbell (108 m), Brand (515 m)"
 XS0919,Sachse W,Campbell Road,32.977896,-96.629051,street East Campbell Road (108 m)
 XS0920,Sachse W,Brand Road,32.981119,-96.621313,street East Brand Road (238 m)
 XS0920,Wilshire / Hidden Creek,Wilshire / Gardens,32.532297,-97.337612,cross streets Wilshire x Gardens (275 m)
@@ -2050,6 +2107,7 @@ XS0938,La Frontera,Tabasco / Mossberg,32.610592,-97.096759,cross streets Tabasco
 XS0939,La Frontera,Debbie / Tabasco,32.605734,-97.102833,cross streets Debbie x Tabasco (217 m)
 XS0940,Cheek-Sparger / Murphy Drive,Murphy Drive / Martin,32.866633,-97.121279,"nearest streets Murphy Drive (323 m), Martin (381 m)"
 XS0940,Kings Mill NW,Matlock / Country Club,32.600875,-97.108906,"nearest streets Matlock (216 m), Country Club (672 m)"
+XS0940,Matlock / Country Club,Matlock / Debbie,32.600875,-97.108906,"nearest streets Matlock (216 m), Debbie (829 m)"
 XS0941,Kings Mill NW,Country Club Drive,32.594897,-97.113232,street Country Club Drive (294 m)
 XS0942,Kings Mill W,Country Club / Clover Hill,32.588673,-97.117174,"nearest streets Country Club (117 m), Clover Hill (875 m)"
 XS0943,Main / Twin Falls,Twin Falls / Main,33.153369,-96.877618,"same interchange, one spelling"
@@ -2063,6 +2121,7 @@ XS0949,University Crossing SE,McCommas / Skillman,32.833096,-96.763217,cross str
 XS0951,Lakewood SE,Gaston Avenue,32.820597,-96.743929,street Gaston Avenue (485 m)
 XS0952,Swiss Avenue Historic District E,Grand / La Vista,32.804597,-96.729929,cross streets Grand x La Vista (421 m)
 XS0954,Wheatley Place Historic District SE,Elsie Faye Heggins / Malcolm X,32.755678,-96.747051,"nearest streets Elsie Faye Heggins (407 m), Malcolm X (555 m)"
+XS0955,C F Hawn / Lamar,Lamar / C F Hawn,32.741037,-96.762115,"same interchange, one spelling"
 XS0955,Sargent E,C F Hawn / Lamar,32.741037,-96.762115,cross streets C F Hawn x Lamar (427 m)
 XS0958,Winnetka Heights Historic District,Tyler / Jefferson,32.742745,-96.837399,cross streets Tyler x Jefferson (48 m)
 XS0959,Winnetka Heights Historic District NW,Hampton / Plymouth,32.755484,-96.856317,cross streets Hampton x Plymouth (42 m)

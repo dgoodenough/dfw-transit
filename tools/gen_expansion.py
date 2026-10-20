@@ -221,6 +221,52 @@ def fix_infill_years(t, want):
 
 
 _ROADS = None
+_DENS = None
+BRT_SPACING_KM = {"urban": 1.2, "suburban": 1.6}   # stop spacing for new BRT, by how dense the street is
+
+
+def _density_at(lat, lon):
+    """People + jobs per km2 within 800 m of the nearest zone (base data)."""
+    global _DENS
+    import numpy as np
+    from dfwt import demand
+    if _DENS is None:
+        z = demand.Zones(config.load())
+        _DENS = (z, demand.activity_density(z))
+    z, dens = _DENS
+    from dfwt.geo import Projector
+    x, y = Projector().xy(lat, lon)
+    return float(dens[int(np.argmin((z.x - x) ** 2 + (z.y - y) ** 2))])
+
+
+def brt_cuts(pts, L):
+    """Distances along a BRT leg (km) for its intermediate stops: about every 1.2 km where
+    the street is urban (config growth.tod.setting_density_per_km2), 1.6 km elsewhere,
+    evened out so the last gap isn't a stub."""
+    urban = config.load()["growth"]["tod"]["setting_density_per_km2"]["urban"]
+
+    def point_at(d):
+        acc = 0.0
+        for a, b in zip(pts, pts[1:]):
+            dl = geo.hav_km(*a, *b)
+            if acc + dl >= d:
+                f = (d - acc) / dl if dl else 0
+                return (a[0] + f * (b[0] - a[0]), a[1] + f * (b[1] - a[1]))
+            acc += dl
+        return pts[-1]
+
+    def gap(d):
+        lat, lon = point_at(d)
+        return BRT_SPACING_KM["urban" if _density_at(lat, lon) >= urban else "suburban"]
+
+    cuts, pos = [], 0.0
+    while pos + gap(pos) < L - 0.5 * gap(pos):
+        pos += gap(pos)
+        cuts.append(pos)
+    if cuts:   # stretch so the last stop isn't crowded against the end
+        k = L / (cuts[-1] + gap(cuts[-1]))
+        cuts = [c * k for c in cuts]
+    return cuts
 STREET_WORDS = ("lane", "boulevard", "blvd", "road", "parkway", "tap", "avenue", "drive", "freeway", "highway", "street",
                 "loop", "trail", "pike", "expressway")
 
@@ -366,8 +412,11 @@ def build(name):
                 else:
                     report.append(f"{lid} {ln['name']}: no street route for a leg; kept straight")
             L = sum(geo.hav_km(*pts[i], *pts[i + 1]) for i in range(len(pts) - 1))
-            n_extra = max(0, round(L / spacing) - 1) if L > 1.45 * spacing else 0
-            cuts = [L * (k + 1) / (n_extra + 1) for k in range(n_extra)]
+            if mode == "brt":
+                cuts = brt_cuts(pts, L)
+            else:
+                n_extra = max(0, round(L / spacing) - 1) if L > 1.45 * spacing else 0
+                cuts = [L * (k + 1) / (n_extra + 1) for k in range(n_extra)]
             # walk the polyline, emitting intermediate stops
             sub, acc, ci = [pts[0]], 0.0, 0
             for i in range(len(pts) - 1):

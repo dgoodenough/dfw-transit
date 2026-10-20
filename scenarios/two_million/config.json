@@ -1,5 +1,5 @@
 {
-  "_doc": "The 2 million riders scenario: 2M daily transit trips (each trip counted once, all modes) by 2100. The plan plus the expansion package (arterial BRT grid, SH-114 metro, job-campus BRT, infill stations), the frequent-service package (edits.csv), better access (15-min feeder buses, bike/scooter to stations, walkable station areas, drop-off, Wiehle-Reston-style garages at selected suburban stations) and moderate land use (upzoning around stations, 20% of growth steered to station areas). Parking pricing and cash-out are left out: they work in the model but are the heaviest lift politically, and the target is reached without them. Merged over config.json for this scenario only.",
+  "_doc": "The 2 million riders scenario: 2M daily transit trips (each trip counted once, all modes) by 2100. The plan plus the expansion package (arterial BRT grid, SH-114 metro, job-campus BRT, infill stations), the frequent-service package (edits.csv), better access (15-min feeder buses, bike/scooter to stations, walkable station areas, drop-off, Wiehle-Reston-style garages at selected suburban stations) and moderate land use (upzoning around stations, 20% of growth steered to station areas). Parking pricing and cash-out are left out: they work in the model but are the heaviest lift politically, and the target is reached without them. Stages are scheduled by riders per dollar (staging.priority), so cheap high-value BRT comes early under the same $2.3B/yr budget. Merged over config.json for this scenario only.",
   "growth": {
     "tod": {
       "pop_uplift": {
@@ -40,5 +40,8 @@
     "walk_max_m": 1600,
     "walk_circuity": 1.15,
     "pnr_min_km": 1.6
+  },
+  "staging": {
+    "priority": "value_per_musd"
   }
 }
