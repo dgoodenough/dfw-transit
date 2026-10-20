@@ -49,7 +49,7 @@ summary{cursor:pointer;font-weight:600;font-size:.9rem}
 .sw{height:4px;border-radius:2px}
 .li .nm{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .li .yr{color:var(--muted);font-variant-numeric:tabular-nums;font-size:.76rem}
-.li.future{opacity:.45}
+.li.future{opacity:.62}
 .interval{font-size:.82rem;line-height:1.45;border-top:1px solid var(--rule);padding-top:10px}
 .interval b{font-weight:600}
 .interval .op{display:grid;grid-template-columns:10px minmax(0,1fr) auto;gap:6px;align-items:center}
@@ -61,9 +61,13 @@ summary{cursor:pointer;font-weight:600;font-size:.9rem}
 #trip .leg{display:grid;grid-template-columns:8px minmax(0,1fr);gap:8px;margin:3px 0}
 #trip .leg i{border-radius:2px}
 .hint{color:var(--muted);font-size:.8rem}
-.pop b{font-size:.95rem}.pop .m{color:#555;font-size:.8rem;margin-top:3px;line-height:1.4}
+.pop b{font-size:.95rem}.pop .m{color:var(--muted);font-size:.8rem;margin-top:3px;line-height:1.4}
 .chip{display:inline-block;padding:1px 7px;border-radius:9px;color:#fff;font-size:.72rem;margin:1px 3px 1px 0}
 a{color:var(--accent)}
+.leaflet-popup-content-wrapper,.leaflet-popup-tip,.leaflet-tooltip,.leaflet-bar a,.leaflet-control-layers{background:var(--panel);color:var(--ink);border-color:var(--rule)}
+.leaflet-tooltip-top:before{border-top-color:var(--panel)}
+#trip .clear{background:none;border:0;padding:0;color:var(--accent);font:inherit;font-size:.8rem;text-decoration:underline}
+@media (pointer:coarse){.li{padding:6px 0}.li input,.grp input{width:20px;height:20px}}
 @media (max-width:640px){
   #panel{top:auto;bottom:0;left:0;right:0;width:auto;max-height:52%;border-radius:12px 12px 0 0;
     padding-left:max(16px,env(safe-area-inset-left));padding-right:max(16px,env(safe-area-inset-right));padding-bottom:max(16px,env(safe-area-inset-bottom))}
@@ -111,7 +115,8 @@ const D = /*__DATA__*/null;
 // each scenario stores its distinct routing graphs once; years point at them
 for (const S of Object.values(D.scen)) S.years = Object.fromEntries(Object.entries(S.yearGraph).map(([y, i]) => [y, S.graphs[i]]));
 const dark = window.matchMedia && matchMedia('(prefers-color-scheme: dark)').matches;
-const map = L.map('map', {zoomControl: false, preferCanvas: true}).setView([32.84, -97.03], 10);
+const touch = matchMedia('(pointer: coarse)').matches;
+const map = L.map('map', {zoomControl: false, preferCanvas: true, renderer: L.canvas({tolerance: touch ? 10 : 4})}).setView([32.84, -97.03], 10);
 L.control.zoom({position: 'topright'}).addTo(map);
 // Key-free basemaps: Esri's gray canvas (light/dark, with a labels overlay) and standard OpenStreetMap.
 map.createPane('labels').style.cssText = 'z-index:450;pointer-events:none';
@@ -128,7 +133,16 @@ const basemaps = {
 };
 basemaps[dark ? 'Dark gray' : 'Light gray'].addTo(map);
 const layerCtl = L.control.layers(basemaps, null, {position: 'topright'}).addTo(map);  // schematic: adds the Waterways overlay
+map.createPane('trip').style.zIndex = 430;   // a planned trip sits above the (dimmed) network
+const tripR = L.canvas({pane: 'trip'});
 const lineLayer = L.layerGroup().addTo(map), stLayer = L.layerGroup().addTo(map), tripLayer = L.layerGroup().addTo(map);
+const dimNetwork = on => { map.getPane('overlayPane').style.opacity = on ? .35 : ''; map.getPane('glow').style.visibility = on ? 'hidden' : ''; };
+// text on a line-colour chip: dark ink on light colours
+const inkOn = hex => { const c = (hex || '#000').replace('#', ''), v = [0, 2, 4].map(i => parseInt(c.slice(i, i + 2), 16) / 255)
+  .map(x => x <= .04045 ? x / 12.92 : ((x + .055) / 1.055) ** 2.4); return .2126 * v[0] + .7152 * v[1] + .0722 * v[2] > .32 ? '#18212b' : '#fff'; };
+// keep popups clear of the panel (left on desktop, a bottom sheet on phones)
+const panelPad = () => { const r = $('panel').getBoundingClientRect(), sheet = r.width > innerWidth * .6;
+  return sheet ? {autoPanPaddingTopLeft: [12, 12], autoPanPaddingBottomRight: [12, innerHeight - r.top + 12]} : {autoPanPaddingTopLeft: [r.right + 12, 12]}; };
 const $ = id => document.getElementById(id);
 const fmt = n => n >= 10000 ? Math.round(n / 1000) + 'k' : n.toLocaleString();
 let scenKey = D.order[0], yi = 0, hidden = new Set(), pick = [];
@@ -312,17 +326,18 @@ function drawStations() {
       : brt ? {radius: 2.4 * zf(), color: dark ? '#11171d' : '#fff', weight: 1.2, fillColor: lineColor(ln.color, ln.mode), fillOpacity: 1}
       : {radius: 3.5 * zf(), color: lineColor(ln.color, ln.mode), weight: 2, fillColor: paper, fillOpacity: 1}).addTo(stLayer);
     m.on('click', () => choose(sid));
-    const chips = [...lis].map(li => `<span class="chip" style="background:${S.lines[li].color}">${S.lines[li].name}</span>`).join('');
+    const chips = vis.map(li => `<span class="chip" style="background:${S.lines[li].color};color:${inkOn(S.lines[li].color)}">${S.lines[li].name}</span>`).join('');
     const b = S.boardings[sid];
     m.bindTooltip(st[0]);
     m.bindPopup(`<div class="pop"><b>${st[0]}</b><div>${chips}</div><div class="m">${fmt(st[3])} residents · ${fmt(st[4])} jobs within 1 km` +
-      (b ? `<br>${fmt(b)} competitive commuters board here in ${D.years[D.years.length - 1]}` : '') + `</div></div>`);
+      (b ? `<br>${fmt(b)} competitive commuters board here by ${D.years[D.years.length - 1]} (end of plan)` : '') + `</div></div>`, panelPad());
   }
 }
 map.on('zoomend', () => { drawLines(); drawStations(); });   // offsets and weights are in screen pixels
 function draw() {
   const Y = D.years[yi], prevY = yi ? D.years[yi - 1] : -Infinity;
   $('year').textContent = Y;
+  $('slider').setAttribute('aria-valuetext', String(Y));
   drawLines();
   drawStations();
   intervalSummary(Y, prevY, stateFn());
@@ -342,7 +357,7 @@ function intervalSummary(Y, prevY, state) {
     if (bkm > 0.05) building.push([ln, bkm, by]);
   }
   const row = ([ln, km, by]) => `<div class="op"><i style="background:${ln.color}"></i><span>${ln.name}</span><span>${km.toFixed(1)} km${by ? ' · ' + by : ''}</span></div>`;
-  const span = yi ? `${prevY + 1}–${Y}` : `by ${Y}`;
+  const span = !yi ? `by ${Y}` : prevY + 1 === Y ? `in ${Y}` : `${prevY + 1}–${Y}`;
   $('interval').innerHTML = `<b>Opened ${span}</b>` + (opened.length ? opened.sort((a, b) => b[1] - a[1]).map(row).join('') : '<div class="none">Nothing new</div>') +
     (building.length ? `<b style="display:block;margin-top:6px">Under construction</b>` + building.sort((a, b) => a[2] - b[2]).map(row).join('') : '');
 }
@@ -358,7 +373,7 @@ function metrics() {
   const modes = [['boardings_metro', 'metro'], ['boardings_commuter', 'regional rail'], ['boardings_brt', 'BRT'], ['boardings_feeder_bus', 'feeder bus']]
     .filter(([c]) => m[c]).map(([c, n]) => `${k(m[c])} ${n}`).join(' · ');
   $('metrics').innerHTML = [
-    [fmt(m.daily_trips) + d('daily_trips'), 'daily transit trips (each trip counted once)'],
+    [(m.daily_trips >= 1e6 ? k(m.daily_trips) : fmt(m.daily_trips)) + d('daily_trips'), 'daily transit trips (each trip counted once)'],
     [k(m.all_boardings), `boardings a day: ${modes}`],
     [fmt(m.jobs_45min) + d('jobs_45min'), 'jobs the average resident reaches in 45 min'],
     ['$' + m.capex_busd + 'B' + d('capex_busd', '$'), 'capital spent since 2025'],
@@ -388,14 +403,16 @@ function lineList() {
   let h = '';
   groups.forEach(([name, g], gi) => {
     const on = g.filter(l => !hidden.has(l.id)).length;
-    h += `<label class="grp"><input type="checkbox" data-grp="${gi}" ${on ? 'checked' : ''}>${name} <span class="n">${g.length}</span></label>`;
+    h += `<label class="grp"><input type="checkbox" data-grp="${gi}" ${on === g.length ? 'checked' : ''}>${name} <span class="n">${g.length}</span></label>`;
     for (const l of g) {
       const v = l.value !== '' && l.value != null ? ` · ${l.value}/$M` : '';
       h += `<label class="li${l.first > Y ? ' future' : ''}" title="${(l.notes || '').replace(/"/g, '&quot;')}"><input type="checkbox" data-id="${l.id}" ${hidden.has(l.id) ? '' : 'checked'}>` +
         `<span class="sw" style="background:${l.color}"></span><span class="nm">${l.name}</span><span class="yr">${l.status === 'existing' ? 'today' : l.first}${v}</span></label>`;
     }
   });
+  const f = document.activeElement, refocus = f && $('lines').contains(f) ? (f.dataset.id ? `[data-id="${f.dataset.id}"]` : `[data-grp="${f.dataset.grp}"]`) : null;
   $('lines').innerHTML = h;
+  if (refocus) { const e = $('lines').querySelector('input' + refocus); if (e) e.focus(); }   // keyboard users keep their place
   $('lines').querySelectorAll('input[data-id]').forEach(i => i.onchange = () => { i.checked ? hidden.delete(i.dataset.id) : hidden.add(i.dataset.id); draw(); });
   $('lines').querySelectorAll('input[data-grp]').forEach(i => {
     const g = groups[+i.dataset.grp][1], on = g.filter(l => !hidden.has(l.id)).length;
@@ -404,11 +421,19 @@ function lineList() {
   });
 }
 // ---- trip planner: Dijkstra over the exported year graph (same model as the reports) ----
+const pickMark = s => L.circleMarker([D.stations[s][1], D.stations[s][2]], {renderer: tripR, pane: 'trip', radius: 8, color: '#c96f00', weight: 3, fill: false}).addTo(tripLayer);
+const showTrip = () => { $('trip').closest('details').open = true; if (touch) $('trip').scrollIntoView({block: 'nearest', behavior: 'smooth'}); };
+function clearTrip() {
+  pick = []; tripLayer.clearLayers(); dimNetwork(false); if (window.Schem) Schem.trip(null, null, pick);
+  $('trip').innerHTML = '<p class="hint">Click an origin station, then a destination.</p>';
+}
 function choose(sid) {
   if (pick.length === 2) pick = [];
   pick.push(sid);
-  if (pick.length === 1) { tripLayer.clearLayers(); if (window.Schem) Schem.trip(null, null, pick); $('trip').innerHTML = `<p class="hint">From <b>${D.stations[sid][0]}</b>. Now click a destination.</p>`; }
-  else route();
+  if (pick.length === 1) {
+    tripLayer.clearLayers(); dimNetwork(false); pickMark(sid); if (window.Schem) Schem.trip(null, null, pick);
+    $('trip').innerHTML = `<p class="hint">From <b>${D.stations[sid][0]}</b>. Now click a destination.</p>`; showTrip();
+  } else route();
 }
 function route() {
   const Y = D.years[yi], yd = S.years[Y], [a, b] = pick;
@@ -426,9 +451,16 @@ function route() {
     if (d > (dist.get(u) ?? Infinity)) continue; if (u === 'P' + b) break;
     for (const [v, w, info] of adj.get(u) || []) { const nd = d + w; if (nd < (dist.get(v) ?? Infinity)) { dist.set(v, nd); prev.set(v, [u, info]); heap.push([nd, v]); } }
   }
-  tripLayer.clearLayers(); if (window.Schem) Schem.trip(null, null, pick);  // schematic: clear the diagram route
-  const A = D.stations[a][0], B = D.stations[b][0];
-  if (!dist.has('P' + b) || !D.stations[a] || a === b) { $('trip').innerHTML = `<p class="hint">No route from ${A} to ${B} in ${Y}. Try a later year.</p>`; return; }
+  tripLayer.clearLayers(); dimNetwork(false); if (window.Schem) Schem.trip(null, null, pick);  // schematic: clear the diagram route
+  const A = D.stations[a][0], B = D.stations[b][0], clear = ' <button type="button" class="clear" onclick="clearTrip()">Clear</button>';
+  const served = s => yd.runs.some(([, stops]) => stops.includes(s));
+  if (a === b || !dist.has('P' + b)) {
+    const why = a === b ? 'That is the same station twice; pick a different destination.'
+      : !served(a) || !served(b) ? `${!served(a) ? A : B} has no service in ${Y} in this plan.`
+      : `No route from ${A} to ${B} in ${Y}.` + (yi < D.years.length - 1 ? ' Try a later year.' : '');
+    if (a !== b) pick.forEach(pickMark);
+    $('trip').innerHTML = `<p class="hint">${why}${clear}</p>`; if (a === b) pick = [a]; showTrip(); return;
+  }
   const path = []; let u = 'P' + b; while (prev.has(u)) { const [p, info] = prev.get(u); path.unshift([p, u, info]); u = p; }
   const legs = [];
   for (const [p, v, info] of path) {
@@ -439,19 +471,25 @@ function route() {
   }
   const sidOf = n => n[0] === 'P' ? n.slice(1) : yd.runs[+n.slice(1).split(':')[0]][1][+n.split(':')[1]];
   const total = dist.get('P' + b) - D.boardPenalty;
-  let h = `<div class="tot">${A} → ${B}: ${Math.round(total)} min</div><div class="hint">${Y} network, station to station</div>`;
+  let h = `<div class="tot">${A} → ${B}: ${Math.round(total)} min</div><div class="hint">${Y} network, station to station.${clear}</div>`;
+  const runPts = (ri, f, t) => { const k0 = +f.split(':')[1], k1 = +t.split(':')[1], st = yd.runs[ri][1];
+    return (k0 <= k1 ? st.slice(k0, k1 + 1) : st.slice(k1, k0 + 1).reverse()).map(s => [D.stations[s][1], D.stations[s][2]]); };
+  const tripW = 6 * zf();
   for (const l of legs) {
     if (l.t === 'ride') { const ln = S.lines[yd.runs[l.ri][0]], f = sidOf(l.from), t = sidOf(l.to);
       h += `<div class="leg"><i style="background:${ln.color}"></i><span><b>${ln.name}</b> ${D.stations[f][0]} → ${D.stations[t][0]} · ${Math.round(l.min)} min</span></div>`;
-      L.polyline([f, t].map(s => [D.stations[s][1], D.stations[s][2]]), {color: ln.color, weight: 8, opacity: .35}).addTo(tripLayer); }
+      const pts = runPts(l.ri, l.from, l.to);   // through the stops it rides, not a straight line
+      L.polyline(pts, {renderer: tripR, pane: 'trip', color: bgColor, weight: tripW + 4, lineJoin: 'round', interactive: false}).addTo(tripLayer);
+      L.polyline(pts, {renderer: tripR, pane: 'trip', color: lineColor(ln.color, ln.mode), weight: tripW, lineJoin: 'round', interactive: false}).addTo(tripLayer); }
     else if (l.t === 'walk') h += `<div class="leg"><i style="background:var(--rule)"></i><span>Walk ${D.stations[sidOf(l.from)][0]} → ${D.stations[sidOf(l.to)][0]} · ${Math.round(l.min)} min</span></div>`;
     else h += `<div class="leg"><i style="background:var(--rule)"></i><span class="hint">Wait about ${Math.round(l.min)} min</span></div>`;
   }
-  for (const s of [a, b]) L.circleMarker([D.stations[s][1], D.stations[s][2]], {radius: 8, color: '#c96f00', weight: 3, fill: false}).addTo(tripLayer);
-  $('trip').innerHTML = h; if (window.Schem) Schem.trip(legs, yd, pick);  // schematic: highlight the route
+  pick.forEach(pickMark);
+  dimNetwork(true);
+  $('trip').innerHTML = h; showTrip(); if (window.Schem) Schem.trip(legs, yd, pick);  // schematic: highlight the route
 }
 $('slider').oninput = e => { yi = +e.target.value; draw(); };
-$('scen').onchange = e => { scenKey = e.target.value; S = D.scen[scenKey]; hidden.clear(); draw(); };
+$('scen').onchange = e => { scenKey = e.target.value; S = D.scen[scenKey]; draw(); };   // hidden lines stay hidden
 $('allOn').onclick = () => { hidden.clear(); draw(); };
 $('allOff').onclick = () => { S.lines.forEach(l => hidden.add(l.id)); draw(); };
 let timer = null;
@@ -463,6 +501,14 @@ $('play').onclick = () => {
   step(); timer = setInterval(step, matchMedia('(prefers-reduced-motion: reduce)').matches ? 2200 : 1200);
 };
 draw();
+// open on the whole network, in the part of the screen the panel leaves clear
+(() => {
+  const pts = Object.values(D.stations).map(s => [s[1], s[2]]);
+  if (!pts.length) return;
+  const r = $('panel').getBoundingClientRect(), sheet = r.width > innerWidth * .6;
+  map.fitBounds(L.latLngBounds(pts), sheet ? {paddingTopLeft: [8, 8], paddingBottomRight: [8, innerHeight - r.top + 8]}
+                                            : {paddingTopLeft: [r.right + 8, 8], paddingBottomRight: [8, 8]});
+})();
 </script>
 <!--__SCHEMATIC__-->
 </body>
