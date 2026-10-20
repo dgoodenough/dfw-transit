@@ -326,6 +326,8 @@ class Access:
         cong = getattr(zones, "cong", 1.0)
         rc = cfg["ridership"]
         ovt_w = rc["b_ovt_extra_per_min"] / rc["b_ivt_per_min"]
+        pen = np.zeros((5, 1, 1), dtype=np.float32)
+        pen[PNR] = -rc.get("pnr_asc_offset", 0.0) / rc["b_ivt_per_min"]
         # feeder bus: walk to the bus stop, wait half the headway, ride at bus speed
         # in general traffic (it takes the congestion), transfer to the line.
         fh = feeder_headway(cfg, year)
@@ -383,8 +385,9 @@ class Access:
                 tt = np.stack([m[0] for m in modes])
                 oo = np.stack([m[1] for m in modes])
                 # riders pick the access mode by perceived minutes (out-of-vehicle time weighs
-                # more), not raw minutes; ties go to the earlier mode (walk first)
-                best = np.argmin(tt + ovt_w * np.where(np.isfinite(oo), oo, 0), axis=0)
+                # more, and driving to a garage carries its constant, pnr_asc_offset, in minutes),
+                # not raw minutes; ties go to the earlier mode (walk first)
+                best = np.argmin(tt + ovt_w * np.where(np.isfinite(oo), oo, 0) + pen, axis=0)
                 arr = np.take_along_axis(tt, best[None], axis=0)[0]
                 ovt = np.take_along_axis(oo, best[None], axis=0)[0]
                 st[i0:i1], t[i0:i1] = _diverse_nearest(arr, run_cols, k)
