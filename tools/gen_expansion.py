@@ -239,10 +239,45 @@ def _density_at(lat, lon):
     return float(dens[int(np.argmin((z.x - x) ** 2 + (z.y - y) ** 2))])
 
 
-def brt_cuts(pts, L):
-    """Distances along a BRT leg (km) for its intermediate stops: about every 1.2 km where
-    the street is urban (config growth.tod.setting_density_per_km2), 1.6 km elsewhere,
-    evened out so the last gap isn't a stub."""
+ANCHOR_KM = 0.3   # a station this close to a new BRT street becomes one of its stops
+
+
+def brt_anchors(pts, L, stations, ends):
+    """Stations (id -> (lat, lon)) within ANCHOR_KM of a BRT leg, as [(km along, id)]: the bus
+    stops there, so new lines meet the rail and BRT they pass instead of missing them by a
+    few hundred metres. Leg ends and stations near them are left out."""
+    lat0 = pts[0][0]
+    kx = 111.32 * math.cos(math.radians(lat0))
+    P = [((p[1] - pts[0][1]) * kx, (p[0] - lat0) * 110.57) for p in pts]
+    lo_lat, hi_lat = min(p[0] for p in pts) - 0.004, max(p[0] for p in pts) + 0.004
+    lo_lon, hi_lon = min(p[1] for p in pts) - 0.005, max(p[1] for p in pts) + 0.005
+    out = {}
+    for sid, (la, lo) in stations.items():
+        if sid in ends or not (lo_lat <= la <= hi_lat and lo_lon <= lo <= hi_lon):
+            continue
+        q = ((lo - pts[0][1]) * kx, (la - lat0) * 110.57)
+        acc, best = 0.0, None
+        for a, b in zip(P, P[1:]):
+            dx, dy = b[0] - a[0], b[1] - a[1]
+            seg = math.hypot(dx, dy)
+            t = max(0.0, min(1.0, ((q[0] - a[0]) * dx + (q[1] - a[1]) * dy) / (seg * seg))) if seg else 0.0
+            d = math.hypot(a[0] + t * dx - q[0], a[1] + t * dy - q[1])
+            if best is None or d < best[0]:
+                best = (d, acc + t * seg)
+            acc += seg
+        if best and best[0] <= ANCHOR_KM and 0.4 < best[1] * L / (acc or 1) < L - 0.4:
+            out[sid] = best[1] * L / acc
+    picked = []
+    for sid, d in sorted(out.items(), key=lambda kv: kv[1]):
+        if not picked or d - picked[-1][0] > 0.4:   # two stations a few steps apart: stop at the first
+            picked.append((d, sid))
+    return picked
+
+
+def brt_cuts(pts, L, start=0.0):
+    """Distances along a BRT leg (km) for its intermediate stops between `start` and `L`:
+    about every 1.2 km where the street is urban (config growth.tod.setting_density_per_km2),
+    1.6 km elsewhere, evened out so the last gap isn't a stub."""
     urban = config.load()["growth"]["tod"]["setting_density_per_km2"]["urban"]
 
     def point_at(d):
@@ -259,13 +294,13 @@ def brt_cuts(pts, L):
         lat, lon = point_at(d)
         return BRT_SPACING_KM["urban" if _density_at(lat, lon) >= urban else "suburban"]
 
-    cuts, pos = [], 0.0
+    cuts, pos = [], start
     while pos + gap(pos) < L - 0.5 * gap(pos):
         pos += gap(pos)
         cuts.append(pos)
     if cuts:   # stretch so the last stop isn't crowded against the end
-        k = L / (cuts[-1] + gap(cuts[-1]))
-        cuts = [c * k for c in cuts]
+        k = (L - start) / (cuts[-1] + gap(cuts[-1]) - start)
+        cuts = [start + (c - start) * k for c in cuts]
     return cuts
 STREET_WORDS = ("lane", "boulevard", "blvd", "road", "parkway", "tap", "avenue", "drive", "freeway", "highway", "street",
                 "loop", "trail", "pike", "expressway")
@@ -412,23 +447,30 @@ def build(name):
                 else:
                     report.append(f"{lid} {ln['name']}: no street route for a leg; kept straight")
             L = sum(geo.hav_km(*pts[i], *pts[i + 1]) for i in range(len(pts) - 1))
-            if mode == "brt":
-                cuts = brt_cuts(pts, L)
+            if mode == "brt":   # stations it passes are stops; regular stops fill the gaps between them
+                served = {sid: (float(st[sid]["lat"]), float(st[sid]["lon"])) for sid in used}
+                anchors = brt_anchors(pts, L, served, {cur[0][2], w[2]})
+                bounds = [0.0] + [d for d, _ in anchors] + [L]
+                cuts = []
+                for k in range(len(bounds) - 1):
+                    cuts += [(d, None) for d in brt_cuts(pts, bounds[k + 1], bounds[k])]
+                    if k < len(anchors):
+                        cuts.append(anchors[k])
             else:
                 n_extra = max(0, round(L / spacing) - 1) if L > 1.45 * spacing else 0
-                cuts = [L * (k + 1) / (n_extra + 1) for k in range(n_extra)]
+                cuts = [(L * (k + 1) / (n_extra + 1), None) for k in range(n_extra)]
             # walk the polyline, emitting intermediate stops
             sub, acc, ci = [pts[0]], 0.0, 0
             for i in range(len(pts) - 1):
                 a, b = pts[i], pts[i + 1]
                 dl = geo.hav_km(*a, *b)
-                while ci < len(cuts) and acc + dl >= cuts[ci] - 1e-9:
-                    f = (cuts[ci] - acc) / dl if dl else 0
+                while ci < len(cuts) and acc + dl >= cuts[ci][0] - 1e-9:
+                    f = (cuts[ci][0] - acc) / dl if dl else 0
                     p = (a[0] + f * (b[0] - a[0]), a[1] + f * (b[1] - a[1]))
                     sub.append(p)
                     legs.append(sub)
                     leg_grades.append(g_now)
-                    stops.append((p[0], p[1], None, None, False))
+                    stops.append((p[0], p[1], cuts[ci][1], None, False))
                     sub = [p]
                     ci += 1
                 acc += dl

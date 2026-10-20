@@ -267,6 +267,7 @@ def run(lines=None, write=False, procs=2, log=print):
                 grades=["tunnel" if any(s.grade == "tunnel" for s in ln.segments[a:b]) else ln.segments[a].grade
                         for a, b in spans])
         movable = [not _in_core(cfg, net.stations[sid]) and (sid not in moves or sid in moved)
+                   and len(st_lines[sid]) == 1   # interchanges stay put: other lines meet them there
                    and all(net.lines[l].mode == "metro" and net.lines[l].status == "proposed" for l in st_lines[sid])
                    for sid in kept_ids]
         for k, (lon, lat, d) in align.station_slides(pts, ends, m, auto, movable).items():

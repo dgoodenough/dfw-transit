@@ -4,7 +4,8 @@
 
 The 2M scenario is the plan plus lever_expand_package's new lines (tools/gen_expansion.py),
 stored as additions: *.add.csv for new lines, stations, transfers; *.patch.csv for the plan
-lines the package changes (infill stops); stages.csv is then rescheduled into exact years.
+lines the package changes (infill stops); stages.csv (the plan's stages plus the new lines')
+is then rescheduled into exact years.
 Lines listed in scenarios/two_million/drop_lines.txt (weak corridors) are left out,
 with the stations and transfers only they used. Its config.json (policies) and
 edits.csv (service) are left as they are.
@@ -55,7 +56,8 @@ def main():
         rows = [r for r in pkg[t] if r["line_id"] not in base_lines or r["line_id"] in changed]
         write(t[:-4] + ".patch.csv", rows, list(pkg[t][0].keys()))
     new_stages = [r for r in pkg["stages.csv"] if r["line_id"] not in base_lines]
-    write("stages.add.csv", new_stages, list(pkg["stages.csv"][0].keys()))
+    # a full table (the plan's stages, then the new lines'), which `schedule --write` replaces in place
+    write("stages.csv", base["stages.csv"] + new_stages, list(pkg["stages.csv"][0].keys()))
     print(f"two_million: {len(new_stages)} new stages ({len(drop)} corridors left out); now run python -m dfwt schedule --scenario two_million --write")
 
 

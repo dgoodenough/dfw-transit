@@ -266,15 +266,8 @@ def check(net):
                 add("error", "INTERIM_GAP", base.name, f"via routing ends {y1} but its own track opens {max(s.year for s in own)}")
 
     # budget: spend spread over construction, against a flat annual budget with carryover
-    spend = spend_by_year(net)
     per_year = cfg["budget"]["musd_per_year"]
-    cum_s = cum_b = 0.0
-    worst = None
-    for y in range(cfg["existing_year"] + 1, max(years) + 1):
-        cum_s += spend.get(y, 0.0)
-        cum_b += per_year
-        if cum_s > cum_b * (1 + cfg["budget"]["tolerance"]) and (worst is None or cum_s - cum_b > worst[1]):
-            worst = (y, cum_s - cum_b)
+    worst = over_budget(net, max(years))
     if worst:
         add("warn", "OVER_BUDGET", "", f"cumulative spending exceeds the flat ${per_year / 1000:.1f}B/yr budget; "
             f"worst in {worst[0]} by ${worst[1] / 1000:.1f}B")
@@ -336,6 +329,51 @@ def spend_by_year(net):
     return allocate_spending([(y, c, cy[m]) for (y, _, m), c in items.items()], cfg)
 
 
+def over_budget(net, last_year):
+    """(year, $M) where cumulative spending most exceeds the money accrued, or None."""
+    cfg = net.cfg
+    spend = spend_by_year(net)
+    per_year = cfg["budget"]["musd_per_year"]
+    cum_s = cum_b = 0.0
+    worst = None
+    for y in range(cfg["existing_year"] + 1, last_year + 1):
+        cum_s += spend.get(y, 0.0)
+        cum_b += per_year
+        if cum_s > cum_b * (1 + cfg["budget"]["tolerance"]) and (worst is None or cum_s - cum_b > worst[1]):
+            worst = (y, cum_s - cum_b)
+    return worst
+
+
+def _repair(scenario, rows, last_year, tries=150):
+    """Per-stage costs (what exact_years schedules with) and the year-by-year spending
+    check disagree a little where track ownership shifts. Close the gap locally: push the
+    first stage that opens after the over-budget year back a year (and its line's later
+    stages with it), until the plan fits. Returns the rows, or None if it doesn't fit."""
+    from .network import Network
+    from .validate import islands as find_islands
+    rows = copy.deepcopy(rows)
+    cy = max(_cfg_for(scenario)["staging"]["construction_years"].values())
+    for _ in range(tries):
+        test = Network.load(scenario, stage_rows=rows)
+        worst = over_budget(test, last_year)
+        if not worst:
+            return rows if not find_islands(test) else None
+        y = worst[0]
+        cand = [r for r in rows if r.get("locked") != "1" and r["kind"] != "via" and y < int(r["year_opens"]) <= y + cy]
+        if not cand:
+            return None
+        r = min(cand, key=lambda r: (int(r["year_opens"]), r["line_id"], -int(r["stage"])))
+        new = int(r["year_opens"]) + 1
+        for q in rows:
+            if q["line_id"] == r["line_id"] and q["kind"] != "via" and int(q["stage"]) >= int(r["stage"]) and int(q["year_opens"]) < new:
+                q["year_opens"] = str(new)
+    return None
+
+
+def _cfg_for(scenario):
+    return config.load(scenario=scenario)
+
+
 def schedule(scenario=None, log=print):
     """exact_years with a safety margin: stage costs are estimated per stage, so if
     the resulting plan trips the budget check, retry against a slightly smaller
@@ -358,6 +396,12 @@ def schedule(scenario=None, log=print):
                 break
             for lid, y in late.items():
                 floor[lid] = max(floor.get(lid, 0), y + 1)
+        if late and log:
+            log("warning: still cut off from the network: " + ", ".join(sorted(late)))
+        if any(f[1] == "OVER_BUDGET" for f in check(test)) and not late:
+            fixed = _repair(scenario, rows, max(test.cfg["years"]))
+            if fixed is not None:
+                rows, test = fixed, Network.load(scenario, stage_rows=fixed)
         if not any(f[1] == "OVER_BUDGET" for f in check(test)):
             moved = sum(1 for a, b in zip(net.stage_rows, rows) if a["year_opens"] != b["year_opens"])
             if log:
@@ -459,7 +503,11 @@ def _exact_years(net, rows, log=print, scale=1.0, floor=None):
     # last full build, results/<scenario>/lines.csv), each line's stages in their own order
     by_value = cfg["staging"].get("priority") == "value_per_musd"
     value = _line_values(net) if by_value else {}
-    if by_value:
+    if by_value:   # a line not measured yet (new since the last full build) ranks at its mode's median
+        import statistics
+        med = {m: statistics.median([v for l, v in value.items() if l in net.lines and net.lines[l].mode == m] or [0.0])
+               for m in {ln.mode for ln in net.lines.values()}}
+        value = {l: value.get(l, med[ln.mode]) for l, ln in net.lines.items()}
         first_year = {}
         for r in rows:
             first_year[r["line_id"]] = min(first_year.get(r["line_id"], 9999), int(r["year_opens"]))
@@ -504,8 +552,8 @@ def _exact_years(net, rows, log=print, scale=1.0, floor=None):
             y = max(y0, lo)   # keep it where it was (or after its line's previous stage)
         if y > end:
             r["note"] = f"after the {end} horizon"
-        elif (r.get("note") or "").startswith("after the"):
-            r["note"] = "deferred by the optimizer (no gain by 2070); built when money frees up"
+        elif (r.get("note") or "").startswith(("after the", "deferred by the optimizer")):
+            r["note"] = "value per $" if by_value else "optimizer"
         r["year_opens"] = str(y)
         placed.append((y, cost, n))
         last[r["line_id"]] = y

@@ -206,7 +206,7 @@ function draw() {
     const b = S.boardings[sid];
     m.bindTooltip(st[0]);
     m.bindPopup(`<div class="pop"><b>${st[0]}</b><div>${chips}</div><div class="m">${fmt(st[3])} residents · ${fmt(st[4])} jobs within 1 km` +
-      (b ? `<br>${fmt(b)} competitive commuters board here in 2070` : '') + `</div></div>`);
+      (b ? `<br>${fmt(b)} competitive commuters board here in ${D.years[D.years.length - 1]}` : '') + `</div></div>`);
   }
   metrics(); lineList(); if (pick.length === 2) route();
   if (window.Schem) Schem.draw();  // schematic: redraw the diagram view

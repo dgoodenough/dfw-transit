@@ -60,7 +60,10 @@ def pieces(lines):
         n_own = 0
         prev = None
         for year, pts in segs:
-            P = [osmroute.xy(*p) for p in pts]
+            P = []
+            for q in (osmroute.xy(*p) for p in pts):   # repeated vertices give 0-length steps with no heading
+                if not P or math.dist(P[-1], q) > 0.5:
+                    P.append(q)
             S = []
             for a, b in zip(P, P[1:]):
                 d = math.dist(a, b)

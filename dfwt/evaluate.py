@@ -251,8 +251,10 @@ def evaluate(ctx, net, line_values=True, log=print, procs=None):
         loads = [fr["hop_load"][i] for i, _ in runs]
         pkm = sum(float((l * np.array(run.hop_km)).sum()) for l, (_, run) in zip(loads, runs))
         peak = max([float(l.max()) for l in loads if len(l)] or [0.0])
-        # crude peak-hour, peak-direction load: 10% of daily one-way commutes in the peak hour, 60% peak direction
-        peak_hour = peak * 0.10 * 0.6
+        # crude peak-hour, peak-direction load: the link's daily riders (one-way commuters x round
+        # trips / work share, as daily_trips), 10% of them in the peak hour, 60% in the peak direction
+        rc = cfg["ridership"]
+        peak_hour = peak * rc["round_trip"] / rc["work_share_of_transit_trips"] * 0.10 * 0.6
         spacing = ln.km / max(len(ln.stop_ids) - 1, 1)
         line_rows.append({
             "line_id": ln.id, "name": ln.name, "mode": ln.mode, "status": ln.status,

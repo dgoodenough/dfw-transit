@@ -84,7 +84,7 @@
       "cruise_kmh": 63,
       "stop_penalty_min": 1.2,
       "default_headway_min": 6,
-      "capacity_pphpd": 20000,
+      "capacity_pphpd": 12000,
       "label": "Metro / light rail"
     },
     "brt": {

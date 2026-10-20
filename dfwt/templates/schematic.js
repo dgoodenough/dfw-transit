@@ -466,7 +466,7 @@ function popupHtml(v) {
   const chips = lis.map(li => `<span class="chip" style="background:${S.lines[li].color}">${S.lines[li].name}</span>`).join('');
   const b = sids.reduce((a, s) => a + (S.boardings[s] || 0), 0);
   return `<div class="pop"><b>${SD.nodes[v][3]}</b><div>${chips}</div><div class="m">${fmt(st[3])} residents · ${fmt(st[4])} jobs within 1 km` +
-    (b ? `<br>${fmt(b)} competitive commuters board here in 2070` : '') + `</div></div>`;
+    (b ? `<br>${fmt(b)} competitive commuters board here in ${D.years[D.years.length - 1]}` : '') + `</div></div>`;
 }
 function showPop(v) {
   popNode = v;
