@@ -75,10 +75,13 @@ def write_results(ctx, nets, evals):
             "pnr_full_garages", "jobs_45min", "avg_transit_min"]
     L += [_table(cols, [[r[c] if c == "year" else _fmt(r[c]) for c in cols] for r in plan["years"]]), ""]
 
+    final = max(r["year"] for r in plan["years"])
     L += ["## Proposed lines, by value", "",
-          "*Value per $M* = competitive commutes lost if the line is removed (tested in its opening year "
-          "and in 2070; the higher is used) divided by its capital cost. *Peak-hour load* assumes 10% of "
-          "daily commute trips in the peak hour, 60% in the peak direction.", ""]
+          f"*Value per $M* = daily transit trips lost if the line is removed (tested in its opening year "
+          f"and in {final}; the higher is used) divided by its capital cost. *Peak-hour load* assumes 10% of "
+          "daily commute trips in the peak hour, 60% in the peak direction."
+          + (f" Line values are from the full build of {plan['line_values_from']} (quick builds keep them; "
+             "lines added since then show none)." if plan.get("line_values_from") else ""), ""]
     prop = [r for r in plan["lines"] if r["status"] != "existing"]
     prop.sort(key=lambda r: -r["value_per_musd"] if isinstance(r.get("value_per_musd"), (int, float)) else 1)
     cols = ["name", "mode", "first_year", "km", "cost_musd", "marginal_at_opening", "marginal_final",

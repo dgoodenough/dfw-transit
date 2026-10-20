@@ -128,8 +128,12 @@ flowchart LR
 ```
 pip install -r requirements.txt
 python -m dfwt validate                 # check the plan (also: --scenario v1_baseline)
-python -m dfwt build                    # evaluate plan + scenarios (~6 min), write results, reports, map
-python -m dfwt build --quick            # skip per-line values (~1 min)
+python -m dfwt build --quick            # routine: every year 2025-2100, all scenarios (~30 min); keeps the
+                                        #   last full build's per-line values
+python -m dfwt build                    # full: also re-measures each line's value (~70 min). Run it when
+                                        #   lines are added, cut or extended, demand assumptions change,
+                                        #   or many opening years move
+python -m dfwt ridership --scenario two_million --years 2050,2100   # a few years, fast
 python -m dfwt trip "Midlothian" "Union Station" --year 2050
 python -m unittest discover -s tests
 ```

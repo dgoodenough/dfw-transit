@@ -309,6 +309,43 @@ def evaluate(ctx, net, line_values=True, log=print, procs=None):
     return {"years": year_rows, "lines": line_rows, "stations": st_rows, "results": results}
 
 
+LINE_VALUE_COLS = ("marginal_at_opening", "marginal_final", "value_per_musd")
+
+
+def stamp_line_values(out_dir, ev):
+    """Record that this build measured the line values (results/<scenario>/line_values.json)."""
+    import datetime
+    import json
+    os.makedirs(out_dir, exist_ok=True)
+    ev["line_values_from"] = datetime.date.today().isoformat()
+    with open(os.path.join(out_dir, "line_values.json"), "w", encoding="utf-8") as f:
+        json.dump({"full_build": ev["line_values_from"]}, f)
+        f.write("\n")
+
+
+def carry_line_values(out_dir, ev):
+    """A quick build skips the leave-one-out runs: copy each line's values from the last
+    full build's results, and note which build they came from. Lines that are new since
+    then stay blank."""
+    import json
+    path, stamp = os.path.join(out_dir, "lines.csv"), os.path.join(out_dir, "line_values.json")
+    if not os.path.exists(path):
+        return
+    with open(path, encoding="utf-8") as f:
+        prev = {r["line_id"]: r for r in csv.DictReader(f)}
+    for row in ev["lines"]:
+        old = prev.get(row["line_id"], {})
+        for k in LINE_VALUE_COLS:
+            v = old.get(k, "")
+            try:
+                row[k] = float(v) if "." in v else int(v)
+            except (TypeError, ValueError):
+                row[k] = ""
+    if os.path.exists(stamp):
+        with open(stamp, encoding="utf-8") as f:
+            ev["line_values_from"] = json.load(f).get("full_build")
+
+
 def write(out_dir, ev):
     os.makedirs(out_dir, exist_ok=True)
     for name in ("years", "lines", "stations"):

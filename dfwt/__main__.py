@@ -56,10 +56,15 @@ def cmd_build(args):
             print("the plan has data errors; fix them before building")
             return 1
         print(f"{key}: evaluating")
-        values = not args.quick and (sc is None or sc == net.cfg.get("default_scenario"))
-        evals[key] = evaluate.evaluate(sctx, net, line_values=values)
+        wanted = sc is None or sc == net.cfg.get("default_scenario")
+        evals[key] = evaluate.evaluate(sctx, net, line_values=wanted and not args.quick)
         nets[key] = net
-        evaluate.write(config.path("results", key), evals[key])
+        out = config.path("results", key)
+        if wanted and args.quick:   # keep the last full build's line values instead of blanking them
+            evaluate.carry_line_values(out, evals[key])
+        elif wanted:
+            evaluate.stamp_line_values(out, evals[key])
+        evaluate.write(out, evals[key])
     report.write_all(ctx, nets, evals, findings)
     webmap.write(nets, evals, config.path("docs", "index.html"))
     print(f"done in {time.time() - t0:.0f}s: results/, reports/RESULTS.md, reports/VALIDATION.md, docs/index.html")
@@ -221,7 +226,8 @@ def main(argv=None):
     v.add_argument("--scenario")
     v.add_argument("-v", "--verbose", action="store_true")
     b = sub.add_parser("build")
-    b.add_argument("--quick", action="store_true", help="skip per-line leave-one-out values")
+    b.add_argument("--quick", action="store_true",
+                   help="skip per-line leave-one-out values (~40 min); keep the last full build's")
     b.add_argument("--all", action="store_true", help="also evaluate the lever_* analysis scenarios")
     sc = sub.add_parser("schedule", help="move stages to the earliest year the flat budget allows (keeps the order)")
     sc.add_argument("--scenario")
