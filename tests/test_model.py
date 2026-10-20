@@ -296,6 +296,28 @@ class ModeChoiceTests(unittest.TestCase):
         self.assertLess(rc["active"]["asc"], 0)
 
 
+class QuickBuildTests(unittest.TestCase):
+    def test_quick_build_keeps_last_full_line_values(self):
+        import csv as _csv
+        import json
+        import tempfile
+        from dfwt import evaluate
+        d = tempfile.mkdtemp()
+        with open(os.path.join(d, "lines.csv"), "w", newline="") as f:
+            w = _csv.DictWriter(f, fieldnames=["line_id", "status", "marginal_at_opening", "marginal_final", "value_per_musd"])
+            w.writeheader()
+            w.writerow({"line_id": "A", "status": "proposed", "marginal_at_opening": "120", "marginal_final": "300",
+                        "value_per_musd": "4.5"})
+        with open(os.path.join(d, "line_values.json"), "w") as f:
+            json.dump({"full_build": "2026-10-20"}, f)
+        ev = {"lines": [{"line_id": "A", "status": "proposed"}, {"line_id": "B", "status": "proposed"}]}
+        evaluate.carry_line_values(d, ev)
+        self.assertEqual(ev["lines"][0]["marginal_final"], 300)
+        self.assertEqual(ev["lines"][0]["value_per_musd"], 4.5)
+        self.assertEqual(ev["lines"][1]["value_per_musd"], "")       # new since the full build
+        self.assertEqual(ev["line_values_from"], "2026-10-20")
+
+
 class LandUsePolicyTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
