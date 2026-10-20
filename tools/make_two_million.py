@@ -5,7 +5,9 @@
 The 2M scenario is the plan plus lever_expand_package's new lines (tools/gen_expansion.py),
 stored as additions: *.add.csv for new lines, stations, transfers; *.patch.csv for the plan
 lines the package changes (infill stops); stages.csv is then rescheduled into exact years.
-Its config.json (policies) and edits.csv (service) are left as they are.
+Lines listed in scenarios/two_million/drop_lines.txt (weak corridors) are left out,
+with the stations and transfers only they used. Its config.json (policies) and
+edits.csv (service) are left as they are.
 """
 import csv
 import os
@@ -32,6 +34,15 @@ def main():
             os.remove(os.path.join(OUT, n))
     base, _ = Network.read_tables(None)
     pkg, _ = Network.read_tables("lever_expand_package")
+    drop_path = os.path.join(OUT, "drop_lines.txt")
+    drop = set()
+    if os.path.exists(drop_path):
+        drop = {ln.split("#")[0].strip() for ln in open(drop_path, encoding="utf-8")} - {""}
+    for t in ("lines.csv", "line_stops.csv", "line_segments.csv", "stages.csv"):
+        pkg[t] = [r for r in pkg[t] if r["line_id"] not in drop]
+    used = {r["station_id"] for r in pkg["line_stops.csv"]}
+    pkg["stations.csv"] = [r for r in pkg["stations.csv"] if r["station_id"] in used]
+    pkg["transfers.csv"] = [r for r in pkg["transfers.csv"] if r["station_a"] in used and r["station_b"] in used]
     base_lines = {r["line_id"] for r in base["lines.csv"]}
     for t, k in KEYS.items():
         have = {tuple(r[x] for x in k) for r in base[t]}
@@ -45,7 +56,7 @@ def main():
         write(t[:-4] + ".patch.csv", rows, list(pkg[t][0].keys()))
     new_stages = [r for r in pkg["stages.csv"] if r["line_id"] not in base_lines]
     write("stages.add.csv", new_stages, list(pkg["stages.csv"][0].keys()))
-    print(f"two_million: {len(new_stages)} new stages; now run python -m dfwt schedule --scenario two_million --write")
+    print(f"two_million: {len(new_stages)} new stages ({len(drop)} corridors left out); now run python -m dfwt schedule --scenario two_million --write")
 
 
 if __name__ == "__main__":
