@@ -544,7 +544,7 @@ XS0001,NW Highway / Community,32.857689,-96.873582
 XS0002,NW Highway / Timberline,32.857149,-96.862925
 XS0003,Lemmon / Marsh,32.861832,-96.851980
 XS0004,NW Highway / Midway Road,32.863888,-96.839796
-XS0005,NW Highway / Inwood Road,32.866776,-96.824546
+XS0005,NW Highway / Stonegate,32.866776,-96.824546
 XS0006,NW Highway / Douglas,32.865502,-96.808204
 XS0007,NW Highway / Thackery,32.865485,-96.791493
 XS0008,NW Highway / Boedeker,32.865445,-96.778960
@@ -561,9 +561,9 @@ XS0018,Buckner Boulevard / Thornton,32.800181,-96.682600
 XS0019,Buckner Boulevard / Samuell,32.789694,-96.685140
 XS0020,Buckner Boulevard / Military,32.767955,-96.682784
 XS0021,Buckner Boulevard / Jennie Lee,32.753258,-96.682955
-XS0022,Buckner Boulevard / Umphress,32.742225,-96.682972
+XS0022,Umphress / Buckner Boulevard,32.742225,-96.682972
 XS0023,Buckner Boulevard / Lake June,32.731192,-96.682993
-XS0024,Buckner Boulevard / C F Hawn,32.716482,-96.683067
+XS0024,C F Hawn / Buckner Boulevard,32.716482,-96.683067
 XS0025,Murdock / Fireside,32.700000,-96.683000
 XS0026,Falls / Cockrell Hill Road,32.727000,-96.890000
 XS0027,Illinois / Keats,32.720338,-96.880433
@@ -600,7 +600,7 @@ XS0057,Chimney Hill Lane,32.915000,-96.730000
 XS0058,Larga / Webb Chapel,32.865000,-96.860000
 XS0059,Park / Larga,32.875038,-96.859072
 XS0060,Marsh / Merrell,32.887482,-96.856078
-XS0061,Marsh / Northaven,32.902361,-96.856115
+XS0061,Northaven / Marsh,32.902361,-96.856115
 XS0062,Marsh / LBJ,32.917239,-96.855888
 XS0063,Marsh / Brookhaven Club,32.932112,-96.855709
 XS0064,Marsh / Beltway,32.946990,-96.855683
@@ -694,8 +694,8 @@ XS0151,Coit / Tulane,33.032645,-96.769977
 XS0152,Coit / Cross Bend,33.047300,-96.770381
 XS0153,Coit / Sailmaker,33.061975,-96.770392
 XS0154,Coit / Hearst Castle,33.076346,-96.771907
-XS0155,Coit / Stonehaven,33.091016,-96.771586
-XS0156,Coit / Ridgeview,33.105246,-96.769904
+XS0155,Stonehaven / Coit,33.091016,-96.771586
+XS0156,Ridgeview / Coit,33.105246,-96.769904
 XS0157,Coit / Lebanon Road,33.119366,-96.767949
 XS0158,Coit / Rolater,33.134042,-96.767894
 XS0159,Coit / Main,33.150000,-96.769000
@@ -710,7 +710,7 @@ XS0167,Preston / Plano Parkway,33.017124,-96.795142
 XS0168,Preston / Highland Drive,33.028026,-96.794857
 XS0169,Preston / Tulane,33.038926,-96.794453
 XS0170,Preston / Lorimar,33.049828,-96.794286
-XS0171,Preston / Tennyson,33.064214,-96.796118
+XS0171,Tennyson / Preston,33.064214,-96.796118
 XS0172,Preston / Quincy,33.078563,-96.796783
 XS0173,Preston / Headquarters,33.090645,-96.805483
 XS0174,Preston / Stone Crest,33.101550,-96.805408
@@ -721,7 +721,7 @@ XS0178,Preston / Hutson,33.148714,-96.804332
 XS0179,Meadow Hill / Preston,33.165000,-96.800000
 XS0180,Spring Creek / McKamy,33.065000,-96.850000
 XS0181,Spring Creek / Dallas Parkway,33.065410,-96.826914
-XS0182,Dallas Parkway / Tennyson,33.074269,-96.824051
+XS0182,Tennyson / Dallas Parkway,33.074269,-96.824051
 XS0183,Legacy / Parkwood,33.077847,-96.815104
 XS0184,Legacy / Windcrest,33.073670,-96.803626
 XS0185,Legacy / Archgate,33.070928,-96.787224
@@ -788,10 +788,10 @@ XS0245,Frankford / I-35,32.993636,-96.940389
 XS0246,Frankford / Eisenhower,32.996994,-96.928438
 XS0247,Frankford / Old Denton,32.998607,-96.910866
 XS0248,Cemetery Hill / Frankford,32.999689,-96.893857
-XS0249,Cemetery Hill / Rosemeade,33.010444,-96.891806
+XS0249,Rosemeade / Cemetery Hill,33.010444,-96.891806
 XS0250,Rosemeade Parkway,33.011520,-96.879816
 XS0251,Rosemeade / Kelly Boulevard,33.011629,-96.866285
-XS0252,Marsh / Kelly Boulevard,33.019971,-96.855682
+XS0252,Marsh Ridge / Kelly Boulevard,33.019971,-96.855682
 XS0253,Flower Mound Road / Skillern,33.030000,-97.100000
 XS0254,Flower Mound Road / Old Settlers,33.022302,-97.082726
 XS0255,Long Prairie / Flower Mound Road,33.013752,-97.070710
@@ -805,10 +805,10 @@ XS0262,Main / Cowan,33.046280,-97.004562
 XS0263,Bonnie Brae / I-35,33.190000,-97.165000
 XS0264,Bonnie Brae / Airport,33.204990,-97.161518
 XS0265,Texas / I-35,33.204958,-97.153104
-XS0266,Eagle / Bernard,33.206602,-97.143272
+XS0266,Eagle Drive,33.206602,-97.143272
 XS0267,Bell / Eagle,33.207310,-97.131223
 XS0268,Bell / Mingo Road,33.220353,-97.127372
-XS0269,Bell / University,33.230926,-97.127215
+XS0269,University / Bell,33.230926,-97.127215
 XS0270,Sherman Drive / Stuart,33.239948,-97.122020
 XS0271,Kings Row / Nottingham,33.249266,-97.111686
 XS0272,Nottingham / University,33.238507,-97.106704
@@ -839,7 +839,7 @@ XS0296,MacArthur / Hidden Ridge,32.877516,-96.963065
 XS0297,MacArthur / Corporate,32.887508,-96.964041
 XS0298,MacArthur / Fluor,32.900000,-96.960000
 XS0299,Wildlife Boulevard,32.780000,-97.000000
-XS0300,Belt Line / Lone Star Parkway,32.763984,-96.995099
+XS0300,Belt Line / Tom Landry,32.763984,-96.995099
 XS0301,Belt Line / Small,32.749783,-96.994682
 XS0302,Belt Line / Skyline,32.735691,-96.994508
 XS0303,Pioneer / Acosta,32.709546,-96.996869
@@ -856,7 +856,7 @@ XS0313,Cooper / Mitchell,32.729749,-97.114597
 XS0314,Cooper / Park Row,32.718948,-97.114761
 XS0315,Matlock / Arkansas,32.704769,-97.114728
 XS0316,Matlock / Mayfield,32.690356,-97.115015
-XS0317,Matlock / I-20,32.679541,-97.115055
+XS0317,High Point / Highlander,32.679541,-97.115055
 XS0318,Matlock / Embercrest,32.668727,-97.115059
 XS0319,Matlock / Green Oaks,32.657914,-97.115165
 XS0320,Matlock / Sublett,32.643577,-97.115339
@@ -888,7 +888,7 @@ XS0345,Hulen / Ranch View,32.695933,-97.391282
 XS0346,Hulen / Overton Plaza,32.686012,-97.392468
 XS0347,Hulen / Overton Ridge,32.676188,-97.396947
 XS0348,Hulen / Oakmont,32.662863,-97.402529
-XS0349,Hulen / Trail Lake,32.654633,-97.395875
+XS0349,Trail Lake / Hulen,32.654633,-97.395875
 XS0350,Hulen / Kingswood Drive,32.640060,-97.395976
 XS0351,Sycamore School / Cleburne Road,32.636027,-97.383412
 XS0352,Sycamore School / McCart,32.634820,-97.366739
@@ -901,14 +901,14 @@ XS0358,Haltom / Fincher,32.799680,-97.273151
 XS0359,Haltom / Webster,32.813816,-97.273156
 XS0360,Haltom / Glenview,32.827952,-97.273066
 XS0361,Loop 820 / Haltom,32.839963,-97.276912
-XS0362,Beach / Fossil Vista,32.842673,-97.290461
+XS0362,Fossil Vista / Beach,32.842673,-97.290461
 XS0363,Beach / Silver Sage,32.856769,-97.289912
 XS0364,Beach / Basswood,32.870741,-97.290967
 XS0365,Basswood Boulevard,32.871943,-97.275741
 XS0366,Basswood / Parkwood Hill,32.874097,-97.265248
 XS0367,Denton Highway / Starnes,32.881992,-97.260763
 XS0368,Main Street,32.903001,-97.257361
-XS0369,Main / Wall Price Keller,32.917012,-97.255121
+XS0369,Main / Wall-Price-Keller,32.917012,-97.255121
 XS0370,Bear Creek / Keller Parkway,32.930000,-97.245000
 XS0371,Blue Mound Road,32.831947,-97.342915
 XS0372,Blue Mound Road / Industrial,32.845771,-97.342814
