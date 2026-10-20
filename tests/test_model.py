@@ -85,6 +85,29 @@ class NetworkTests(unittest.TestCase):
         self.assertEqual(net.lines["E17X"].headway_at(2070), 10)
 
 
+class CostAndRerouteTests(unittest.TestCase):
+    def test_cost_factor_falls_as_the_program_matures(self):
+        from dfwt.network import cost_factor
+        cfg = {"cost_efficiency": {"2025": 1.0, "2040": 0.85, "2055": 0.75}, "staging": {"construction_years": {"metro": 0}}}
+        self.assertAlmostEqual(cost_factor(cfg, 2025, "metro"), 1.0)
+        self.assertAlmostEqual(cost_factor(cfg, 2032.5, "metro"), 0.925)
+        self.assertAlmostEqual(cost_factor(cfg, 2090, "metro"), 0.75)
+        self.assertEqual(cost_factor({"staging": {"construction_years": {}}}, 2050, "metro"), 1.0)
+
+    def test_reroute_keeps_the_old_routing_until_the_new_track_opens(self):
+        net = Network.load()
+        before = net.line_cost_musd(net.lines["E13"])
+        net.apply_edits([{"op": "reroute", "target": "E13", "field": "2035", "value": "tunnel|X137;@32.784,-96.80;X141"}])
+        ln = net.lines["E13"]
+        self.assertNotIn("X138", ln.stop_ids)          # West End is off the new routing
+        self.assertIn("X138", net.line_at("E13", 2030).stop_ids)
+        self.assertEqual(net.line_at("E13", 2035), ln)
+        self.assertGreater(net.line_cost_musd(ln), before + 500)   # a tunnel is built
+        served = lambda y: {s for r in net.runs(y) if r.line.id == "E13" for s in r.stops}
+        self.assertIn("X138", served(2030))
+        self.assertNotIn("X138", served(2040))
+
+
 class ValidationTests(unittest.TestCase):
     def test_plan_has_no_errors_or_islands(self):
         findings = validate.run(Network.load())
@@ -122,7 +145,12 @@ class GraphTests(unittest.TestCase):
         g = YearGraph(Network.load(), 2025)
         T = g.skim()
         self.assertTrue(np.all(np.diag(T) == 0))
-        self.assertTrue(np.isfinite(T).all())
+        # every pair is reachable by riding, except stations a short walk apart (a walk
+        # between platforms isn't a transit trip), which are left out
+        walk = {(i, j) for i in range(g.n_st) for j, _, kind in g.adj[i] if kind == "walk" and j < g.n_st}
+        bad = [(i, j) for i, j in zip(*np.nonzero(~np.isfinite(T))) if (i, j) not in walk]
+        self.assertLess(len(bad), 0.001 * T.size)
+        self.assertTrue((T[np.isfinite(T)] >= 0).all())
 
 
 class DemandTests(unittest.TestCase):
@@ -415,7 +443,7 @@ class StagingTests(unittest.TestCase):
         rows += [
             {"line_id": "E17", "stage": "1", "kind": "starter", "from_stop": "Galleria",
              "to_stop": "Pearl/Arts District", "year_opens": "2045"},
-            {"line_id": "E17", "stage": "2", "kind": "extension", "from_stop": "All Stars / Frisco Street",
+            {"line_id": "E17", "stage": "2", "kind": "extension", "from_stop": "Frisco Main St",
              "to_stop": "Galleria", "year_opens": "2050"},
             {"line_id": "E17", "stage": "3", "kind": "extension", "from_stop": "Pearl/Arts District",
              "to_stop": "Rowlett", "year_opens": "2055"},

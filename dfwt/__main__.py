@@ -50,10 +50,10 @@ def cmd_build(args):
         sctx = evaluate.Context(net.cfg) if config.has_overlay(sc) else ctx   # the scenario's own assumptions
         findings[key] = validate.run(net)
         errors = [f for f in findings[key] if f[0] == "error"]
-        if errors and sc is None:
+        if errors and (sc is None or sc == net.cfg.get("default_scenario")):
             for f in errors:
                 print("error", f[1], f[2], f[3])
-            print("the plan has data errors; fix them before building")
+            print(f"{key} has data errors; fix them before building")
             return 1
         print(f"{key}: evaluating")
         wanted = sc is None or sc == net.cfg.get("default_scenario")
@@ -100,6 +100,9 @@ def cmd_schedule(args):
             w = _csv.DictWriter(f, fieldnames=staging.STAGE_COLS, lineterminator="\n", extrasaction="ignore")
             w.writeheader()
             w.writerows(rows)
+        for n in ("stages.add.csv", "stages.patch.csv"):   # the full table replaces them; left in place they'd add rows twice
+            if os.path.exists(os.path.join(folder, n)):
+                os.remove(os.path.join(folder, n))
         print(f"wrote {os.path.join(folder, 'stages.csv')}")
     else:
         for a, b in zip(net.stage_rows, rows):

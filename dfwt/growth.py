@@ -90,14 +90,22 @@ def tod_uplift(zones, net, year, cfg):
     pj = geo.Projector()
     r, r0 = t["radius_m"] / 1000, t["full_radius_m"] / 1000
     cache = zones.__dict__.setdefault("_setting", {})
+    mode_year = net.station_mode_years()
+    up_ex = t.get("upzone_existing_year")
     for sid, modes in opened.items():
-        y0 = net.station_year(sid)
-        if y0 <= ex:
-            # existing stations get TOD only once they are upzoned (from that year)
-            y0 = t.get("upzone_existing_year")
-            if not y0 or y0 > year:
-                continue
-        ramp = 1.0 / (1.0 + np.exp(-((year - y0) - t["ramp_mid_years"]) / t["ramp_width_years"]))
+        # each mode's uplift ramps from the year that mode arrives (a BRT stop that gets
+        # metro 30 years later earns metro-level TOD from then, not from the BRT opening);
+        # existing service counts only once upzoned (from upzone_existing_year)
+        ramps = {}
+        for m in modes:
+            y0 = mode_year[sid].get(m, year)
+            if y0 <= ex:
+                if not up_ex or up_ex > year:
+                    continue
+                y0 = max(y0, up_ex)
+            ramps[m] = 1.0 / (1.0 + np.exp(-((year - y0) - t["ramp_mid_years"]) / t["ramp_width_years"]))
+        if not ramps:
+            continue
         s = net.stations[sid]
         x, y = pj.xy(s.lat, s.lon)
         d = np.sqrt((zones.x - x) ** 2 + (zones.y - y) ** 2)
@@ -108,9 +116,9 @@ def tod_uplift(zones, net, year, cfg):
         if key not in cache:
             cache[key] = setting(zones, s.lat, s.lon, cfg)
         kind = cache[key]
-        w = np.clip((r - d[near]) / (r - r0), 0.0, 1.0) * ramp
-        best_p = t["pop_uplift"][kind] * max(t["mode_factor_pop"][m] for m in modes)
-        best_j = t["jobs_uplift"][kind] * max(t["mode_factor_jobs"][m] for m in modes)
+        w = np.clip((r - d[near]) / (r - r0), 0.0, 1.0)
+        best_p = t["pop_uplift"][kind] * max(t["mode_factor_pop"][m] * q for m, q in ramps.items())
+        best_j = t["jobs_uplift"][kind] * max(t["mode_factor_jobs"][m] * q for m, q in ramps.items())
         up_p[near] = np.maximum(up_p[near], best_p * w)
         up_j[near] = np.maximum(up_j[near], best_j * w)
     return up_p, up_j

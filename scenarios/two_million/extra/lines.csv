@@ -1,0 +1,3 @@
+line_id,name,mode,status,color,headway_min,notes
+E40,Weatherford Line,commuter,proposed,#a1887f,30,"Regional rail to Parker County on the UP Baird Subdivision. Long-range reserve (2.9 trips per $M in the 2026 review), built late for a complete network."
+E41,Greenville Line,commuter,proposed,#c2185b,30,"Regional rail to Rockwall and Hunt County on the Dallas, Garland & Northeastern from the Blue Line at Downtown Rowlett. Greenville is outside the model's zones (Hunt County), so its riders are understated."

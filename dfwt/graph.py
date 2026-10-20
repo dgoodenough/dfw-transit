@@ -7,6 +7,7 @@ Edges: board (platform -> line, cost = expected wait + transfer penalty),
 Every trip boards at least once, so one transfer penalty is subtracted from all
 station-to-station times: the first boarding costs only the wait.
 """
+import collections
 import heapq
 
 import numpy as np
@@ -90,9 +91,30 @@ class YearGraph:
         n = self.n_st
         T = np.full((n, n), np.inf, dtype=np.float32)
         preds = []
+        # stations joined by walking links: the only pairs a path can connect without riding
+        group = list(range(n))
+
+        def find(i):
+            while group[i] != i:
+                group[i] = group[group[i]]
+                i = group[i]
+            return i
+        for i in range(n):
+            for j, _, kind in self.adj[i]:
+                if kind == "walk" and j < n:
+                    group[find(i)] = find(j)
+        members = collections.defaultdict(list)
+        for i in range(n):
+            members[find(i)].append(i)
         for a in range(n):
             dist, pred = self.dijkstra(a)
             row = np.array(dist[:n], dtype=np.float32) - self.board_pen
+            for b in members[find(a)]:   # a walk between platforms is not a transit trip
+                u = pred[b]
+                while u != -1 and u != a and u < n:
+                    u = pred[u]
+                if u == a or u == -1:
+                    row[b] = np.inf
             row[a] = 0.0
             T[a] = row
             preds.append(np.array(pred, dtype=np.int32))

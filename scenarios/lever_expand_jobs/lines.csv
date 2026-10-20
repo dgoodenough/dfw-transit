@@ -1,16 +1,16 @@
 line_id,name,mode,status,color,headway_min,notes
-F01,Teal,metro,proposed,#00b251,,
-F02,Blue,metro,proposed,#0896d7,,
-F03,Orange,metro,proposed,#df8600,,
-F04,Pink,metro,proposed,#d63384,,
-F05,Berry Line,metro,proposed,#7A1840,,
-F06,Red,metro,proposed,#bd1038,,
-F07,Purple,metro,proposed,#7b2d8e,,
+F01,FW Green,metro,proposed,#00b251,,
+F02,FW Blue,metro,proposed,#0896d7,,
+F03,FW Orange,metro,proposed,#df8600,,
+F04,FW Pink,metro,proposed,#d63384,,
+F05,FW Berry,metro,proposed,#7A1840,,
+F06,FW Red,metro,proposed,#bd1038,,
+F07,FW Purple,metro,proposed,#7b2d8e,,
 E01,White Settlement BRT,brt,proposed,#00838f,,A7: long-range reserve; lowest value per $ in the v1 plan
 E02,Riverside-Forest Hill BRT,brt,proposed,#00838f,,
 E04,Jacksboro BRT,brt,proposed,#00838f,,
 E05,TexPress Expansion,commuter,proposed,#A87A70,,
-E07,SE TexRail,commuter,proposed,#7D5A6E,,
+E07,SE TexRail,commuter,proposed,#739342,,
 E08,FTW/Denton,commuter,proposed,#6E6A4F,,
 E09,TEXRail,commuter,existing,#7E4A52,30,
 E10,TRE,commuter,existing,#4A5D7E,30,
@@ -25,7 +25,7 @@ E18,Las Colinas-Mesquite Line,metro,proposed,#880E4F,,
 E19,I-20 Crosstown,metro,proposed,#8D5524,,
 E20,Silver Line,metro,existing,#A7A9AC,30,
 E21,Beltline Line,brt,proposed,#00838f,,
-E22,I-30 Line,metro,proposed,#01579B,,
+E22,I-30 Line,metro,proposed,#283593,,
 E23,SH-360 Line,metro,proposed,#9C27B0,,
 E24,FW Crosstown Loop,brt,proposed,#00838f,,
 E25,McKinney Line,commuter,proposed,#8E7CA8,,
@@ -33,16 +33,16 @@ E26,Legacy Line,metro,proposed,#0d8a4f,,
 E27,Ross Avenue BRT,brt,proposed,#00838f,,
 E28,Forest Lane BRT,brt,proposed,#00838f,,
 E29,Jefferson Blvd BRT,brt,proposed,#00838f,,
-E30,Alvarado Line,commuter,proposed,#93708A,,
-E31,Bowie Line,commuter,proposed,#8A6E4B,,A7: long-range reserve (already 2070); consider intercity bus first
-E32,Gainesville Line,commuter,proposed,#8C7A5A,,
+E30,Alvarado Line,commuter,proposed,#a366a3,,
+E31,Bowie Line,commuter,proposed,#5b437d,,A7: long-range reserve (already 2070); consider intercity bus first
+E32,Gainesville Line,commuter,proposed,#66a37e,,
 E33,Sherman Line,commuter,proposed,#75608F,,
 E34,Terrell Line,commuter,proposed,#7D7552,,
 E35,Ennis Line,commuter,proposed,#A0694E,,A7: long-range reserve; lowest value per $ in the v1 plan
 E36,Waxahachie Line,commuter,proposed,#5F7466,,
 E37,Midlothian Line,commuter,proposed,#806070,,
 E38,SH-121 BRT,brt,proposed,#00838f,,A6: McKinney-Frisco-Legacy crosstown. Sketch alignment on SH-121 frontage roads; needs a real road-ROW routing pass.
-XP01,SH-114 Line,metro,proposed,#e65100,,"Expansion lever: Farmers Branch - Valwood - Freeport - DFW north - Grapevine - Southlake - Westlake, light metro on LBJ/SH-114 right-of-way"
+XP01,SH-114 Line,metro,proposed,#7cb342,,"Expansion lever: Farmers Branch - Valwood - Freeport - DFW north - Grapevine - Southlake - Westlake, light metro on LBJ/SH-114 right-of-way"
 XP02,Coppell-Lewisville BRT,brt,proposed,#00838f,,Expansion lever: Cypress Waters - Coppell business parks - Vista Ridge - Old Town Lewisville
 XP05,Stemmons-Brookhollow BRT,brt,proposed,#00838f,,"Expansion lever: Inwood/Love Field - Brookhollow - Regal Row - Northwest Hwy - Royal/Luna - Valwood, the Stemmons/I-35E job corridor"
 XP06,Dallas Parkway BRT,brt,proposed,#00838f,,"Expansion lever: Legacy West - Stonebriar - The Star - Frisco Station, the Dallas Parkway office corridor"

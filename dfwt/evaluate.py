@@ -206,7 +206,7 @@ def evaluate(ctx, net, line_values=True, log=print, procs=None):
     for y, r in sorted(_pool_map(_year_job, years, ctx, net, final, procs)):
         results[y] = r
         pcov, jcov = r["coverage"]
-        opened = [ln for ln in net.lines.values() if ln.status != "existing"]
+        opened = list(net.lines.values())   # today's track costs nothing (opened by existing_year)
         capex = sum(net.line_cost_musd(ln, by_year=y, owner=owner) for ln in opened)
         km = {m: 0.0 for m in cfg["modes"]}
         seen = set()  # count shared track once
@@ -222,6 +222,7 @@ def evaluate(ctx, net, line_values=True, log=print, procs=None):
         row = {"year": y, "stations": r["n_st"], "lines": r["n_lines"],
                "km_metro": round(km["metro"]), "km_brt": round(km["brt"]), "km_commuter": round(km["commuter"]),
                "capex_busd": round(capex / 1000, 1),
+               "opex_busd_per_year": round(sum(net.opex_musd(y).values()) / 1000, 2),
                "spent_busd": round(sum(v for yy, v in spend.items() if yy <= y) / 1000, 1),
                "budget_busd": round(per_year * (y - cfg["existing_year"]) / 1000, 1),
                "pop_covered_pct": round(pcov * 100, 1), "jobs_covered_pct": round(jcov * 100, 1),
@@ -251,8 +252,10 @@ def evaluate(ctx, net, line_values=True, log=print, procs=None):
         loads = [fr["hop_load"][i] for i, _ in runs]
         pkm = sum(float((l * np.array(run.hop_km)).sum()) for l, (_, run) in zip(loads, runs))
         peak = max([float(l.max()) for l in loads if len(l)] or [0.0])
-        # crude peak-hour, peak-direction load: 10% of daily one-way commutes in the peak hour, 60% peak direction
-        peak_hour = peak * 0.10 * 0.6
+        # crude peak-hour, peak-direction load: the link's daily riders (one-way commuters x round
+        # trips / work share, as daily_trips), 10% of them in the peak hour, 60% in the peak direction
+        rc = cfg["ridership"]
+        peak_hour = peak * rc["round_trip"] / rc["work_share_of_transit_trips"] * 0.10 * 0.6
         spacing = ln.km / max(len(ln.stop_ids) - 1, 1)
         line_rows.append({
             "line_id": ln.id, "name": ln.name, "mode": ln.mode, "status": ln.status,
@@ -341,6 +344,9 @@ def carry_line_values(out_dir, ev):
                 row[k] = float(v) if "." in v else int(v)
             except (TypeError, ValueError):
                 row[k] = ""
+        # the riders carry over; the cost is this build's (shared track moves with opening order)
+        if row["marginal_final"] != "" and row.get("cost_musd"):
+            row["value_per_musd"] = round(max(row["marginal_at_opening"] or 0, row["marginal_final"]) / row["cost_musd"], 2)
     if os.path.exists(stamp):
         with open(stamp, encoding="utf-8") as f:
             ev["line_values_from"] = json.load(f).get("full_build")

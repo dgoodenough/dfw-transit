@@ -45,6 +45,18 @@ def resolve(stop, stop_ids, names):
     raise KeyError(f"'{stop}' is {'ambiguous' if hits else 'not a stop'} on this line")
 
 
+def resolve_on(net, ln, stop, names):
+    """resolve() on a line that may have absorbed others (through_route): a stage of the
+    absorbed line may name its old terminus, which merged into the junction."""
+    try:
+        return resolve(stop, ln.stop_ids, names)
+    except KeyError:
+        for old, new in net.stop_alias.items():
+            if stop.strip() == old or stop.strip().lower() == names.get(old, "").lower():
+                return resolve(new, ln.stop_ids, names)
+        raise
+
+
 def stop_ref(stop_ids, names, i):
     """The friendliest unambiguous reference to stop i."""
     sid = stop_ids[i]
@@ -222,7 +234,8 @@ def check(net):
             yo = int(r["year_opens"])
             if yo > max(years):
                 add("warn", "PAST_HORIZON", base.name, f"stage {r['stage']} opens {yo}, after {max(years)}")
-            if yo - rules["construction_years"][mode] < cfg["existing_year"] and base.status != "existing":
+            new_track = any(s.year > cfg["existing_year"] for s in base.segments[a:b])   # a through-routed line's old part isn't built
+            if yo - rules["construction_years"][mode] < cfg["existing_year"] and base.status != "existing" and new_track:
                 add("warn", "BUILD_STARTED", base.name, f"stage {r['stage']} opens {yo} but takes "
                     f"{rules['construction_years'][mode]} years to build")
             if km > rules["max_km_per_stage"][mode]:
@@ -256,6 +269,8 @@ def check(net):
                 if y - stub_since[sid] == rules["max_stub_years"]:
                     add("info", "LONG_STUB", base.name, f"{names[sid]} has been a temporary terminus since {stub_since[sid]}")
         for y0, y1, v, it in net.variants.get(lid, []):
+            if it.get("via") is None:   # a reroute's old routing, not a borrowed track
+                continue
             host = net.lines[it["via"]]
             for y in (yy for yy in years if y0 <= yy < y1):
                 if not all(s.year <= y for s in v.segments[it["a"]:it["a"] + it["n_mid"]]):
@@ -266,15 +281,8 @@ def check(net):
                 add("error", "INTERIM_GAP", base.name, f"via routing ends {y1} but its own track opens {max(s.year for s in own)}")
 
     # budget: spend spread over construction, against a flat annual budget with carryover
-    spend = spend_by_year(net)
     per_year = cfg["budget"]["musd_per_year"]
-    cum_s = cum_b = 0.0
-    worst = None
-    for y in range(cfg["existing_year"] + 1, max(years) + 1):
-        cum_s += spend.get(y, 0.0)
-        cum_b += per_year
-        if cum_s > cum_b * (1 + cfg["budget"]["tolerance"]) and (worst is None or cum_s - cum_b > worst[1]):
-            worst = (y, cum_s - cum_b)
+    worst = over_budget(net, max(years))
     if worst:
         add("warn", "OVER_BUDGET", "", f"cumulative spending exceeds the flat ${per_year / 1000:.1f}B/yr budget; "
             f"worst in {worst[0]} by ${worst[1] / 1000:.1f}B")
@@ -322,18 +330,80 @@ def spend_by_year(net):
     first = net._station_first_line()
     items = collections.defaultdict(float)     # (opening year, line, mode) -> cost: a piece is built as one project
 
-    for ln in net.lines.values():
-        if ln.status == "existing":
-            continue
-        per_km = cfg["cost_musd_per_km"][ln.mode]
+    for ln in net.lines.values():   # existing lines too: a rerouted line builds new track
         for i, s in enumerate(ln.segments):
             key = (ln.mode, frozenset((ln.stop_ids[i], ln.stop_ids[i + 1])))
             if ex < s.year < 9999 and owner[key][1] == ln.id:
-                items[(s.year, ln.id, ln.mode)] += s.km * per_km.get(s.grade, per_km["surface"])
-        for sid, y in zip(ln.stop_ids, ln.stop_years):
-            if ex < y < 9999 and first.get(sid) == ln.id:
-                items[(y, ln.id, ln.mode)] += cfg["station_cost_musd"][ln.mode]
+                items[(s.year, ln.id, ln.mode)] += net.segment_cost(ln, i)
+        for i, (sid, y) in enumerate(zip(ln.stop_ids, ln.stop_years)):
+            if ex < y < 9999 and first.get((sid, ln.mode)) == ln.id:
+                items[(y, ln.id, ln.mode)] += net.stop_cost(ln, i)
     return allocate_spending([(y, c, cy[m]) for (y, _, m), c in items.items()], cfg)
+
+
+def over_budget(net, last_year):
+    """(year, $M) where cumulative spending most exceeds the money accrued, or None."""
+    cfg = net.cfg
+    spend = spend_by_year(net)
+    per_year = cfg["budget"]["musd_per_year"]
+    cum_s = cum_b = 0.0
+    worst = None
+    for y in range(cfg["existing_year"] + 1, last_year + 1):
+        cum_s += spend.get(y, 0.0)
+        cum_b += per_year
+        if cum_s > cum_b * (1 + cfg["budget"]["tolerance"]) and (worst is None or cum_s - cum_b > worst[1]):
+            worst = (y, cum_s - cum_b)
+    return worst
+
+
+def _repair(scenario, rows, last_year, tries=150):
+    """Per-stage costs (what exact_years schedules with) and the year-by-year spending
+    check disagree a little where track ownership shifts. Close the gap locally: push the
+    first stage that opens after the over-budget year back a year (and its line's later
+    stages with it), until the plan fits. Returns the rows, or None if it doesn't fit."""
+    from .network import Network
+    from .validate import islands as find_islands
+    rows = copy.deepcopy(rows)
+    cy = max(_cfg_for(scenario)["staging"]["construction_years"].values())
+    for _ in range(tries):
+        test = Network.load(scenario, stage_rows=rows)
+        worst = over_budget(test, last_year)
+        if not worst:
+            return rows   # a line briefly cut off is reported (validate ISLAND), not a budget failure
+        y = worst[0]
+        cand = [r for r in rows if r.get("locked") != "1" and r["kind"] != "via" and y < int(r["year_opens"]) <= y + cy]
+        if not cand:
+            return None
+        r = min(cand, key=lambda r: (int(r["year_opens"]), r["line_id"], -int(r["stage"])))
+        new = int(r["year_opens"]) + 1
+        for q in rows:
+            if q["line_id"] == r["line_id"] and q["kind"] != "via" and int(q["stage"]) >= int(r["stage"]) and int(q["year_opens"]) < new:
+                q["year_opens"] = str(new)
+    return None
+
+
+def _attach_islands(scenario, rows, test, rounds=6):
+    """A line still cut off from the network in some year opens the stages it had by then a
+    year later, until it connects. Delaying spending can't break the cumulative budget."""
+    from .network import Network
+    from .validate import islands as find_islands
+    for _ in range(rounds):
+        late = find_islands(test)
+        if not late:
+            break
+        for r in rows:
+            host = test.host_line(r["line_id"])
+            lid = host.id if host else r["line_id"]
+            y = late.get(r["line_id"], late.get(lid))
+            if y and r["kind"] != "via" and r.get("locked") != "1" and test.cfg["existing_year"] < int(r["year_opens"]) <= y:
+                r["year_opens"] = str(y + 1)
+        rows = renumber(keep_attached(test, rows))
+        test = Network.load(scenario, stage_rows=rows)
+    return rows, test
+
+
+def _cfg_for(scenario):
+    return config.load(scenario=scenario)
 
 
 def schedule(scenario=None, log=print):
@@ -358,7 +428,14 @@ def schedule(scenario=None, log=print):
                 break
             for lid, y in late.items():
                 floor[lid] = max(floor.get(lid, 0), y + 1)
+        if late and log:
+            log("warning: still cut off from the network: " + ", ".join(sorted(late)))
+        if any(f[1] == "OVER_BUDGET" for f in check(test)):
+            fixed = _repair(scenario, rows, max(test.cfg["years"]))
+            if fixed is not None:
+                rows, test = fixed, Network.load(scenario, stage_rows=fixed)
         if not any(f[1] == "OVER_BUDGET" for f in check(test)):
+            rows, test = _attach_islands(scenario, rows, test)
             moved = sum(1 for a, b in zip(net.stage_rows, rows) if a["year_opens"] != b["year_opens"])
             if log:
                 log(f"{moved} of {len(rows)} stages moved to their earliest affordable year "
@@ -374,24 +451,68 @@ def stage_costs(net, rows):
     names = {k: v.name for k, v in net.stations.items()}
     owner = net.track_owner()
     first = net._station_first_line()
+    ex = cfg["existing_year"]
     out = {}
     for r in rows:
-        ln = net.lines.get(r["line_id"])
-        if ln is None or r["kind"] == "via" or ln.status == "existing":
+        ln = net.host_line(r["line_id"])   # a through-routed line's stages price its part of the joined line
+        if ln is None or r["kind"] == "via" or int(r["year_opens"]) <= ex:   # today's service costs nothing
             continue
-        a, b = sorted((resolve(r["from_stop"], ln.stop_ids, names), resolve(r["to_stop"], ln.stop_ids, names)))
-        per_km = cfg["cost_musd_per_km"][ln.mode]
+        a, b = sorted((resolve_on(net, ln, r["from_stop"], names), resolve_on(net, ln, r["to_stop"], names)))
         cost = 0.0
         for i in range(a, b):
-            s = ln.segments[i]
-            if owner[(ln.mode, frozenset((ln.stop_ids[i], ln.stop_ids[i + 1])))][1] == ln.id:
-                cost += s.km * per_km.get(s.grade, per_km["surface"])
+            if ln.segments[i].year > ex and owner[(ln.mode, frozenset((ln.stop_ids[i], ln.stop_ids[i + 1])))][1] == ln.id:
+                cost += net.segment_cost(ln, i)
         y = int(r["year_opens"])
         for i in range(a, b + 1):   # stations this line opens first, charged to the stage that first reaches them
             reach = min(ln.segments[k].year for k in (i - 1, i) if 0 <= k < len(ln.segments))
-            if first.get(ln.stop_ids[i]) == ln.id and reach == y and (i > a or i == 0 or ln.segments[i - 1].year != y):
-                cost += cfg["station_cost_musd"][ln.mode]
+            if reach > ex and first.get((ln.stop_ids[i], ln.mode)) == ln.id and reach == y and (i > a or i == 0 or ln.segments[i - 1].year != y):
+                cost += net.stop_cost(ln, i)
         out[id(r)] = (cost, ln.mode)
+    return out
+
+
+def unstaged_spending(net, rows):
+    """[(year, $M, construction years)] for new track and stations no stage row covers (a
+    reroute edit's new track, say): fixed spending the scheduler works around."""
+    cfg = net.cfg
+    ex, cy = cfg["existing_year"], cfg["staging"]["construction_years"]
+    names = {k: v.name for k, v in net.stations.items()}
+    owner, first = net.track_owner(), net._station_first_line()
+    covered, covered_seg = set(), set()
+    for r in rows:
+        ln = net.host_line(r["line_id"])
+        if ln is None or r["kind"] == "via" or int(r["year_opens"]) <= ex:
+            continue
+        try:
+            a, b = sorted((resolve_on(net, ln, r["from_stop"], names), resolve_on(net, ln, r["to_stop"], names)))
+        except KeyError:
+            continue
+        covered |= {(ln.id, i) for i in range(a, b + 1)}
+        covered_seg |= {(ln.id, i) for i in range(a, b)}
+    out = []
+    for ln in net.lines.values():
+        for i, s in enumerate(ln.segments):
+            if ex < s.year < 9999 and (ln.id, i) not in covered_seg \
+                    and owner[(ln.mode, frozenset((ln.stop_ids[i], ln.stop_ids[i + 1])))][1] == ln.id:
+                out.append((s.year, net.segment_cost(ln, i), cy[ln.mode]))
+        for i, y in enumerate(ln.stop_years):
+            if ex < y < 9999 and (ln.id, i) not in covered and first.get((ln.stop_ids[i], ln.mode)) == ln.id:
+                out.append((y, net.stop_cost(ln, i), cy[ln.mode]))
+    return out
+
+
+def _line_values(net):
+    """line_id -> daily trips per $M from the last full build of this scenario."""
+    import csv
+    import os
+    p = config.path("results", net.name, "lines.csv")
+    out = {}
+    if os.path.exists(p):
+        for r in csv.DictReader(open(p, encoding="utf-8")):
+            try:
+                out[r["line_id"]] = float(r["value_per_musd"])
+            except (TypeError, ValueError):
+                pass
     return out
 
 
@@ -439,12 +560,29 @@ def _exact_years(net, rows, log=print, scale=1.0, floor=None):
     priority = _priorities(net, rows)
     spend = [0.0] * (horizon - ex + 1)
     last = {}
-    # locked stages reserve their money first; then the rest in build order
-    order = sorted(range(len(rows)), key=lambda i: (rows[i].get("locked") != "1",
-                                                    int(rows[i]["year_opens"]) > end, int(rows[i]["year_opens"]),
-                                                    priority.get(i, 1e9), rows[i]["line_id"], int(rows[i]["stage"])))
+    # locked stages reserve their money first; then the rest in build order, or, with
+    # staging.priority = "value_per_musd", best riders per dollar first (line values from the
+    # last full build, results/<scenario>/lines.csv), each line's stages in their own order
+    by_value = cfg["staging"].get("priority") == "value_per_musd"
+    value = _line_values(net) if by_value else {}
+    if by_value:   # a line not measured yet (new since the last full build) ranks at its mode's median
+        import statistics
+        med = {m: statistics.median([v for l, v in value.items() if l in net.lines and net.lines[l].mode == m] or [0.0])
+               for m in {ln.mode for ln in net.lines.values()}}
+        value = {r["line_id"]: value.get(r["line_id"], med[net.host_line(r["line_id"]).mode]) for r in rows
+                 if net.host_line(r["line_id"])}
+        first_year = {}
+        for r in rows:
+            first_year[r["line_id"]] = min(first_year.get(r["line_id"], 9999), int(r["year_opens"]))
+        order = sorted(range(len(rows)), key=lambda i: (rows[i].get("locked") != "1" and int(rows[i]["year_opens"]) > ex, -value.get(rows[i]["line_id"], 0.0),
+                                                        first_year[rows[i]["line_id"]], int(rows[i]["year_opens"]),
+                                                        int(rows[i]["stage"])))
+    else:
+        order = sorted(range(len(rows)), key=lambda i: (rows[i].get("locked") != "1" and int(rows[i]["year_opens"]) > ex,
+                                                        int(rows[i]["year_opens"]) > end, int(rows[i]["year_opens"]),
+                                                        priority.get(i, 1e9), rows[i]["line_id"], int(rows[i]["stage"])))
 
-    placed = []
+    placed = list(unstaged_spending(net, rows))   # e.g. the D2 subway, built by a reroute edit
     bcfg = dict(cfg, budget=dict(cfg["budget"], musd_per_year=cfg["budget"]["musd_per_year"] * scale))
 
     def ok(items):
@@ -464,21 +602,23 @@ def _exact_years(net, rows, log=print, scale=1.0, floor=None):
             continue
         cost, mode = oc[i]
         n = cy[mode]
-        if r.get("locked") == "1":
+        if r.get("locked") == "1" or y0 <= ex:   # locked, or running today (a through-routed existing line)
             placed.append((y0, cost, n))
             last[r["line_id"]] = max(last.get(r["line_id"], 0), y0)
             continue
         lo = max(ex + n, last.get(r["line_id"], 0))
         if r["kind"] == "starter":   # a new line needs the network it joins: never earlier than planned
-            lo = max(lo, y0 if y0 <= end else lo, floor.get(r["line_id"], 0))
+            host = net.host_line(r["line_id"])
+            lo = max(lo, y0 if (y0 <= end and not by_value) else lo, floor.get(r["line_id"], 0),
+                     floor.get(host.id, 0) if host else 0)
         hi = horizon - 10   # earlier if the money is there, later if it isn't
         y = next((t for t in range(lo, hi + 1) if ok(placed + [(t, cost, n)])), None)
         if y is None:
             y = max(y0, lo)   # keep it where it was (or after its line's previous stage)
         if y > end:
             r["note"] = f"after the {end} horizon"
-        elif (r.get("note") or "").startswith("after the"):
-            r["note"] = "deferred by the optimizer (no gain by 2070); built when money frees up"
+        elif (r.get("note") or "").startswith(("after the", "deferred by the optimizer")):
+            r["note"] = "value per $" if by_value else "optimizer"
         r["year_opens"] = str(y)
         placed.append((y, cost, n))
         last[r["line_id"]] = y
@@ -495,11 +635,11 @@ def keep_attached(net, rows):
     names = {k: v.name for k, v in net.stations.items()}
     by = collections.defaultdict(list)
     for r in rows:
-        ln = net.lines.get(r["line_id"])
+        ln = net.host_line(r["line_id"])   # a through-routed line's stages price its part of the joined line
         if ln is None or r["kind"] == "via":
             continue
         try:
-            a, b = sorted((resolve(r["from_stop"], ln.stop_ids, names), resolve(r["to_stop"], ln.stop_ids, names)))
+            a, b = sorted((resolve_on(net, ln, r["from_stop"], names), resolve_on(net, ln, r["to_stop"], names)))
         except KeyError:
             continue
         by[r["line_id"]].append((r, a, b))

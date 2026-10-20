@@ -196,3 +196,82 @@ Scenarios:
 - The 2M scenario leaves out 10 corridors that added under 5 daily trips per $M
   (`scenarios/two_million/drop_lines.txt`, 137 km, $2.4B); it still reaches 2M daily trips (2089).
 - An extension never opens before the stage it attaches to (budget scheduler).
+
+## v2.7 — Fewer BRT stops, best value first
+
+- New BRT corridors stop every 1.2 km in dense areas and 1.6 km in suburban ones (was 0.8 km);
+  new corridors average 1.5 km between stops.
+- The 2M scenario schedules by riders per dollar (`"staging": {"priority": "value_per_musd"}`):
+  the strongest corridors are built first, whatever their mode. BRT now opens at a median of 2051
+  (was 2070), metro at 2045 (was 2037), commuter rail at 2058 (was 2030). Three weak BRT
+  corridors fall past 2100. 2.04M daily trips in 2100.
+
+## v2.8 — Shared track, McKinney straightened, map groups
+
+- DNT East runs on the Legacy Line's track from Frisco to Stonebriar (Frisco, Stonebrook / Dallas
+  Parkway, The T's, Dallas Parkway / Gaylord, Stonebriar) instead of a parallel alignment 0.5 km
+  west. Starwood / Stonebrook (DNT East only) is removed; Frisco Main St, Riders Field and the
+  western Stonebriar stay as BRT stops.
+- The McKinney Line runs straight up the DART-owned railroad from Parker Road (no detour west to
+  Watters Creek), with a new Spring Creek Parkway station where the Legacy Line now ends (extended
+  1.6 km from Watters Creek). Transfers Red / McKinney at Parker Road, Legacy / McKinney at Spring
+  Creek Parkway.
+- Map: lines on the same track are drawn side by side when zoomed in (dfwt/bundle.py), and the
+  Lines panel has a checkbox per group (each mode, split into plan lines and scenario additions).
+
+## v2.9 — Review fixes
+
+Nine reviewers and a UX pass went over the project (reports/REVIEW.md lists what they found
+and what is left to decide). Fixed:
+
+- Model: riders rank access modes, connector stations and routes by the same perceived
+  minutes as the mode choice, including the drive-to-transit constant (garages had been
+  chosen on raw minutes and penalised afterwards, so a full garage could add riders).
+  Recalibrated to 2025: transit constant -0.797, drive-to-transit constant -1.0 (51% of
+  rail riders drive to a garage, 80.6k rail boardings). Walks between nearby platforms no
+  longer count as transit trips. Station-area growth ramps from each mode's arrival.
+- **The 2M scenario now reaches about 1.87M daily trips in 2100** (was 2.04M). The access
+  fix moves riders off garages (5% of 2100 riders, was 20%), and the scenario's
+  walkability package now starts in 2030 instead of applying to today's network (its 2025
+  run was 13% above calibration). Whether to add levers to reach 2M is an open decision.
+- Costs: platforms are charged per mode (a metro line at a BRT stop builds its own).
+- Network: new BRT stops at every station within 300 m of the route, so new corridors meet
+  the lines they cross (three had been cut off and pushed past 2100); Shiloh Road BRT
+  stops at SpringPark. The aligner no longer moves interchange stations.
+- Schedule: a local repair replaces shrinking the whole budget (100% used, was 97%);
+  `schedule --write` clears stale stage files; build stops on default-scenario errors.
+- Reports: peak-hour loads use daily riders (were ~3.8x low); light-rail capacity 12k/h.
+- Map: continuous side-by-side shared track, interchange capsules, stations by zoom,
+  contrast guard, recoloured clashing lines (SH-114, I-30, Gainesville, Bowie, SE TexRail,
+  Alvarado), trips drawn along their route, trip-planner messages, popup/panel/touch fixes.
+
+## v2.10 — Peer costs, D2, levers to 2M, Weatherford and Greenville
+
+- **Costs** at 2025 US peer levels (commuter rail $45M/km, arterial BRT $30M/km, light rail
+  $140M/km at grade, $600M/km in tunnel; stations $4-50M, $200M underground), garages charged
+  at ~$30k a space (BRT termini 400 spaces), falling with a steady program: 15% lower by 2040,
+  25% by 2055 (config cost_efficiency). Operating cost is reported per year. The plan costs
+  $103.6B (was $94.4B) and is rescheduled into the budget (last opening 2075).
+- **D2 subway** (2M): Green and Orange leave the downtown mall in 2035 for a tunnel under
+  Commerce Street (Victory - Metro Center - Commerce / Harwood, then Deep Ellum or Pearl); the
+  mall keeps Red and Blue. New `reroute` edit: the old routing runs until the new track opens.
+- **Levers** (2M): parking prices double downtown by 2050 and $5/day parking spreads to the
+  densest job centers; regional rail runs through Fort Worth and Dallas (TRE to Alvarado and
+  Terrell, TEXRail to Primrose, Mansfield-Denton-Carrollton); the Red Line runs on to McKinney
+  as light rail. The suburban Wiehle-Reston garages are dropped. **About 2.24M daily trips in
+  2100** (1.85M without the parking policy).
+- **New regional rail** (2M, locked by 2100 for a complete network): Weatherford Line (Fort
+  Worth T&P - Benbrook - Aledo - Hudson Oaks / Willow Park - Weatherford, 2090), Greenville
+  Line (Downtown Rowlett - Rockwall - Fate - Royse City - Caddo Mills - Greenville, 2095), Alvarado
+  Line on to Cleburne (2088). Hunt County is outside the model's zones, so Greenville's
+  ridership is understated.
+- **Network**: DNT East starts at Frisco Main St (Frisco Square); the Legacy Line runs as a DNT
+  East branch from Spring Creek Parkway via Legacy West to Pearl (each branch every 10 min);
+  FW Orange ends at Medical City - Baylor (FW Red serves the rest); Fort Worth metro lines are
+  named "FW Green / Blue / Orange / Pink / Berry / Red / Purple".
+- **Scheduler**: through-routed lines' stages price their part of the joined line; today's
+  service is never moved; new track no stage covers (D2) is reserved at its own year; lines
+  briefly cut off open when they connect.
+- **Map**: From/To station search; hidden lines are left out of trips (as if not built); BRT
+  routes on one street draw as one stroke with route names on hover; operating cost on the
+  capital card.

@@ -7,7 +7,7 @@ times, waits, transfer walks), so the in-page trip planner can't drift from it.
 import json
 import os
 
-from . import config, schematic
+from . import bundle, config, schematic
 from .graph import YearGraph
 
 TEMPLATE = os.path.join(os.path.dirname(__file__), "templates", "map.html")
@@ -45,8 +45,22 @@ def write(nets, evals, out_path):
                 "notes": ln.notes, "first": ln.first_year, "km": round(ln.km, 1),
                 "cost": m.get("cost_musd", 0), "value": m.get("value_per_musd", ""),
                 "load": m.get("peak_hour_load", 0),
-                "segs": [[s.year, geom_id(s.pts), round(s.km, 2)] for s in ln.segments],
+                "segs": [[s.year, round(s.km, 2)] for s in ln.segments],
             })
+        # drawn geometry: shared-track pieces, each with its lines in side-by-side order
+        def drawn_segs(ln):
+            """The line's track, plus a rerouted line's old track until the new one opens."""
+            out = [(s.year, s.pts) for s in ln.segments]
+            have = {(tuple(s.pts[0]), tuple(s.pts[-1])) for s in ln.segments}
+            for _, until, old, it in net.variants.get(ln.id, []):
+                if it.get("reroute"):
+                    out += [(s.year, s.pts, until) for s in old.segments
+                            if (tuple(s.pts[0]), tuple(s.pts[-1])) not in have and (tuple(s.pts[-1]), tuple(s.pts[0])) not in have]
+            return out
+        raw = bundle.pieces([(i, ln.mode, ln.status, ln.first_year, drawn_segs(ln)) for i, ln in enumerate(net.lines.values())])
+        pieces = [[geom_id(pts), [list(u) for u in users]] for pts, users in raw]
+        st_piece = bundle.station_pieces(raw, {sid: (st.lon, st.lat) for sid, st in net.stations.items()},
+                                         {ln_i: ln.stop_ids for ln_i, ln in enumerate(net.lines.values())})
         for sid, r in st_metrics.items():
             s = net.stations[sid]
             prev = stations.get(sid)
@@ -70,7 +84,7 @@ def write(nets, evals, out_path):
                 gkey[k] = len(graphs)
                 graphs.append({"runs": runs, "walks": walks})
             years[y] = gkey[k]
-        scen[key] = {"label": LABELS.get(key, key), "lines": lines, "graphs": graphs, "yearGraph": years,
+        scen[key] = {"label": LABELS.get(key, key), "lines": lines, "pieces": pieces, "stPiece": st_piece, "graphs": graphs, "yearGraph": years,
                      "metrics": ev["years"],
                      "boardings": {r["station_id"]: r["boardings_final"] for r in ev["stations"]}}
     data = {"years": cfg["years"], "boardPenalty": cfg["transfer"]["penalty_min"],

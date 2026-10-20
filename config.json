@@ -84,7 +84,7 @@
       "cruise_kmh": 63,
       "stop_penalty_min": 1.2,
       "default_headway_min": 6,
-      "capacity_pphpd": 20000,
+      "capacity_pphpd": 12000,
       "label": "Metro / light rail"
     },
     "brt": {
@@ -114,7 +114,7 @@
     "penalty_min": 3
   },
   "access": {
-    "_doc": "How people reach stations. Walk to anything within walk_max_m; drive (park & ride) to garages within pnr_max_km but not closer than pnr_min_km (people that close walk): commuter rail stations, each line's planned termini, today's lots at existing suburban stations (pnr_existing) and optional suburban garages (pnr_suburban). Garages hold pnr_spaces cars (DART Parker Road ~2,000, TRE/TEXRail stations 175-1,000); each space serves pnr_people_per_space commuters a day (75% full x 1.1 per car x 1.15 with drop-offs). Riders a full garage turns away take their best access without parking (pnr_overflow_fallback). Today's local buses are the feeder grid (30 min in denser areas); faster grids are a lever. Riders choose each station's access mode by perceived minutes (out-of-vehicle time weighs 2.5x). circuity applies to drive access, walk_circuity to walking. The micromobility, kiss_ride and pnr_suburban blocks are levers, off by default.",
+    "_doc": "How people reach stations. Walk to anything within walk_max_m; drive (park & ride) to garages within pnr_max_km but not closer than pnr_min_km (people that close walk): commuter rail stations, each line's planned termini, today's lots at existing suburban stations (pnr_existing) and optional suburban garages (pnr_suburban). Garages hold pnr_spaces cars (DART Parker Road ~2,000, TRE/TEXRail stations 175-1,000); each space serves pnr_people_per_space commuters a day (75% full x 1.1 per car x 1.15 with drop-offs). Riders a full garage turns away take their best access without parking (pnr_overflow_fallback). Today's local buses are the feeder grid (30 min in denser areas); faster grids are a lever. Riders choose their access mode, connector stations and route by perceived minutes: out-of-vehicle time weighs 2.5x and driving to a garage carries the drive-to-transit constant (ridership.pnr_asc_offset, in in-vehicle minutes), the same terms the mode choice uses. circuity applies to drive access, walk_circuity to walking. The micromobility, kiss_ride and pnr_suburban blocks are levers, off by default.",
     "walk_max_m": 1200,
     "walk_speed_kmh": 4.8,
     "circuity": 1.25,
@@ -125,7 +125,9 @@
     "max_access_stations": 8,
     "pnr_spaces": {
       "terminus": 1500,
-      "commuter_station": 400
+      "commuter_station": 400,
+      "brt_terminus": 400,
+      "_doc": "Garage spaces: line termini (BRT termini smaller), every commuter station. Charged at garage_musd_per_space (~$30k a structured space) with the station."
     },
     "pnr_people_per_space": 0.95,
     "pnr_min_km": 1.2,
@@ -226,27 +228,29 @@
     "gravity_iterations": 25
   },
   "cost_musd_per_km": {
-    "_doc": "Capital cost per route-km by mode and grade, 2025 USD. Calibrated to recent US projects: DART Silver Line ~$45M/km (new track on freight ROW), TEXRail ~$24M/km, Houston/Indy BRT $5-25M/km, US light rail $100-200M/km, US subway $400M+/km.",
+    "_doc": "Capital cost per route-km by mode and grade, 2025 USD, at recent US peer levels: DART Silver Line and the TEXRail extension ~$45-50M/km (new track on freight right-of-way), US light rail $100-200M/km at grade, center-running arterial BRT $25-55M/km (Houston University BRT ~$55M/km), US subway $500M+/km. cost_efficiency then lowers them as a steady program matures.",
     "brt": {
-      "surface": 15,
-      "elevated": 60,
-      "tunnel": 250
+      "surface": 30,
+      "elevated": 80,
+      "tunnel": 300
     },
     "commuter": {
-      "surface": 30,
-      "elevated": 90,
-      "tunnel": 350
+      "surface": 45,
+      "elevated": 120,
+      "tunnel": 450
     },
     "metro": {
-      "surface": 120,
-      "elevated": 200,
-      "tunnel": 450
+      "surface": 140,
+      "elevated": 240,
+      "tunnel": 600
     }
   },
   "station_cost_musd": {
-    "brt": 2,
-    "commuter": 15,
-    "metro": 40
+    "_doc": "Per station and mode (a metro line reaching a BRT stop builds its own platform); metro_tunnel for an underground metro station. 2025 USD, x cost_efficiency.",
+    "brt": 4,
+    "commuter": 20,
+    "metro": 50,
+    "metro_tunnel": 200
   },
   "standards": {
     "_doc": "Stop-spacing bands (km) used by validate. Sources in reports/DESIGN_STANDARDS.md.",
@@ -511,7 +515,7 @@
   },
   "ridership": {
     "_doc": "Daily riders from the commute model (dfwt/demand.py). Each commute chooses drive, transit or walk/bike the whole way (multinomial logit, drive is the reference). Transit utility: asc + b_ivt*(drive - transit door-to-door minutes) - b_ovt_extra*(access + egress minutes) - b_ratio*(how far transit exceeds 1x the drive time, as a ratio) + 0.125/$ x (driving cost avoided at drive_usd_per_km + parking avoided at paid-parking destinations). FTA/MWCOG ranges: IVT -0.02..-0.03/min, out-of-vehicle 2-3x. asc is calibrated so the 2025 network carries today's rail ridership with today's buses as feeders; active.asc so ~2% walk or bike. Transit commuters x telework; daily trips = commuters x round_trip / work_share_of_transit_trips; boardings = trips x boardings per trip (from the load assignment). Drive-to-transit has its own constant (pnr_asc_offset, as in MPO models: parking, walking in from the lot), set so about half of 2025 rail riders drive to a garage, near DART's on-board surveys; riders without a car (no_car) can't.",
-    "asc": -0.4141,
+    "asc": -0.7969,
     "b_ivt_per_min": 0.025,
     "b_ovt_extra_per_min": 0.0375,
     "b_per_dollar": 0.125,
@@ -617,7 +621,25 @@
       ],
       "ride_bonus": 3.0
     },
-    "pnr_asc_offset": -1.5
+    "pnr_asc_offset": -1.0
   },
-  "default_scenario": "two_million"
+  "default_scenario": "two_million",
+  "garage_musd_per_space": 0.03,
+  "cost_efficiency": {
+    "_doc": "Unit-cost factor by year of construction (linear between entries, flat after): a continuous program keeps local contractors, crews and agency staff busy, so costs fall from peer levels toward the lower end of international practice. 2025 = 1.0; 15% lower by 2040, 25% lower by 2055.",
+    "2025": 1.0,
+    "2040": 0.85,
+    "2055": 0.75
+  },
+  "operating": {
+    "_doc": "Operating cost, reported per year (not in the capital budget): revenue vehicle-hours = 2 directions x run minutes / headway x service hours x layover/recovery; $ per revenue hour per train or bus; weekday-equivalent days. Feeder buses are not included.",
+    "usd_per_revenue_hour": {
+      "metro": 250,
+      "brt": 150,
+      "commuter": 400
+    },
+    "span_hours": 18,
+    "layover": 1.15,
+    "days_per_year": 300
+  }
 }

@@ -43,13 +43,13 @@ svg.spark{width:100%;height:46px;display:block}
 details{border-top:1px solid var(--rule);padding-top:10px}
 summary{cursor:pointer;font-weight:600;font-size:.9rem}
 .lines{display:flex;flex-direction:column;gap:2px;margin-top:8px;max-height:260px;overflow-y:auto}
-.grp{font-size:.7rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:8px 0 2px}
+.grp{display:flex;align-items:center;gap:6px;font-size:.7rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:8px 0 2px;cursor:pointer}.grp .n{font-weight:400;letter-spacing:0}
 .li{display:grid;grid-template-columns:16px 22px minmax(0,1fr) auto;gap:6px;align-items:center;font-size:.84rem;padding:2px 0}
-.li input{margin:0}
+.li input,.grp input{margin:0}
 .sw{height:4px;border-radius:2px}
 .li .nm{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .li .yr{color:var(--muted);font-variant-numeric:tabular-nums;font-size:.76rem}
-.li.future{opacity:.45}
+.li.future{opacity:.62}
 .interval{font-size:.82rem;line-height:1.45;border-top:1px solid var(--rule);padding-top:10px}
 .interval b{font-weight:600}
 .interval .op{display:grid;grid-template-columns:10px minmax(0,1fr) auto;gap:6px;align-items:center}
@@ -61,9 +61,14 @@ summary{cursor:pointer;font-weight:600;font-size:.9rem}
 #trip .leg{display:grid;grid-template-columns:8px minmax(0,1fr);gap:8px;margin:3px 0}
 #trip .leg i{border-radius:2px}
 .hint{color:var(--muted);font-size:.8rem}
-.pop b{font-size:.95rem}.pop .m{color:#555;font-size:.8rem;margin-top:3px;line-height:1.4}
+.od{gap:6px;margin:6px 0}.od input{flex:1;min-width:0;padding:5px 7px;border:1px solid var(--rule);border-radius:6px;background:var(--panel);color:var(--ink);font:inherit;font-size:.85rem}
+.pop b{font-size:.95rem}.pop .m{color:var(--muted);font-size:.8rem;margin-top:3px;line-height:1.4}
 .chip{display:inline-block;padding:1px 7px;border-radius:9px;color:#fff;font-size:.72rem;margin:1px 3px 1px 0}
 a{color:var(--accent)}
+.leaflet-popup-content-wrapper,.leaflet-popup-tip,.leaflet-tooltip,.leaflet-bar a,.leaflet-control-layers{background:var(--panel);color:var(--ink);border-color:var(--rule)}
+.leaflet-tooltip-top:before{border-top-color:var(--panel)}
+#trip .clear{background:none;border:0;padding:0;color:var(--accent);font:inherit;font-size:.8rem;text-decoration:underline}
+@media (pointer:coarse){.li{padding:6px 0}.li input,.grp input{width:20px;height:20px}}
 @media (max-width:640px){
   #panel{top:auto;bottom:0;left:0;right:0;width:auto;max-height:52%;border-radius:12px 12px 0 0;
     padding-left:max(16px,env(safe-area-inset-left));padding-right:max(16px,env(safe-area-inset-right));padding-bottom:max(16px,env(safe-area-inset-bottom))}
@@ -96,7 +101,10 @@ a{color:var(--accent)}
   <div id="interval" class="interval" aria-live="polite"></div>
   <details open>
     <summary>Trip planner</summary>
-    <div id="trip"><p class="hint">Click an origin station, then a destination.</p></div>
+    <div class="row od"><input id="from" list="stlist" placeholder="From station" aria-label="From station" autocomplete="off">
+      <input id="to" list="stlist" placeholder="To station" aria-label="To station" autocomplete="off"></div>
+    <datalist id="stlist"></datalist>
+    <div id="trip"><p class="hint">Click an origin station, then a destination, or type their names.</p></div>
   </details>
   <details>
     <summary>Lines</summary>
@@ -111,7 +119,8 @@ const D = /*__DATA__*/null;
 // each scenario stores its distinct routing graphs once; years point at them
 for (const S of Object.values(D.scen)) S.years = Object.fromEntries(Object.entries(S.yearGraph).map(([y, i]) => [y, S.graphs[i]]));
 const dark = window.matchMedia && matchMedia('(prefers-color-scheme: dark)').matches;
-const map = L.map('map', {zoomControl: false, preferCanvas: true}).setView([32.84, -97.03], 10);
+const touch = matchMedia('(pointer: coarse)').matches;
+const map = L.map('map', {zoomControl: false, preferCanvas: true, renderer: L.canvas({tolerance: touch ? 10 : 4})}).setView([32.84, -97.03], 10);
 L.control.zoom({position: 'topright'}).addTo(map);
 // Key-free basemaps: Esri's gray canvas (light/dark, with a labels overlay) and standard OpenStreetMap.
 map.createPane('labels').style.cssText = 'z-index:450;pointer-events:none';
@@ -128,7 +137,16 @@ const basemaps = {
 };
 basemaps[dark ? 'Dark gray' : 'Light gray'].addTo(map);
 const layerCtl = L.control.layers(basemaps, null, {position: 'topright'}).addTo(map);  // schematic: adds the Waterways overlay
+map.createPane('trip').style.zIndex = 430;   // a planned trip sits above the (dimmed) network
+const tripR = L.canvas({pane: 'trip'});
 const lineLayer = L.layerGroup().addTo(map), stLayer = L.layerGroup().addTo(map), tripLayer = L.layerGroup().addTo(map);
+const dimNetwork = on => { map.getPane('overlayPane').style.opacity = on ? .35 : ''; map.getPane('glow').style.visibility = on ? 'hidden' : ''; };
+// text on a line-colour chip: dark ink on light colours
+const inkOn = hex => { const c = (hex || '#000').replace('#', ''), v = [0, 2, 4].map(i => parseInt(c.slice(i, i + 2), 16) / 255)
+  .map(x => x <= .04045 ? x / 12.92 : ((x + .055) / 1.055) ** 2.4); return .2126 * v[0] + .7152 * v[1] + .0722 * v[2] > .32 ? '#18212b' : '#fff'; };
+// keep popups clear of the panel (left on desktop, a bottom sheet on phones)
+const panelPad = () => { const r = $('panel').getBoundingClientRect(), sheet = r.width > innerWidth * .6;
+  return sheet ? {autoPanPaddingTopLeft: [12, 12], autoPanPaddingBottomRight: [12, innerHeight - r.top + 12]} : {autoPanPaddingTopLeft: [r.right + 12, 12]}; };
 const $ = id => document.getElementById(id);
 const fmt = n => n >= 10000 ? Math.round(n / 1000) + 'k' : n.toLocaleString();
 let scenKey = D.order[0], yi = 0, hidden = new Set(), pick = [];
@@ -137,48 +155,206 @@ let S = D.scen[scenKey];
 for (const k of D.order) { const o = document.createElement('option'); o.value = k; o.textContent = D.scen[k].label; $('scen').append(o); }
 $('slider').max = D.years.length - 1;
 
-function style(mode, color, future) {
-  // BRT: a solid, thinner line (dashes read as 'planned' on transit maps)
-  const w = mode === 'commuter' ? 3 : mode === 'brt' ? 2.2 : 4.5;
-  return {color, weight: w, opacity: future ? .18 : .92, dashArray: mode === 'commuter' ? '8 5' : null, lineCap: 'round'};
+// Colour guard: a line colour too close to the page background (a pale yellow on
+// the light theme, a deep purple on the dark one) is darkened or lightened just
+// enough to read as a line. Hue and saturation are kept; most colours pass as is.
+const lineColor = (() => {
+  const memo = new Map();
+  const lin = c => { c /= 255; return c <= 0.04045 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4; };
+  const lum = ([r, g, b]) => 0.2126 * lin(r) + 0.7152 * lin(g) + 0.0722 * lin(b);
+  const rgb = h => { h = h.replace('#', ''); if (h.length === 3) h = [...h].map(c => c + c).join(''); return [0, 2, 4].map(i => parseInt(h.slice(i, i + 2), 16)); };
+  const toHsl = ([r, g, b]) => {
+    r /= 255; g /= 255; b /= 255;
+    const mx = Math.max(r, g, b), mn = Math.min(r, g, b), l = (mx + mn) / 2, d = mx - mn;
+    if (!d) return [0, 0, l];
+    const s = d / (1 - Math.abs(2 * l - 1));
+    const h = mx === r ? ((g - b) / d) % 6 : mx === g ? (b - r) / d + 2 : (r - g) / d + 4;
+    return [(h * 60 + 360) % 360, s, l];
+  };
+  const toRgb = ([h, s, l]) => {
+    const c = (1 - Math.abs(2 * l - 1)) * s, x = c * (1 - Math.abs((h / 60) % 2 - 1)), m = l - c / 2;
+    const [r, g, b] = h < 60 ? [c, x, 0] : h < 120 ? [x, c, 0] : h < 180 ? [0, c, x] : h < 240 ? [0, x, c] : h < 300 ? [x, 0, c] : [c, 0, x];
+    return [r, g, b].map(v => Math.round((v + m) * 255));
+  };
+  return (hex, mode) => {
+    const bgHex = getComputedStyle(document.documentElement).getPropertyValue('--bg').trim() || '#f4f6f5';
+    const key = hex + bgHex + (mode || '');
+    if (memo.has(key)) return memo.get(key);
+    let out = hex;
+    try {
+      const bg = lum(rgb(bgHex)), darkBg = bg < 0.2, need = darkBg ? (mode === 'commuter' ? 3.0 : 2.6) : 2.0;   // commuter's hollow stroke needs more
+      const ratio = c => { const L = lum(c); return (Math.max(L, bg) + 0.05) / (Math.min(L, bg) + 0.05); };
+      let c = rgb(hex);
+      if (ratio(c) < need) {
+        const hsl = toHsl(c);
+        for (let i = 0; i < 50 && ratio(c) < need; i++) { hsl[2] = Math.max(0, Math.min(1, hsl[2] + (darkBg ? 0.015 : -0.015))); c = toRgb(hsl); }
+        out = '#' + c.map(v => v.toString(16).padStart(2, '0')).join('');
+      }
+    } catch (e) { /* unparseable colour: use as given */ }
+    memo.set(key, out);
+    return out;
+  };
+})();
+
+// line weights grow with zoom (0.75x at z10 to 1.35x at z16)
+const zf = () => Math.max(.75, Math.min(1.35, .75 + .1 * (map.getZoom() - 10)));
+const W = {metro: 4.5, commuter: 4, brt: 2.4};
+const weightOf = mode => (W[mode] || W.metro) * zf();
+const bgColor = getComputedStyle(document.documentElement).getPropertyValue('--bg').trim() || '#f4f6f5';
+// "opened this interval" glows sit in their own pane, faded as a whole so overlaps don't darken
+map.createPane('glow').style.cssText = `z-index:390;opacity:${dark ? .32 : .5};pointer-events:none`;
+const glowR = L.canvas({pane: 'glow'}), glowLayer = L.layerGroup().addTo(map);
+// a polyline shifted to its left by a number of screen pixels at the current zoom: `px` along
+// the middle, easing from `px0` at the start and to `px1` at the end over the first and last
+// ~40 px, so a line meets its continuation on the next piece without a step
+function offsetPath(ll, px, px0 = px, px1 = px) {
+  if (ll.length < 2 || (Math.abs(px) < .05 && Math.abs(px0) < .05 && Math.abs(px1) < .05)) return ll;
+  let P = ll.map(p => map.latLngToLayerPoint(p));
+  const cum = [0];
+  for (let i = 1; i < P.length; i++) cum.push(cum[i - 1] + P[i].distanceTo(P[i - 1]));
+  const len = cum[cum.length - 1], R = Math.min(40, len / 2);
+  // add vertices where the easing starts and ends so it isn't spread over a long segment
+  const at = s => { let i = 1; while (i < P.length - 1 && cum[i] < s) i++; const t = (s - cum[i - 1]) / ((cum[i] - cum[i - 1]) || 1);
+    return [i, L.point(P[i - 1].x + t * (P[i].x - P[i - 1].x), P[i - 1].y + t * (P[i].y - P[i - 1].y))]; };
+  if (px0 !== px && R > 1) { const [i, q] = at(R); P.splice(i, 0, q); cum.splice(i, 0, R); }
+  if (px1 !== px && R > 1) { const [i, q] = at(len - R); P.splice(i, 0, q); cum.splice(i, 0, len - R); }
+  const off = s => s < R ? px0 + (px - px0) * s / R : s > len - R ? px1 + (px - px1) * (len - s) / R : px;
+  const nrm = (a, b) => { const dx = b.x - a.x, dy = b.y - a.y, l = Math.hypot(dx, dy) || 1; return [dy / l, -dx / l]; };
+  const out = [];
+  for (let i = 0; i < P.length; i++) {
+    const a = i > 0 ? nrm(P[i - 1], P[i]) : null, b = i < P.length - 1 ? nrm(P[i], P[i + 1]) : null;
+    let [x, y] = a && b ? [a[0] + b[0], a[1] + b[1]] : (a || b);
+    const l = Math.hypot(x, y) || 1; x /= l; y /= l;
+    const m = Math.min(2, 1 / Math.max(.5, x * (a || b)[0] + y * (a || b)[1])), o = off(cum[i]);
+    out.push(map.layerPointToLatLng(L.point(P[i].x + x * o * m, P[i].y + y * o * m)));
+  }
+  return out;
 }
-function draw() {
+// track states this year: future (faint), under construction (dotted), open (solid),
+// and newly opened since the last interval (solid on a glow)
+function stateFn() {
+  const Y = D.years[yi], prevY = yi ? D.years[yi - 1] : -Infinity;
+  return (ln, yr) => yr <= prevY ? 'open' : yr <= Y ? 'new' : yr - (D.build[ln.mode] || 0) < Y ? 'building' : 'future';
+}
+// piece ends that meet: endpoint -> [[piece, is its start]] (per scenario, built once)
+function pieceEnds() {
+  if (S._ends) return S._ends;
+  const m = new Map(), key = p => p[0].toFixed(5) + ',' + p[1].toFixed(5);
+  S.pieces.forEach(([gi], pi) => { const g = D.geoms[gi];
+    for (const [p, st] of [[g[0], true], [g[g.length - 1], false]]) { const k = key(p); if (!m.has(k)) m.set(k, []); m.get(k).push([pi, st]); } });
+  S._ends = S.pieces.map(([gi]) => { const g = D.geoms[gi]; return [m.get(key(g[0])), m.get(key(g[g.length - 1]))]; });
+  return S._ends;
+}
+let pieceOffs = [];   // per piece: Map line -> offset (px), for the station markers
+function drawLines() {
+  lineLayer.clearLayers(); glowLayer.clearLayers();
+  const state = stateFn(), apart = map.getZoom() >= 12 ? 1 : 0;   // shared track side by side from zoom 12
   const Y = D.years[yi];
-  $('year').textContent = Y;
-  lineLayer.clearLayers(); stLayer.clearLayers();
-  const drawn = new Set(), prevY = yi ? D.years[yi - 1] : -Infinity;
-  // track states this year: future (faint), under construction (dashed), open (solid),
-  // and newly opened since the last interval (solid on a glow)
-  const state = (ln, yr) => yr <= prevY ? 'open' : yr <= Y ? 'new' : yr - (D.build[ln.mode] || 0) < Y ? 'building' : 'future';
-  for (const pass of ['future', 'building', 'new', 'open']) for (const ln of S.lines) {
-    if (hidden.has(ln.id)) continue;
-    for (const [yr, gi] of ln.segs) {
-      const st = state(ln, yr); if (st !== pass) continue;
-      const k = gi + '|' + ln.color + '|' + st; if (drawn.has(k)) continue; drawn.add(k);
-      const ll = D.geoms[gi].map(p => [p[1], p[0]]);
-      if (st === 'new') L.polyline(ll, {color: '#ffd23f', weight: 13, opacity: .55, lineCap: 'round'}).addTo(lineLayer);
-      const sty = style(ln.mode, ln.color, st === 'future');
-      if (st === 'building') Object.assign(sty, {opacity: .7, dashArray: '1 8', weight: sty.weight + 1.5});
-      L.polyline(ll, sty).addTo(lineLayer);
+  pieceOffs = S.pieces.map(([, users]) => {
+    const vis = users.filter(([li, , until]) => !hidden.has(S.lines[li].id) && !(until && Y >= until));
+    // BRT routes sharing a street draw as one stroke: they take one slot between them
+    const slots = [], slotOf = new Map();
+    for (const [li] of vis) {
+      const ln = S.lines[li], k = ln.mode === 'brt' ? 'brt' + ln.color : 'l' + li;
+      if (!slotOf.has(k)) { slotOf.set(k, slots.length); slots.push([]); }
+      slots[slotOf.get(k)].push(li);
+    }
+    const ws = slots.map(g => weightOf(S.lines[g[0]].mode) + 1);
+    let at = -ws.reduce((a, b) => a + b, 0) / 2;
+    const o = new Map();
+    slots.forEach((g, k) => { for (const li of g) o.set(li, (at + ws[k] / 2) * apart); at += ws[k]; });
+    return o;
+  });
+  const ends = pieceEnds();
+  // where two pieces meet, a line on both eases to the midpoint of its two offsets
+  const joint = (pi, end, li, own) => {
+    for (const [pj, st] of ends[pi][end] || []) {
+      if (pj === pi || !pieceOffs[pj].has(li)) continue;
+      const nb = pieceOffs[pj].get(li);
+      return (own + ((end === 0) !== st ? nb : -nb)) / 2;   // pieces running the same way share a left side
+    }
+    return own;
+  };
+  for (const pass of ['future', 'building', 'new', 'open']) {
+    const strokes = [];
+    S.pieces.forEach(([gi, users], pi) => {
+      let ll = null;
+      for (const [li, yr, until] of users) {
+        const ln = S.lines[li]; if (hidden.has(ln.id) || (until && D.years[yi] >= until) || state(ln, yr) !== pass) continue;
+        ll = ll || D.geoms[gi].map(p => [p[1], p[0]]);
+        const off = pieceOffs[pi].get(li);
+        strokes.push([ln, offsetPath(ll, off, joint(pi, 0, li, off), joint(pi, 1, li, off))]);
+      }
+    });
+    const opts = {lineCap: 'butt', lineJoin: 'round', interactive: false};
+    for (const [ln, path] of strokes) {
+      const w = weightOf(ln.mode), col = lineColor(ln.color, ln.mode);
+      if (pass === 'new') L.polyline(path, {...opts, renderer: glowR, pane: 'glow', color: dark ? '#f2c230' : '#ffd23f', weight: w + 6}).addTo(glowLayer);
+      if (pass !== 'future' && ln.mode !== 'brt')   // a casing in the background colour: crossings read as crossings
+        L.polyline(path, {...opts, color: bgColor, weight: w + 2.5, opacity: pass === 'building' ? .6 : 1}).addTo(lineLayer);
+    }
+    for (const [ln, path] of strokes) {
+      const w = weightOf(ln.mode), col = lineColor(ln.color, ln.mode);
+      if (pass === 'future') L.polyline(path, {...opts, color: col, weight: w, opacity: .18}).addTo(lineLayer);
+      else if (pass === 'building') L.polyline(path, {...opts, color: col, weight: w + 1.5, opacity: .7, dashArray: '1 8', lineCap: 'round'}).addTo(lineLayer);
+      else {
+        const pl = L.polyline(path, {...opts, color: col, weight: w, opacity: .95, interactive: true}).addTo(lineLayer);
+        pl.bindTooltip(ln.name, {sticky: true});   // which route is this (BRT routes share one colour)
+        if (ln.mode === 'commuter')   // railroad style, as on the diagram: a dashed line down the middle
+          L.polyline(path, {...opts, color: bgColor, weight: 1.3 * zf(), dashArray: '6 4'}).addTo(lineLayer);
+      }
     }
   }
-  intervalSummary(Y, prevY, state);
-  const yd = S.years[Y], served = new Map();
+}
+// station markers: interchanges always; rail stops from zoom 11; BRT stops from zoom 12.
+// An interchange on side-by-side track is a capsule across the lines it serves.
+function drawStations() {
+  stLayer.clearLayers();
+  const Y = D.years[yi], z = map.getZoom(), yd = S.years[Y], served = new Map();
   for (const [li, stops] of yd.runs) for (const s of stops) {
-    if (!served.has(s)) served.set(s, []); served.get(s).push(li);
+    if (!served.has(s)) served.set(s, new Set()); served.get(s).add(li);
   }
+  const ink = dark ? '#e7ecef' : '#18212b', paper = dark ? '#18212a' : '#fff';
   for (const [sid, lis] of served) {
-    const vis = lis.filter(li => !hidden.has(S.lines[li].id)); if (!vis.length) continue;
-    const st = D.stations[sid], ln = S.lines[vis[0]], big = lis.length > 1;
-    const m = L.circleMarker([st[1], st[2]], {radius: big ? 5 : 3.5, color: dark ? '#e7ecef' : '#18212b', weight: big ? 2 : 1.2,
-      fillColor: big ? (dark ? '#18212a' : '#fff') : ln.color, fillOpacity: 1}).addTo(stLayer);
+    const vis = [...lis].filter(li => !hidden.has(S.lines[li].id)); if (!vis.length) continue;
+    const st = D.stations[sid], ln = S.lines[vis[0]], big = lis.size > 1, brt = vis.every(li => S.lines[li].mode === 'brt');
+    if (!big && (z < 11 || (brt && z < 12))) continue;
+    const at = S.stPiece && S.stPiece[sid], ll = at ? L.latLng(at[3], at[2]) : L.latLng(st[1], st[2]);   // on its line
+    let m;
+    if (at && pieceOffs[at[0]]) {   // offsets of the lines it serves on its piece, across the track
+      const os = vis.map(li => pieceOffs[at[0]].get(li)).filter(o => o !== undefined);
+      if (os.length) {
+        const p = map.latLngToLayerPoint(ll), a = at[1] * Math.PI / 180, n = [Math.sin(a), -Math.cos(a)];   // left normal, screen
+        const pt = o => map.layerPointToLatLng(L.point(p.x + n[0] * o, p.y + n[1] * o));
+        const lo = Math.min(...os), hi = Math.max(...os);
+        if (big && hi - lo > 1) {
+          const seg = [pt(lo), pt(hi)];
+          L.polyline(seg, {color: ink, weight: 10 * zf() + 3, lineCap: 'round', interactive: false}).addTo(stLayer);
+          m = L.polyline(seg, {color: paper, weight: 10 * zf(), lineCap: 'round'}).addTo(stLayer);
+        } else if (!big) {
+          ll.lat = pt(lo).lat; ll.lng = pt(lo).lng;   // a one-line stop sits on its own line
+        }
+      }
+    }
+    if (!m) m = L.circleMarker(ll, big ? {radius: z <= 10 ? 3 : 5, color: ink, weight: z <= 10 ? 1.5 : 2, fillColor: paper, fillOpacity: 1}
+      : brt ? {radius: 2.4 * zf(), color: dark ? '#11171d' : '#fff', weight: 1.2, fillColor: lineColor(ln.color, ln.mode), fillOpacity: 1}
+      : {radius: 3.5 * zf(), color: lineColor(ln.color, ln.mode), weight: 2, fillColor: paper, fillOpacity: 1}).addTo(stLayer);
     m.on('click', () => choose(sid));
-    const chips = [...new Set(lis)].map(li => `<span class="chip" style="background:${S.lines[li].color}">${S.lines[li].name}</span>`).join('');
+    const chips = vis.map(li => `<span class="chip" style="background:${S.lines[li].color};color:${inkOn(S.lines[li].color)}">${S.lines[li].name}</span>`).join('');
     const b = S.boardings[sid];
     m.bindTooltip(st[0]);
     m.bindPopup(`<div class="pop"><b>${st[0]}</b><div>${chips}</div><div class="m">${fmt(st[3])} residents · ${fmt(st[4])} jobs within 1 km` +
-      (b ? `<br>${fmt(b)} competitive commuters board here in 2070` : '') + `</div></div>`);
+      (b ? `<br>${fmt(b)} competitive commuters board here by ${D.years[D.years.length - 1]} (end of plan)` : '') + `</div></div>`, panelPad());
   }
+}
+map.on('zoomend', () => { drawLines(); drawStations(); });   // offsets and weights are in screen pixels
+function draw() {
+  const Y = D.years[yi], prevY = yi ? D.years[yi - 1] : -Infinity;
+  $('year').textContent = Y;
+  $('slider').setAttribute('aria-valuetext', String(Y));
+  drawLines();
+  drawStations();
+  intervalSummary(Y, prevY, stateFn());
   metrics(); lineList(); if (pick.length === 2) route();
   if (window.Schem) Schem.draw();  // schematic: redraw the diagram view
 }
@@ -186,7 +362,7 @@ function intervalSummary(Y, prevY, state) {
   const opened = [], building = [];
   for (const ln of S.lines) {
     let km = 0, bkm = 0, by = Infinity;
-    for (const [yr, , k] of ln.segs) {
+    for (const [yr, k] of ln.segs) {
       const st = state(ln, yr);
       if (st === 'new') km += k;
       if (st === 'building') { bkm += k; by = Math.min(by, yr); }
@@ -195,7 +371,7 @@ function intervalSummary(Y, prevY, state) {
     if (bkm > 0.05) building.push([ln, bkm, by]);
   }
   const row = ([ln, km, by]) => `<div class="op"><i style="background:${ln.color}"></i><span>${ln.name}</span><span>${km.toFixed(1)} km${by ? ' · ' + by : ''}</span></div>`;
-  const span = yi ? `${prevY + 1}–${Y}` : `by ${Y}`;
+  const span = !yi ? `by ${Y}` : prevY + 1 === Y ? `in ${Y}` : `${prevY + 1}–${Y}`;
   $('interval').innerHTML = `<b>Opened ${span}</b>` + (opened.length ? opened.sort((a, b) => b[1] - a[1]).map(row).join('') : '<div class="none">Nothing new</div>') +
     (building.length ? `<b style="display:block;margin-top:6px">Under construction</b>` + building.sort((a, b) => a[2] - b[2]).map(row).join('') : '');
 }
@@ -211,10 +387,10 @@ function metrics() {
   const modes = [['boardings_metro', 'metro'], ['boardings_commuter', 'regional rail'], ['boardings_brt', 'BRT'], ['boardings_feeder_bus', 'feeder bus']]
     .filter(([c]) => m[c]).map(([c, n]) => `${k(m[c])} ${n}`).join(' · ');
   $('metrics').innerHTML = [
-    [fmt(m.daily_trips) + d('daily_trips'), 'daily transit trips (each trip counted once)'],
+    [(m.daily_trips >= 1e6 ? k(m.daily_trips) : fmt(m.daily_trips)) + d('daily_trips'), 'daily transit trips (each trip counted once)'],
     [k(m.all_boardings), `boardings a day: ${modes}`],
     [fmt(m.jobs_45min) + d('jobs_45min'), 'jobs the average resident reaches in 45 min'],
-    ['$' + m.capex_busd + 'B' + d('capex_busd', '$'), 'capital spent since 2025'],
+    ['$' + m.capex_busd + 'B' + d('capex_busd', '$'), 'capital spent since 2025' + (m.opex_busd_per_year != null ? ` · $${m.opex_busd_per_year.toFixed(1)}B a year to run the rail and BRT` : '')],
   ].map(([a, b]) => `<div class="metric"><b>${a}</b><span>${b}</span></div>`).join('');
   const series = sc => sc.metrics.map(r => r.daily_trips);
   const all = series(S).concat(ref ? series(ref) : []).concat([2e6]), max = Math.max(...all) * 1.05;
@@ -229,31 +405,56 @@ function metrics() {
   $('sparkKey').textContent = (ref ? `Daily trips. Solid: this plan · dashed: ${refName} · ` : 'Daily trips · ') + `${D.years[0]}–${D.years[D.years.length - 1]}`;
 }
 function lineList() {
-  const Y = D.years[yi], groups = {metro: [], commuter: [], brt: []};
-  S.lines.forEach(l => groups[l.mode].push(l));
-  let h = '';
+  // groups: each mode, split into the plan's lines and those this scenario adds; a group's box
+  // shows or hides all its lines at once
+  const Y = D.years[yi], inPlan = D.scen.plan && scenKey !== 'plan' ? new Set(D.scen.plan.lines.map(l => l.id)) : null;
+  const groups = [];
   for (const m of ['metro', 'commuter', 'brt']) {
-    h += `<div class="grp">${D.modes[m]}</div>`;
-    for (const l of groups[m].sort((a, b) => a.first - b.first || a.name.localeCompare(b.name))) {
+    const ls = S.lines.filter(l => l.mode === m);
+    const parts = inPlan ? [[D.modes[m], ls.filter(l => inPlan.has(l.id))], [`${D.modes[m]} added by this scenario`, ls.filter(l => !inPlan.has(l.id))]] : [[D.modes[m], ls]];
+    for (const [name, g] of parts) if (g.length) groups.push([name, g.sort((a, b) => a.first - b.first || a.name.localeCompare(b.name))]);
+  }
+  let h = '';
+  groups.forEach(([name, g], gi) => {
+    const on = g.filter(l => !hidden.has(l.id)).length;
+    h += `<label class="grp"><input type="checkbox" data-grp="${gi}" ${on === g.length ? 'checked' : ''}>${name} <span class="n">${g.length}</span></label>`;
+    for (const l of g) {
       const v = l.value !== '' && l.value != null ? ` · ${l.value}/$M` : '';
       h += `<label class="li${l.first > Y ? ' future' : ''}" title="${(l.notes || '').replace(/"/g, '&quot;')}"><input type="checkbox" data-id="${l.id}" ${hidden.has(l.id) ? '' : 'checked'}>` +
         `<span class="sw" style="background:${l.color}"></span><span class="nm">${l.name}</span><span class="yr">${l.status === 'existing' ? 'today' : l.first}${v}</span></label>`;
     }
-  }
+  });
+  const f = document.activeElement, refocus = f && $('lines').contains(f) ? (f.dataset.id ? `[data-id="${f.dataset.id}"]` : `[data-grp="${f.dataset.grp}"]`) : null;
   $('lines').innerHTML = h;
-  $('lines').querySelectorAll('input').forEach(i => i.onchange = () => { i.checked ? hidden.delete(i.dataset.id) : hidden.add(i.dataset.id); draw(); });
+  if (refocus) { const e = $('lines').querySelector('input' + refocus); if (e) e.focus(); }   // keyboard users keep their place
+  $('lines').querySelectorAll('input[data-id]').forEach(i => i.onchange = () => { i.checked ? hidden.delete(i.dataset.id) : hidden.add(i.dataset.id); draw(); });
+  $('lines').querySelectorAll('input[data-grp]').forEach(i => {
+    const g = groups[+i.dataset.grp][1], on = g.filter(l => !hidden.has(l.id)).length;
+    i.indeterminate = on > 0 && on < g.length;
+    i.onchange = () => { g.forEach(l => i.checked ? hidden.delete(l.id) : hidden.add(l.id)); draw(); };
+  });
 }
 // ---- trip planner: Dijkstra over the exported year graph (same model as the reports) ----
+const pickMark = s => L.circleMarker([D.stations[s][1], D.stations[s][2]], {renderer: tripR, pane: 'trip', radius: 8, color: '#c96f00', weight: 3, fill: false}).addTo(tripLayer);
+const showTrip = () => { $('trip').closest('details').open = true; if (touch) $('trip').scrollIntoView({block: 'nearest', behavior: 'smooth'}); };
+function clearTrip() {
+  pick = []; $('from').value = $('to').value = ''; tripLayer.clearLayers(); dimNetwork(false); if (window.Schem) Schem.trip(null, null, pick);
+  $('trip').innerHTML = '<p class="hint">Click an origin station, then a destination.</p>';
+}
 function choose(sid) {
   if (pick.length === 2) pick = [];
   pick.push(sid);
-  if (pick.length === 1) { tripLayer.clearLayers(); if (window.Schem) Schem.trip(null, null, pick); $('trip').innerHTML = `<p class="hint">From <b>${D.stations[sid][0]}</b>. Now click a destination.</p>`; }
-  else route();
+  $(pick.length === 1 ? 'from' : 'to').value = D.stations[sid][0];
+  if (pick.length === 1) $('to').value = '';
+  if (pick.length === 1) {
+    tripLayer.clearLayers(); dimNetwork(false); pickMark(sid); if (window.Schem) Schem.trip(null, null, pick);
+    $('trip').innerHTML = `<p class="hint">From <b>${D.stations[sid][0]}</b>. Now click a destination.</p>`; showTrip();
+  } else route();
 }
 function route() {
   const Y = D.years[yi], yd = S.years[Y], [a, b] = pick;
   const adj = new Map(), add = (u, v, w, info) => { if (!adj.has(u)) adj.set(u, []); adj.get(u).push([v, w, info]); };
-  yd.runs.forEach(([li, stops, hops, wait], ri) => stops.forEach((s, k) => {
+  yd.runs.forEach(([li, stops, hops, wait], ri) => !hidden.has(S.lines[li].id) && stops.forEach((s, k) => {   // hidden lines: as if not built
     const n = `L${ri}:${k}`;
     add('P' + s, n, wait + D.boardPenalty, {t: 'board', ri}); add(n, 'P' + s, 0, {t: 'alight'});
     if (k) { const p = `L${ri}:${k - 1}`; add(p, n, hops[k - 1], {t: 'ride', ri}); add(n, p, hops[k - 1], {t: 'ride', ri}); }
@@ -266,9 +467,16 @@ function route() {
     if (d > (dist.get(u) ?? Infinity)) continue; if (u === 'P' + b) break;
     for (const [v, w, info] of adj.get(u) || []) { const nd = d + w; if (nd < (dist.get(v) ?? Infinity)) { dist.set(v, nd); prev.set(v, [u, info]); heap.push([nd, v]); } }
   }
-  tripLayer.clearLayers(); if (window.Schem) Schem.trip(null, null, pick);  // schematic: clear the diagram route
-  const A = D.stations[a][0], B = D.stations[b][0];
-  if (!dist.has('P' + b) || !D.stations[a] || a === b) { $('trip').innerHTML = `<p class="hint">No route from ${A} to ${B} in ${Y}. Try a later year.</p>`; return; }
+  tripLayer.clearLayers(); dimNetwork(false); if (window.Schem) Schem.trip(null, null, pick);  // schematic: clear the diagram route
+  const A = D.stations[a][0], B = D.stations[b][0], clear = ' <button type="button" class="clear" onclick="clearTrip()">Clear</button>';
+  const served = s => yd.runs.some(([, stops]) => stops.includes(s));
+  if (a === b || !dist.has('P' + b)) {
+    const why = a === b ? 'That is the same station twice; pick a different destination.'
+      : !served(a) || !served(b) ? `${!served(a) ? A : B} has no service in ${Y} in this plan.`
+      : `No route from ${A} to ${B} in ${Y}.` + (yi < D.years.length - 1 ? ' Try a later year.' : '');
+    if (a !== b) pick.forEach(pickMark);
+    $('trip').innerHTML = `<p class="hint">${why}${clear}</p>`; if (a === b) pick = [a]; showTrip(); return;
+  }
   const path = []; let u = 'P' + b; while (prev.has(u)) { const [p, info] = prev.get(u); path.unshift([p, u, info]); u = p; }
   const legs = [];
   for (const [p, v, info] of path) {
@@ -279,19 +487,40 @@ function route() {
   }
   const sidOf = n => n[0] === 'P' ? n.slice(1) : yd.runs[+n.slice(1).split(':')[0]][1][+n.split(':')[1]];
   const total = dist.get('P' + b) - D.boardPenalty;
-  let h = `<div class="tot">${A} → ${B}: ${Math.round(total)} min</div><div class="hint">${Y} network, station to station</div>`;
+  let h = `<div class="tot">${A} → ${B}: ${Math.round(total)} min</div><div class="hint">${Y} network, station to station` +
+    (hidden.size ? ', without the hidden lines' : '') + `.${clear}</div>`;
+  const runPts = (ri, f, t) => { const k0 = +f.split(':')[1], k1 = +t.split(':')[1], st = yd.runs[ri][1];
+    return (k0 <= k1 ? st.slice(k0, k1 + 1) : st.slice(k1, k0 + 1).reverse()).map(s => [D.stations[s][1], D.stations[s][2]]); };
+  const tripW = 6 * zf();
   for (const l of legs) {
     if (l.t === 'ride') { const ln = S.lines[yd.runs[l.ri][0]], f = sidOf(l.from), t = sidOf(l.to);
       h += `<div class="leg"><i style="background:${ln.color}"></i><span><b>${ln.name}</b> ${D.stations[f][0]} → ${D.stations[t][0]} · ${Math.round(l.min)} min</span></div>`;
-      L.polyline([f, t].map(s => [D.stations[s][1], D.stations[s][2]]), {color: ln.color, weight: 8, opacity: .35}).addTo(tripLayer); }
+      const pts = runPts(l.ri, l.from, l.to);   // through the stops it rides, not a straight line
+      L.polyline(pts, {renderer: tripR, pane: 'trip', color: bgColor, weight: tripW + 4, lineJoin: 'round', interactive: false}).addTo(tripLayer);
+      L.polyline(pts, {renderer: tripR, pane: 'trip', color: lineColor(ln.color, ln.mode), weight: tripW, lineJoin: 'round', interactive: false}).addTo(tripLayer); }
     else if (l.t === 'walk') h += `<div class="leg"><i style="background:var(--rule)"></i><span>Walk ${D.stations[sidOf(l.from)][0]} → ${D.stations[sidOf(l.to)][0]} · ${Math.round(l.min)} min</span></div>`;
     else h += `<div class="leg"><i style="background:var(--rule)"></i><span class="hint">Wait about ${Math.round(l.min)} min</span></div>`;
   }
-  for (const s of [a, b]) L.circleMarker([D.stations[s][1], D.stations[s][2]], {radius: 8, color: '#c96f00', weight: 3, fill: false}).addTo(tripLayer);
-  $('trip').innerHTML = h; if (window.Schem) Schem.trip(legs, yd, pick);  // schematic: highlight the route
+  pick.forEach(pickMark);
+  dimNetwork(true);
+  $('trip').innerHTML = h; showTrip(); if (window.Schem) Schem.trip(legs, yd, pick);  // schematic: highlight the route
 }
+// type-ahead station search for the trip planner (keyboard, screen readers, small screens)
+function stationList() {
+  const ids = new Set(Object.values(S.years).flatMap(g => g.runs.flatMap(r => r[1])));
+  const byName = new Map();
+  for (const s of ids) if (!byName.has(D.stations[s][0])) byName.set(D.stations[s][0], s);
+  S._byName = byName;
+  $('stlist').innerHTML = [...byName.keys()].sort().map(n => `<option value="${n.replace(/"/g, '&quot;')}">`).join('');
+}
+const odPick = () => {
+  const a = S._byName.get($('from').value.trim()), b = S._byName.get($('to').value.trim());
+  if (a && b) { pick = [a, b]; route(); } else if (a && !b && document.activeElement !== $('to')) { pick = []; choose(a); }
+};
+$('from').onchange = odPick; $('to').onchange = odPick;
+stationList();
 $('slider').oninput = e => { yi = +e.target.value; draw(); };
-$('scen').onchange = e => { scenKey = e.target.value; S = D.scen[scenKey]; hidden.clear(); draw(); };
+$('scen').onchange = e => { scenKey = e.target.value; S = D.scen[scenKey]; stationList(); draw(); };   // hidden lines stay hidden
 $('allOn').onclick = () => { hidden.clear(); draw(); };
 $('allOff').onclick = () => { S.lines.forEach(l => hidden.add(l.id)); draw(); };
 let timer = null;
@@ -303,6 +532,14 @@ $('play').onclick = () => {
   step(); timer = setInterval(step, matchMedia('(prefers-reduced-motion: reduce)').matches ? 2200 : 1200);
 };
 draw();
+// open on the whole network, in the part of the screen the panel leaves clear
+(() => {
+  const pts = Object.values(D.stations).map(s => [s[1], s[2]]);
+  if (!pts.length) return;
+  const r = $('panel').getBoundingClientRect(), sheet = r.width > innerWidth * .6;
+  map.fitBounds(L.latLngBounds(pts), sheet ? {paddingTopLeft: [8, 8], paddingBottomRight: [8, innerHeight - r.top + 8]}
+                                            : {paddingTopLeft: [r.right + 8, 8], paddingBottomRight: [8, 8]});
+})();
 </script>
 <!--__SCHEMATIC__-->
 </body>

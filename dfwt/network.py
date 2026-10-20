@@ -23,6 +23,10 @@ overrides applied on top: op, target, field, value, note.
                     stations within THROUGH_SNAP_KM): run them as one line, keeping
                     `target`'s id; `field` is removed. `value` (optional) is the new
                     name. The junction keeps its park & ride (Line.pnr_stops).
+  reroute           from year `field`, line `target` runs a new routing between two of its
+                    stops: `value` is "grade|A;stop;@lat,lon;stop;B" (A and B on the line,
+                    stops by id or unique name, @lat,lon shape points). The new track is
+                    built for that year (and costed); before it the old routing runs.
   add_express       add line `field`: a copy of line `target` that stops only at the
                     `;`-separated stops in `value` (names or ids) and runs through the
                     rest; set its headway with a later set_headway row
@@ -36,6 +40,23 @@ from dataclasses import dataclass, field
 from . import config, geo, growth
 
 NEVER = 9999
+
+
+def cost_factor(cfg, year, mode):
+    """Unit-cost factor for work opening in `year` (config cost_efficiency): costs fall as a
+    steady program builds local contractor and agency experience. Linear between the
+    table's years, flat outside them; measured at the middle of construction."""
+    t = cfg.get("cost_efficiency")
+    if not t:
+        return 1.0
+    y = year - cfg["staging"]["construction_years"].get(mode, 0) / 2
+    pts = sorted((int(k), float(v)) for k, v in t.items() if not str(k).startswith("_"))
+    if y <= pts[0][0]:
+        return pts[0][1]
+    for (y0, v0), (y1, v1) in zip(pts, pts[1:]):
+        if y <= y1:
+            return v0 + (v1 - v0) * (y - y0) / (y1 - y0)
+    return pts[-1][1]
 THROUGH_SNAP_KM = 0.3   # through_route: termini this close count as one station
 csv.field_size_limit(1 << 28)  # long fitted alignments make large WKT cells
 TABLES = ("lines.csv", "stations.csv", "line_stops.csv", "line_segments.csv")
@@ -116,6 +137,8 @@ class Network:
         self.lines = lines
         self.transfers = transfers or []   # [(station_a, station_b, walk_min or None, note)]
         self.variants = {}                 # line_id -> [(from_year, until_year, Line, interim)]
+        self.absorbed = {}                 # through-routed line id -> the line it now runs as
+        self.stop_alias = {}               # a merged-away terminus -> the junction that replaced it
         self.stage_rows = []
         self.stage_findings = []
         self.cfg = cfg
@@ -178,8 +201,16 @@ class Network:
         net = Network(self.stations, {k: v for k, v in self.lines.items() if k != line_id},
                       self.cfg, self.name, self.transfers)
         net.variants = {k: v for k, v in self.variants.items()
-                        if k != line_id and all(it["via"] != line_id for *_, it in v)}
+                        if k != line_id and all(it.get("via") != line_id for *_, it in v)}
+        net.absorbed, net.stop_alias = dict(self.absorbed), dict(self.stop_alias)
         return net
+
+    def host_line(self, line_id):
+        """The line a stage row's line now runs as: itself, or the line it was through-routed
+        into (its stages still name it), or None if it was dropped."""
+        while line_id in self.absorbed and line_id not in self.lines:
+            line_id = self.absorbed[line_id]
+        return self.lines.get(line_id)
 
     def line_at(self, line_id, year):
         """The line's routing in force in `year` (an interim via-routing, or itself)."""
@@ -226,6 +257,8 @@ class Network:
                 setattr(ln, e["field"], float(e["value"]) if e["field"] == "headway" else e["value"])
             elif op == "through_route":
                 self._through_route(ln, e["field"], e.get("value") or "")
+            elif op == "reroute":
+                self._reroute(ln, int(e["field"]), e["value"])
             elif op == "add_express":
                 self._add_express(ln, e["field"], e["value"])
             elif op in ("shift_line_years", "set_line_year"):
@@ -266,6 +299,7 @@ class Network:
         if ib == -1:
             self._reversed(b)        # junction at the start of b
         junction = a.stop_ids[-1]
+        b_first = b.stop_ids[0]
         # the joined line runs as often as the more frequent of the parts already running
         years = sorted({y for y, _ in a.service + b.service} | {a.first_year, b.first_year})
 
@@ -285,8 +319,53 @@ class Network:
         if a.status != b.status:
             a.status = "proposed"
         del self.lines[b_id]
+        self.absorbed[b_id] = a.id
+        if b_first != junction:   # b's own terminus merged into a's (within THROUGH_SNAP_KM)
+            self.stop_alias[b_first] = junction
         self.variants.pop(b_id, None)
         self.variants.pop(a.id, None)
+
+    def _reroute(self, ln, year, spec):
+        """Replace the line's stops between two of its stops with a new routing from `year`
+        (see module doc); the old routing becomes a variant that runs until then."""
+        grade, _, path = spec.partition("|")
+        by_name = {}
+        for sid, st in self.stations.items():
+            by_name.setdefault(st.name, []).append(sid)
+
+        def sid_of(x):
+            x = x.strip()
+            if x in self.stations:
+                return x
+            hits = by_name.get(x, [])
+            if len(hits) != 1:
+                raise KeyError(f"reroute {ln.id}: '{x}' is not a station id or a unique station name")
+            return hits[0]
+        items = [x.strip() for x in path.split(";") if x.strip()]
+        stops, shape = [], []   # stop ids; shape points before each stop after the first
+        pending = []
+        for x in items:
+            if x.startswith("@"):
+                lat, lon = (float(v) for v in x[1:].split(","))
+                pending.append((lon, lat))
+            else:
+                stops.append(sid_of(x))
+                shape.append(pending)
+                pending = []
+        a, b = ln.stop_ids.index(stops[0]), ln.stop_ids.index(stops[-1])
+        if a > b:
+            self._reversed(ln)
+            a, b = ln.stop_ids.index(stops[0]), ln.stop_ids.index(stops[-1])
+        old = copy.deepcopy(ln)
+        segs = []
+        for k in range(1, len(stops)):
+            p, q = self.stations[stops[k - 1]], self.stations[stops[k]]
+            pts = [(p.lon, p.lat)] + shape[k] + [(q.lon, q.lat)]
+            segs.append(Segment(year, grade or "surface", pts, geo.polyline_km(pts)))
+        ln.stop_ids = ln.stop_ids[:a] + stops + ln.stop_ids[b + 1:]
+        ln.stop_years = ln.stop_years[:a + 1] + [year] * (len(stops) - 2) + ln.stop_years[b:]
+        ln.segments = ln.segments[:a] + segs + ln.segments[b:]
+        self.variants.setdefault(ln.id, []).append((0, year, old, {"via": None, "reroute": year}))
 
     def _add_express(self, base, new_id, stops):
         """A skip-stop copy of `base` (see module doc)."""
@@ -375,27 +454,78 @@ class Network:
     def line_cost_musd(self, ln, by_year=None, owner=None):
         """Capital cost of a line's new track and stations (2025 USD), opened by
         `by_year` if given. Track shared with an earlier line is not charged again;
-        a station is charged to the first line that opens it."""
-        ex = self.cfg["existing_year"]
-        if ln.status == "existing":
-            return 0.0
+        a station is charged to the first line of its mode that opens it."""
+        ex = self.cfg["existing_year"]   # today's track and stations (opened by then) cost nothing
         owner = owner or self.track_owner()
         by_year = by_year or NEVER
-        per_km = self.cfg["cost_musd_per_km"][ln.mode]
         track = 0.0
         for i, s in enumerate(ln.segments):
             key = (ln.mode, frozenset((ln.stop_ids[i], ln.stop_ids[i + 1])))
             if ex < s.year <= by_year and owner[key][1] == ln.id:
-                track += s.km * per_km.get(s.grade, per_km["surface"])
+                track += self.segment_cost(ln, i)
         first_line = self._station_first_line()
-        stops = sum(1 for sid, y in zip(ln.stop_ids, ln.stop_years)
-                    if ex < y <= by_year and first_line.get(sid) == ln.id)
-        return track + stops * self.cfg["station_cost_musd"][ln.mode]
+        stops = sum(self.stop_cost(ln, i) for i, (sid, y) in enumerate(zip(ln.stop_ids, ln.stop_years))
+                    if ex < y <= by_year and first_line.get((sid, ln.mode)) == ln.id)
+        return track + stops
+
+    def opex_musd(self, year):
+        """Operating cost ($M/yr) of the service running in `year`, by mode (config.operating):
+        revenue vehicle-hours = 2 directions x run minutes / headway x service hours a day
+        x layover/recovery, x cost per revenue hour x weekday-equivalent days."""
+        oc = self.cfg.get("operating")
+        if not oc:
+            return {}
+        out = collections.Counter()
+        for r in self.runs(year):
+            hw = r.line.headway_at(year)
+            veh_h = 2 * sum(r.hop_min) / hw * oc["span_hours"] * oc["layover"]
+            out[r.line.mode] += veh_h * oc["usd_per_revenue_hour"][r.line.mode] * oc["days_per_year"] / 1e6
+        return dict(out)
+
+    def segment_cost(self, ln, i):
+        """Capital ($M) of segment i of a line: km x the mode's cost per km for its grade, x the
+        program's cost factor when it's built (cost_factor)."""
+        s = ln.segments[i]
+        per_km = self.cfg["cost_musd_per_km"][ln.mode]
+        return s.km * per_km.get(s.grade, per_km["surface"]) * cost_factor(self.cfg, s.year, ln.mode)
+
+    def stop_cost(self, ln, i):
+        """Capital ($M) of stop i of a line, for the line that first serves it in its mode: the
+        platform (an underground metro station costs station_cost_musd.metro_tunnel), plus the
+        park-and-ride garage the demand model gives it (every commuter station; a line's
+        termini and kept through-route junctions), x the cost factor when it's built."""
+        cfg = self.cfg
+        sc = cfg["station_cost_musd"]
+        sid, y = ln.stop_ids[i], ln.stop_years[i]
+        under = any(ln.segments[k].grade == "tunnel" for k in (i - 1, i) if 0 <= k < len(ln.segments))
+        cost = sc.get(ln.mode + "_tunnel", sc[ln.mode]) if under else sc[ln.mode]
+        per_space = cfg.get("garage_musd_per_space", 0.0)
+        if per_space:
+            sp = cfg["access"]["pnr_spaces"]
+            if ln.mode == "commuter":
+                spaces = sp["commuter_station"]
+            elif i in (0, len(ln.stop_ids) - 1) or sid in ln.pnr_stops:
+                spaces = sp.get(ln.mode + "_terminus", sp["terminus"])
+            else:
+                spaces = 0
+            cost += spaces * per_space
+        return cost * cost_factor(cfg, y, ln.mode)
 
     def _station_first_line(self):
+        """(station_id, mode) -> the line that first serves that station in that mode: it
+        pays for the mode's platform (a metro line reaching a BRT stop builds its own)."""
         first = {}
         for ln in self.lines.values():
             for sid, y in zip(ln.stop_ids, ln.stop_years):
-                if sid not in first or (y, ln.id) < first[sid]:
-                    first[sid] = (y, ln.id)
+                k = (sid, ln.mode)
+                if k not in first or (y, ln.id) < first[k]:
+                    first[k] = (y, ln.id)
         return {k: v[1] for k, v in first.items()}
+
+    def station_mode_years(self):
+        """station_id -> {mode: first year a line of that mode serves it}."""
+        out = collections.defaultdict(dict)
+        for ln in self.lines.values():
+            for sid, y in zip(ln.stop_ids, ln.stop_years):
+                out[sid][ln.mode] = min(out[sid].get(ln.mode, NEVER), y)
+        return out

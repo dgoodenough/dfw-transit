@@ -1,5 +1,5 @@
 line_id,name,mode,status,color,headway_min,notes
-XP01,SH-114 Line,metro,proposed,#e65100,,"Expansion lever: Farmers Branch - Valwood - Freeport - DFW north - Grapevine - Southlake - Westlake, light metro on LBJ/SH-114 right-of-way"
+XP01,SH-114 Line,metro,proposed,#7cb342,,"Expansion lever: Farmers Branch - Valwood - Freeport - DFW north - Grapevine - Southlake - Westlake, light metro on LBJ/SH-114 right-of-way"
 XP02,Coppell-Lewisville BRT,brt,proposed,#00838f,,Expansion lever: Cypress Waters - Coppell business parks - Vista Ridge - Old Town Lewisville
 XP05,Stemmons-Brookhollow BRT,brt,proposed,#00838f,,"Expansion lever: Inwood/Love Field - Brookhollow - Regal Row - Northwest Hwy - Royal/Luna - Valwood, the Stemmons/I-35E job corridor"
 XP06,Dallas Parkway BRT,brt,proposed,#00838f,,"Expansion lever: Legacy West - Stonebriar - The Star - Frisco Station, the Dallas Parkway office corridor"
@@ -38,3 +38,5 @@ XB41,Watauga-Keller BRT,brt,proposed,#00838f,,Expansion lever: arterial BRT grid
 XB42,Denton Tap BRT,brt,proposed,#00838f,,Expansion lever: arterial BRT grid phase 2
 XB44,Sachse-Wylie BRT,brt,proposed,#00838f,,Expansion lever: arterial BRT grid phase 2
 XB45,Matlock-Mansfield BRT,brt,proposed,#00838f,,Expansion lever: arterial BRT grid phase 2
+E40,Weatherford Line,commuter,proposed,#a1887f,30,"Regional rail to Parker County on the UP Baird Subdivision. Long-range reserve (2.9 trips per $M in the 2026 review), built late for a complete network."
+E41,Greenville Line,commuter,proposed,#c2185b,30,"Regional rail to Rockwall and Hunt County on the Dallas, Garland & Northeastern from the Blue Line at Downtown Rowlett. Greenville is outside the model's zones (Hunt County), so its riders are understated."
