@@ -72,20 +72,21 @@ led to thirteen steps, and v2 implements the ones the data supports
 
 | | v1 plan | v2 plan (budget-constrained) | **2 million riders (default)** |
 |---|---|---|---|
-| Daily transit trips, 2050 (each trip counted once) | 352k | 470k | **1.01M** |
-| Daily transit trips, 2100 | 749k | 870k | **2.06M** (2M reached in 2089) |
-| Daily boardings, all modes, 2100 | 1.21M | 1.44M | **3.46M** |
-| Jobs the average resident reaches in 45 min, 2100 | 134k | 162k | **340k** |
-| Capital through 2100 (2025 $, lines and stations) | $104.0B | $94.5B | **$112.0B** |
+| Daily transit trips, 2050 (each trip counted once) | 327k | 376k | **1.10M** |
+| Daily transit trips, 2100 | 666k | 781k | **2.24M** (2M reached in 2076) |
+| Daily boardings, all modes, 2100 | 1.15M | 1.35M | **4.17M** |
+| Jobs the average resident reaches in 45 min, 2100 | 93k | 107k | **172k** |
+| Capital through 2100 (2025 $, lines, stations, garages) | $112.3B | $103.6B | **$134.8B** |
+| Operating cost, 2100 (rail and BRT, per year) | $0.9B | $0.9B | **$1.6B** |
 | Validation: errors / islands | 1 / 10 | 0 / 0 | 0 / 0 |
 
 The **2 million riders** scenario adds an arterial BRT grid on real streets (10 weak corridors left out), an SH-114 metro, job-campus BRT and
-infill stations (2065-2090), frequent service, 15-minute feeder buses, bike and walk access,
-garages at selected suburban stations (Wiehle-Reston style), and moderate upzoning with 20% of
-growth steered to station areas. It stays within the flat $2.3B/yr budget for lines and stations;
-feeder buses, frequency and access are extra operating and capital costs (see the PR notes and
-`scenarios/two_million/config.json`). Parking pricing and cash-out work in the model but aren't
-needed to reach the target. Ridership is a model estimate calibrated to today's ~80k rail
+infill stations, the D2 subway downtown, the Red Line on to McKinney, regional rail to Weatherford, Greenville and Cleburne by the
+2090s, through-running regional rail, frequent service, 15-minute feeder buses, bike and walk access, moderate upzoning with 20% of
+growth steered to station areas, and parking pricing (downtown prices double by 2050, $5/day at the densest job centers; 1.85M in
+2100 without it). It stays within the flat $2.3B/yr budget for lines, stations and garages at 2025 peer unit costs that fall 25% by
+2055 as a steady program matures; feeder buses and operations are extra (see `scenarios/two_million/config.json`).
+Ridership is a model estimate calibrated to today's ~80k rail
 boardings; treat the long-range numbers as orders of magnitude.
 
 

@@ -1,93 +1,91 @@
 station_id,name,lat,lon,year_opens,lines,modes,pop_1km,jobs_1km,boardings_final
-S001,Main / Terminal,32.813,-97.349,2035,Orange;Pink,metro,2104,712,836
-S002,Mercado,32.802557,-97.350952,2035,Orange;Pink,metro,5874,1560,263
-S003,Stockyards North,32.793029,-97.349097,2040,Orange;Pink,metro,2322,572,102
-S004,Stockyards Main,32.788871,-97.349159,2035,Orange;Pink,metro,4176,3076,86
-S005,Marine Park,32.7794,-97.347759,2035,Orange;Pink,metro,3688,2507,322
-S006,Panther Island - Lagrave,32.76988,-97.341418,2040,Orange;Pink,metro,601,1211,16
-S007,Panther Island South,32.763747,-97.337321,2040,Orange;Pink,metro,1285,1741,33
-S008,Trinity Bluff,32.761839,-97.328527,2039,Teal,metro,3286,20541,87
-S009,Courthouse,32.757116,-97.332894,2035,Teal;Orange;Pink,metro,7715,38906,1385
-S010,Sundance Square,32.75512,-97.331555,2041,Blue,metro,7756,43279,5
-S011,Central Station,32.752543,-97.326747,2035,Blue;Orange;Pink;Purple,metro,6345,36322,2928
-S012,T&P Station,32.745606,-97.327894,2040,Orange;Pink;Purple,metro,1877,3050,808
-S014,S Main,32.741072,-97.326249,2040,Orange;Pink,metro,2758,6103,0
-S015,Pennsylvania / Main,32.737533,-97.326916,2035,Orange;Pink,metro,2758,7280,457
-S016,TCC Trinity River,32.755097,-97.339228,2035,Teal;Blue;Berry Line,metro,7676,28109,2115
-S017,7th Street / Carroll,32.750941,-97.353021,2035,Teal;Blue,metro,5922,27191,187
-S018,University / Lancaster Avenue,32.749067,-97.360638,2041,Teal;Blue,metro,6496,26404,341
-S019,Museum Way,32.746337,-97.365933,2041,Teal;Blue;Red,metro,5231,8763,1389
-S020,Medical City - Baylor,32.729126,-97.347804,2035,Orange;Purple,metro,5525,8735,203
-S021,Magnolia / 8th Avenue,32.730401,-97.341033,2035,Orange;Purple,metro,4635,20649,173
-S022,Magnolia / Hemphill,32.730673,-97.334052,2035,Orange;Purple,metro,6154,23984,110
-S023,John Peter Smith,32.726835,-97.326746,2042,Pink,metro,5616,9336,193
-S024,University Park,32.728222,-97.36346,2051,Orange;Red,metro,0,0,433
-S025,Hemphill/Berry,32.703895,-97.330966,2061,Pink;Berry Line,metro,6909,2471,1474
-S026,La Gran Plaza,32.685672,-97.324154,2064,Pink,metro,4322,2487,599
-S027,Stonegate,32.710485,-97.389004,2051,Orange;Red,metro,4387,4323,163
-S028,Clearfork,32.707646,-97.398102,2051,Orange;Red,metro,889,3726,142
-S029,Waterside,32.697075,-97.41487,2051,Orange;Red,metro,7353,1907,1111
-S030,Ridglea Hills,32.729943,-97.417961,2041,Teal;Blue,metro,4196,3252,541
-S031,Arlington Heights,32.731525,-97.388777,2041,Teal;Blue,metro,8871,9693,478
-S032,Ridgmar,32.737009,-97.42571,2041,Teal;Blue,metro,8177,5325,606
-S033,Ridgmar Mall / BRT Transfer,32.742118,-97.438575,2041,Teal;Blue,metro,1318,569,1979
-S034,Six Points,32.772028,-97.308392,2039,Teal,metro,7659,6158,400
-S035,Riverside / Race St,32.773688,-97.270032,2039,Teal,metro,2021,9968,306
-S036,Butler Place,32.750203,-97.317516,2054,Blue,metro,2347,1490,1
-S037,Lancaster Ave,32.747714,-97.313742,2049,Blue,metro,4409,2485,250
-S038,Polytechnic/Weslyan,32.732687,-97.284125,2049,Blue,metro,4676,1047,526
-S039,Handley,32.732498,-97.218083,2049,Blue,metro,3074,843,744
-S040,Oakland Corners,32.740258,-97.263346,2054,Blue,metro,3874,779,381
-S042,Lake Worth,32.8122,-97.4298,2045,Berry Line,metro,2185,4803,1199
-S043,Fair Oaks,32.7836,-97.3857,2050,Berry Line,metro,2762,212,674
-S044,Berry / Riverside,32.706643,-97.301987,2066,Berry Line,metro,0,0,369
-S045,Renaissance Square,32.71217,-97.282722,2066,Berry Line,metro,3468,1099,317
-S046,Berry / Stalcup,32.7085,-97.238,2061,Berry Line,metro,4537,327,740
-S047,Benbrook,32.6753,-97.4678,2052,Red,metro,3094,1851,763
-S048,TCU,32.707506,-97.3604,2035,Purple,metro,8615,5851,514
-S049,Bluebonnet Circle,32.6991,-97.3604,2035,Purple,metro,3409,4818,1112
-S050,Hulen Mall,32.643523,-97.415276,2054,Orange,metro,2517,348,176
-S051,Altamesa,32.638,-97.413,2054,Orange,metro,4318,778,1471
-S052,Woodhaven,32.764046,-97.22685,2039,Teal,metro,6653,1832,1007
-S053,Everman,32.633,-97.295,2064,Pink,metro,3431,1322,1542
+S001,Main / Terminal,32.813,-97.349,2035,FW Orange;FW Pink,metro,2104,712,818
+S002,Mercado,32.802557,-97.350952,2035,FW Orange;FW Pink,metro,5874,1560,257
+S003,Stockyards North,32.793029,-97.349097,2040,FW Orange;FW Pink,metro,2322,572,98
+S004,Stockyards Main,32.788871,-97.349159,2035,FW Orange;FW Pink,metro,4176,3076,83
+S005,Marine Park,32.7794,-97.347759,2035,FW Orange;FW Pink,metro,3688,2507,315
+S006,Panther Island - Lagrave,32.76988,-97.341418,2040,FW Orange;FW Pink,metro,601,1211,16
+S007,Panther Island South,32.763747,-97.337321,2040,FW Orange;FW Pink,metro,1285,1741,31
+S008,Trinity Bluff,32.761839,-97.328527,2042,FW Green,metro,3286,20541,88
+S009,Courthouse,32.757116,-97.332894,2035,FW Green;FW Orange;FW Pink,metro,7715,38906,1353
+S010,Sundance Square,32.75512,-97.331555,2045,FW Blue,metro,7756,43279,5
+S011,Central Station,32.752543,-97.326747,2035,FW Blue;FW Orange;FW Pink;FW Purple,metro,6345,36322,3039
+S012,T&P Station,32.745606,-97.327894,2040,FW Orange;FW Pink;FW Purple,metro,1877,3050,1060
+S014,S Main,32.741072,-97.326249,2040,FW Orange;FW Pink,metro,2758,6103,0
+S015,Pennsylvania / Main,32.737533,-97.326916,2035,FW Orange;FW Pink,metro,2758,7280,414
+S016,TCC Trinity River,32.755097,-97.339228,2039,FW Green;FW Blue;FW Berry,metro,7676,28109,2169
+S017,7th Street / Carroll,32.750941,-97.353021,2039,FW Green;FW Blue,metro,5922,27191,186
+S018,University / Lancaster Avenue,32.749067,-97.360638,2047,FW Green;FW Blue,metro,6496,26404,342
+S019,Museum Way,32.746337,-97.365933,2047,FW Green;FW Blue;FW Red,metro,5231,8763,1687
+S020,Medical City - Baylor,32.729126,-97.347804,2035,FW Orange;FW Purple,metro,5525,8735,251
+S021,Magnolia / 8th Avenue,32.730401,-97.341033,2035,FW Orange;FW Purple,metro,4635,20649,165
+S022,Magnolia / Hemphill,32.730673,-97.334052,2035,FW Orange;FW Purple,metro,6154,23984,104
+S023,John Peter Smith,32.726835,-97.326746,2046,FW Pink,metro,5616,9336,199
+S024,University Park,32.728222,-97.36346,2056,FW Red,metro,0,0,12
+S025,Hemphill/Berry,32.703895,-97.330966,2065,FW Pink;FW Berry,metro,6909,2471,1534
+S026,La Gran Plaza,32.685672,-97.324154,2068,FW Pink,metro,4322,2487,596
+S027,Stonegate,32.710485,-97.389004,2056,FW Red,metro,4387,4323,106
+S028,Clearfork,32.707646,-97.398102,2056,FW Red,metro,889,3726,56
+S029,Waterside,32.697075,-97.41487,2056,FW Red,metro,7353,1907,641
+S030,Ridglea Hills,32.729943,-97.417961,2047,FW Green;FW Blue,metro,4196,3252,568
+S031,Arlington Heights,32.731525,-97.388777,2047,FW Green;FW Blue,metro,8871,9693,488
+S032,Ridgmar,32.737009,-97.42571,2047,FW Green;FW Blue,metro,8177,5325,604
+S033,Ridgmar Mall / BRT Transfer,32.742118,-97.438575,2047,FW Green;FW Blue,metro,1318,569,2026
+S034,Six Points,32.772028,-97.308392,2042,FW Green,metro,7659,6158,400
+S035,Riverside / Race St,32.773688,-97.270032,2042,FW Green,metro,2021,9968,307
+S036,Butler Place,32.750203,-97.317516,2060,FW Blue,metro,2347,1490,1
+S037,Lancaster Ave,32.747714,-97.313742,2055,FW Blue,metro,4409,2485,250
+S038,Polytechnic/Weslyan,32.732687,-97.284125,2055,FW Blue,metro,4676,1047,525
+S039,Handley,32.732498,-97.218083,2055,FW Blue,metro,3074,843,743
+S040,Oakland Corners,32.740258,-97.263346,2060,FW Blue,metro,3874,779,381
+S042,Lake Worth,32.8122,-97.4298,2051,FW Berry,metro,2185,4803,1204
+S043,Fair Oaks,32.7836,-97.3857,2056,FW Berry,metro,2762,212,676
+S044,Berry / Riverside,32.706643,-97.301987,2070,FW Berry,metro,0,0,369
+S045,Renaissance Square,32.71217,-97.282722,2070,FW Berry,metro,3468,1099,317
+S046,Berry / Stalcup,32.7085,-97.238,2065,FW Berry,metro,4537,327,740
+S047,Benbrook,32.6753,-97.4678,2056,FW Red,metro,3094,1851,706
+S048,TCU,32.707506,-97.3604,2039,FW Purple,metro,8615,5851,506
+S049,Bluebonnet Circle,32.6991,-97.3604,2039,FW Purple,metro,3409,4818,1352
+S052,Woodhaven,32.764046,-97.22685,2042,FW Green,metro,6653,1832,1007
+S053,Everman,32.633,-97.295,2068,FW Pink,metro,3431,1322,1597
 X131,Walnut Hill/Denton,32.881529,-96.883758,2025,Green Line,metro,1916,4953,226
-X130,Royal Lane,32.895513,-96.888157,2025,Green Line,metro,3114,6627,399
+X130,Royal Lane,32.895513,-96.888157,2025,Green Line,metro,3114,6627,398
 X129,Farmers Branch,32.921314,-96.896078,2025,Green Line,metro,4408,10011,294
 X134,Inwood/Love Field,32.821756,-96.833261,2025,Orange Line;Green Line,metro,12370,8509,430
-X133,Burbank,32.842702,-96.861651,2025,Orange Line;Green Line,metro,1952,21576,405
-X132,Bachman,32.853236,-96.877236,2025,Orange Line;Green Line,metro,5458,752,1097
-X125,Parker Road,33.03432,-96.700657,2025,Orange Line;Red Line;McKinney Line,commuter;metro,3707,1323,2740
+X133,Burbank,32.842702,-96.861651,2025,Orange Line;Green Line,metro,1952,21576,404
+X132,Bachman,32.853236,-96.877236,2025,Orange Line;Green Line,metro,5458,752,1096
+X125,Parker Road,33.03432,-96.700657,2025,Orange Line;Red Line;McKinney Line,commuter;metro,3707,1323,2696
 X124,Downtown Plano,33.021203,-96.700862,2025,Orange Line;Red Line,metro,5261,20929,214
-X123,12th Street,33.014509,-96.700996,2025,Orange Line;Red Line,metro,3468,16209,155
-X128,Downtown Carrollton,32.95404,-96.908049,2025,Green Line;Silver Line;Beltline Line,brt;metro,4789,5828,1911
-X127,Trinity Mills,32.980393,-96.926177,2025,A-train;Green Line;Sherman Line,commuter;metro,0,0,1054
+X123,12th Street,33.014509,-96.700996,2025,Orange Line;Red Line,metro,3468,16209,152
+X128,Downtown Carrollton,32.95404,-96.908049,2025,Green Line;Silver Line;Beltline Line,brt;metro,4789,5828,1912
+X127,Trinity Mills,32.980393,-96.926177,2025,A-train;Green Line;Sherman Line,commuter;metro,0,0,1053
 X126,North Carrollton/Frankford,32.992155,-96.937439,2025,Green Line,metro,0,0,728
 X143,Baylor University Medical Center,32.786689,-96.781325,2025,Green Line,metro,5085,26397,339
 X142,Deep Ellum,32.785505,-96.78815,2025,Green Line,metro,9903,58669,6
-X141,Pearl/Arts District,32.786763,-96.79409,2025,Orange Line;Green Line;Red Line;Blue Line;DNT East,metro,8998,62271,6521
-X146,Hatcher,32.766281,-96.74187,2025,Green Line,metro,9413,1402,549
-X145,MLK Jr.,32.773475,-96.764245,2025,Green Line;DNT East;Las Colinas-Mesquite Line,metro,3342,1788,2712
-X144,Fair Park,32.781353,-96.76621,2025,Green Line,metro,4770,4396,183
-X137,Victory,32.788989,-96.812452,2025,TRE;Orange Line;Green Line;I-20 Crosstown,brt;commuter;metro,10003,23854,4975
-X136,Market Center,32.804496,-96.82307,2025,Orange Line;Green Line,metro,6351,5482,234
+X141,Pearl/Arts District,32.786763,-96.79409,2025,Orange Line;Green Line;Red Line;Blue Line;DNT East;Legacy Line,metro,8998,62271,6851
+X146,Hatcher,32.766281,-96.74187,2025,Green Line,metro,9413,1402,546
+X145,MLK Jr.,32.773475,-96.764245,2025,Green Line;DNT East;Las Colinas-Mesquite Line,metro,3342,1788,2682
+X144,Fair Park,32.781353,-96.76621,2025,Green Line,metro,4770,4396,137
+X137,Victory,32.788989,-96.812452,2025,TRE;Orange Line;Green Line;I-20 Crosstown,brt;commuter;metro,10003,23854,4954
+X136,Market Center,32.804496,-96.82307,2025,Orange Line;Green Line,metro,6351,5482,231
 X135,Southwestern Medical District/Parkland,32.813304,-96.833266,2025,Orange Line;Green Line,metro,7405,41665,564
-X140,Saint Paul,32.784576,-96.796695,2025,Orange Line;Green Line;Red Line;Blue Line;Las Colinas-Mesquite Line,metro,7131,90802,4028
-X139,Akard,32.782015,-96.800167,2025,Orange Line;Green Line;Red Line;Blue Line,metro,6514,89389,269
+X140,Saint Paul,32.784576,-96.796695,2025,Orange Line;Green Line;Red Line;Blue Line;Las Colinas-Mesquite Line,metro,7131,90802,4050
+X139,Akard,32.782015,-96.800167,2025,Orange Line;Green Line;Red Line;Blue Line,metro,6514,89389,270
 X138,West End,32.781003,-96.80499,2025,Orange Line;Green Line;Red Line;Blue Line,metro,7797,90007,381
 X101,University of Dallas,32.848753,-96.914543,2025,Orange Line,metro,0,0,382
 X100,Las Colinas Urban Center,32.868224,-96.933252,2025,Orange Line,metro,9409,28389,506
 X099,Irving Convention Center,32.876663,-96.938094,2025,Orange Line,metro,6190,19519,394
-X119,Spring Valley,32.941299,-96.737057,2025,Orange Line;Red Line,metro,2862,12090,820
-X118,LBJ/Central,32.918689,-96.751792,2025,Orange Line;Red Line,metro,5281,2881,635
+X119,Spring Valley,32.941299,-96.737057,2025,Orange Line;Red Line,metro,2862,12090,819
+X118,LBJ/Central,32.918689,-96.751792,2025,Orange Line;Red Line,metro,5281,2881,634
 X117,Forest Lane,32.908824,-96.761325,2025,Orange Line;Red Line,metro,5236,11366,1063
-X122,CityLine/Bush,33.00249,-96.702941,2025,Orange Line;Red Line;Silver Line,metro,4580,10824,1563
+X122,CityLine/Bush,33.00249,-96.702941,2025,Orange Line;Red Line;Silver Line,metro,4580,10824,1549
 X121,Galatyn Park,32.985465,-96.71077,2025,Orange Line;Red Line,metro,3238,20000,420
 X120,Arapaho Center,32.963965,-96.722586,2025,Orange Line;Red Line,metro,2447,15949,463
-X113,SMU/Mockingbird,32.838193,-96.774435,2025,Orange Line;Red Line;Blue Line,metro,11847,10784,1590
-X112,CityPlace/Uptown,32.806758,-96.793225,2025,Orange Line;Red Line;Blue Line,metro,18537,15921,1094
+X113,SMU/Mockingbird,32.838193,-96.774435,2025,Orange Line;Red Line;Blue Line,metro,11847,10784,1596
+X112,CityPlace/Uptown,32.806758,-96.793225,2025,Orange Line;Red Line;Blue Line,metro,18537,15921,1089
 X116,Walnut Hill,32.883191,-96.764865,2025,Orange Line;Red Line,metro,9734,25927,530
 X115,Park Lane,32.873176,-96.765729,2025,Orange Line;Red Line,metro,12843,14728,1516
-X114,Lovers Lane,32.849026,-96.771595,2025,Orange Line;Red Line,metro,13126,15292,1221
+X114,Lovers Lane,32.849026,-96.771595,2025,Orange Line;Red Line,metro,13126,15292,1225
 X147,Lawnview,32.765571,-96.719953,2025,Green Line,metro,2734,22,556
 X180,White Rock,32.855521,-96.732718,2025,Blue Line,metro,3394,1092,962
 X179,Lake Highlands,32.878976,-96.730623,2025,Blue Line,metro,10962,935,979
@@ -104,29 +102,29 @@ X190,Morrell,32.739735,-96.802666,2025,Blue Line,metro,6582,636,466
 X196,UNT Dallas,32.65388,-96.801574,2025,Blue Line,metro,1209,46,1881
 X195,Camp Wisdom,32.666083,-96.787899,2025,Blue Line,metro,2439,17,754
 X193,VA Medical Center,32.69331,-96.792811,2025,Blue Line,metro,2677,5542,555
-X189,8th & Corinth,32.748008,-96.798735,2025,Red Line;Blue Line,metro,2531,908,331
+X189,8th & Corinth,32.748008,-96.798735,2025,Red Line;Blue Line,metro,2531,908,330
 X188,Cedars,32.76855,-96.79325,2025,Red Line;Blue Line,metro,2458,3686,147
 X187,Union Station,32.775477,-96.808115,2025,TRE;Red Line;Blue Line;Jefferson Blvd BRT,brt;commuter;metro,5460,29680,2338
 X149,Buckner,32.718265,-96.684696,2025,Green Line,metro,2966,1425,2736
 X148,Lake June,32.732028,-96.709088,2025,Green Line,metro,5849,283,941
 X171,Dallas Zoo,32.740418,-96.813372,2025,Red Line,metro,5623,1596,217
 X098,North Lake College,32.875156,-96.966591,2025,Orange Line,metro,6906,4946,497
-X072,Fort Worth T&P,32.745306,-97.329001,2025,Jacksboro BRT;TexPress Expansion;TEXRail;TRE;Alvarado Line,brt;commuter,2758,6103,981
-X073,Fort Worth Central,32.75202,-97.325515,2025,SE TexRail;FTW/Denton;TEXRail;TRE;Bowie Line;Gainesville Line,commuter,6345,36322,1165
+X072,Fort Worth T&P,32.745306,-97.329001,2025,Jacksboro BRT;TexPress Expansion;TEXRail;TRE;Alvarado Line,brt;commuter,2758,6103,956
+X073,Fort Worth Central,32.75202,-97.325515,2025,SE TexRail;FTW/Denton;TEXRail;TRE;Bowie Line;Gainesville Line,commuter,6345,36322,1144
 X318,DFW Airport North,32.934261,-97.054329,2025,Silver Line,metro,0,0,299
 X317,DFW Airport Terminal B,32.906918,-97.041221,2025,TEXRail;Orange Line;Silver Line,commuter;metro,0,0,865
-X074,North Side,32.795759,-97.33813,2025,TEXRail,commuter,5087,4991,301
+X074,North Side,32.795759,-97.33813,2025,TEXRail,commuter,5087,4991,300
 X077,North Richland Hills/Smithfield,32.864882,-97.211686,2025,TEXRail,commuter,2404,256,807
 X078,Grapevine-Main Street,32.933708,-97.077642,2025,TEXRail,commuter,5003,17453,138
 X075,Mercantile Center,32.819569,-97.292877,2025,TEXRail,commuter,2098,247,299
-X076,North Richland Hills/Iron Horse,32.844595,-97.249724,2025,TEXRail,commuter,3871,4452,758
-X325,12th Street,33.015498,-96.698026,2025,Silver Line,metro,3468,16209,247
+X076,North Richland Hills/Iron Horse,32.844595,-97.249724,2025,TEXRail,commuter,3871,4452,757
+X325,12th Street,33.015498,-96.698026,2025,Silver Line,metro,3468,16209,235
 X194,Ledbetter,32.682824,-96.788722,2025,Blue Line,metro,868,5500,410
-X326,Shiloh Road,33.0125,-96.66537,2025,Silver Line,metro,7934,7500,1641
-X323,UT Dallas,32.996497,-96.749607,2025,Silver Line,metro,5232,8864,726
-X319,Cypress Waters,32.950817,-96.982823,2025,Silver Line,metro,1586,995,714
+X326,Shiloh Road,33.0125,-96.66537,2025,Silver Line,metro,7934,7500,1582
+X323,UT Dallas,32.996497,-96.749607,2025,Silver Line,metro,5232,8864,724
+X319,Cypress Waters,32.950817,-96.982823,2025,Silver Line,metro,1586,995,715
 X322,Knoll Trail,32.962958,-96.817204,2025,Silver Line,metro,13078,40604,582
-X321,Addison,32.959128,-96.827719,2025,Silver Line,metro,4257,31987,532
+X321,Addison,32.959128,-96.827719,2025,Silver Line,metro,4257,31987,544
 X091,Hebron,33.010593,-96.958731,2025,A-train,commuter,3859,1163,151
 X087,Trinity Lakes,32.805216,-97.21005,2025,TRE,commuter,0,0,714
 X092,Old Town,33.047791,-96.986572,2025,A-train,commuter,0,0,145
@@ -135,383 +133,383 @@ X095,Downtown Denton Transit Center,33.21385,-97.126216,2025,FTW/Denton;A-train,
 X093,Highland Village/Lewisville Lake,33.083903,-97.026097,2025,A-train,commuter,2595,521,310
 X094,MedPark,33.182633,-97.091034,2025,A-train,commuter,0,208,238
 X084,West Irving,32.816138,-97.00777,2025,TRE,commuter,1824,401,923
-X082,Medical/Market Center,32.809647,-96.841013,2025,TRE;Ross Avenue BRT,brt;commuter,2675,41018,696
+X082,Medical/Market Center,32.809647,-96.841013,2025,TRE;Ross Avenue BRT,brt;commuter,2675,41018,685
 X085,CentrePort/DFW Airport,32.817043,-97.053542,2025,TRE,commuter,4348,6761,811
-X086,Bell,32.804628,-97.155799,2025,TRE,commuter,3502,4090,816
+X086,Bell,32.804628,-97.155799,2025,TRE,commuter,3502,4090,815
 X083,Downtown Irving/Heritage Crossing,32.814967,-96.948368,2025,TRE,commuter,2771,3015,1404
-X041,Park Place / 8th Avenue,32.726976,-97.347332,2030,TexPress Expansion,commuter,5525,8735,3
-X013,Six Points,32.773111,-97.304163,2031,Riverside-Forest Hill BRT,brt,5739,5979,37
-X535,Jessamine / South Freeway,32.718392,-97.32487,2032,Alvarado Line,commuter,3508,8078,17
-X042,Granbury Road / Biddison,32.699481,-97.355351,2030,TexPress Expansion,commuter,5502,5079,12
-X044,Hulen / Sycamore School,32.653816,-97.406791,2030,TexPress Expansion,commuter,8805,1202,282
-X536,Bolt / Hemphill,32.687373,-97.32941,2032,Alvarado Line,commuter,7048,2240,37
-X016,Riverside / Maddox,32.723506,-97.304256,2031,Riverside-Forest Hill BRT,brt,5872,610,102
-X018,Forest Hill,32.690063,-97.295147,2031,Riverside-Forest Hill BRT,brt,4887,1228,126
-X538,Lytle,32.625449,-97.333281,2032,Alvarado Line,commuter,4054,1473,262
-X014,Riverside Drive,32.758462,-97.301758,2031,Riverside-Forest Hill BRT,brt,2524,2816,3
-X015,Riverside / US-287,32.741041,-97.30292,2031,Riverside-Forest Hill BRT,brt,3886,1223,12
-X541,Alvarado,32.406212,-97.20744,2032,Alvarado Line,commuter,1493,955,28
-X046,Primrose,32.599686,-97.441755,2030,TexPress Expansion,commuter,0,0,84
-X210,Arts District,32.785542,-96.802313,2042,DNT West,metro,9285,100186,245
-X209,Pearl,32.793373,-96.804541,2030,DNT West;I-20 Crosstown;Ross Avenue BRT,brt;metro,20785,58930,7088
+X041,Park Place / 8th Avenue,32.726976,-97.347332,2030,TexPress Expansion,commuter,5525,8735,8
+X013,Six Points,32.773111,-97.304163,2033,Riverside-Forest Hill BRT,brt,5739,5979,37
+X535,Jessamine / South Freeway,32.718392,-97.32487,2036,Alvarado Line,commuter,3508,8078,17
+X042,Granbury Road / Biddison,32.699481,-97.355351,2030,TexPress Expansion,commuter,5502,5079,15
+X044,Hulen / Sycamore School,32.653816,-97.406791,2030,TexPress Expansion,commuter,8805,1202,452
+X536,Bolt / Hemphill,32.687373,-97.32941,2036,Alvarado Line,commuter,7048,2240,37
+X016,Riverside / Maddox,32.723506,-97.304256,2033,Riverside-Forest Hill BRT,brt,5872,610,103
+X018,Forest Hill,32.690063,-97.295147,2033,Riverside-Forest Hill BRT,brt,4887,1228,126
+X538,Lytle,32.625449,-97.333281,2036,Alvarado Line,commuter,4054,1473,308
+X014,Riverside Drive,32.758462,-97.301758,2033,Riverside-Forest Hill BRT,brt,2524,2816,3
+X015,Riverside / US-287,32.741041,-97.30292,2033,Riverside-Forest Hill BRT,brt,3886,1223,13
+X541,Alvarado,32.406212,-97.20744,2036,Alvarado Line,commuter,1493,955,28
+X046,Primrose,32.599686,-97.441755,2030,TexPress Expansion,commuter,0,0,111
+X210,Arts District,32.785542,-96.802313,2046,DNT West,metro,9285,100186,249
+X209,Pearl,32.793373,-96.804541,2030,DNT West;I-20 Crosstown;Ross Avenue BRT,brt;metro,20785,58930,7101
 X516,Woodall Rodgers / Central,32.793671,-96.795061,2030,Ross Avenue BRT,brt,12355,57420,131
 X513,Stemmons / Wycliff,32.802173,-96.831875,2030,Ross Avenue BRT,brt,2413,51920,258
-X211,Downtown,32.77474,-96.793066,2042,DNT West,metro,8587,39853,211
-X517,Old East Dallas,32.802856,-96.780246,2030,Ross Avenue BRT,brt,14076,31170,337
+X211,Downtown,32.77474,-96.793066,2046,DNT West,metro,8587,39853,211
+X517,Old East Dallas,32.802856,-96.780246,2030,Ross Avenue BRT,brt,14076,31170,332
 X570,Dallas,32.773278,-96.806906,2030,Terrell Line;Ennis Line,commuter,5460,29680,13
-X208,Turtle Creek,32.809264,-96.80923,2041,DNT West,metro,15151,19690,837
-X514,Hi Line,32.802581,-96.816117,2030,Ross Avenue BRT,brt,9069,15462,186
-X205,Love Field,32.843761,-96.847152,2041,DNT West,metro,40,20338,118
-X202,Forest and Marsh,32.909175,-96.856885,2030,DNT West;Forest Lane BRT,brt;metro,6422,11100,1857
-X207,Oak Lawn,32.824236,-96.820054,2041,DNT West,metro,13486,3858,1099
-X198,Marsh Lane,32.981095,-96.854998,2044,DNT West,metro,6653,9317,357
-X197,Frankford / Vail,32.996906,-96.847392,2044,DNT West,metro,13684,1678,1999
-X199,Marsh / Keller Springs,32.964387,-96.853228,2044,DNT West,metro,6441,6690,440
-X518,Munger / Live Oak,32.805587,-96.76883,2030,Ross Avenue BRT,brt,11400,1439,285
+X208,Turtle Creek,32.809264,-96.80923,2044,DNT West,metro,15151,19690,812
+X514,Hi Line,32.802581,-96.816117,2030,Ross Avenue BRT,brt,9069,15462,180
+X205,Love Field,32.843761,-96.847152,2044,DNT West,metro,40,20338,119
+X202,Forest and Marsh,32.909175,-96.856885,2030,DNT West;Forest Lane BRT,brt;metro,6422,11100,1848
+X207,Oak Lawn,32.824236,-96.820054,2044,DNT West,metro,13486,3858,1096
+X198,Marsh Lane,32.981095,-96.854998,2047,DNT West,metro,6653,9317,357
+X197,Frankford / Vail,32.996906,-96.847392,2047,DNT West,metro,13684,1678,1998
+X199,Marsh / Keller Springs,32.964387,-96.853228,2047,DNT West,metro,6441,6690,442
+X518,Munger / Live Oak,32.805587,-96.76883,2030,Ross Avenue BRT,brt,11400,1439,281
 X577,Main / Scyene,32.766778,-96.591464,2030,Terrell Line,commuter,5242,6482,32
-X200,Belt Line / Marsh,32.953156,-96.855471,2031,DNT West;Beltline Line,brt;metro,3194,8123,1383
-X497,Watters Creek,33.0518,-96.709,2035,Legacy Line,metro,6895,4118,328
+X200,Belt Line / Marsh,32.953156,-96.855471,2034,DNT West;Beltline Line,brt;metro,3194,8123,1397
+X497,Watters Creek,33.0518,-96.709,2041,Legacy Line,metro,6895,4118,409
 X500,McKinney,33.1976,-96.6155,2030,McKinney Line;SH-121 BRT,brt;commuter,5787,4492,499
 X574,Forney Road / Jim Miller,32.77667,-96.701978,2030,Terrell Line,commuter,8372,1038,12
-X519,Abrams / La Vista,32.812711,-96.752661,2030,Ross Avenue BRT,brt,6335,1623,406
-X204,NW Highway and Marsh,32.860127,-96.85606,2041,DNT West,metro,5873,1785,826
-X498,Allen,33.103176,-96.670553,2030,McKinney Line,commuter,3043,4513,482
-X580,Terrell,32.735395,-96.275354,2030,Terrell Line,commuter,3656,3782,107
-X212,South Side,32.768489,-96.782582,2042,DNT West;DNT East;Las Colinas-Mesquite Line,metro,3828,3994,1849
-X203,Walnut Hill / Marsh,32.880668,-96.855836,2041,DNT West,metro,4610,1126,618
-X213,Elsie Faye Heggins / M Wright,32.751366,-96.759004,2042,DNT West,metro,4943,642,2199
-X201,Brookhaven,32.92754,-96.855308,2044,DNT West,metro,5076,257,355
-X579,Forney,32.748402,-96.471231,2030,Terrell Line,commuter,2839,2373,292
-X540,Burleson,32.56312,-97.322804,2037,Alvarado Line,commuter,2516,2383,582
-X043,Wedgwood,32.676119,-97.380408,2035,TexPress Expansion,commuter,4380,305,147
-X023,Melinda / California,32.662214,-97.244891,2031,Riverside-Forest Hill BRT,brt,3526,894,33
-X017,Berry / Riverside,32.705882,-97.304345,2031,Riverside-Forest Hill BRT;FW Crosstown Loop,brt,2659,237,245
-X539,Crowley,32.594288,-97.328011,2037,Alvarado Line,commuter,1970,727,139
-X537,Edgecliff Village,32.656317,-97.328773,2037,Alvarado Line,commuter,1364,189,104
-X045,Mesa Springs,32.625706,-97.421017,2035,TexPress Expansion,commuter,1369,108,66
-X235,McKinney Avenue / Maple,32.795531,-96.801174,2037,DNT East,metro,16432,53109,1748
-X229,Galleria,32.927773,-96.817387,2035,DNT East,metro,5325,51412,792
-X228,Addison South,32.934405,-96.824431,2035,DNT East,metro,5052,51066,284
-X225,Addison Circle,32.964694,-96.826246,2035,DNT East,metro,11056,42615,780
-X237,Marilla / Pearl,32.778222,-96.789895,2048,DNT East;Las Colinas-Mesquite Line,metro,6129,36167,1279
-X234,Turtle Creek,32.809072,-96.806882,2037,DNT East,metro,19851,31873,1096
-X219,Stonebriar,33.087888,-96.819549,2030,SH-121 BRT,brt,3354,30599,35
-X226,Belt Line / Quorum,32.954124,-96.826527,2031,DNT East;Beltline Line,brt;metro,3606,23744,3138
-X220,Legacy West,33.067785,-96.820826,2030,DNT East;SH-121 BRT,brt;metro,2528,21148,1896
-X525,Richland College,32.90908,-96.734798,2030,Forest Lane BRT,brt,11714,10067,638
-X526,Forest / Audelia Road,32.909436,-96.717748,2030,Forest Lane BRT,brt,18023,3752,1419
-X523,Medical City Dallas,32.909538,-96.7734,2030,Forest Lane BRT,brt,3793,17916,284
-X232,Preston Center,32.863568,-96.806612,2037,DNT East,metro,5650,14722,1096
+X519,Abrams / La Vista,32.812711,-96.752661,2030,Ross Avenue BRT,brt,6335,1623,404
+X204,NW Highway and Marsh,32.860127,-96.85606,2044,DNT West,metro,5873,1785,826
+X498,Allen,33.103176,-96.670553,2030,McKinney Line,commuter,3043,4513,476
+X580,Terrell,32.735395,-96.275354,2033,Terrell Line,commuter,3656,3782,107
+X212,South Side,32.768489,-96.782582,2046,DNT West;DNT East;Las Colinas-Mesquite Line,metro,3828,3994,1848
+X203,Walnut Hill / Marsh,32.880668,-96.855836,2044,DNT West,metro,4610,1126,618
+X213,Elsie Faye Heggins / M Wright,32.751366,-96.759004,2046,DNT West,metro,4943,642,2198
+X201,Brookhaven,32.92754,-96.855308,2047,DNT West,metro,5076,257,355
+X579,Forney,32.748402,-96.471231,2033,Terrell Line,commuter,2839,2373,292
+X540,Burleson,32.56312,-97.322804,2041,Alvarado Line,commuter,2516,2383,580
+X043,Wedgwood,32.676119,-97.380408,2035,TexPress Expansion,commuter,4380,305,162
+X023,Melinda / California,32.662214,-97.244891,2033,Riverside-Forest Hill BRT,brt,3526,894,33
+X017,Berry / Riverside,32.705882,-97.304345,2031,Riverside-Forest Hill BRT;FW Crosstown Loop,brt,2659,237,249
+X539,Crowley,32.594288,-97.328011,2041,Alvarado Line,commuter,1970,727,167
+X537,Edgecliff Village,32.656317,-97.328773,2041,Alvarado Line,commuter,1364,189,110
+X045,Mesa Springs,32.625706,-97.421017,2035,TexPress Expansion,commuter,1369,108,289
+X235,McKinney Avenue / Maple,32.795531,-96.801174,2040,DNT East;Legacy Line,metro,16432,53109,1746
+X229,Galleria,32.927773,-96.817387,2039,DNT East;Legacy Line,metro,5325,51412,798
+X228,Addison South,32.934405,-96.824431,2039,DNT East;Legacy Line,metro,5052,51066,287
+X225,Addison Circle,32.964694,-96.826246,2039,DNT East;Legacy Line,metro,11056,42615,798
+X237,Marilla / Pearl,32.778222,-96.789895,2052,DNT East;Las Colinas-Mesquite Line,metro,6129,36167,1279
+X234,Turtle Creek,32.809072,-96.806882,2040,DNT East;Legacy Line,metro,19851,31873,1100
+X219,Stonebriar,33.087888,-96.819549,2031,SH-121 BRT,brt,3354,30599,11
+X226,Belt Line / Quorum,32.954124,-96.826527,2034,DNT East;Beltline Line;Legacy Line,brt;metro,3606,23744,3194
+X220,Legacy West,33.067785,-96.820826,2031,DNT East;Legacy Line;SH-121 BRT,brt;metro,2528,21148,2626
+X525,Richland College,32.90908,-96.734798,2030,Forest Lane BRT,brt,11714,10067,640
+X526,Forest / Audelia Road,32.909436,-96.717748,2030,Forest Lane BRT,brt,18023,3752,1422
+X523,Medical City Dallas,32.909538,-96.7734,2030,Forest Lane BRT,brt,3793,17916,285
+X232,Preston Center,32.863568,-96.806612,2040,DNT East;Legacy Line,metro,5650,14722,1105
 X530,Bishop Arts District,32.743228,-96.824896,2030,Jefferson Blvd BRT,brt,8407,6869,104
-X223,Tollway / Frankford,33.007264,-96.824618,2038,DNT East,metro,12980,1749,2053
-X218,Riders Field,33.099252,-96.818468,2030,SH-121 BRT,brt,3721,9427,74
+X223,Tollway / Frankford,33.007264,-96.824618,2039,DNT East;Legacy Line,metro,12980,1749,2101
+X215,Frisco Main St,33.150534,-96.834581,2043,DNT East,metro,3262,10910,1849
+X218,Riders Field,33.099252,-96.818468,2030,SH-121 BRT,brt,3721,9427,89
 X533,Cockrell Hill Road,32.742336,-96.891421,2030,I-30 Line;Jefferson Blvd BRT,brt,8080,3674,1610
-X233,Highland Park Village,32.836011,-96.805131,2037,DNT East,metro,6173,5458,929
-X247,Emporium / Town East,32.808804,-96.624036,2048,DNT East,metro,4099,7214,904
-X246,Motley / Town East,32.802088,-96.645616,2048,DNT East,metro,10293,800,1303
-X214,All Stars / Frisco Street,33.160926,-96.836717,2039,DNT East,metro,2427,8122,1583
+X233,Highland Park Village,32.836011,-96.805131,2040,DNT East;Legacy Line,metro,6173,5458,933
+X247,Emporium / Town East,32.808804,-96.624036,2056,DNT East,metro,4099,7214,904
+X246,Motley / Town East,32.802088,-96.645616,2056,DNT East,metro,10293,800,1303
 X531,Jefferson / 10th Street,32.746024,-96.849788,2030,Jefferson Blvd BRT,brt,8245,2298,377
-X217,The T's,33.116544,-96.823901,2035,DNT East;Legacy Line,metro,4057,5979,463
+X217,The T's,33.116544,-96.823901,2043,DNT East,metro,4057,5979,407
 X524,Bouchard,32.909097,-96.754141,2030,Forest Lane BRT,brt,6372,3651,445
-X062,Roanoke,33.004737,-97.227651,2045,FTW/Denton,commuter,3628,6141,87
-X058,Seminary / Campus,32.686047,-97.293475,2031,SE TexRail,commuter,8288,912,141
-X221,Tollway / Park Blvd,33.047616,-96.822107,2038,DNT East,metro,6196,2905,577
-X067,Denton Highway / Watauga Road,32.861858,-97.264477,2045,FTW/Denton,commuter,7895,697,314
-X059,South Freeway / Berry,32.703455,-97.320922,2031,SE TexRail,commuter,5101,2698,49
-X224,Dallas Parkway / Knoll Trail,32.985992,-96.825475,2038,DNT East,metro,5076,2395,619
-X244,Buckner Boulevard / Forney Road,32.779603,-96.6811,2048,DNT East;Las Colinas-Mesquite Line,metro,2312,5022,1517
+X062,Roanoke,33.004737,-97.227651,2048,FTW/Denton,commuter,3628,6141,87
+X058,Seminary / Campus,32.686047,-97.293475,2033,SE TexRail,commuter,8288,912,141
+X221,Tollway / Park Blvd,33.047616,-96.822107,2039,DNT East;Legacy Line,metro,6196,2905,594
+X067,Denton Highway / Watauga Road,32.861858,-97.264477,2048,FTW/Denton,commuter,7895,697,312
+X059,South Freeway / Berry,32.703455,-97.320922,2033,SE TexRail,commuter,5101,2698,50
+X224,Dallas Parkway / Knoll Trail,32.985992,-96.825475,2039,DNT East;Legacy Line,metro,5076,2395,638
+X244,Buckner Boulevard / Forney Road,32.779603,-96.6811,2052,DNT East;Las Colinas-Mesquite Line,metro,2312,5022,1517
 X532,Jefferson / Westmoreland,32.743738,-96.873787,2030,Jefferson Blvd BRT,brt,6533,606,307
-X222,Park / Mira Vista,33.027448,-96.823388,2038,DNT East,metro,2964,3947,618
+X222,Park / Mira Vista,33.027448,-96.823388,2039,DNT East;Legacy Line,metro,2964,3947,649
 X591,Hillside Village,32.602019,-96.949672,2030,Midlothian Line,commuter,2411,4479,139
-X243,Forney Road,32.779674,-96.704625,2048,DNT East;Las Colinas-Mesquite Line,metro,6663,175,1528
-X241,Haskell / Barry,32.782865,-96.745938,2048,DNT East;Las Colinas-Mesquite Line,metro,5565,1158,928
-X057,Hartman / Mansfield Highway,32.672544,-97.259795,2031,SE TexRail,commuter,6050,650,185
-X521,Asian Trade District,32.909488,-96.830546,2030,Forest Lane BRT,brt,4611,1972,175
-X066,Watauga,32.893046,-97.259421,2045,FTW/Denton,commuter,4511,1849,291
+X243,Forney Road,32.779674,-96.704625,2052,DNT East;Las Colinas-Mesquite Line,metro,6663,175,1528
+X241,Haskell / Barry,32.782865,-96.745938,2052,DNT East;Las Colinas-Mesquite Line,metro,5565,1158,894
+X057,Hartman / Mansfield Highway,32.672544,-97.259795,2033,SE TexRail,commuter,6050,650,184
+X521,Asian Trade District,32.909488,-96.830546,2030,Forest Lane BRT,brt,4611,1972,177
+X066,Watauga,32.893046,-97.259421,2048,FTW/Denton,commuter,4511,1849,290
 X594,Oak Cliff,32.710056,-96.875803,2030,Midlothian Line,commuter,5304,898,166
-X522,First Baptist Medical Center,32.909408,-96.804066,2030,DNT East;Forest Lane BRT,brt;metro,3586,2590,3384
-X065,Main / Bear Creek,32.92432,-97.255448,2045,FTW/Denton,commuter,3963,1864,146
-X227,Inwood Road / Landmark,32.944359,-96.827356,2035,DNT East,metro,6158,423,456
+X522,First Baptist Medical Center,32.909408,-96.804066,2030,DNT East;Legacy Line;Forest Lane BRT,brt;metro,3586,2590,3436
+X065,Main / Bear Creek,32.92432,-97.255448,2048,FTW/Denton,commuter,3963,1864,146
+X227,Inwood Road / Landmark,32.944359,-96.827356,2039,DNT East;Legacy Line,metro,6158,423,462
 X576,Mesquite,32.773429,-96.627763,2035,Terrell Line,commuter,2196,2556,13
-X019,Mansfield Highway / Shackleford,32.680667,-97.27435,2036,Riverside-Forest Hill BRT,brt,3980,554,65
-X020,Forest Hill Drive / Horton,32.680112,-97.273452,2036,Riverside-Forest Hill BRT,brt,3980,554,4
-X499,Fairview,33.159586,-96.636305,2030,McKinney Line,commuter,2037,2060,430
+X019,Mansfield Highway / Shackleford,32.680667,-97.27435,2038,Riverside-Forest Hill BRT,brt,3980,554,65
+X020,Forest Hill Drive / Horton,32.680112,-97.273452,2038,Riverside-Forest Hill BRT,brt,3980,554,4
+X499,Fairview,33.159586,-96.636305,2030,McKinney Line,commuter,2037,2060,431
 X571,Botham Jean / Pennsylvania,32.754554,-96.777526,2035,Terrell Line;Ennis Line,commuter,2751,860,13
-X206,Mockingbird / Airdrome,32.834984,-96.833969,2046,DNT West,metro,2299,1026,204
-X022,Loop 820 / Forest Hill Drive,32.661101,-97.267242,2036,Riverside-Forest Hill BRT,brt,5298,2139,46
-X248,Rowlett,32.814214,-96.595111,2030,DNT East;Beltline Line,brt;metro,2222,173,2483
+X206,Mockingbird / Airdrome,32.834984,-96.833969,2049,DNT West,metro,2299,1026,205
+X022,Loop 820 / Forest Hill Drive,32.661101,-97.267242,2038,Riverside-Forest Hill BRT,brt,5298,2139,46
+X248,Rowlett,32.814214,-96.595111,2031,DNT East;Beltline Line,brt;metro,2222,173,2483
 X573,Elsie Faye Heggins Street,32.772681,-96.735004,2035,Terrell Line,commuter,2310,84,7
 X572,Bexar / C F Hawn,32.745074,-96.752231,2035,Terrell Line,commuter,2294,63,14
 X575,Prairie Creek / Big Town,32.776451,-96.664614,2035,Terrell Line,commuter,1530,457,52
-X578,Scyene / Glen,32.763191,-96.554276,2035,Terrell Line,commuter,1546,47,56
-X021,Tarrant County College South Campus,32.669789,-97.280205,2036,Riverside-Forest Hill BRT,brt,1413,165,39
+X578,Scyene / Glen,32.763191,-96.554276,2038,Terrell Line,commuter,1546,47,56
+X021,Tarrant County College South Campus,32.669789,-97.280205,2038,Riverside-Forest Hill BRT,brt,1413,165,39
 X589,Midlothian,32.4824,-96.9942,2030,Midlothian Line,commuter,0,0,135
-X055,Mansfield,32.567493,-97.14205,2031,SE TexRail;SH-360 Line;Waxahachie Line,brt;commuter,0,0,513
-X262,Victory Park,32.79089,-96.804995,2046,Las Colinas-Mesquite Line,metro,17493,85764,950
-X258,Bachman Lake,32.80627,-96.849244,2046,Las Colinas-Mesquite Line,metro,0,0,42
-X259,Irving Boulevard / Stemmons,32.801514,-96.839087,2046,Las Colinas-Mesquite Line,metro,2413,51920,149
-X261,Harwood District,32.792781,-96.811228,2046,Las Colinas-Mesquite Line,metro,13090,34507,455
-X505,Stonebriar,33.085864,-96.821381,2035,DNT East;Legacy Line,metro,3247,20789,1407
+X055,Mansfield,32.567493,-97.14205,2033,SE TexRail;SH-360 Line;Waxahachie Line,brt;commuter,0,0,513
+X262,Victory Park,32.79089,-96.804995,2051,Las Colinas-Mesquite Line,metro,17493,85764,948
+X258,Bachman Lake,32.80627,-96.849244,2051,Las Colinas-Mesquite Line,metro,0,0,42
+X259,Irving Boulevard / Stemmons,32.801514,-96.839087,2051,Las Colinas-Mesquite Line,metro,2413,51920,147
+X261,Harwood District,32.792781,-96.811228,2051,Las Colinas-Mesquite Line,metro,13090,34507,454
+X505,Stonebriar,33.085864,-96.821381,2043,DNT East,metro,3247,20789,410
 X249,Irving West,32.85517,-96.992241,2036,Las Colinas-Mesquite Line;Beltline Line;SH-360 Line,brt;metro,14689,3356,3391
-X250,Las Brisas / Walnut Hill,32.865192,-96.983665,2046,Las Colinas-Mesquite Line,metro,11666,6367,592
-X506,Legacy Town Center,33.070049,-96.810228,2035,Legacy Line,metro,0,9618,28
+X250,Las Brisas / Walnut Hill,32.865192,-96.983665,2051,Las Colinas-Mesquite Line,metro,11666,6367,592
+X506,Legacy Town Center,33.070049,-96.810228,2041,Legacy Line,metro,0,9618,56
 X562,Denton Drive / Belt Line,32.957299,-96.906069,2030,Sherman Line,commuter,6229,8945,63
-X566,Main / Frisco Street,33.151512,-96.828998,2030,Sherman Line,commuter,3262,10910,271
-X501,Frisco,33.150543,-96.82393,2035,DNT East;Legacy Line,metro,3262,10910,2128
-X252,Northgate Drive,32.851703,-96.943125,2046,Las Colinas-Mesquite Line,metro,3738,10095,447
-X254,Airport / John W Carpenter,32.832933,-96.902442,2046,Las Colinas-Mesquite Line,metro,1254,11945,153
-X563,New Koreatown,32.978541,-96.878695,2030,Sherman Line,commuter,8438,2589,145
-X272,Saint Augustine / Scyene,32.763735,-96.654433,2050,Las Colinas-Mesquite Line,metro,8570,1875,2869
-X275,Main / Galloway,32.766698,-96.59933,2030,Las Colinas-Mesquite Line;Beltline Line,brt;metro,5103,4155,3142
-X251,Irving,32.859056,-96.963966,2046,Las Colinas-Mesquite Line,metro,6138,3098,431
-X510,Custer / Legacy,33.053591,-96.729106,2035,Legacy Line,metro,6220,873,355
-X509,Independence / Legacy,33.056962,-96.751845,2035,Legacy Line,metro,6809,1284,435
-X507,Preston / Legacy,33.066165,-96.788804,2035,Legacy Line,metro,6341,1238,417
-X273,Military / Clary,32.769479,-96.6374,2050,Las Colinas-Mesquite Line,metro,4361,2746,961
-X567,Prosper,33.238827,-96.806499,2054,Sherman Line,commuter,2231,4708,390
-X508,Coit / Legacy,33.065338,-96.769616,2035,Legacy Line,metro,5210,1716,377
-X565,The Colony,33.09085,-96.856909,2030,Sherman Line,commuter,4009,2223,214
-X260,Market Center / Riverfront,32.792661,-96.819938,2046,Las Colinas-Mesquite Line,metro,5552,12094,482
-X253,Northgate / Chemsearch,32.843178,-96.920212,2046,Las Colinas-Mesquite Line,metro,2905,2490,403
-X504,Dallas Parkway / Gaylord,33.099276,-96.823246,2035,DNT East;Legacy Line,metro,2303,2819,351
+X566,Main / Frisco Street,33.151512,-96.828998,2030,Sherman Line,commuter,3262,10910,272
+X501,Frisco,33.150543,-96.82393,2043,DNT East,metro,3262,10910,652
+X252,Northgate Drive,32.851703,-96.943125,2051,Las Colinas-Mesquite Line,metro,3738,10095,447
+X254,Airport / John W Carpenter,32.832933,-96.902442,2051,Las Colinas-Mesquite Line,metro,1254,11945,153
+X563,New Koreatown,32.978541,-96.878695,2030,Sherman Line,commuter,8438,2589,144
+X272,Saint Augustine / Scyene,32.763735,-96.654433,2056,Las Colinas-Mesquite Line,metro,8570,1875,2869
+X275,Main / Galloway,32.766698,-96.59933,2031,Las Colinas-Mesquite Line;Beltline Line,brt;metro,5103,4155,3142
+X251,Irving,32.859056,-96.963966,2051,Las Colinas-Mesquite Line,metro,6138,3098,431
+X510,Custer / Legacy,33.053591,-96.729106,2041,Legacy Line,metro,6220,873,464
+X509,Independence / Legacy,33.056962,-96.751845,2041,Legacy Line,metro,6809,1284,565
+X507,Preston / Legacy,33.066165,-96.788804,2041,Legacy Line,metro,6341,1238,551
+X273,Military / Clary,32.769479,-96.6374,2056,Las Colinas-Mesquite Line,metro,4361,2746,960
+X567,Prosper,33.238827,-96.806499,2058,Sherman Line,commuter,2231,4708,397
+X508,Coit / Legacy,33.065338,-96.769616,2041,Legacy Line,metro,5210,1716,547
+X565,The Colony,33.09085,-96.856909,2030,Sherman Line,commuter,4009,2223,211
+X260,Market Center / Riverfront,32.792661,-96.819938,2051,Las Colinas-Mesquite Line,metro,5552,12094,482
+X253,Northgate / Chemsearch,32.843178,-96.920212,2051,Las Colinas-Mesquite Line,metro,2905,2490,403
+X504,Dallas Parkway / Gaylord,33.099276,-96.823246,2043,DNT East,metro,2303,2819,301
 X593,Main / Freeman,32.653377,-96.907193,2035,Midlothian Line,commuter,3926,1051,174
 X529,Zang / Greenbriar,32.761614,-96.816138,2035,Jefferson Blvd BRT,brt,3989,900,204
-X070,North Freeway,32.786577,-97.322962,2050,FTW/Denton,commuter,1190,3679,19
-X239,Baylor South,32.771907,-96.770656,2048,DNT East;Las Colinas-Mesquite Line,metro,2784,1896,312
-X068,McLean / Janada,32.832448,-97.275218,2050,FTW/Denton,commuter,3880,224,147
-X231,Meaders,32.894904,-96.80415,2037,DNT East,metro,2575,1486,471
-X245,Samuell / Big Town,32.79251,-96.667297,2048,DNT East,metro,2292,1634,724
+X070,North Freeway,32.786577,-97.322962,2053,FTW/Denton,commuter,1190,3679,19
+X239,Baylor South,32.771907,-96.770656,2052,DNT East;Las Colinas-Mesquite Line,metro,2784,1896,312
+X068,McLean / Janada,32.832448,-97.275218,2053,FTW/Denton,commuter,3880,224,146
+X231,Meaders,32.894904,-96.80415,2040,DNT East;Legacy Line,metro,2575,1486,473
+X245,Samuell / Big Town,32.79251,-96.667297,2056,DNT East,metro,2292,1634,724
 X590,Cedar Hill,32.571822,-96.959549,2035,Midlothian Line,commuter,1756,1335,54
 X592,Joe Wilson / Santa Fe,32.628386,-96.92989,2035,Midlothian Line,commuter,2336,370,149
-X242,Forney Road / Military,32.781366,-96.726524,2048,DNT East;Las Colinas-Mesquite Line,metro,2033,441,299
-X056,Dick Price / North Road,32.652251,-97.235135,2036,SE TexRail,commuter,1178,720,132
-X069,Long / Texrail,32.809646,-97.297779,2050,FTW/Denton,commuter,1642,150,68
-X064,Keller,32.95574,-97.254696,2050,FTW/Denton,commuter,1402,102,149
-X063,Alliance Gateway / Main,32.984351,-97.239123,2050,FTW/Denton,commuter,0,550,25
-X569,Sherman,33.640283,-96.606733,2054,Sherman Line,commuter,0,0,0
-X032,Henderson St,32.749122,-97.337377,2030,Jacksboro BRT,brt,8090,32150,35
-X033,TCC Trinity River,32.754976,-97.339474,2030,Jacksboro BRT,brt,7676,28109,346
-X031,Rosedale / Henderson,32.73301,-97.339404,2030,Jacksboro BRT,brt,2190,23058,66
-X559,28th Street / Decatur Avenue,32.793628,-97.338995,2030,FW Crosstown Loop;Gainesville Line,brt;commuter,3324,4928,162
-X554,Bailey Boswell / Basswood,32.889496,-97.362584,2030,Gainesville Line,commuter,6043,75,120
-X036,Fair Oaks,32.7856,-97.383254,2030,Jacksboro BRT,brt,5303,750,68
-X037,Jacksboro / Skyline,32.795679,-97.397625,2030,Jacksboro BRT,brt,5078,970,242
-X556,36th Street / Deen,32.807445,-97.322807,2030,Gainesville Line,commuter,5182,62,9
-X274,Gross / Hillcrest,32.774943,-96.615901,2055,Las Colinas-Mesquite Line,metro,5936,3384,814
-X568,Celina,33.324268,-96.78434,2059,Sherman Line,commuter,3102,1612,158
-X039,Lake Worth,32.811075,-97.429509,2030,Jacksboro BRT,brt,1113,3035,20
-X564,Hebron Parkway / Arbor Creek,33.027084,-96.86436,2035,Sherman Line,commuter,3020,544,156
-X502,Stonebrook / Dallas Parkway,33.133649,-96.823891,2035,DNT East;Legacy Line,metro,2060,660,513
-X257,Stemmons / Commonwealth,32.812191,-96.861891,2051,Las Colinas-Mesquite Line,metro,1330,813,106
-X255,Regal Row / John W Carpenter,32.821477,-96.886245,2051,Las Colinas-Mesquite Line,metro,0,0,0
-X551,Gainesville,33.625847,-97.140163,2066,Gainesville Line,commuter,0,0,0
-X256,Mockingbird / John W Carpenter,32.815745,-96.87814,2051,Las Colinas-Mesquite Line,metro,0,0,88
-X416,McKinnon / Pearl,32.796184,-96.807948,2051,I-30 Line,brt,20119,65364,232
-X417,Uptown,32.803194,-96.799527,2051,I-30 Line,brt,21611,59003,242
-X402,Grand Prairie,32.746853,-97.031938,2056,I-30 Line,brt,6833,19457,341
-X400,Six Flags,32.751395,-97.070829,2056,I-30 Line,brt,15,9940,68
-X401,Great Southwest / Randol Mill,32.750442,-97.046297,2056,I-30 Line,brt,2387,18924,379
-X418,Ross / Bennett,32.807364,-96.774329,2042,I-20 Crosstown;I-30 Line,brt,10929,2970,807
-X415,Design District,32.788743,-96.818459,2051,I-30 Line,brt,6835,12712,96
-X489,Berry / McCart,32.706084,-97.353596,2030,FW Crosstown Loop,brt,10816,5740,183
-X398,Downtown Arlington,32.736406,-97.103904,2056,I-30 Line,brt,3360,3596,83
-X396,Davis Drive,32.730204,-97.125244,2056,I-30 Line,brt,8228,7459,436
-X397,Mesquite Street / Border,32.734207,-97.106041,2056,I-30 Line;SH-360 Line,brt,5018,3698,506
-X414,Trinity Groves,32.778199,-96.829587,2037,I-20 Crosstown;I-30 Line,brt,7085,6269,239
+X242,Forney Road / Military,32.781366,-96.726524,2052,DNT East;Las Colinas-Mesquite Line,metro,2033,441,299
+X056,Dick Price / North Road,32.652251,-97.235135,2038,SE TexRail,commuter,1178,720,131
+X069,Long / Texrail,32.809646,-97.297779,2053,FTW/Denton,commuter,1642,150,68
+X064,Keller,32.95574,-97.254696,2053,FTW/Denton,commuter,1402,102,149
+X063,Alliance Gateway / Main,32.984351,-97.239123,2053,FTW/Denton,commuter,0,550,25
+X569,Sherman,33.640283,-96.606733,2058,Sherman Line,commuter,0,0,0
+X032,Henderson St,32.749122,-97.337377,2031,Jacksboro BRT,brt,8090,32150,33
+X033,TCC Trinity River,32.754976,-97.339474,2031,Jacksboro BRT,brt,7676,28109,423
+X031,Rosedale / Henderson,32.73301,-97.339404,2031,Jacksboro BRT,brt,2190,23058,39
+X559,28th Street / Decatur Avenue,32.793628,-97.338995,2033,FW Crosstown Loop;Gainesville Line,brt;commuter,3324,4928,162
+X554,Bailey Boswell / Basswood,32.889496,-97.362584,2033,Gainesville Line,commuter,6043,75,119
+X036,Fair Oaks,32.7856,-97.383254,2031,Jacksboro BRT,brt,5303,750,70
+X037,Jacksboro / Skyline,32.795679,-97.397625,2031,Jacksboro BRT,brt,5078,970,242
+X556,36th Street / Deen,32.807445,-97.322807,2033,Gainesville Line,commuter,5182,62,9
+X274,Gross / Hillcrest,32.774943,-96.615901,2061,Las Colinas-Mesquite Line,metro,5936,3384,814
+X568,Celina,33.324268,-96.78434,2063,Sherman Line,commuter,3102,1612,156
+X039,Lake Worth,32.811075,-97.429509,2031,Jacksboro BRT,brt,1113,3035,20
+X564,Hebron Parkway / Arbor Creek,33.027084,-96.86436,2035,Sherman Line,commuter,3020,544,155
+X502,Stonebrook / Dallas Parkway,33.133649,-96.823891,2043,DNT East,metro,2060,660,439
+X257,Stemmons / Commonwealth,32.812191,-96.861891,2056,Las Colinas-Mesquite Line,metro,1330,813,106
+X255,Regal Row / John W Carpenter,32.821477,-96.886245,2056,Las Colinas-Mesquite Line,metro,0,0,0
+X551,Gainesville,33.625847,-97.140163,2068,Gainesville Line,commuter,0,0,0
+X256,Mockingbird / John W Carpenter,32.815745,-96.87814,2056,Las Colinas-Mesquite Line,metro,0,0,88
+X416,McKinnon / Pearl,32.796184,-96.807948,2055,I-30 Line,brt,20119,65364,232
+X417,Uptown,32.803194,-96.799527,2055,I-30 Line,brt,21611,59003,242
+X402,Grand Prairie,32.746853,-97.031938,2060,I-30 Line,brt,6833,19457,341
+X400,Six Flags,32.751395,-97.070829,2060,I-30 Line,brt,15,9940,68
+X401,Great Southwest / Randol Mill,32.750442,-97.046297,2060,I-30 Line,brt,2387,18924,379
+X418,Ross / Bennett,32.807364,-96.774329,2043,I-20 Crosstown;I-30 Line,brt,10929,2970,809
+X415,Design District,32.788743,-96.818459,2055,I-30 Line,brt,6835,12712,96
+X489,Berry / McCart,32.706084,-97.353596,2031,FW Crosstown Loop,brt,10816,5740,187
+X398,Downtown Arlington,32.736406,-97.103904,2060,I-30 Line,brt,3360,3596,83
+X396,Davis Drive,32.730204,-97.125244,2060,I-30 Line,brt,8228,7459,436
+X397,Mesquite Street / Border,32.734207,-97.106041,2060,I-30 Line;SH-360 Line,brt,5018,3698,506
+X414,Trinity Groves,32.778199,-96.829587,2043,I-20 Crosstown;I-30 Line,brt,7085,6269,239
 X395,Arlington,32.72198,-97.144724,2060,I-30 Line,brt,7305,2627,280
-X413,Commerce / Fort Worth Avenue,32.773043,-96.833034,2037,I-20 Crosstown;I-30 Line,brt,7085,6269,905
-X399,Cowboys/Rangers Stadiums,32.751794,-97.087268,2056,I-30 Line;SH-360 Line,brt,1849,7560,838
-X424,Zacha Junction,32.866467,-96.681397,2053,I-20 Crosstown;I-30 Line,brt,6841,1678,716
-X476,Haltom North,32.801839,-97.263346,2061,FW Crosstown Loop,brt,4094,5951,72
-X419,Richmond / Skillman,32.815303,-96.7575,2050,I-20 Crosstown;I-30 Line,brt,6552,2116,643
-X490,Berry / Stadium,32.702455,-97.365547,2030,FW Crosstown Loop,brt,7611,1822,92
-X488,Hemphill/Berry,32.705848,-97.331702,2031,FW Crosstown Loop,brt,6467,2506,229
-X420,Lakewood,32.813193,-96.735858,2050,I-20 Crosstown;I-30 Line,brt,6810,1988,590
-X475,Haltom City,32.795064,-97.286195,2061,FW Crosstown Loop,brt,7115,1611,99
-X493,Bryant Irvin Road,32.715778,-97.411961,2030,FW Crosstown Loop,brt,5415,2964,82
-X482,Loop 820 / Meadowbrook,32.748642,-97.221013,2061,FW Crosstown Loop,brt,6658,1511,117
-X410,North Oak Cliff,32.752992,-96.874538,2043,I-30 Line,brt,3110,2007,439
-X423,Reinhardt,32.847464,-96.686248,2053,I-20 Crosstown;I-30 Line,brt,6554,1539,860
+X413,Commerce / Fort Worth Avenue,32.773043,-96.833034,2043,I-20 Crosstown;I-30 Line,brt,7085,6269,905
+X399,Cowboys/Rangers Stadiums,32.751794,-97.087268,2060,I-30 Line;SH-360 Line,brt,1849,7560,838
+X424,Zacha Junction,32.866467,-96.681397,2055,I-20 Crosstown;I-30 Line,brt,6841,1678,716
+X476,Haltom North,32.801839,-97.263346,2063,FW Crosstown Loop,brt,4094,5951,71
+X419,Richmond / Skillman,32.815303,-96.7575,2051,I-20 Crosstown;I-30 Line,brt,6552,2116,640
+X490,Berry / Stadium,32.702455,-97.365547,2031,FW Crosstown Loop,brt,7611,1822,129
+X488,Hemphill/Berry,32.705848,-97.331702,2031,FW Crosstown Loop,brt,6467,2506,265
+X420,Lakewood,32.813193,-96.735858,2051,I-20 Crosstown;I-30 Line,brt,6810,1988,589
+X475,Haltom City,32.795064,-97.286195,2063,FW Crosstown Loop,brt,7115,1611,98
+X493,Bryant Irvin Road,32.715778,-97.411961,2031,FW Crosstown Loop,brt,5415,2964,85
+X482,Loop 820 / Meadowbrook,32.748642,-97.221013,2063,FW Crosstown Loop,brt,6658,1511,117
+X410,North Oak Cliff,32.752992,-96.874538,2048,I-30 Line,brt,3110,2007,439
+X423,Reinhardt,32.847464,-96.686248,2055,I-20 Crosstown;I-30 Line,brt,6554,1539,859
 X009,Las Vegas / Western Hills,32.74124,-97.467818,2075,White Settlement BRT,brt,7201,844,344
-X492,Waterside,32.69897,-97.411662,2030,FW Crosstown Loop,brt,5907,1788,240
-X472,Marine Park,32.781215,-97.349047,2061,FW Crosstown Loop,brt,5022,2525,133
-X494,Ridglea Hills,32.728311,-97.416346,2030,FW Crosstown Loop,brt,4196,3252,58
-X422,Garland Road / Buckner Boulevard,32.832544,-96.703823,2051,I-20 Crosstown;I-30 Line,brt,3933,3431,449
-X491,Bellaire / Hulen,32.704353,-97.391898,2030,FW Crosstown Loop,brt,2675,4234,34
-X403,Indian Hills,32.742751,-97.013154,2056,I-30 Line,brt,4164,2492,287
-X485,Berry / Miller,32.713742,-97.260889,2031,FW Crosstown Loop,brt,6392,295,221
+X492,Waterside,32.69897,-97.411662,2031,FW Crosstown Loop,brt,5907,1788,246
+X472,Marine Park,32.781215,-97.349047,2063,FW Crosstown Loop,brt,5022,2525,129
+X494,Ridglea Hills,32.728311,-97.416346,2031,FW Crosstown Loop,brt,4196,3252,58
+X422,Garland Road / Buckner Boulevard,32.832544,-96.703823,2055,I-20 Crosstown;I-30 Line,brt,3933,3431,449
+X491,Bellaire / Hulen,32.704353,-97.391898,2031,FW Crosstown Loop,brt,2675,4234,47
+X403,Indian Hills,32.742751,-97.013154,2060,I-30 Line,brt,4164,2492,287
+X485,Berry / Miller,32.713742,-97.260889,2035,FW Crosstown Loop,brt,6392,295,221
 X011,Clifford / Las Vegas,32.76614,-97.468199,2075,White Settlement BRT,brt,5290,1289,57
-X002,Jacksboro / Northside,32.795438,-97.366084,2075,White Settlement BRT,brt,6103,351,182
-X004,River Oaks,32.773216,-97.399846,2075,White Settlement BRT,brt,6144,1591,144
+X002,Jacksboro / Northside,32.795438,-97.366084,2075,White Settlement BRT,brt,6103,351,181
+X004,River Oaks,32.773216,-97.399846,2075,White Settlement BRT,brt,6144,1591,145
 X584,Ennis,32.328437,-96.62703,2075,Ennis Line,commuter,3789,2449,15
-X481,Ederville,32.764611,-97.213787,2061,FW Crosstown Loop,brt,4805,1170,43
+X481,Ederville,32.764611,-97.213787,2063,FW Crosstown Loop,brt,4805,1170,43
 X008,White Settlement,32.73381,-97.452284,2075,White Settlement BRT,brt,5357,519,327
-X477,Richland Hills,32.809016,-97.244906,2061,FW Crosstown Loop,brt,4881,829,55
+X477,Richland Hills,32.809016,-97.244906,2063,FW Crosstown Loop,brt,4881,829,55
 X583,Hutchins,32.644041,-96.709898,2075,Ennis Line,commuter,3814,1626,381
-X404,Jefferson / Belt Line,32.744779,-96.994978,2041,Beltline Line;I-30 Line,brt,4811,294,1030
-X010,Las Vegas Trail,32.759396,-97.46886,2075,White Settlement BRT,brt,3960,1122,189
-X495,Ridgmar Mall,32.721941,-97.439878,2031,FW Crosstown Loop,brt,2479,2590,119
-X001,Main / 28th Street,32.795208,-97.349097,2075,White Settlement BRT,brt,3122,1803,52
+X404,Jefferson / Belt Line,32.744779,-96.994978,2036,Beltline Line;I-30 Line,brt,4811,294,1030
+X010,Las Vegas Trail,32.759396,-97.46886,2075,White Settlement BRT,brt,3960,1122,188
+X495,Ridgmar Mall,32.721941,-97.439878,2031,FW Crosstown Loop,brt,2479,2590,122
+X001,Main / 28th Street,32.795208,-97.349097,2075,White Settlement BRT,brt,3122,1803,51
 X392,Handley,32.732464,-97.218083,2060,I-30 Line,brt,3074,843,1045
-X552,Sanger,33.363367,-97.169313,2071,Gainesville Line,commuter,2397,1020,0
-X555,Saginaw Boulevard / McLeroy,32.85818,-97.36069,2035,Gainesville Line,commuter,2099,320,111
-X038,Sansom Park,32.804763,-97.412816,2035,Jacksboro BRT,brt,1496,558,126
-X553,Lakemont / Berkshire Lake,32.920957,-97.361427,2071,Gainesville Line,commuter,1967,34,158
-X035,Jacksboro / 21st Street,32.776501,-97.368114,2035,Jacksboro BRT,brt,1918,17,135
-X034,Fort Worth,32.766514,-97.352986,2035,Jacksboro BRT,brt,1771,139,66
+X552,Sanger,33.363367,-97.169313,2073,Gainesville Line,commuter,2397,1020,0
+X555,Saginaw Boulevard / McLeroy,32.85818,-97.36069,2038,Gainesville Line,commuter,2099,320,110
+X038,Sansom Park,32.804763,-97.412816,2036,Jacksboro BRT,brt,1496,558,127
+X553,Lakemont / Berkshire Lake,32.920957,-97.361427,2073,Gainesville Line,commuter,1967,34,158
+X035,Jacksboro / 21st Street,32.776501,-97.368114,2036,Jacksboro BRT,brt,1918,17,136
+X034,Fort Worth,32.766514,-97.352986,2036,Jacksboro BRT,brt,1771,139,66
 X012,Lockheed Gate,32.765491,-97.446112,2075,White Settlement BRT,brt,1002,284,19
 X496,Ridgmar Mall / BRT Transfer,32.742639,-97.440678,2031,White Settlement BRT;FW Crosstown Loop,brt,0,0,364
-X425,Kingsley / Wood,32.881345,-96.674518,2053,I-20 Crosstown;I-30 Line,brt,0,0,872
+X425,Kingsley / Wood,32.881345,-96.674518,2055,I-20 Crosstown;I-30 Line,brt,0,0,872
 X355,Belt Line / Royal,32.910654,-96.993881,2036,Beltline Line,brt,6569,27371,176
 X357,Belt Line / Walnut Hill,32.866355,-96.991785,2036,Beltline Line,brt,16660,7097,344
-X457,Carrier South,32.775806,-97.047949,2056,SH-360 Line,brt,3552,18485,178
-X458,Great Southwest Parkway,32.752921,-97.045652,2056,SH-360 Line,brt,2387,18924,489
-X433,South Arlington,32.707979,-97.130629,2065,SH-360 Line,brt,5139,14331,224
-X341,Main / Sherman Street,32.949068,-96.731669,2031,Beltline Line,brt,4566,13768,157
-X344,Addison Double East,32.954038,-96.803655,2031,Beltline Line,brt,7244,10383,473
-X340,Richardson,32.945317,-96.708159,2031,Beltline Line,brt,5772,10486,331
-X437,North Arlington,32.774023,-97.096957,2061,SH-360 Line,brt,12386,4562,338
-X365,Belt Line / Warrior,32.700689,-96.993883,2046,Beltline Line,brt,9415,5464,375
-X432,Parks Mall,32.681665,-97.133393,2065,SH-360 Line,brt,6071,8390,419
-X345,Belt Line / Montfort,32.954156,-96.818476,2031,Beltline Line,brt,6027,24948,153
+X457,Carrier South,32.775806,-97.047949,2058,SH-360 Line,brt,3552,18485,178
+X458,Great Southwest Parkway,32.752921,-97.045652,2058,SH-360 Line,brt,2387,18924,489
+X433,South Arlington,32.707979,-97.130629,2068,SH-360 Line,brt,5139,14331,224
+X341,Main / Sherman Street,32.949068,-96.731669,2034,Beltline Line,brt,4566,13768,158
+X344,Addison Double East,32.954038,-96.803655,2034,Beltline Line,brt,7244,10383,477
+X340,Richardson,32.945317,-96.708159,2034,Beltline Line,brt,5772,10486,332
+X437,North Arlington,32.774023,-97.096957,2063,SH-360 Line,brt,12386,4562,338
+X365,Belt Line / Warrior,32.700689,-96.993883,2037,Beltline Line,brt,9415,5464,375
+X432,Parks Mall,32.681665,-97.133393,2068,SH-360 Line,brt,6071,8390,419
+X345,Belt Line / Montfort,32.954156,-96.818476,2034,Beltline Line,brt,6027,24948,154
 X335,Garland,32.899496,-96.630851,2031,Beltline Line,brt,11209,498,455
-X449,Estelle,32.857035,-97.014692,2060,SH-360 Line,brt,6943,4277,291
-X451,Airport / Irving Boulevard,32.836421,-96.993238,2060,SH-360 Line,brt,6310,4531,190
+X449,Estelle,32.857035,-97.014692,2061,SH-360 Line,brt,6943,4277,291
+X451,Airport / Irving Boulevard,32.836421,-96.993238,2061,SH-360 Line,brt,6310,4531,190
 X332,Rose Hill,32.851119,-96.5984,2031,Beltline Line,brt,8771,1937,481
-X337,Belt Line / Kingsbridge,32.939665,-96.635902,2031,Beltline Line,brt,9270,1336,394
-X439,Euless,32.820947,-97.097461,2061,SH-360 Line,brt,7122,3260,295
-X391,Bryan-Belt Line / Davis,32.765285,-96.597063,2062,Beltline Line,brt,3642,6682,46
-X349,Carrollton,32.953679,-96.881996,2031,Beltline Line,brt,5905,2155,431
-X342,Belt Line / Waterview,32.951149,-96.756057,2031,Beltline Line,brt,8746,1507,348
-X434,Fielder Road,32.729819,-97.130267,2065,SH-360 Line,brt,5614,4553,265
-X427,Dallas Baptist University (DBU Mansfield),32.585699,-97.139363,2065,SH-360 Line,brt,4997,5162,223
-X463,Great Southwest / Claremont,32.661192,-97.042916,2057,SH-360 Line,brt,7816,1762,213
+X337,Belt Line / Kingsbridge,32.939665,-96.635902,2034,Beltline Line,brt,9270,1336,394
+X439,Euless,32.820947,-97.097461,2063,SH-360 Line,brt,7122,3260,295
+X391,Bryan-Belt Line / Davis,32.765285,-96.597063,2064,Beltline Line,brt,3642,6682,46
+X349,Carrollton,32.953679,-96.881996,2034,Beltline Line,brt,5905,2155,434
+X342,Belt Line / Waterview,32.951149,-96.756057,2034,Beltline Line,brt,8746,1507,351
+X434,Fielder Road,32.729819,-97.130267,2068,SH-360 Line,brt,5614,4553,265
+X427,Dallas Baptist University (DBU Mansfield),32.585699,-97.139363,2068,SH-360 Line,brt,4997,5162,223
+X463,Great Southwest / Claremont,32.661192,-97.042916,2061,SH-360 Line,brt,7816,1762,213
 X359,Belt Line / Irving Boulevard,32.834135,-96.993776,2036,Beltline Line,brt,6452,3045,322
-X328,Belt Line / Galloway,32.781885,-96.595817,2030,Beltline Line,brt,7039,2348,192
-X370,FM 1382 / Old Straus,32.605756,-96.951891,2046,Beltline Line,brt,4790,4580,84
-X371,Belt Line / Cannady,32.589906,-96.933707,2062,Beltline Line,brt,7021,2125,126
-X464,Chester Village,32.64489,-97.046062,2057,SH-360 Line,brt,7138,1241,268
-X347,Addison S Central,32.954423,-96.838661,2031,Beltline Line,brt,1550,6806,72
+X328,Belt Line / Galloway,32.781885,-96.595817,2031,Beltline Line,brt,7039,2348,192
+X370,FM 1382 / Old Straus,32.605756,-96.951891,2037,Beltline Line,brt,4790,4580,84
+X371,Belt Line / Cannady,32.589906,-96.933707,2064,Beltline Line,brt,7021,2125,126
+X464,Chester Village,32.64489,-97.046062,2061,SH-360 Line,brt,7138,1241,268
+X347,Addison S Central,32.954423,-96.838661,2034,Beltline Line,brt,1550,6806,73
 X331,New Hope,32.832896,-96.595645,2031,Beltline Line,brt,6788,1452,245
-X462,Outlet Mall,32.676548,-97.049865,2057,I-20 Crosstown;SH-360 Line,brt,8632,3739,822
+X462,Outlet Mall,32.676548,-97.049865,2060,I-20 Crosstown;SH-360 Line,brt,8632,3739,822
 X354,Belt Line / Saintsbury,32.933014,-96.993699,2036,Beltline Line,brt,1894,6229,49
-X459,Great Southwest,32.73128,-97.04582,2057,SH-360 Line,brt,5824,2004,231
-X430,Ambercrest,32.639556,-97.1346,2065,SH-360 Line,brt,6557,1245,475
-X343,Prestonwood,32.950107,-96.780847,2031,Beltline Line,brt,5523,2029,272
-X338,SpringPark,32.945151,-96.658519,2031,Beltline Line,brt,7073,388,498
-X454,Shady Grove,32.802528,-97.02741,2056,SH-360 Line,brt,1973,5440,130
-X388,Lawson,32.706418,-96.586199,2062,Beltline Line,brt,6725,188,99
-X440,Airport / Ector Drive,32.838109,-97.086798,2061,SH-360 Line,brt,4784,1724,239
-X441,Fuller-Wiser / Harwood,32.852707,-97.07215,2061,SH-360 Line,brt,11709,658,519
-X452,Jackson / Belt Line,32.817556,-96.994789,2056,SH-360 Line,brt,4104,2121,170
-X364,Belt Line / Marshall,32.723,-96.994101,2046,Beltline Line,brt,5942,174,229
-X339,Whispering Hills,32.945374,-96.683294,2031,Beltline Line,brt,5262,823,299
-X428,Mansfield North,32.603846,-97.144016,2065,SH-360 Line,brt,4873,1141,194
-X374,Belt Line / Terrace,32.589737,-96.854135,2062,Beltline Line,brt,3903,2087,53
-X431,Cooper / Green Oaks,32.660742,-97.134488,2065,SH-360 Line,brt,4931,906,362
-X442,SH-360 / Harwood,32.854591,-97.064328,2061,SH-360 Line,brt,6054,107,124
+X459,Great Southwest,32.73128,-97.04582,2061,SH-360 Line,brt,5824,2004,231
+X430,Ambercrest,32.639556,-97.1346,2068,SH-360 Line,brt,6557,1245,475
+X343,Prestonwood,32.950107,-96.780847,2034,Beltline Line,brt,5523,2029,274
+X338,SpringPark,32.945151,-96.658519,2034,Beltline Line,brt,7073,388,499
+X454,Shady Grove,32.802528,-97.02741,2058,SH-360 Line,brt,1973,5440,130
+X388,Lawson,32.706418,-96.586199,2064,Beltline Line,brt,6725,188,99
+X440,Airport / Ector Drive,32.838109,-97.086798,2063,SH-360 Line,brt,4784,1724,239
+X441,Fuller-Wiser / Harwood,32.852707,-97.07215,2063,SH-360 Line,brt,11709,658,519
+X452,Jackson / Belt Line,32.817556,-96.994789,2058,SH-360 Line,brt,4104,2121,170
+X364,Belt Line / Marshall,32.723,-96.994101,2037,Beltline Line,brt,5942,174,229
+X339,Whispering Hills,32.945374,-96.683294,2034,Beltline Line,brt,5262,823,299
+X428,Mansfield North,32.603846,-97.144016,2068,SH-360 Line,brt,4873,1141,194
+X374,Belt Line / Terrace,32.589737,-96.854135,2064,Beltline Line,brt,3903,2087,53
+X431,Cooper / Green Oaks,32.660742,-97.134488,2068,SH-360 Line,brt,4931,906,362
+X442,SH-360 / Harwood,32.854591,-97.064328,2063,SH-360 Line,brt,6054,107,124
 X334,Garland Central,32.880889,-96.623642,2031,Beltline Line,brt,4948,779,295
-X360,Belt Line / Rock Island,32.812924,-96.99396,2041,Beltline Line,brt,4208,1251,251
-X381,Wilmer,32.59325,-96.675142,2062,Beltline Line,brt,2231,3081,16
-X461,Mayfield / Great Southwest,32.691715,-97.046713,2057,SH-360 Line,brt,3045,270,225
+X360,Belt Line / Rock Island,32.812924,-96.99396,2036,Beltline Line,brt,4208,1251,251
+X381,Wilmer,32.59325,-96.675142,2064,Beltline Line,brt,2231,3081,16
+X461,Mayfield / Great Southwest,32.691715,-97.046713,2061,SH-360 Line,brt,3045,270,225
 X352,Valley Ranch,32.953088,-96.961444,2036,Beltline Line,brt,4544,673,362
 X336,1st Street / Castle,32.920393,-96.630656,2031,Beltline Line,brt,2826,2311,208
-X469,White Settlement Road,32.760046,-97.396793,2066,FW Crosstown Loop,brt,3898,1081,76
-X484,Berry / Stalcup,32.708631,-97.237985,2065,I-20 Crosstown;FW Crosstown Loop,brt,4537,327,487
-X478,North Richland Hills,32.809053,-97.224417,2066,FW Crosstown Loop,brt,3163,1513,58
-X407,Arcadia Park,32.738267,-96.923899,2058,I-30 Line,brt,4793,183,259
-X486,Renaissance Square,32.713308,-97.285146,2036,FW Crosstown Loop,brt,3468,1099,72
-X406,Collins Learning Center,32.745766,-96.942955,2058,I-30 Line,brt,0,0,79
-X483,Loop 820 / Tension,32.732446,-97.225386,2066,FW Crosstown Loop,brt,2782,911,73
-X470,White Settlement Road / Isbell,32.759326,-97.375428,2066,FW Crosstown Loop,brt,2766,522,50
-X588,Waxahachie,32.391661,-96.851799,2062,Waxahachie Line,commuter,932,2350,25
-X003,Fair Oaks,32.783939,-97.38595,2080,White Settlement BRT,brt,2762,212,131
-X005,NAS JRB,32.759819,-97.420925,2066,White Settlement BRT;FW Crosstown Loop,brt,1696,1167,84
-X408,Jefferson Boulevard,32.740058,-96.909609,2058,I-30 Line,brt,2636,193,266
-X006,Ridgmar North,32.752106,-97.43184,2066,White Settlement BRT;FW Crosstown Loop,brt,946,1549,9
-X471,University / Jacksboro,32.767123,-97.35955,2066,FW Crosstown Loop,brt,1771,139,25
-X421,Garland Road / Saint Francis,32.818901,-96.718172,2053,I-20 Crosstown;I-30 Line,brt,2418,740,363
+X469,White Settlement Road,32.760046,-97.396793,2068,FW Crosstown Loop,brt,3898,1081,76
+X484,Berry / Stalcup,32.708631,-97.237985,2068,I-20 Crosstown;FW Crosstown Loop,brt,4537,327,487
+X478,North Richland Hills,32.809053,-97.224417,2068,FW Crosstown Loop,brt,3163,1513,58
+X407,Arcadia Park,32.738267,-96.923899,2062,I-30 Line,brt,4793,183,259
+X486,Renaissance Square,32.713308,-97.285146,2040,FW Crosstown Loop,brt,3468,1099,72
+X406,Collins Learning Center,32.745766,-96.942955,2062,I-30 Line,brt,0,0,79
+X483,Loop 820 / Tension,32.732446,-97.225386,2068,FW Crosstown Loop,brt,2782,911,73
+X470,White Settlement Road / Isbell,32.759326,-97.375428,2068,FW Crosstown Loop,brt,2766,522,50
+X588,Waxahachie,32.391661,-96.851799,2068,Waxahachie Line,commuter,932,2350,25
+X003,Fair Oaks,32.783939,-97.38595,2080,White Settlement BRT,brt,2762,212,132
+X005,NAS JRB,32.759819,-97.420925,2068,White Settlement BRT;FW Crosstown Loop,brt,1696,1167,84
+X408,Jefferson Boulevard,32.740058,-96.909609,2062,I-30 Line,brt,2636,193,266
+X006,Ridgmar North,32.752106,-97.43184,2068,White Settlement BRT;FW Crosstown Loop,brt,946,1549,9
+X471,University / Jacksboro,32.767123,-97.35955,2068,FW Crosstown Loop,brt,1771,139,25
+X421,Garland Road / Saint Francis,32.818901,-96.718172,2055,I-20 Crosstown;I-30 Line,brt,2418,740,363
 X394,Arlington Lakeside,32.720547,-97.170432,2065,I-30 Line,brt,1668,110,223
-X480,Handley Ederville / Randol Mill,32.778605,-97.217085,2066,FW Crosstown Loop,brt,1525,55,13
-X405,Bagdad / Main,32.746213,-96.969747,2058,I-30 Line,brt,1115,318,92
-X474,28th Street / Sylvania,32.795182,-97.312537,2066,FW Crosstown Loop,brt,0,0,18
+X480,Handley Ederville / Randol Mill,32.778605,-97.217085,2068,FW Crosstown Loop,brt,1525,55,13
+X405,Bagdad / Main,32.746213,-96.969747,2062,I-30 Line,brt,1115,318,92
+X474,28th Street / Sylvania,32.795182,-97.312537,2068,FW Crosstown Loop,brt,0,0,18
 X393,Lancaster Avenue,32.728296,-97.191229,2065,I-30 Line,brt,0,0,63
-X465,Lake Port Village,32.627499,-97.039729,2057,SH-360 Line,brt,0,0,390
-X479,Riverbend,32.794513,-97.22122,2066,FW Crosstown Loop,brt,0,0,5
-X411,West Dallas,32.764944,-96.862846,2048,I-30 Line,brt,4203,544,217
-X412,Singleton / Sylvan,32.767443,-96.853006,2048,I-30 Line,brt,812,189,65
-X308,Central / Hall,32.798838,-96.792879,2037,I-20 Crosstown,brt,17995,61933,376
-X303,Bishop / Canty,32.752932,-96.828645,2047,I-20 Crosstown,brt,8262,10427,754
-X547,Meacham / Terminal,32.822461,-97.329386,2058,Bowie Line,commuter,3856,11879,40
-X295,Center / Main,32.655919,-96.913136,2052,I-20 Crosstown,brt,9287,1855,508
-X284,Arlington Highlands,32.684143,-97.101573,2060,I-20 Crosstown,brt,4370,7198,155
-X297,Red Bird,32.667516,-96.881586,2052,I-20 Crosstown,brt,4936,4212,614
-X300,Marvin D Love / Tyler,32.700263,-96.837012,2052,I-20 Crosstown,brt,9110,690,1128
-X296,I-20 / Camp Wisdom,32.66236,-96.898935,2052,I-20 Crosstown,brt,7408,2244,606
-X289,North Westchester Meadows,32.675547,-97.007636,2057,I-20 Crosstown,brt,4047,995,170
-X301,Zang / Illinois,32.718957,-96.829757,2052,I-20 Crosstown,brt,7288,1202,785
-X280,Little / Pleasant Ridge,32.680513,-97.194439,2065,I-20 Crosstown,brt,5106,2868,158
-X302,Zang / 12th Street,32.739465,-96.82501,2047,I-20 Crosstown,brt,6106,5225,387
-X549,Long / Deen,32.806027,-97.32677,2058,Bowie Line,commuter,6945,125,116
-X279,Lindberg,32.676179,-97.216627,2065,I-20 Crosstown,brt,6063,179,370
-X299,Brook Valley / Marvin D Love,32.68429,-96.853009,2052,I-20 Crosstown,brt,5142,289,795
-X293,Mountain Creek / Wheatland Road,32.645003,-96.954282,2057,I-20 Crosstown,brt,4765,437,324
-X546,Saginaw,32.876283,-97.364532,2058,Bowie Line,commuter,4211,985,313
-X281,Pleasant Ridge Road,32.681907,-97.171807,2065,I-20 Crosstown,brt,3369,210,148
-X329,Belt Line / Tripp Road,32.798051,-96.59574,2035,Beltline Line,brt,3285,1700,127
-X282,Dalworthington Gardens,32.67777,-97.150793,2065,I-20 Crosstown,brt,1557,611,67
-X294,Duncanville,32.648023,-96.929834,2057,I-20 Crosstown,brt,2351,2369,266
-X373,De Soto,32.589742,-96.880644,2067,Beltline Line,brt,3926,706,48
-X375,Belt Line / Crestwood,32.589654,-96.827612,2067,Beltline Line,brt,4123,487,30
-X389,Balch Springs,32.72431,-96.599413,2067,Beltline Line,brt,2583,1911,113
+X465,Lake Port Village,32.627499,-97.039729,2061,SH-360 Line,brt,0,0,390
+X479,Riverbend,32.794513,-97.22122,2068,FW Crosstown Loop,brt,0,0,5
+X411,West Dallas,32.764944,-96.862846,2053,I-30 Line,brt,4203,544,217
+X412,Singleton / Sylvan,32.767443,-96.853006,2053,I-30 Line,brt,812,189,65
+X308,Central / Hall,32.798838,-96.792879,2043,I-20 Crosstown,brt,17995,61933,376
+X303,Bishop / Canty,32.752932,-96.828645,2046,I-20 Crosstown,brt,8262,10427,754
+X547,Meacham / Terminal,32.822461,-97.329386,2064,Bowie Line,commuter,3856,11879,40
+X295,Center / Main,32.655919,-96.913136,2056,I-20 Crosstown,brt,9287,1855,508
+X284,Arlington Highlands,32.684143,-97.101573,2061,I-20 Crosstown,brt,4370,7198,155
+X297,Red Bird,32.667516,-96.881586,2056,I-20 Crosstown,brt,4936,4212,614
+X300,Marvin D Love / Tyler,32.700263,-96.837012,2056,I-20 Crosstown,brt,9110,690,1128
+X296,I-20 / Camp Wisdom,32.66236,-96.898935,2056,I-20 Crosstown,brt,7408,2244,606
+X289,North Westchester Meadows,32.675547,-97.007636,2060,I-20 Crosstown,brt,4047,995,170
+X301,Zang / Illinois,32.718957,-96.829757,2056,I-20 Crosstown,brt,7288,1202,785
+X280,Little / Pleasant Ridge,32.680513,-97.194439,2068,I-20 Crosstown,brt,5106,2868,158
+X302,Zang / 12th Street,32.739465,-96.82501,2046,I-20 Crosstown,brt,6106,5225,387
+X549,Long / Deen,32.806027,-97.32677,2064,Bowie Line,commuter,6945,125,116
+X279,Lindberg,32.676179,-97.216627,2068,I-20 Crosstown,brt,6063,179,370
+X299,Brook Valley / Marvin D Love,32.68429,-96.853009,2056,I-20 Crosstown,brt,5142,289,795
+X293,Mountain Creek / Wheatland Road,32.645003,-96.954282,2060,I-20 Crosstown,brt,4765,437,324
+X546,Saginaw,32.876283,-97.364532,2064,Bowie Line,commuter,4211,985,311
+X281,Pleasant Ridge Road,32.681907,-97.171807,2068,I-20 Crosstown,brt,3369,210,148
+X329,Belt Line / Tripp Road,32.798051,-96.59574,2036,Beltline Line,brt,3285,1700,127
+X282,Dalworthington Gardens,32.67777,-97.150793,2068,I-20 Crosstown,brt,1557,611,67
+X294,Duncanville,32.648023,-96.929834,2060,I-20 Crosstown,brt,2351,2369,266
+X373,De Soto,32.589742,-96.880644,2069,Beltline Line,brt,3926,706,48
+X375,Belt Line / Crestwood,32.589654,-96.827612,2069,Beltline Line,brt,4123,487,30
+X389,Balch Springs,32.72431,-96.599413,2069,Beltline Line,brt,2583,1911,113
 X333,Centerville,32.867389,-96.608192,2036,Beltline Line,brt,3824,504,258
-X377,Lancaster,32.592046,-96.775173,2067,Beltline Line,brt,4227,43,35
-X456,Great Southwest / Carrier,32.78677,-97.045639,2061,SH-360 Line,brt,0,0,35
-X286,Design / Scientific,32.678211,-97.070344,2060,I-20 Crosstown,brt,1684,1530,56
-X285,Enchanted Creek,32.67941,-97.08194,2060,I-20 Crosstown,brt,2692,499,116
-X376,Mill Creek Estates,32.592625,-96.8016,2067,Beltline Line,brt,2765,420,37
-X460,Pioneer / Great Southwest,32.711462,-97.044965,2062,SH-360 Line,brt,1261,1594,126
-X544,Bonds Ranch / Saginaw Boulevard,32.921962,-97.406308,2058,Bowie Line,commuter,1993,814,145
-X438,Viridian,32.799898,-97.098101,2066,SH-360 Line,brt,2575,212,56
-X372,Belt Line / Duncanville Road,32.589748,-96.907169,2067,Beltline Line,brt,2667,34,38
-X586,Britton,32.550076,-97.06934,2067,Waxahachie Line,commuter,2511,156,49
-X292,Mountain Creek / Camp Wisdom,32.657411,-96.971261,2057,I-20 Crosstown,brt,2535,117,140
-X353,Coppell,32.949765,-96.98524,2041,Beltline Line,brt,1586,995,292
-X545,Saginaw Boulevard,32.893726,-97.392102,2058,Bowie Line,commuter,1345,1044,142
-X390,Belt Line / Bruton,32.743727,-96.598911,2067,Beltline Line,brt,2225,128,61
-X368,FM 1382,32.63902,-96.972499,2051,Beltline Line,brt,1766,568,35
-X366,Belt Line / Holly Hill,32.681386,-96.985113,2051,Beltline Line,brt,1964,214,53
-X290,Belt Line Road,32.666214,-96.988459,2057,I-20 Crosstown,brt,2121,803,55
-X283,Parks Mall,32.67843,-97.131568,2060,I-20 Crosstown,brt,0,0,244
-X288,I-20 / Matthew,32.676657,-97.030486,2057,I-20 Crosstown,brt,0,0,47
-X455,113th Street / Post & Paddock,32.791324,-97.040371,2061,SH-360 Line,brt,0,0,0
-X367,Belt Line / FM 1382,32.659681,-96.981397,2051,Beltline Line,brt,1010,5,40
-X386,Kleberg,32.671229,-96.608239,2067,Beltline Line,brt,0,0,23
-X387,Belt Line / Seagoville Road,32.686912,-96.589325,2067,Beltline Line,brt,0,0,79
-X382,Belt Line / Post Oak,32.604004,-96.651997,2067,Beltline Line,brt,0,0,0
+X377,Lancaster,32.592046,-96.775173,2069,Beltline Line,brt,4227,43,35
+X456,Great Southwest / Carrier,32.78677,-97.045639,2063,SH-360 Line,brt,0,0,35
+X286,Design / Scientific,32.678211,-97.070344,2061,I-20 Crosstown,brt,1684,1530,56
+X285,Enchanted Creek,32.67941,-97.08194,2061,I-20 Crosstown,brt,2692,499,116
+X376,Mill Creek Estates,32.592625,-96.8016,2069,Beltline Line,brt,2765,420,37
+X460,Pioneer / Great Southwest,32.711462,-97.044965,2066,SH-360 Line,brt,1261,1594,126
+X544,Bonds Ranch / Saginaw Boulevard,32.921962,-97.406308,2064,Bowie Line,commuter,1993,814,145
+X438,Viridian,32.799898,-97.098101,2068,SH-360 Line,brt,2575,212,56
+X372,Belt Line / Duncanville Road,32.589748,-96.907169,2069,Beltline Line,brt,2667,34,38
+X586,Britton,32.550076,-97.06934,2073,Waxahachie Line,commuter,2511,156,49
+X292,Mountain Creek / Camp Wisdom,32.657411,-96.971261,2060,I-20 Crosstown,brt,2535,117,140
+X353,Coppell,32.949765,-96.98524,2041,Beltline Line,brt,1586,995,291
+X545,Saginaw Boulevard,32.893726,-97.392102,2064,Bowie Line,commuter,1345,1044,142
+X390,Belt Line / Bruton,32.743727,-96.598911,2069,Beltline Line,brt,2225,128,61
+X368,FM 1382,32.63902,-96.972499,2042,Beltline Line,brt,1766,568,35
+X366,Belt Line / Holly Hill,32.681386,-96.985113,2042,Beltline Line,brt,1964,214,53
+X290,Belt Line Road,32.666214,-96.988459,2060,I-20 Crosstown,brt,2121,803,55
+X283,Parks Mall,32.67843,-97.131568,2061,I-20 Crosstown,brt,0,0,244
+X288,I-20 / Matthew,32.676657,-97.030486,2060,I-20 Crosstown,brt,0,0,47
+X455,113th Street / Post & Paddock,32.791324,-97.040371,2063,SH-360 Line,brt,0,0,0
+X367,Belt Line / FM 1382,32.659681,-96.981397,2042,Beltline Line,brt,1010,5,40
+X386,Kleberg,32.671229,-96.608239,2069,Beltline Line,brt,0,0,23
+X387,Belt Line / Seagoville Road,32.686912,-96.589325,2069,Beltline Line,brt,0,0,79
+X382,Belt Line / Post Oak,32.604004,-96.651997,2069,Beltline Line,brt,0,0,0
 X351,Belt Line / Bush Turnpike,32.951189,-96.934964,2041,Beltline Line,brt,0,0,56
-X443,Airfield / Harwood,32.858317,-97.048854,2066,SH-360 Line,brt,0,0,0
-X385,Belt Line / Kleberg Road,32.651995,-96.617228,2067,Beltline Line,brt,0,0,7
-X379,Belt Line / Pleasant Run Road,32.587594,-96.725592,2067,Beltline Line,brt,0,0,0
-X587,Avenue E / 8th Street,32.487466,-96.990649,2067,Waxahachie Line,commuter,0,0,86
-X380,Belt Line / Sunrise,32.5875,-96.699237,2067,Beltline Line,brt,0,0,8
-X384,Sand Branch,32.630735,-96.613406,2067,Beltline Line,brt,0,0,0
-X383,Sand Branch / Belt Line,32.613677,-96.628201,2067,Beltline Line,brt,0,0,0
-X378,Belt Line / Lancaster Hutchins,32.584991,-96.751793,2067,Beltline Line,brt,0,0,9
-X298,Red Bird Lane,32.672405,-96.867276,2052,I-20 Crosstown,brt,0,0,172
-X448,Passport Drive,32.85759,-97.03089,2066,SH-360 Line,brt,0,0,0
-X543,Decatur,33.235616,-97.580358,2058,Bowie Line,commuter,0,0,0
-X453,Rock Island / SH-161,32.815303,-97.013536,2061,SH-360 Line,brt,0,0,147
-X277,Loop 820 / Martin,32.692637,-97.238463,2065,I-20 Crosstown,brt,0,0,68
-X542,Bowie,33.558088,-97.849522,2067,Bowie Line,commuter,0,0,0
-X369,FM 1382 / Straus,32.617313,-96.973996,2051,Beltline Line,brt,0,0,4
-X429,La Frontera,32.620616,-97.137775,2070,SH-360 Line,brt,0,0,190
-X362,Entertainment,32.770589,-96.99494,2046,Beltline Line,brt,0,0,4
+X443,Airfield / Harwood,32.858317,-97.048854,2068,SH-360 Line,brt,0,0,0
+X385,Belt Line / Kleberg Road,32.651995,-96.617228,2069,Beltline Line,brt,0,0,7
+X379,Belt Line / Pleasant Run Road,32.587594,-96.725592,2069,Beltline Line,brt,0,0,0
+X587,Avenue E / 8th Street,32.487466,-96.990649,2073,Waxahachie Line,commuter,0,0,86
+X380,Belt Line / Sunrise,32.5875,-96.699237,2069,Beltline Line,brt,0,0,8
+X384,Sand Branch,32.630735,-96.613406,2069,Beltline Line,brt,0,0,0
+X383,Sand Branch / Belt Line,32.613677,-96.628201,2069,Beltline Line,brt,0,0,0
+X378,Belt Line / Lancaster Hutchins,32.584991,-96.751793,2069,Beltline Line,brt,0,0,9
+X298,Red Bird Lane,32.672405,-96.867276,2056,I-20 Crosstown,brt,0,0,172
+X448,Passport Drive,32.85759,-97.03089,2068,SH-360 Line,brt,0,0,0
+X543,Decatur,33.235616,-97.580358,2064,Bowie Line,commuter,0,0,0
+X453,Rock Island / SH-161,32.815303,-97.013536,2063,SH-360 Line,brt,0,0,147
+X277,Loop 820 / Martin,32.692637,-97.238463,2068,I-20 Crosstown,brt,0,0,68
+X542,Bowie,33.558088,-97.849522,2070,Bowie Line,commuter,0,0,0
+X369,FM 1382 / Straus,32.617313,-96.973996,2042,Beltline Line,brt,0,0,4
+X429,La Frontera,32.620616,-97.137775,2073,SH-360 Line,brt,0,0,190
+X362,Entertainment,32.770589,-96.99494,2041,Beltline Line,brt,0,0,4
 X356,Las Colinas,32.888719,-96.991309,2041,Beltline Line,brt,0,0,69
-X361,Belt Line / Trinity,32.791741,-96.994666,2046,Beltline Line,brt,0,0,72
-X601,McKinney South,33.159089,-96.655002,2030,SH-121 BRT,brt,5597,1276,261
-X602,Craig Ranch,33.133587,-96.710344,2030,SH-121 BRT,brt,2051,4,392
-X603,Custer / SH-121,33.118,-96.74,2030,SH-121 BRT,brt,5334,638,321
-X604,Coit / SH-121,33.111986,-96.770605,2030,SH-121 BRT,brt,3436,805,166
-X605,Preston / SH-121,33.104582,-96.80002,2030,SH-121 BRT,brt,3029,4173,181
-X606,Spring Creek Parkway,33.05745,-96.69285,2030,McKinney Line;Legacy Line,commuter;metro,2943,4335,1580
+X361,Belt Line / Trinity,32.791741,-96.994666,2041,Beltline Line,brt,0,0,72
+X601,McKinney South,33.159089,-96.655002,2030,SH-121 BRT,brt,5597,1276,260
+X602,Craig Ranch,33.133587,-96.710344,2030,SH-121 BRT,brt,2051,4,398
+X603,Custer / SH-121,33.118,-96.74,2030,SH-121 BRT,brt,5334,638,332
+X604,Coit / SH-121,33.111986,-96.770605,2030,SH-121 BRT,brt,3436,805,171
+X605,Preston / SH-121,33.104582,-96.80002,2030,SH-121 BRT,brt,3029,4173,176
+X606,Spring Creek Parkway,33.05745,-96.69285,2030,McKinney Line;Legacy Line,commuter;metro,2943,4335,1854
