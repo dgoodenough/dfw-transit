@@ -205,3 +205,16 @@ Scenarios:
   the strongest corridors are built first, whatever their mode. BRT now opens at a median of 2051
   (was 2070), metro at 2045 (was 2037), commuter rail at 2058 (was 2030). Three weak BRT
   corridors fall past 2100. 2.04M daily trips in 2100.
+
+## v2.8 — Shared track, McKinney straightened, map groups
+
+- DNT East runs on the Legacy Line's track from Frisco to Stonebriar (Frisco, Stonebrook / Dallas
+  Parkway, The T's, Dallas Parkway / Gaylord, Stonebriar) instead of a parallel alignment 0.5 km
+  west. Starwood / Stonebrook (DNT East only) is removed; Frisco Main St, Riders Field and the
+  western Stonebriar stay as BRT stops.
+- The McKinney Line runs straight up the DART-owned railroad from Parker Road (no detour west to
+  Watters Creek), with a new Spring Creek Parkway station where the Legacy Line now ends (extended
+  1.6 km from Watters Creek). Transfers Red / McKinney at Parker Road, Legacy / McKinney at Spring
+  Creek Parkway.
+- Map: lines on the same track are drawn side by side when zoomed in (dfwt/bundle.py), and the
+  Lines panel has a checkbox per group (each mode, split into plan lines and scenario additions).

@@ -43,9 +43,9 @@ svg.spark{width:100%;height:46px;display:block}
 details{border-top:1px solid var(--rule);padding-top:10px}
 summary{cursor:pointer;font-weight:600;font-size:.9rem}
 .lines{display:flex;flex-direction:column;gap:2px;margin-top:8px;max-height:260px;overflow-y:auto}
-.grp{font-size:.7rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:8px 0 2px}
+.grp{display:flex;align-items:center;gap:6px;font-size:.7rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:8px 0 2px;cursor:pointer}.grp .n{font-weight:400;letter-spacing:0}
 .li{display:grid;grid-template-columns:16px 22px minmax(0,1fr) auto;gap:6px;align-items:center;font-size:.84rem;padding:2px 0}
-.li input{margin:0}
+.li input,.grp input{margin:0}
 .sw{height:4px;border-radius:2px}
 .li .nm{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .li .yr{color:var(--muted);font-variant-numeric:tabular-nums;font-size:.76rem}
@@ -137,32 +137,61 @@ let S = D.scen[scenKey];
 for (const k of D.order) { const o = document.createElement('option'); o.value = k; o.textContent = D.scen[k].label; $('scen').append(o); }
 $('slider').max = D.years.length - 1;
 
-function style(mode, color, future) {
+function style(mode, color = null, future = false) {
   // BRT: a solid, thinner line (dashes read as 'planned' on transit maps)
   const w = mode === 'commuter' ? 3 : mode === 'brt' ? 2.2 : 4.5;
   return {color, weight: w, opacity: future ? .18 : .92, dashArray: mode === 'commuter' ? '8 5' : null, lineCap: 'round'};
 }
-function draw() {
-  const Y = D.years[yi];
-  $('year').textContent = Y;
-  lineLayer.clearLayers(); stLayer.clearLayers();
-  const drawn = new Set(), prevY = yi ? D.years[yi - 1] : -Infinity;
-  // track states this year: future (faint), under construction (dashed), open (solid),
-  // and newly opened since the last interval (solid on a glow)
-  const state = (ln, yr) => yr <= prevY ? 'open' : yr <= Y ? 'new' : yr - (D.build[ln.mode] || 0) < Y ? 'building' : 'future';
-  for (const pass of ['future', 'building', 'new', 'open']) for (const ln of S.lines) {
-    if (hidden.has(ln.id)) continue;
-    for (const [yr, gi] of ln.segs) {
-      const st = state(ln, yr); if (st !== pass) continue;
-      const k = gi + '|' + ln.color + '|' + st; if (drawn.has(k)) continue; drawn.add(k);
-      const ll = D.geoms[gi].map(p => [p[1], p[0]]);
-      if (st === 'new') L.polyline(ll, {color: '#ffd23f', weight: 13, opacity: .55, lineCap: 'round'}).addTo(lineLayer);
+// a polyline shifted `px` screen pixels to its left (mitred corners), at the current zoom
+function offsetPath(ll, px) {
+  if (Math.abs(px) < 0.05 || ll.length < 2) return ll;
+  const P = ll.map(p => map.latLngToLayerPoint(p)), n = P.length, out = [];
+  const nrm = (a, b) => { const dx = b.x - a.x, dy = b.y - a.y, l = Math.hypot(dx, dy) || 1; return [dy / l, -dx / l]; };
+  for (let i = 0; i < n; i++) {
+    const a = i > 0 ? nrm(P[i - 1], P[i]) : null, b = i < n - 1 ? nrm(P[i], P[i + 1]) : null;
+    let [x, y] = a && b ? [a[0] + b[0], a[1] + b[1]] : (a || b);
+    const l = Math.hypot(x, y) || 1; x /= l; y /= l;
+    const m = Math.min(2, 1 / Math.max(.5, x * (a || b)[0] + y * (a || b)[1]));
+    out.push(map.layerPointToLatLng(L.point(P[i].x + x * px * m, P[i].y + y * px * m)));
+  }
+  return out;
+}
+// track states this year: future (faint), under construction (dashed), open (solid),
+// and newly opened since the last interval (solid on a glow)
+function stateFn() {
+  const Y = D.years[yi], prevY = yi ? D.years[yi - 1] : -Infinity;
+  return (ln, yr) => yr <= prevY ? 'open' : yr <= Y ? 'new' : yr - (D.build[ln.mode] || 0) < Y ? 'building' : 'future';
+}
+function drawLines() {
+  lineLayer.clearLayers();
+  const state = stateFn();
+  // shared track: lines side by side once zoomed in (fully apart from zoom 13), stacked when zoomed out
+  const apart = Math.max(0, Math.min(1, (map.getZoom() - 11) / 2));
+  for (const pass of ['future', 'building', 'new', 'open']) for (const [gi, users] of S.pieces) {
+    const vis = users.filter(([li]) => !hidden.has(S.lines[li].id));
+    if (!vis.length) continue;
+    const widths = vis.map(([li]) => style(S.lines[li].mode).weight + 1), total = widths.reduce((a, b) => a + b, 0);
+    let ll = null, at = -total / 2;
+    vis.forEach(([li, yr], k) => {
+      const ln = S.lines[li], off = (at + widths[k] / 2) * apart;
+      at += widths[k];
+      const st = state(ln, yr); if (st !== pass) return;
+      ll = ll || D.geoms[gi].map(p => [p[1], p[0]]);
+      const path = offsetPath(ll, off);
+      if (st === 'new') L.polyline(path, {color: '#ffd23f', weight: 13, opacity: .55, lineCap: 'round'}).addTo(lineLayer);
       const sty = style(ln.mode, ln.color, st === 'future');
       if (st === 'building') Object.assign(sty, {opacity: .7, dashArray: '1 8', weight: sty.weight + 1.5});
-      L.polyline(ll, sty).addTo(lineLayer);
-    }
+      L.polyline(path, sty).addTo(lineLayer);
+    });
   }
-  intervalSummary(Y, prevY, state);
+}
+map.on('zoomend', drawLines);   // offsets are in screen pixels
+function draw() {
+  const Y = D.years[yi], prevY = yi ? D.years[yi - 1] : -Infinity;
+  $('year').textContent = Y;
+  stLayer.clearLayers();
+  drawLines();
+  intervalSummary(Y, prevY, stateFn());
   const yd = S.years[Y], served = new Map();
   for (const [li, stops] of yd.runs) for (const s of stops) {
     if (!served.has(s)) served.set(s, []); served.get(s).push(li);
@@ -186,7 +215,7 @@ function intervalSummary(Y, prevY, state) {
   const opened = [], building = [];
   for (const ln of S.lines) {
     let km = 0, bkm = 0, by = Infinity;
-    for (const [yr, , k] of ln.segs) {
+    for (const [yr, k] of ln.segs) {
       const st = state(ln, yr);
       if (st === 'new') km += k;
       if (st === 'building') { bkm += k; by = Math.min(by, yr); }
@@ -229,19 +258,32 @@ function metrics() {
   $('sparkKey').textContent = (ref ? `Daily trips. Solid: this plan · dashed: ${refName} · ` : 'Daily trips · ') + `${D.years[0]}–${D.years[D.years.length - 1]}`;
 }
 function lineList() {
-  const Y = D.years[yi], groups = {metro: [], commuter: [], brt: []};
-  S.lines.forEach(l => groups[l.mode].push(l));
-  let h = '';
+  // groups: each mode, split into the plan's lines and those this scenario adds; a group's box
+  // shows or hides all its lines at once
+  const Y = D.years[yi], inPlan = D.scen.plan && scenKey !== 'plan' ? new Set(D.scen.plan.lines.map(l => l.id)) : null;
+  const groups = [];
   for (const m of ['metro', 'commuter', 'brt']) {
-    h += `<div class="grp">${D.modes[m]}</div>`;
-    for (const l of groups[m].sort((a, b) => a.first - b.first || a.name.localeCompare(b.name))) {
+    const ls = S.lines.filter(l => l.mode === m);
+    const parts = inPlan ? [[D.modes[m], ls.filter(l => inPlan.has(l.id))], [`${D.modes[m]} added by this scenario`, ls.filter(l => !inPlan.has(l.id))]] : [[D.modes[m], ls]];
+    for (const [name, g] of parts) if (g.length) groups.push([name, g.sort((a, b) => a.first - b.first || a.name.localeCompare(b.name))]);
+  }
+  let h = '';
+  groups.forEach(([name, g], gi) => {
+    const on = g.filter(l => !hidden.has(l.id)).length;
+    h += `<label class="grp"><input type="checkbox" data-grp="${gi}" ${on ? 'checked' : ''}>${name} <span class="n">${g.length}</span></label>`;
+    for (const l of g) {
       const v = l.value !== '' && l.value != null ? ` · ${l.value}/$M` : '';
       h += `<label class="li${l.first > Y ? ' future' : ''}" title="${(l.notes || '').replace(/"/g, '&quot;')}"><input type="checkbox" data-id="${l.id}" ${hidden.has(l.id) ? '' : 'checked'}>` +
         `<span class="sw" style="background:${l.color}"></span><span class="nm">${l.name}</span><span class="yr">${l.status === 'existing' ? 'today' : l.first}${v}</span></label>`;
     }
-  }
+  });
   $('lines').innerHTML = h;
-  $('lines').querySelectorAll('input').forEach(i => i.onchange = () => { i.checked ? hidden.delete(i.dataset.id) : hidden.add(i.dataset.id); draw(); });
+  $('lines').querySelectorAll('input[data-id]').forEach(i => i.onchange = () => { i.checked ? hidden.delete(i.dataset.id) : hidden.add(i.dataset.id); draw(); });
+  $('lines').querySelectorAll('input[data-grp]').forEach(i => {
+    const g = groups[+i.dataset.grp][1], on = g.filter(l => !hidden.has(l.id)).length;
+    i.indeterminate = on > 0 && on < g.length;
+    i.onchange = () => { g.forEach(l => i.checked ? hidden.delete(l.id) : hidden.add(l.id)); draw(); };
+  });
 }
 // ---- trip planner: Dijkstra over the exported year graph (same model as the reports) ----
 function choose(sid) {
