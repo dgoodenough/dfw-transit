@@ -45,6 +45,18 @@ def resolve(stop, stop_ids, names):
     raise KeyError(f"'{stop}' is {'ambiguous' if hits else 'not a stop'} on this line")
 
 
+def resolve_on(net, ln, stop, names):
+    """resolve() on a line that may have absorbed others (through_route): a stage of the
+    absorbed line may name its old terminus, which merged into the junction."""
+    try:
+        return resolve(stop, ln.stop_ids, names)
+    except KeyError:
+        for old, new in net.stop_alias.items():
+            if stop.strip() == old or stop.strip().lower() == names.get(old, "").lower():
+                return resolve(new, ln.stop_ids, names)
+        raise
+
+
 def stop_ref(stop_ids, names, i):
     """The friendliest unambiguous reference to stop i."""
     sid = stop_ids[i]
@@ -420,10 +432,10 @@ def stage_costs(net, rows):
     first = net._station_first_line()
     out = {}
     for r in rows:
-        ln = net.lines.get(r["line_id"])
+        ln = net.host_line(r["line_id"])   # a through-routed line's stages price its part of the joined line
         if ln is None or r["kind"] == "via" or ln.status == "existing":
             continue
-        a, b = sorted((resolve(r["from_stop"], ln.stop_ids, names), resolve(r["to_stop"], ln.stop_ids, names)))
+        a, b = sorted((resolve_on(net, ln, r["from_stop"], names), resolve_on(net, ln, r["to_stop"], names)))
         cost = 0.0
         for i in range(a, b):
             if owner[(ln.mode, frozenset((ln.stop_ids[i], ln.stop_ids[i + 1])))][1] == ln.id:
@@ -505,15 +517,16 @@ def _exact_years(net, rows, log=print, scale=1.0, floor=None):
         import statistics
         med = {m: statistics.median([v for l, v in value.items() if l in net.lines and net.lines[l].mode == m] or [0.0])
                for m in {ln.mode for ln in net.lines.values()}}
-        value = {l: value.get(l, med[ln.mode]) for l, ln in net.lines.items()}
+        value = {r["line_id"]: value.get(r["line_id"], med[net.host_line(r["line_id"]).mode]) for r in rows
+                 if net.host_line(r["line_id"])}
         first_year = {}
         for r in rows:
             first_year[r["line_id"]] = min(first_year.get(r["line_id"], 9999), int(r["year_opens"]))
-        order = sorted(range(len(rows)), key=lambda i: (rows[i].get("locked") != "1", -value.get(rows[i]["line_id"], 0.0),
+        order = sorted(range(len(rows)), key=lambda i: (rows[i].get("locked") != "1" and int(rows[i]["year_opens"]) > ex, -value.get(rows[i]["line_id"], 0.0),
                                                         first_year[rows[i]["line_id"]], int(rows[i]["year_opens"]),
                                                         int(rows[i]["stage"])))
     else:
-        order = sorted(range(len(rows)), key=lambda i: (rows[i].get("locked") != "1",
+        order = sorted(range(len(rows)), key=lambda i: (rows[i].get("locked") != "1" and int(rows[i]["year_opens"]) > ex,
                                                         int(rows[i]["year_opens"]) > end, int(rows[i]["year_opens"]),
                                                         priority.get(i, 1e9), rows[i]["line_id"], int(rows[i]["stage"])))
 
@@ -537,13 +550,15 @@ def _exact_years(net, rows, log=print, scale=1.0, floor=None):
             continue
         cost, mode = oc[i]
         n = cy[mode]
-        if r.get("locked") == "1":
+        if r.get("locked") == "1" or y0 <= ex:   # locked, or running today (a through-routed existing line)
             placed.append((y0, cost, n))
             last[r["line_id"]] = max(last.get(r["line_id"], 0), y0)
             continue
         lo = max(ex + n, last.get(r["line_id"], 0))
         if r["kind"] == "starter":   # a new line needs the network it joins: never earlier than planned
-            lo = max(lo, y0 if (y0 <= end and not by_value) else lo, floor.get(r["line_id"], 0))
+            host = net.host_line(r["line_id"])
+            lo = max(lo, y0 if (y0 <= end and not by_value) else lo, floor.get(r["line_id"], 0),
+                     floor.get(host.id, 0) if host else 0)
         hi = horizon - 10   # earlier if the money is there, later if it isn't
         y = next((t for t in range(lo, hi + 1) if ok(placed + [(t, cost, n)])), None)
         if y is None:
@@ -568,11 +583,11 @@ def keep_attached(net, rows):
     names = {k: v.name for k, v in net.stations.items()}
     by = collections.defaultdict(list)
     for r in rows:
-        ln = net.lines.get(r["line_id"])
+        ln = net.host_line(r["line_id"])   # a through-routed line's stages price its part of the joined line
         if ln is None or r["kind"] == "via":
             continue
         try:
-            a, b = sorted((resolve(r["from_stop"], ln.stop_ids, names), resolve(r["to_stop"], ln.stop_ids, names)))
+            a, b = sorted((resolve_on(net, ln, r["from_stop"], names), resolve_on(net, ln, r["to_stop"], names)))
         except KeyError:
             continue
         by[r["line_id"]].append((r, a, b))

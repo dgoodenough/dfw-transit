@@ -39,7 +39,7 @@ def run(net):
                     add("warn", "GEOM_GAP", ln.name, f"segment {i + 1} ends {d * 1000:.0f} m from {st.name}")
         # contiguity: in every year the line's open track must be one piece
         for y in cfg["years"]:
-            open_ = [s.year <= y for s in ln.segments]
+            open_ = [s.year <= y for s in net.line_at(ln.id, y).segments]   # the routing in force that year
             pieces = sum(1 for i, o in enumerate(open_) if o and (i == 0 or not open_[i - 1]))
             if pieces > 1:
                 add("warn", "SPLIT", ln.name, f"opens in {pieces} disconnected pieces in {y}")

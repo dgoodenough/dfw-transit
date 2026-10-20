@@ -1,0 +1,5 @@
+line_id,stage,kind,from_stop,to_stop,year_opens,until_year,via_line,headway_min,locked,note
+E40,1,starter,X072,XW04,2090,,,,1,locked: by 2100 (owner)
+E41,1,starter,X175,XG05,2095,,,,1,locked: by 2100 (owner)
+E30,1,starter,Fort Worth T&P,Alvarado,2032,,,,,optimizer
+E30,2,extension,Alvarado,Cleburne,2088,,,,1,locked: by 2100 (owner)

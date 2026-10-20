@@ -1,11 +1,11 @@
 line_id,name,mode,status,color,headway_min,notes
-F01,Teal,metro,proposed,#00b251,,
-F02,Blue,metro,proposed,#0896d7,,
-F03,Orange,metro,proposed,#df8600,,
-F04,Pink,metro,proposed,#d63384,,
-F05,Berry Line,metro,proposed,#7A1840,,
-F06,Red,metro,proposed,#bd1038,,
-F07,Purple,metro,proposed,#7b2d8e,,
+F01,FW Green,metro,proposed,#00b251,,
+F02,FW Blue,metro,proposed,#0896d7,,
+F03,FW Orange,metro,proposed,#df8600,,
+F04,FW Pink,metro,proposed,#d63384,,
+F05,FW Berry,metro,proposed,#7A1840,,
+F06,FW Red,metro,proposed,#bd1038,,
+F07,FW Purple,metro,proposed,#7b2d8e,,
 E01,White Settlement BRT,brt,proposed,#00838f,,A7: long-range reserve; lowest value per $ in the v1 plan
 E02,Riverside-Forest Hill BRT,brt,proposed,#00838f,,
 E04,Jacksboro BRT,brt,proposed,#00838f,,

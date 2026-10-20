@@ -137,6 +137,8 @@ class Network:
         self.lines = lines
         self.transfers = transfers or []   # [(station_a, station_b, walk_min or None, note)]
         self.variants = {}                 # line_id -> [(from_year, until_year, Line, interim)]
+        self.absorbed = {}                 # through-routed line id -> the line it now runs as
+        self.stop_alias = {}               # a merged-away terminus -> the junction that replaced it
         self.stage_rows = []
         self.stage_findings = []
         self.cfg = cfg
@@ -200,7 +202,15 @@ class Network:
                       self.cfg, self.name, self.transfers)
         net.variants = {k: v for k, v in self.variants.items()
                         if k != line_id and all(it.get("via") != line_id for *_, it in v)}
+        net.absorbed, net.stop_alias = dict(self.absorbed), dict(self.stop_alias)
         return net
+
+    def host_line(self, line_id):
+        """The line a stage row's line now runs as: itself, or the line it was through-routed
+        into (its stages still name it), or None if it was dropped."""
+        while line_id in self.absorbed and line_id not in self.lines:
+            line_id = self.absorbed[line_id]
+        return self.lines.get(line_id)
 
     def line_at(self, line_id, year):
         """The line's routing in force in `year` (an interim via-routing, or itself)."""
@@ -289,6 +299,7 @@ class Network:
         if ib == -1:
             self._reversed(b)        # junction at the start of b
         junction = a.stop_ids[-1]
+        b_first = b.stop_ids[0]
         # the joined line runs as often as the more frequent of the parts already running
         years = sorted({y for y, _ in a.service + b.service} | {a.first_year, b.first_year})
 
@@ -308,6 +319,9 @@ class Network:
         if a.status != b.status:
             a.status = "proposed"
         del self.lines[b_id]
+        self.absorbed[b_id] = a.id
+        if b_first != junction:   # b's own terminus merged into a's (within THROUGH_SNAP_KM)
+            self.stop_alias[b_first] = junction
         self.variants.pop(b_id, None)
         self.variants.pop(a.id, None)
 

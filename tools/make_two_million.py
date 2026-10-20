@@ -57,7 +57,7 @@ def main():
         else:
             ids = {r["line_id"] for r in rows}
             pkg[t] = [r for r in pkg[t] if r["line_id"] not in ids] + rows
-    used = {r["station_id"] for r in pkg["line_stops.csv"]}
+    used = {r["station_id"] for r in pkg["line_stops.csv"]} | {r["station_id"] for r in extra.get("stations.csv", [])}
     pkg["stations.csv"] = [r for r in pkg["stations.csv"] if r["station_id"] in used]
     pkg["transfers.csv"] = [r for r in pkg["transfers.csv"] if r["station_a"] in used and r["station_b"] in used]
     base_lines = {r["line_id"] for r in base["lines.csv"]}

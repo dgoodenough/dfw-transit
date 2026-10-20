@@ -125,7 +125,9 @@
     "max_access_stations": 8,
     "pnr_spaces": {
       "terminus": 1500,
-      "commuter_station": 400
+      "commuter_station": 400,
+      "brt_terminus": 400,
+      "_doc": "Garage spaces: line termini (BRT termini smaller), every commuter station. Charged at garage_musd_per_space (~$30k a structured space) with the station."
     },
     "pnr_people_per_space": 0.95,
     "pnr_min_km": 1.2,
@@ -226,27 +228,29 @@
     "gravity_iterations": 25
   },
   "cost_musd_per_km": {
-    "_doc": "Capital cost per route-km by mode and grade, 2025 USD. Calibrated to recent US projects: DART Silver Line ~$45M/km (new track on freight ROW), TEXRail ~$24M/km, Houston/Indy BRT $5-25M/km, US light rail $100-200M/km, US subway $400M+/km.",
+    "_doc": "Capital cost per route-km by mode and grade, 2025 USD, at recent US peer levels: DART Silver Line and the TEXRail extension ~$45-50M/km (new track on freight right-of-way), US light rail $100-200M/km at grade, center-running arterial BRT $25-55M/km (Houston University BRT ~$55M/km), US subway $500M+/km. cost_efficiency then lowers them as a steady program matures.",
     "brt": {
-      "surface": 15,
-      "elevated": 60,
-      "tunnel": 250
+      "surface": 30,
+      "elevated": 80,
+      "tunnel": 300
     },
     "commuter": {
-      "surface": 30,
-      "elevated": 90,
-      "tunnel": 350
+      "surface": 45,
+      "elevated": 120,
+      "tunnel": 450
     },
     "metro": {
-      "surface": 120,
-      "elevated": 200,
-      "tunnel": 450
+      "surface": 140,
+      "elevated": 240,
+      "tunnel": 600
     }
   },
   "station_cost_musd": {
-    "brt": 2,
-    "commuter": 15,
-    "metro": 40
+    "_doc": "Per station and mode (a metro line reaching a BRT stop builds its own platform); metro_tunnel for an underground metro station. 2025 USD, x cost_efficiency.",
+    "brt": 4,
+    "commuter": 20,
+    "metro": 50,
+    "metro_tunnel": 200
   },
   "standards": {
     "_doc": "Stop-spacing bands (km) used by validate. Sources in reports/DESIGN_STANDARDS.md.",
@@ -619,5 +623,23 @@
     },
     "pnr_asc_offset": -1.0
   },
-  "default_scenario": "two_million"
+  "default_scenario": "two_million",
+  "garage_musd_per_space": 0.03,
+  "cost_efficiency": {
+    "_doc": "Unit-cost factor by year of construction (linear between entries, flat after): a continuous program keeps local contractors, crews and agency staff busy, so costs fall from peer levels toward the lower end of international practice. 2025 = 1.0; 15% lower by 2040, 25% lower by 2055.",
+    "2025": 1.0,
+    "2040": 0.85,
+    "2055": 0.75
+  },
+  "operating": {
+    "_doc": "Operating cost, reported per year (not in the capital budget): revenue vehicle-hours = 2 directions x run minutes / headway x service hours x layover/recovery; $ per revenue hour per train or bus; weekday-equivalent days. Feeder buses are not included.",
+    "usd_per_revenue_hour": {
+      "metro": 250,
+      "brt": 150,
+      "commuter": 400
+    },
+    "span_hours": 18,
+    "layover": 1.15,
+    "days_per_year": 300
+  }
 }
