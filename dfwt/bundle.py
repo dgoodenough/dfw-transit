@@ -60,13 +60,18 @@ def pieces(lines):
 
     for li, _, _, _, segs in order:
         n_own = 0
-        prev = None
+        prev = last_until = None
         for seg in segs:
             year, pts, until = seg[0], seg[1], (seg[2] if len(seg) > 2 else None)
             P = []
             for q in (osmroute.xy(*p) for p in pts):   # repeated vertices give 0-length steps with no heading
                 if not P or math.dist(P[-1], q) > 0.5:
                     P.append(q)
+            # a rerouted line's old track is listed after its current route: it starts a new
+            # chain at the old branch point, never a stray join from the route's far end
+            if until != last_until:
+                prev = None
+            last_until = until
             S = []
             for a, b in zip(P, P[1:]):
                 d = math.dist(a, b)
@@ -178,11 +183,12 @@ def pieces(lines):
     return out
 
 
-def station_pieces(pieces_, stations, stops, snap_m=300.0, snap_multi_m=60.0):
-    """Where the map draws each station: station_id -> [piece, screen angle of the piece there
-    (degrees, y down), lon, lat of the nearest point on it]. Only pieces of lines that stop
-    there count; a station farther than snap_m (one line) or snap_multi_m (several) is left out
-    and drawn where it is."""
+def station_pieces(pieces_, stations, stops, snap_m=300.0, snap_multi_m=60.0, keep=4):
+    """Where the map can draw each station: station_id -> up to `keep` candidates, nearest
+    first, each [piece, screen angle of the piece there (degrees, y down), lon, lat of the
+    nearest point on it]. Only pieces of lines that stop there count (the page picks the one
+    carrying most of the lines serving it that year); pieces farther than snap_m (one line)
+    or snap_multi_m (several) are left out, and a station with none is drawn where it is."""
     by_line = collections.defaultdict(list)
     for k, (_, users) in enumerate(pieces_):
         for li, *_ in users:
@@ -195,9 +201,10 @@ def station_pieces(pieces_, stations, stops, snap_m=300.0, snap_multi_m=60.0):
     out = {}
     for sid, lis in lines_at.items():
         q = osmroute.xy(*stations[sid])
-        best = None
-        for k in {k for li in lis for k in by_line[li]}:
+        cands = []
+        for k in sorted({k for li in lis for k in by_line[li]}):
             P = proj[k]
+            best = None
             for a, b in zip(P, P[1:]):
                 dx, dy = b[0] - a[0], b[1] - a[1]
                 L2 = dx * dx + dy * dy
@@ -206,7 +213,11 @@ def station_pieces(pieces_, stations, stops, snap_m=300.0, snap_multi_m=60.0):
                 d = math.dist(c, q)
                 if best is None or d < best[0]:
                     best = (d, k, math.degrees(math.atan2(-dy, dx)), c)
-        if best and best[0] <= (snap_m if len(lis) == 1 else snap_multi_m):
-            lon, lat = osmroute.ll(best[3])
-            out[sid] = [best[1], round(best[2], 1), round(lon, 6), round(lat, 6)]
+            if best and best[0] <= (snap_m if len(lis) == 1 else snap_multi_m):
+                cands.append(best)
+        if cands:
+            out[sid] = []
+            for d, k, ang, c in sorted(cands)[:keep]:
+                lon, lat = osmroute.ll(c)
+                out[sid].append([k, round(ang, 1), round(lon, 6), round(lat, 6)])
     return out

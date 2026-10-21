@@ -109,23 +109,52 @@ function offsetPolyline(pieces) {
 const sw = w => `stroke-width:calc(var(--f) * ${w})`;
 const dstr = pts => 'M' + pts.map(p => p[0].toFixed(3) + ',' + p[1].toFixed(3)).join('L');
 
-// slots: line order within each corridor, among the lines showing in this plan
+// which routings a line draws this year. A rerouted line (ln.pre = {until, segs}) runs its old
+// routing (layout paths[plan + '#pre']) until the new track opens; meanwhile the new track's
+// own stretch (stop-to-stop hops the old routing doesn't have: `only`) shows as future.
+const PRE = '#pre';
+function routings(ln) {
+  const cur = SD.paths[scenKey] && SD.paths[scenKey][ln.id];
+  const pp = ln.pre && SD.paths[scenKey + PRE] && SD.paths[scenKey + PRE][ln.id];
+  if (!pp || D.years[yi] >= ln.pre.until) return cur ? [{key: scenKey, segs: ln.segs}] : [];
+  const out = [{key: scenKey + PRE, segs: ln.pre.segs}];
+  if (cur) {
+    const have = new Set(), only = new Set();
+    for (let k = 0; k + 1 < pp[1].length; k++) { const a = pp[0][pp[1][k]], b = pp[0][pp[1][k + 1]]; have.add(a + ',' + b).add(b + ',' + a); }
+    for (let k = 0; k + 1 < cur[1].length; k++) if (!have.has(cur[0][cur[1][k]] + ',' + cur[0][cur[1][k + 1]])) only.add(k);
+    if (only.size) out.push({key: scenKey, segs: ln.segs, only});
+  }
+  return out;
+}
+// slots: line order within each corridor, among the lines drawn on it this year
 let slots = new Map();
 function computeSlots() {
-  const present = new Set(S.lines.filter(l => !hidden.has(l.id)).map(l => l.id));
+  const on = new Map();     // edge -> lines drawn on it
+  for (const ln of S.lines) {
+    if (hidden.has(ln.id)) continue;
+    for (const r of routings(ln)) {
+      const [path, st] = SD.paths[r.key][ln.id];
+      for (let k = 0; k + 1 < st.length; k++) {
+        if (r.only && !r.only.has(k)) continue;
+        for (let i = st[k]; i < st[k + 1]; i++) {
+          const ei = edgeOf(path[i], path[i + 1]);
+          if (ei === undefined) continue;
+          if (!on.has(ei)) on.set(ei, new Set());
+          on.get(ei).add(ln.id);
+        }
+      }
+    }
+  }
   slots = new Map();
-  SD.edges.forEach((e, i) => {
-    const ls = e[3].filter(l => present.has(l));
-    slots.set(i, ls);
-  });
+  SD.edges.forEach((e, i) => slots.set(i, e[3].filter(l => on.has(i) && on.get(i).has(l))));
 }
 function slotOffset(ei, lid) {
   const ls = slots.get(ei) || [], k = ls.indexOf(lid);
   if (k < 0) return 0;
   return (k - (ls.length - 1) / 2) * PITCH;
 }
-function linePath(lid) {
-  const pr = SD.paths[scenKey] && SD.paths[scenKey][lid];
+function linePath(lid, key = scenKey) {
+  const pr = SD.paths[key] && SD.paths[key][lid];
   if (!pr) return null;
   const [path, stopAt] = pr, pieces = [];
   // ports[i]: where this line's stroke crosses node path[i], on each adjacent leg (offset
@@ -173,14 +202,15 @@ function draw() {
     .sort((a, b) => order[a[0].mode] - order[b[0].mode]);
   const nodeState = new Map();     // node -> {open:Set(line idx), fut:Set}
   const ns = i => { if (!nodeState.has(i)) nodeState.set(i, {open: new Set(), fut: new Set(), term: false}); return nodeState.get(i); };
-  for (const [ln, li] of lines) {
-    const lp = linePath(ln.id);
+  for (const [ln, li] of lines) for (const [ri, r] of routings(ln).entries()) {
+    const lp = linePath(ln.id, r.key);
     if (!lp) continue;
-    cache.set(ln.id, lp);
+    lp.only = r.only;
+    cache.set(ri ? ln.id + '#' + ri : ln.id, lp);     // the running routing under the line's id (trip overlay)
     // group stop-to-stop segments into runs: open, opened this interval ('new', as on the map), future
     let runStart = 0, state = null;
     const flush = (k, st) => {
-      if (st === null || k <= runStart) return;
+      if (st === null || st === 'skip' || k <= runStart) return;
       const a = lp.at[lp.stopAt[runStart]], b = lp.at[lp.stopAt[k]];
       if (a === undefined || b === undefined) return;
       const pts = lp.pts.slice(a, b + 1);
@@ -188,17 +218,18 @@ function draw() {
       if (st === 'new') el('path', {class: 'glow' + (anim ? ' fadein' : ''), d: dstr(pts), style: sw(2.7 * (W[ln.mode] || W.metro))}, G.glow);
       stroke(st === 'fut' ? G.future : G.lines, ln, pts, st === 'fut', st === 'new' && anim);
     };
-    for (let k = 0; k < ln.segs.length; k++) {
-      const yr = ln.segs[k][0], s = yr > Y ? 'fut' : yr > prevY ? 'new' : 'open';
+    for (let k = 0; k < r.segs.length; k++) {
+      const yr = r.segs[k][0], s = r.only && !r.only.has(k) ? 'skip' : yr > Y ? 'fut' : yr > prevY ? 'new' : 'open';
       if (state === null) { state = s; runStart = k; }
       else if (s !== state) { flush(k, state); state = s; runStart = k; }
     }
-    flush(ln.segs.length, state);
+    flush(r.segs.length, state);
     lp.stopAt.forEach((j, k) => {
+      if (r.only && !r.only.has(k) && !r.only.has(k - 1)) return;
       const v = lp.path[j], st = ns(v);
       const open = SD.nodes[v][2].some(s => (sidLines.get(s) || []).includes(li));
       (open ? st.open : st.fut).add(li);
-      if (k === 0 || k === lp.stopAt.length - 1) st.term = true;
+      if (!r.only && (k === 0 || k === lp.stopAt.length - 1)) st.term = true;
     });
   }
   // stations
@@ -245,7 +276,9 @@ function stroke(g, ln, pts, fut, grow) {
 const AXES = [0, 1, 2, 3].map(k => [Math.cos(k * Math.PI / 4), Math.sin(k * Math.PI / 4)]);
 function marker(v) {
   const pts = [];
-  for (const lp of cache.values()) lp.stopAt.forEach(j => { if (lp.path[j] === v) pts.push(...lp.ports[j]); });
+  for (const lp of cache.values()) lp.stopAt.forEach((j, k) => {
+    if (lp.path[j] === v && !(lp.only && !(lp.only.has(k) && lp.only.has(k - 1)))) pts.push(...lp.ports[j]);   // future stretch: its own stops only
+  });
   if (!pts.length) pts.push([P(v)[0], P(v)[1]]);
   let best = null;
   AXES.forEach(([ux, uy], k) => {

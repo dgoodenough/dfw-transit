@@ -44,6 +44,9 @@ details{border-top:1px solid var(--rule);padding-top:10px}
 summary{cursor:pointer;font-weight:600;font-size:.9rem}
 .lines{display:flex;flex-direction:column;gap:2px;margin-top:8px;max-height:260px;overflow-y:auto}
 .grp{display:flex;align-items:center;gap:6px;font-size:.7rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:8px 0 2px;cursor:pointer}.grp .n{font-weight:400;letter-spacing:0}
+.grp.mode{color:var(--ink);font-size:.74rem;margin-top:12px;padding-top:8px;border-top:1px solid var(--rule)}.grp.mode:first-child{margin-top:4px;padding-top:0;border-top:0}
+.grp.region{margin:6px 0 2px 14px;text-transform:none;letter-spacing:0;font-size:.78rem}
+.li{margin-left:14px}
 .li{display:grid;grid-template-columns:16px 22px minmax(0,1fr) auto;gap:6px;align-items:center;font-size:.84rem;padding:2px 0}
 .li input,.grp input{margin:0}
 .sw{height:4px;border-radius:2px}
@@ -204,31 +207,40 @@ const bgColor = getComputedStyle(document.documentElement).getPropertyValue('--b
 // "opened this interval" glows sit in their own pane, faded as a whole so overlaps don't darken
 map.createPane('glow').style.cssText = `z-index:390;opacity:${dark ? .32 : .5};pointer-events:none`;
 const glowR = L.canvas({pane: 'glow'}), glowLayer = L.layerGroup().addTo(map);
-// a polyline shifted to its left by a number of screen pixels at the current zoom: `px` along
-// the middle, easing from `px0` at the start and to `px1` at the end over the first and last
-// ~40 px, so a line meets its continuation on the next piece without a step
-function offsetPath(ll, px, px0 = px, px1 = px) {
-  if (ll.length < 2 || (Math.abs(px) < .05 && Math.abs(px0) < .05 && Math.abs(px1) < .05)) return ll;
-  let P = ll.map(p => map.latLngToLayerPoint(p));
-  const cum = [0];
-  for (let i = 1; i < P.length; i++) cum.push(cum[i - 1] + P[i].distanceTo(P[i - 1]));
-  const len = cum[cum.length - 1], R = Math.min(40, len / 2);
-  // add vertices where the easing starts and ends so it isn't spread over a long segment
-  const at = s => { let i = 1; while (i < P.length - 1 && cum[i] < s) i++; const t = (s - cum[i - 1]) / ((cum[i] - cum[i - 1]) || 1);
-    return [i, L.point(P[i - 1].x + t * (P[i].x - P[i - 1].x), P[i - 1].y + t * (P[i].y - P[i - 1].y))]; };
-  if (px0 !== px && R > 1) { const [i, q] = at(R); P.splice(i, 0, q); cum.splice(i, 0, R); }
-  if (px1 !== px && R > 1) { const [i, q] = at(len - R); P.splice(i, 0, q); cum.splice(i, 0, len - R); }
-  const off = s => s < R ? px0 + (px - px0) * s / R : s > len - R ? px1 + (px - px1) * (len - s) / R : px;
-  const nrm = (a, b) => { const dx = b.x - a.x, dy = b.y - a.y, l = Math.hypot(dx, dy) || 1; return [dy / l, -dx / l]; };
-  const out = [];
-  for (let i = 0; i < P.length; i++) {
-    const a = i > 0 ? nrm(P[i - 1], P[i]) : null, b = i < P.length - 1 ? nrm(P[i], P[i + 1]) : null;
-    let [x, y] = a && b ? [a[0] + b[0], a[1] + b[1]] : (a || b);
-    const l = Math.hypot(x, y) || 1; x /= l; y /= l;
-    const m = Math.min(2, 1 / Math.max(.5, x * (a || b)[0] + y * (a || b)[1])), o = off(cum[i]);
-    out.push(map.layerPointToLatLng(L.point(P[i].x + x * o * m, P[i].y + y * o * m)));
+// ---- drawing shared track side by side ----
+// Each line is drawn as continuous chains through the shared-track pieces it uses (a chain
+// runs on through every node where the line has exactly two pieces), so it never breaks
+// where the bundle around it changes. Per zoom, each piece is projected to pixels and
+// simplified (sub-pixel jitter in the fitted geometry would otherwise show as notches once
+// offset). Along a chain: corners are rounded with a radius wider than the bundle (so no
+// line of it folds back or spikes at a corner); the line's offset is constant along each
+// piece and changes in a smooth S over a short ramp where the piece changes, placed on the
+// side with fewer lines (a line peels off a bundle after the bundle ends, not inside it);
+// and the offset curve is built from the rounded centre line. Lines sharing a piece use the
+// same rounded centre line, so they stay exactly parallel.
+const RAMP_MIN = 14, RAMP_PER_PX = 5, SIMPLIFY_PX = .6;
+function simplifyPx(P, tol) {   // Douglas-Peucker on projected points, ends kept
+  if (P.length < 3) return P;
+  const keep = new Uint8Array(P.length); keep[0] = keep[P.length - 1] = 1;
+  const st = [[0, P.length - 1]];
+  while (st.length) {
+    const [i, j] = st.pop(), a = P[i], b = P[j], dx = b.x - a.x, dy = b.y - a.y, L2 = dx * dx + dy * dy;
+    let best = -1, k = -1;
+    for (let m = i + 1; m < j; m++) {
+      const p = P[m]; let d;
+      if (L2 < 1e-9) d = Math.hypot(p.x - a.x, p.y - a.y);
+      else { const t = Math.max(0, Math.min(1, ((p.x - a.x) * dx + (p.y - a.y) * dy) / L2)); d = Math.hypot(p.x - a.x - t * dx, p.y - a.y - t * dy); }
+      if (d > best) { best = d; k = m; }
+    }
+    if (best > tol) { keep[k] = 1; st.push([i, k], [k, j]); }
   }
-  return out;
+  return P.filter((_, i) => keep[i]);
+}
+// pieces projected to pixels at zoom z (absolute, so cacheable per zoom and scenario)
+function pieceProj(z) {
+  S._proj = S._proj || {};
+  if (!S._proj[z]) S._proj[z] = S.pieces.map(([gi]) => simplifyPx(D.geoms[gi].map(p => map.project([p[1], p[0]], z)), SIMPLIFY_PX));
+  return S._proj[z];
 }
 // track states this year: future (faint), under construction (dotted), open (solid),
 // and newly opened since the last interval (solid on a glow)
@@ -245,13 +257,127 @@ function pieceEnds() {
   S._ends = S.pieces.map(([gi]) => { const g = D.geoms[gi]; return [m.get(key(g[0])), m.get(key(g[g.length - 1]))]; });
   return S._ends;
 }
+// a line's pieces (visible this year) as chains: [[piece, runs along it], ...]
+function lineChains(mine) {
+  const ends = pieceEnds(), used = new Set(), out = [];
+  // the line's other pieces at the node at end `e` (0 start, 1 end) of piece pi
+  const nbrs = (pi, e) => (ends[pi][e] || []).filter(([pj]) => pj !== pi && mine.has(pj));
+  const walk = (pi, fwd) => {
+    const ch = [];
+    for (;;) {
+      used.add(pi); ch.push([pi, fwd]);
+      const nb = nbrs(pi, fwd ? 1 : 0), here = 1 + nb.length;
+      if (here !== 2) return ch;       // a terminus or a branch: the chain ends
+      const [pj, st] = nb[0];
+      if (used.has(pj)) return ch;
+      pi = pj; fwd = st;               // enter at its start: run forwards
+    }
+  };
+  for (const pi of mine) if (!used.has(pi)) {
+    const a = nbrs(pi, 0).length !== 1, b = nbrs(pi, 1).length !== 1;
+    if (a) out.push(walk(pi, true)); else if (b) out.push(walk(pi, false));
+  }
+  for (const pi of mine) if (!used.has(pi)) out.push(walk(pi, true));   // loops
+  return out;
+}
+// the chain's centre line with rounded corners, its offset curve, cut into strokes by state.
+// O[k]: the line's offset on piece k (px, left of travel); HW[k]: half the bundle's width;
+// N[k]: lines on piece k; ST[k]: the line's state on piece k.
+function chainStrokes(chain, proj, O, HW, N, ST) {
+  // 1. centre line; T: piece index of each point (a shared end point is k - .5)
+  const B = [], T = [];
+  chain.forEach(([pi, fwd], k) => {
+    const q = fwd ? proj[pi] : proj[pi].slice().reverse();
+    q.forEach((p, i) => { if (k && !i) { T[T.length - 1] = k - .5; return; } B.push(p); T.push(k); });
+  });
+  // 2. round the corners (quadratic arcs; each corner takes at most half of each leg)
+  const F = [], FT = [];
+  const radius = t => Math.max(HW[Math.floor(t)], HW[Math.ceil(t)]) + 6;
+  for (let i = 0; i < B.length; i++) {
+    if (!i || i === B.length - 1) { F.push(B[i]); FT.push(T[i]); continue; }
+    const a = B[i - 1], b = B[i], c = B[i + 1], l1 = a.distanceTo(b), l2 = b.distanceTo(c);
+    if (l1 < 1e-6 || l2 < 1e-6) { F.push(b); FT.push(T[i]); continue; }
+    const u = [(b.x - a.x) / l1, (b.y - a.y) / l1], v = [(c.x - b.x) / l2, (c.y - b.y) / l2];
+    const th = Math.acos(Math.max(-1, Math.min(1, u[0] * v[0] + u[1] * v[1])));
+    if (th < .03) { F.push(b); FT.push(T[i]); continue; }
+    const t = Math.min(radius(T[i]) * Math.tan(Math.min(th, 2.6) / 2), l1 / 2, l2 / 2);
+    const p0 = L.point(b.x - u[0] * t, b.y - u[1] * t), p1 = L.point(b.x + v[0] * t, b.y + v[1] * t);
+    const n = 2 * Math.max(1, Math.ceil(th / .28));   // even: the arc's middle point is the corner's own
+    for (let s = 0; s <= n; s++) {
+      const w = s / n, w0 = (1 - w) * (1 - w), w1 = 2 * w * (1 - w), w2 = w * w;
+      F.push(L.point(w0 * p0.x + w1 * b.x + w2 * p1.x, w0 * p0.y + w1 * b.y + w2 * p1.y));
+      FT.push(Number.isInteger(T[i]) ? T[i] : (s * 2 < n ? T[i] - .5 : s * 2 > n ? T[i] + .5 : T[i]));
+    }
+  }
+  // 3. arc length; where each piece starts and ends along the chain
+  const cum = [0];
+  for (let i = 1; i < F.length; i++) cum.push(cum[i - 1] + F[i].distanceTo(F[i - 1]));
+  const m = chain.length, sb = [0];
+  for (let k = 1; k < m; k++) { let i = FT.findIndex(t => t >= k - .5); sb.push(cum[Math.max(0, i)]); }
+  sb.push(cum[cum.length - 1]);
+  // 4. offset along the chain: constant per piece, smooth ramps at piece changes
+  const ramps = [];
+  for (let k = 1; k < m; k++) {
+    const oA = O[k - 1], oB = O[k], d = Math.abs(oB - oA);
+    if (d < .01) continue;
+    const R = Math.max(RAMP_MIN, RAMP_PER_PX * d), la = sb[k] - sb[k - 1], lb = sb[k + 1] - sb[k];
+    const [s0, s1] = N[k - 1] > N[k] ? [sb[k], sb[k] + Math.min(R, .45 * lb)]
+      : N[k - 1] < N[k] ? [sb[k] - Math.min(R, .45 * la), sb[k]]
+      : [sb[k] - Math.min(R / 2, .45 * la), sb[k] + Math.min(R / 2, .45 * lb)];
+    ramps.push([s0, s1, oA, oB, k]);
+  }
+  const off = (s, t) => {
+    for (const [s0, s1, oA, oB] of ramps) if (s >= s0 && s <= s1) { const w = s1 > s0 ? (s - s0) / (s1 - s0) : 1; return oA + (oB - oA) * w * w * (3 - 2 * w); }
+    return O[Math.min(m - 1, Math.max(0, Math.round(t)))];
+  };
+  // points every ~3 px inside the ramps, so the S reads as a curve
+  const Q = [], QT = [], QS = [];
+  for (let i = 0; i < F.length; i++) {
+    if (i) for (const [s0, s1, , , k] of ramps) {
+      const a = cum[i - 1], b = cum[i];
+      for (let s = Math.max(s0, a); s < Math.min(s1, b); s += 3) if (s > a) {
+        const w = (s - a) / ((b - a) || 1);
+        Q.push(L.point(F[i - 1].x + w * (F[i].x - F[i - 1].x), F[i - 1].y + w * (F[i].y - F[i - 1].y)));
+        QT.push(s < sb[k] ? k - 1 : k); QS.push(s);
+      }
+    }
+    Q.push(F[i]); QT.push(FT[i]); QS.push(cum[i]);
+  }
+  // 5. offset curve: each point along the bisector of its two legs
+  const nrm = (a, b) => { const dx = b.x - a.x, dy = b.y - a.y, l = Math.hypot(dx, dy); return l < 1e-9 ? null : [dy / l, -dx / l]; };
+  const pts = Q.map((p, i) => {
+    const o = off(QS[i], QT[i]);
+    if (Math.abs(o) < .01) return p;
+    let a = null, b = null;
+    for (let j = i; j > 0 && !a; j--) a = nrm(Q[j - 1], Q[j]);
+    for (let j = i; j < Q.length - 1 && !b; j++) b = nrm(Q[j], Q[j + 1]);
+    if (!a && !b) return p;
+    a = a || b; b = b || a;
+    let x = a[0] + b[0], y = a[1] + b[1]; const l = Math.hypot(x, y);
+    if (l < 1e-6) { x = a[0]; y = a[1]; } else { x /= l; y /= l; }
+    const mi = Math.min(2, 1 / Math.max(.5, x * a[0] + y * a[1]));
+    return L.point(p.x + x * o * mi, p.y + y * o * mi);
+  });
+  // 6. cut into strokes where the line's state changes (strokes share their end point)
+  const out = [];
+  let k0 = 0;
+  for (let k = 1; k <= m; k++) {
+    if (k < m && ST[k] === ST[k0]) continue;
+    const seg = [];
+    pts.forEach((p, i) => { if (QT[i] >= k0 - .5 && QT[i] <= k - .5) seg.push(p); });
+    if (seg.length > 1) out.push([ST[k0], seg]);
+    k0 = k;
+  }
+  return out;
+}
 let pieceOffs = [];   // per piece: Map line -> offset (px), for the station markers
 function drawLines() {
   lineLayer.clearLayers(); glowLayer.clearLayers();
-  const state = stateFn(), apart = map.getZoom() >= 12 ? 1 : 0;   // shared track side by side from zoom 12
-  const Y = D.years[yi];
-  pieceOffs = S.pieces.map(([, users]) => {
-    const vis = users.filter(([li, , until]) => !hidden.has(S.lines[li].id) && !(until && Y >= until));
+  const state = stateFn(), z = map.getZoom(), apart = z >= 12 ? 1 : 0;   // shared track side by side from zoom 12
+  const Y = D.years[yi], shown = (li, until) => !hidden.has(S.lines[li].id) && !(until && Y >= until);
+  const nOn = [], half = [];
+  pieceOffs = S.pieces.map(([, users], pi) => {
+    const vis = users.filter(([li, , until]) => shown(li, until));
     // BRT routes sharing a street draw as one stroke: they take one slot between them
     const slots = [], slotOf = new Map();
     for (const [li] of vis) {
@@ -260,54 +386,59 @@ function drawLines() {
       slots[slotOf.get(k)].push(li);
     }
     const ws = slots.map(g => weightOf(S.lines[g[0]].mode) + 1);
-    let at = -ws.reduce((a, b) => a + b, 0) / 2;
+    const tot = ws.reduce((a, b) => a + b, 0);
+    let at = -tot / 2;
     const o = new Map();
     slots.forEach((g, k) => { for (const li of g) o.set(li, (at + ws[k] / 2) * apart); at += ws[k]; });
+    nOn[pi] = slots.length; half[pi] = tot / 2 * apart;
     return o;
   });
-  const ends = pieceEnds();
-  // where two pieces meet, a line on both eases to the midpoint of its two offsets
-  const joint = (pi, end, li, own) => {
-    for (const [pj, st] of ends[pi][end] || []) {
-      if (pj === pi || !pieceOffs[pj].has(li)) continue;
-      const nb = pieceOffs[pj].get(li);
-      return (own + ((end === 0) !== st ? nb : -nb)) / 2;   // pieces running the same way share a left side
+  // each visible line's pieces, and its state on each
+  const mine = new Map();   // li -> Map piece -> state
+  S.pieces.forEach(([, users], pi) => {
+    for (const [li, yr, until] of users) {
+      if (!shown(li, until)) continue;
+      if (!mine.has(li)) mine.set(li, new Map());
+      mine.get(li).set(pi, state(S.lines[li], yr));
     }
-    return own;
-  };
+  });
+  const proj = pieceProj(z), byPass = {future: [], building: [], new: [], open: []};
+  const ll = P => P.map(p => map.unproject(p, z));
+  for (const [li, ps] of mine) {
+    const ln = S.lines[li];
+    for (const chain of lineChains(new Set(ps.keys()))) {
+      const O = chain.map(([pi, fwd]) => (fwd ? 1 : -1) * pieceOffs[pi].get(li));
+      const strokes = chainStrokes(chain, proj, O, chain.map(([pi]) => half[pi]), chain.map(([pi]) => nOn[pi]), chain.map(([pi]) => ps.get(pi)));
+      for (const [st, P] of strokes) byPass[st].push([ln, ll(P)]);
+    }
+  }
   for (const pass of ['future', 'building', 'new', 'open']) {
-    const strokes = [];
-    S.pieces.forEach(([gi, users], pi) => {
-      let ll = null;
-      for (const [li, yr, until] of users) {
-        const ln = S.lines[li]; if (hidden.has(ln.id) || (until && D.years[yi] >= until) || state(ln, yr) !== pass) continue;
-        ll = ll || D.geoms[gi].map(p => [p[1], p[0]]);
-        const off = pieceOffs[pi].get(li);
-        strokes.push([ln, offsetPath(ll, off, joint(pi, 0, li, off), joint(pi, 1, li, off))]);
-      }
-    });
-    const opts = {lineCap: 'butt', lineJoin: 'round', interactive: false};
+    const strokes = byPass[pass], opts = {lineCap: 'round', lineJoin: 'round', interactive: false};
     for (const [ln, path] of strokes) {
-      const w = weightOf(ln.mode), col = lineColor(ln.color, ln.mode);
+      const w = weightOf(ln.mode);
       if (pass === 'new') L.polyline(path, {...opts, renderer: glowR, pane: 'glow', color: dark ? '#f2c230' : '#ffd23f', weight: w + 6}).addTo(glowLayer);
       if (pass !== 'future' && ln.mode !== 'brt')   // a casing in the background colour: crossings read as crossings
         L.polyline(path, {...opts, color: bgColor, weight: w + 2.5, opacity: pass === 'building' ? .6 : 1}).addTo(lineLayer);
     }
     for (const [ln, path] of strokes) {
       const w = weightOf(ln.mode), col = lineColor(ln.color, ln.mode);
-      if (pass === 'future') L.polyline(path, {...opts, color: col, weight: w, opacity: .18}).addTo(lineLayer);
-      else if (pass === 'building') L.polyline(path, {...opts, color: col, weight: w + 1.5, opacity: .7, dashArray: '1 8', lineCap: 'round'}).addTo(lineLayer);
+      if (pass === 'future') L.polyline(path, {...opts, lineCap: 'butt', color: col, weight: w, opacity: .18}).addTo(lineLayer);
+      else if (pass === 'building') L.polyline(path, {...opts, color: col, weight: w + 1.5, opacity: .7, dashArray: '1 8'}).addTo(lineLayer);
       else {
         const pl = L.polyline(path, {...opts, color: col, weight: w, opacity: .95, interactive: true}).addTo(lineLayer);
         pl.bindTooltip(ln.name, {sticky: true});   // which route is this (BRT routes share one colour)
         if (ln.mode === 'commuter')   // railroad style, as on the diagram: a dashed line down the middle
-          L.polyline(path, {...opts, color: bgColor, weight: 1.3 * zf(), dashArray: '6 4'}).addTo(lineLayer);
+          L.polyline(path, {...opts, lineCap: 'butt', color: bgColor, weight: 1.3 * zf(), dashArray: '6 4'}).addTo(lineLayer);
       }
     }
   }
 }
-// station markers: interchanges always; rail stops from zoom 11; BRT stops from zoom 12.
-// An interchange on side-by-side track is a capsule across the lines it serves.
+// station markers, by zoom and mode, the same for every line: none at the overview (zoom 10
+// and out: only the lines); every stop of every rail line (metro, regional rail) from zoom 11;
+// every BRT stop too from zoom 13. A line shows all of its stops or none of them. Where two or
+// more of the lines shown stop, the station is an interchange: a larger marker, and on
+// side-by-side track a capsule across the lines it serves.
+const STOPS_FROM = {metro: 11, commuter: 11, brt: 13};
 function drawStations() {
   stLayer.clearLayers();
   const Y = D.years[yi], z = map.getZoom(), yd = S.years[Y], served = new Map();
@@ -316,10 +447,15 @@ function drawStations() {
   }
   const ink = dark ? '#e7ecef' : '#18212b', paper = dark ? '#18212a' : '#fff';
   for (const [sid, lis] of served) {
-    const vis = [...lis].filter(li => !hidden.has(S.lines[li].id)); if (!vis.length) continue;
-    const st = D.stations[sid], ln = S.lines[vis[0]], big = lis.size > 1, brt = vis.every(li => S.lines[li].mode === 'brt');
-    if (!big && (z < 11 || (brt && z < 12))) continue;
-    const at = S.stPiece && S.stPiece[sid], ll = at ? L.latLng(at[3], at[2]) : L.latLng(st[1], st[2]);   // on its line
+    const vis = [...lis].filter(li => !hidden.has(S.lines[li].id) && z >= (STOPS_FROM[S.lines[li].mode] || 11)); if (!vis.length) continue;
+    const st = D.stations[sid], ln = S.lines[vis[0]], big = vis.length > 1, brt = vis.every(li => S.lines[li].mode === 'brt');
+    // on its line: of the nearby pieces, the one carrying most of the lines serving it now (nearest on a tie)
+    let at = null, nOn = 0;
+    for (const c of (S.stPiece && S.stPiece[sid]) || []) {
+      const n = pieceOffs[c[0]] ? vis.filter(li => pieceOffs[c[0]].has(li)).length : 0;
+      if (!at || n > nOn) { at = c; nOn = n; }
+    }
+    const ll = at ? L.latLng(at[3], at[2]) : L.latLng(st[1], st[2]);
     let m;
     if (at && pieceOffs[at[0]]) {   // offsets of the lines it serves on its piece, across the track
       const os = vis.map(li => pieceOffs[at[0]].get(li)).filter(o => o !== undefined);
@@ -336,11 +472,11 @@ function drawStations() {
         }
       }
     }
-    if (!m) m = L.circleMarker(ll, big ? {radius: z <= 10 ? 3 : 5, color: ink, weight: z <= 10 ? 1.5 : 2, fillColor: paper, fillOpacity: 1}
+    if (!m) m = L.circleMarker(ll, big ? {radius: 3.6 * zf() + 1, color: ink, weight: z < 12 ? 1.5 : 2, fillColor: paper, fillOpacity: 1}
       : brt ? {radius: 2.4 * zf(), color: dark ? '#11171d' : '#fff', weight: 1.2, fillColor: lineColor(ln.color, ln.mode), fillOpacity: 1}
-      : {radius: 3.5 * zf(), color: lineColor(ln.color, ln.mode), weight: 2, fillColor: paper, fillOpacity: 1}).addTo(stLayer);
+      : {radius: 3.3 * zf(), color: lineColor(ln.color, ln.mode), weight: z < 12 ? 1.5 : 2, fillColor: paper, fillOpacity: 1}).addTo(stLayer);
     m.on('click', () => choose(sid));
-    const chips = vis.map(li => `<span class="chip" style="background:${S.lines[li].color};color:${inkOn(S.lines[li].color)}">${S.lines[li].name}</span>`).join('');
+    const chips = [...lis].filter(li => !hidden.has(S.lines[li].id)).map(li => `<span class="chip" style="background:${S.lines[li].color};color:${inkOn(S.lines[li].color)}">${S.lines[li].name}</span>`).join('');
     const b = S.boardings[sid];
     m.bindTooltip(st[0]);
     m.bindPopup(`<div class="pop"><b>${st[0]}</b><div>${chips}</div><div class="m">${fmt(st[3])} residents · ${fmt(st[4])} jobs within 1 km` +
@@ -405,19 +541,23 @@ function metrics() {
   $('sparkKey').textContent = (ref ? `Daily trips. Solid: this plan · dashed: ${refName} · ` : 'Daily trips · ') + `${D.years[0]}–${D.years[D.years.length - 1]}`;
 }
 function lineList() {
-  // groups: each mode, split into the plan's lines and those this scenario adds; a group's box
-  // shows or hides all its lines at once
-  const Y = D.years[yi], inPlan = D.scen.plan && scenKey !== 'plan' ? new Set(D.scen.plan.lines.map(l => l.id)) : null;
-  const groups = [];
+  // groups: each mode, then within it each region (where most of a line's stops are: Fort Worth,
+  // Dallas, Collin County, other; webmap.line_region). A group's box shows or hides all its lines.
+  const Y = D.years[yi], groups = [], R = D.regions || {other: 'Other'};
   for (const m of ['metro', 'commuter', 'brt']) {
     const ls = S.lines.filter(l => l.mode === m);
-    const parts = inPlan ? [[D.modes[m], ls.filter(l => inPlan.has(l.id))], [`${D.modes[m]} added by this scenario`, ls.filter(l => !inPlan.has(l.id))]] : [[D.modes[m], ls]];
-    for (const [name, g] of parts) if (g.length) groups.push([name, g.sort((a, b) => a.first - b.first || a.name.localeCompare(b.name))]);
+    if (!ls.length) continue;
+    groups.push([D.modes[m], ls, 'mode']);
+    for (const r of Object.keys(R)) {
+      const g = ls.filter(l => (R[l.region] ? l.region : 'other') === r);
+      if (g.length) groups.push([R[r], g.sort((a, b) => a.first - b.first || a.name.localeCompare(b.name)), 'region']);
+    }
   }
   let h = '';
-  groups.forEach(([name, g], gi) => {
+  groups.forEach(([name, g, kind], gi) => {
     const on = g.filter(l => !hidden.has(l.id)).length;
-    h += `<label class="grp"><input type="checkbox" data-grp="${gi}" ${on === g.length ? 'checked' : ''}>${name} <span class="n">${g.length}</span></label>`;
+    h += `<label class="grp ${kind}"><input type="checkbox" data-grp="${gi}" ${on === g.length ? 'checked' : ''}>${name} <span class="n">${g.length}</span></label>`;
+    if (kind === 'mode') return;
     for (const l of g) {
       const v = l.value !== '' && l.value != null ? ` · ${l.value}/$M` : '';
       h += `<label class="li${l.first > Y ? ' future' : ''}" title="${(l.notes || '').replace(/"/g, '&quot;')}"><input type="checkbox" data-id="${l.id}" ${hidden.has(l.id) ? '' : 'checked'}>` +

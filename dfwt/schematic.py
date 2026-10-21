@@ -24,7 +24,9 @@ Method
 3. **Octilinear directions.** Chains of degree-2 stations between junctions or
    termini are the units of the drawing. At each junction the incident chains
    get distinct ports (8 directions) by exhaustive search over assignments that
-   keep the cyclic order of neighbours. Along each chain a dynamic program picks
+   keep the cyclic order of neighbours, each aimed along its chain's general
+   direction (its next few stations); termini get no port, so a line's last
+   stretch is free to run straight on. Along each chain a dynamic program picks
    one direction per edge, trading squared angular deviation against a penalty
    per bend (45° cheap, 90° dear, sharper forbidden). A change of direction is
    moved off the station into the longer adjacent edge, which gets one bend.
@@ -37,7 +39,12 @@ Method
    close become linearized separation rows on the next solve (active set).
    Directions are re-assigned for N_ASSIGN rounds, then frozen; edges that
    still collapse or sit far off their direction, or that hold two stations
-   under the minimum spacing, get one bend.
+   under the minimum spacing, get one bend. Then the geography gives way to
+   straight lines where there is room: a bend whose chain runs straight on in
+   one of its leg directions, and a short stub at a terminus turning 45° off
+   its line, are tried straight; those the relaxation can't hold, or that crowd
+   a station, keep their kink (rounds that crowd the map are undone and retried
+   in smaller parts).
 5. **Exact octilinearity and spacing.** A least-norm projection makes every
    straight edge exactly octilinear; each bent edge is drawn as two octilinear
    legs. If any two stations were still under MIN_SP, the whole layout is
@@ -45,11 +52,13 @@ Method
 6. **Line ordering.** In each chain the lines get one order; permutations are
    improved by local search minimizing crossings at the junctions, measured
    geometrically from each line's port position.
-7. **Waterways.** Rivers ride the same cartogram flow plus the smoothed
-   displacement of nearby stations, are clipped to the network's surroundings,
-   simplified (Douglas-Peucker), snapped towards octilinear runs and smoothed
-   (Chaikin) into soft bands. Lakes keep their shape under a local affine fit
-   (geographic -> layout) at their centroid and are smoothed into blobs.
+7. **Waterways**, stylized, not traced. Rivers ride the same cartogram flow
+   plus the smoothed displacement of nearby stations, are clipped to the
+   network's surroundings, simplified hard (Douglas-Peucker, RIVER_DP), snapped
+   to octilinear runs and given rounded corners (Chaikin): ribbons, not outlines.
+   A lake is placed by a local affine fit (geographic -> layout) at its centroid
+   and drawn as a soft ellipse with its area and principal axes (long axis on
+   one of the eight directions), shrunk to clear every station.
 
 Units: 1.0 = the minimum distance between station centres. y grows north here;
 the JSON for the page flips it (SVG y grows down).
@@ -65,6 +74,7 @@ import numpy as np
 
 from . import config, geo
 
+PRE = "#pre"          # paths key suffix: a rerouted line's routing before its reroute opens
 MIN_SP = 1.0          # minimum distance between station centres
 PITCH = 0.30          # offset between parallel lines in a corridor
 MERGE_KM = 0.04       # always merge stations closer than this
@@ -73,6 +83,10 @@ MERGE_LINKED_KM = 0.15  # merge transfer-linked stations closer than this
 CONNECTOR_MAX = 1.6   # transfer pairs closer than this on the diagram get a connector
 LABEL_GROUP = 8.0     # same-named stations (ignoring a compass suffix) this close share one label when zoomed out
 LAKE_SCALE = 0.8      # lakes are drawn a little smaller than their local scale
+LAKE_ASPECT = 3.0     # a lake's blob is at most this elongated
+LAKE_CLEAR = 0.55     # and clears every station centre by this much
+LAKE_MIN = 0.3        # a blob narrower than this (half-width) is left out
+RIVER_DP = 1.6        # rivers are simplified this hard (layout units) before the octilinear snap
 PASS_KM = 0.12        # a line passing this close to another station is drawn through it
 SIGMA_KM = 0.8        # station density smoothing for the cartogram
 BACKGROUND = 0.10     # uniform density added (relative to the mean); smaller = stronger equalization
@@ -80,11 +94,13 @@ INK = 1.0             # cartogram mass per km of line (stations weigh 1)
 EDGE_MED = 2.6        # target median stop-to-stop length after the pre-warp
 L_MIN, L_MAX = 1.3, 8.0
 B45, B90 = 0.35, 1.6
-N_ASSIGN, N_RELAX = 10, 14
+PORT_LOOK = (1.0, 0.9, 0.8, 0.7, 0.6, 0.5)  # weights of a chain's next stations when aiming its port
+N_ASSIGN, N_RELAX, N_STRAIGHTEN = 10, 14, 10
 W_REP = 12.0
 W_LEN = 1.5
 W_ANC = 0.15
 DEV_BEND = 25.0       # a straight edge still this far (degrees) off its direction gets a bend
+STRAIGHT_SP = 0.8      # phase 3 keeps a straightened edge only if no station ends up closer than this
 SP_AIM = 1.2          # the relaxation aims this much above MIN_SP (the final scale guarantees MIN_SP)
 SHRINK = 0.45         # a straight edge shrunk below this fraction of its target gets a bend
 SEG_GAP = 0.45        # clear space between the outer strokes of two corridors  # bend penalties (squared radians of deviation they must save)
@@ -186,6 +202,11 @@ def _union(nets):
         for ln in sorted(net.lines.values(), key=lambda l: l.id):
             seqs.append((key, ln.id, list(ln.stop_ids), [s.pts for s in ln.segments]))
             modes.setdefault(ln.id, ln.mode)
+            # a rerouted line's old routing (it runs until the new track opens) is laid out
+            # too, under the scenario key + PRE, so the page can draw it in the early years
+            for _, until, old, it in net.variants.get(ln.id, []):
+                if it.get("reroute"):
+                    seqs.append((key + PRE, ln.id, list(old.stop_ids), [s.pts for s in old.segments]))
     used = sorted({s for _, _, ss, _ in seqs for s in ss})
     xy = {s: np.array(proj.xy(stations[s].lat, stations[s].lon)) for s in used}
     line_sets = collections.defaultdict(set)
@@ -432,7 +453,9 @@ def _chains(lay):
 
 
 def _ports(X, chains):
-    """Port (direction index 0..7) for each chain end at a junction: ends[(chain, 0|1)]."""
+    """Port (direction index 0..7) for each chain end at a junction: ends[(chain, 0|1)].
+    Each end aims along its chain's general direction (its first few stations, nearest
+    weighted most); a terminus gets no port, so its chain is free to run straight."""
     at = collections.defaultdict(list)       # node -> [(chain idx, end)]
     for ci, (nodes, _) in enumerate(chains):
         at[nodes[0]].append((ci, 0))
@@ -441,12 +464,15 @@ def _ports(X, chains):
     order = sorted(at, key=lambda v: (-len(at[v]), v))
     for v in order:
         ends = at[v]
+        if len(ends) == 1:     # a terminus: nothing to fit around, its chain finds its own way
+            continue
         angs = []
         for ci, end in ends:
             nodes = chains[ci][0] if end == 0 else chains[ci][0][::-1]
-            r1 = X[nodes[1]] - X[v]
-            r2 = X[nodes[min(2, len(nodes) - 1)]] - X[v]
-            r = r1 / (np.linalg.norm(r1) + 1e-9) + 0.5 * r2 / (np.linalg.norm(r2) + 1e-9)
+            r = np.zeros(2)
+            for j, wt in zip(range(1, len(nodes)), PORT_LOOK):
+                d = X[nodes[j]] - X[v]
+                r += wt * d / (np.linalg.norm(d) + 1e-9)
             angs.append(math.atan2(r[1], r[0]))
         # preferred ports from already-assigned single-edge neighbours
         pref = []
@@ -515,7 +541,7 @@ def _assign(lay, X, chains, key, L):
     dirs, bent = {}, {}
     for ci, (nodes, es) in enumerate(chains):
         cd = _chain_dirs(X, nodes, ports.get((ci, 0)), ports.get((ci, 1)))
-        if len(es) == 1:
+        if len(es) == 1 and (ci, 0) in ports and (ci, 1) in ports:
             # a single edge between two junctions: the ports may disagree -> one bend
             d0, d1 = ports[(ci, 0)], (ports[(ci, 1)] + 4) % 8
             if d0 != d1 and min((d0 - d1) % 8, (d1 - d0) % 8) <= 2:
@@ -922,8 +948,10 @@ def _water(lay, A, X, water, warped):
                 for r in runs:
                     if len(r) < 3:
                         continue
-                    R = _dp(np.array(r), 0.8)
-                    lay.water["rivers"].append({"name": name, "pts": _chaikin(_octi_path(R), 3)})
+                    R = _dp(np.array(r), RIVER_DP)
+                    if np.linalg.norm(np.diff(R, axis=0), axis=1).sum() < 1.5:   # a stub: leave it out
+                        continue
+                    lay.water["rivers"].append({"name": name, "pts": _chaikin(_octi_path(R), 2)})
             else:
                 c = ring.mean(0)
                 Yc = _carry(A, X, warped[k - 1].mean(0, keepdims=True))[0]
@@ -931,10 +959,37 @@ def _water(lay, A, X, water, warped):
                     continue
                 Z = _local_affine(G, X, c)(ring)
                 Z = (Z - Z.mean(0)) * LAKE_SCALE + Yc
-                R = _dp(Z, 0.3)
-                if len(R) >= 4:
-                    lay.water["lakes"].append({"name": name, "area": area,
-                                               "pts": _chaikin(R[:-1], 3, closed=True)})
+                pts = _lake_blob(Z, X)
+                if pts is not None:
+                    lay.water["lakes"].append({"name": name, "area": area, "pts": pts})
+
+
+def _lake_blob(Z, X):
+    """A lake outline generalized to a soft ellipse: the outline's area and principal axes
+    (aspect at most LAKE_ASPECT), its long axis on the nearest of the eight directions,
+    shrunk until it clears every station by LAKE_CLEAR; None when that leaves too little."""
+    P = np.vstack([Z, Z[:1]])
+    cross = P[:-1, 0] * P[1:, 1] - P[1:, 0] * P[:-1, 1]
+    area = abs(cross.sum()) / 2
+    if area < 1e-6:
+        return None
+    seg = np.linalg.norm(np.diff(P, axis=0), axis=1)          # second moments of the outline,
+    mid = (P[:-1] + P[1:]) / 2                                # sampled evenly along it
+    c = (mid * seg[:, None]).sum(0) / seg.sum()
+    C = ((mid - c).T * seg) @ (mid - c) / seg.sum()
+    w, V = np.linalg.eigh(C)
+    ratio = min(LAKE_ASPECT, math.sqrt(max(w[1], 1e-12) / max(w[0], 1e-12)))
+    th = round(math.atan2(V[1, 1], V[0, 1]) / (math.pi / 4)) * math.pi / 4
+    a, b = math.sqrt(area / math.pi * ratio), math.sqrt(area / math.pi / ratio)
+    u, n = np.array([math.cos(th), math.sin(th)]), np.array([-math.sin(th), math.cos(th)])
+    L = np.stack([(X - c) @ u, (X - c) @ n], 1)
+    s = 1.0
+    while s * b >= LAKE_MIN and (((L[:, 0] / (s * a + LAKE_CLEAR)) ** 2 + (L[:, 1] / (s * b + LAKE_CLEAR)) ** 2) < 1).any():
+        s *= 0.92
+    if s * b < LAKE_MIN:
+        return None
+    t = np.linspace(0, 2 * math.pi, 40, endpoint=False)
+    return c + np.outer(s * a * np.cos(t), u) + np.outer(s * b * np.sin(t), n)
 
 
 # ---------------------------------------------------------------- driver
@@ -998,6 +1053,124 @@ def compute(nets, log=None):
             log(f"relax {it}: {len(conv)} -> bent, {len(dirs)} straight, {len(bent)} bent, {bad} spacing violations")
         if it >= 4 and bad == 0 and not conv:
             break
+    # phase 3: straighten, where the relaxed layout leaves room. Two kinds of kink are tried
+    # away: a bent edge whose neighbour in its chain runs straight on in one of its two leg
+    # directions is made straight that way, and a short stub at a terminus (up to two edges)
+    # that turns 45° off its line is lined up with it. Edges the relaxation can't hold that
+    # way, or that crowd a station, keep their kink; a round that crowds the map is undone.
+    def deviates(e, d):
+        ed = lay.edges[e]
+        v = X[ed["b"]] - X[ed["a"]]
+        dev = math.degrees(_angdiff(math.atan2(v[1], v[0]), d * math.pi / 4))
+        return dev > DEV_BEND or v @ DIRS[d] < SHRINK * L[e]
+
+    def nearest():      # each station's distance to its nearest neighbour once made exact
+        Xe = _exact(lay, X, dirs)
+        D = np.sqrt(((Xe[:, None, :] - Xe[None, :, :]) ** 2).sum(-1))
+        np.fill_diagonal(D, np.inf)
+        return D.min(1)
+
+    def going(f, v):    # straight edge f's direction, leaving node v
+        return dirs[f] if lay.edges[f]["a"] == v else (dirs[f] + 4) % 8
+
+    def restore(e, was):
+        dirs.pop(e, None)
+        bent.pop(e, None)
+        (dirs if was[0] == "d" else bent)[e] = was[1]
+
+    def candidates():
+        out = {}
+        for e, legs2 in sorted(bent.items()):
+            ed = lay.edges[e]
+            cont = collections.Counter()
+            for v, w in ((ed["a"], ed["b"]), (ed["b"], ed["a"])):
+                if key[v]:
+                    continue
+                for f in inc[v]:
+                    if f != e and f in dirs:      # straight on through v, towards w
+                        g = (going(f, v) + 4) % 8
+                        cont[g if w == ed["b"] else (g + 4) % 8] += 1
+            cands = [d for d in legs2 if cont[d]]
+            if cands:
+                d = max(cands, key=lambda d: (cont[d], -d))
+                if not deviates(e, d) or len(cands) == 1:
+                    out[e] = (("b", legs2), d)
+        other = lambda f, v: lay.edges[f]["b"] if lay.edges[f]["a"] == v else lay.edges[f]["a"]  # noqa: E731
+        for t in range(len(lay.nodes)):           # stubs at termini
+            if len(inc[t]) != 1 or inc[t][0] not in dirs:
+                continue
+            stub = [inc[t][0]]
+            d, u = going(stub[0], t), other(stub[0], t)   # the stub leaves the terminus going d
+            if not key[u] and len(inc[u]) == 2:
+                f = inc[u][0] if inc[u][1] == stub[0] else inc[u][1]
+                if f in dirs and going(f, u) == d:
+                    stub.append(f)
+                    u = other(f, u)
+            if key[u] or len(inc[u]) != 2:
+                continue
+            f = inc[u][0] if inc[u][1] == stub[-1] else inc[u][1]
+            if f not in dirs:
+                continue
+            line, out_d = (going(f, u) + 4) % 8, (d + 4) % 8   # arriving at u; on into the stub
+            if min((line - out_d) % 8, (out_d - line) % 8) != 1:
+                continue
+            node = u                              # the stub runs on in the line's direction
+            for s in reversed(stub):
+                out[s] = (("d", dirs[s]), line if lay.edges[s]["a"] == node else (line + 4) % 8)
+                node = other(s, node)
+        return out
+
+    floor = min(STRAIGHT_SP, nearest().min())     # never more crowded than before (or STRAIGHT_SP)
+    failed, parts, part = set(), 1, 0      # after an undone round, try in smaller parts (west to east)
+    for it in range(N_STRAIGHTEN):
+        cand = {e: c for e, c in candidates().items() if e not in failed}
+        if not cand:
+            break
+        mid = lambda e: X[lay.edges[e]["a"], 0] + X[lay.edges[e]["b"], 0]  # noqa: E731
+        order = sorted(cand, key=lambda e: (mid(e), e))
+        k = len(order)
+        tried = {}
+        for e in order[part * k // parts:(part + 1) * k // parts]:
+            tried[e] = cand[e][0]
+            bent.pop(e, None)
+            dirs[e] = cand[e][1]
+        part = (part + 1) % parts
+        if not tried:
+            continue
+        X0, legs0, rep0, close0 = X, legs, rep, close
+        for _ in range(3):      # let the separation terms (active set) catch up
+            step(80.0)
+        back = {e for e in tried if deviates(e, dirs[e]) or any(e in inc[v] for pair in close for v in pair)}
+        for e in back:
+            restore(e, tried[e])
+        if back:
+            step(80.0)
+        # the exact projection must not crowd stations either (it would shrink the whole map):
+        # give the kinks back near any station that ends up too close to another, widening
+        for reach in (1.5, 3.0, 6.0):
+            crowd = np.nonzero(nearest() < floor)[0]
+            if not len(crowd):
+                break
+            near = {e for e in tried if e not in back and
+                    min(np.linalg.norm(X[crowd] - X[lay.edges[e][s]], axis=1).min() for s in ("a", "b")) < reach}
+            for e in near:
+                restore(e, tried[e])
+            back |= near
+            for _ in range(2):
+                step(80.0)
+        else:
+            if nearest().min() < floor:      # still crowded: undo this round altogether
+                for e in tried:
+                    restore(e, tried[e])
+                X, legs, rep, close = X0, legs0, rep0, close0
+                if parts < 8:
+                    parts, part = parts * 2, 0
+                if log:
+                    log(f"straighten {it}: undone")
+                continue
+        failed |= back
+        if log:
+            log(f"straighten {it}: {len(tried) - len(back)} of {len(tried)} kinks removed")
     X = _exact(lay, X, dirs)
     # hard guarantee of the minimum spacing: a uniform scale keeps every angle
     D = np.sqrt(((X[:, None, :] - X[None, :, :]) ** 2).sum(-1))
