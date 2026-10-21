@@ -397,18 +397,20 @@ def trim_tail(pts):
 
 
 _FREEWAYS = None
+_RAILS = None
 
 
-def metro_road_path(pts):
+def metro_road_path(pts, w_cls=None):
     """Route a rail line through its stations ((lat, lon) list) along freeway and arterial
     corridors (light rail in a freeway or boulevard right-of-way rather than through
     neighborhoods): freeways and major arterials preferred, changing roads costs a lot.
-    Returns (lat, lon) points or None."""
+    `w_cls` (a spec's road_weights) can make arterials dearer still, to keep a line in its
+    freeway. Returns (lat, lon) points or None."""
     global _FREEWAYS
     from dfwt import osmroute
     if _FREEWAYS is None:
         _FREEWAYS = osmroute.Graph("road", classes={"motorway", "trunk", "primary", "secondary"}, oneway=False)
-    w_cls = {"motorway": 1.0, "trunk": 1.0, "primary": 1.1, "secondary": 1.3}
+    w_cls = w_cls or {"motorway": 1.0, "trunk": 1.0, "primary": 1.1, "secondary": 1.3}
     xy = [osmroute.xy(lon, lat) for lat, lon in pts]
     for snap, turn in ((700, 100), (1200, 135)):
         P, _ = osmroute.route(_FREEWAYS, xy, max_turn=turn, snap_r=snap, w_cls=w_cls, turn_pen=1500.0, detour=1.8,
@@ -416,6 +418,18 @@ def metro_road_path(pts):
         if P:
             return [(lat, lon) for lon, lat in (osmroute.ll(p) for p in _cut_loops(P))]
     return None
+
+
+def rail_path(pts):
+    """Route a leg along existing railway (a new line beside an existing rail corridor).
+    Returns (lat, lon) points or None."""
+    global _RAILS
+    from dfwt import osmroute
+    if _RAILS is None:
+        _RAILS = osmroute.Graph("rail")
+    xy = [osmroute.xy(lon, lat) for lat, lon in pts]
+    P, _ = osmroute.route(_RAILS, xy, max_turn=60, snap_r=300, detour=1.6)
+    return [(lat, lon) for lon, lat in (osmroute.ll(p) for p in P)] if P else None
 
 
 def build(name):
@@ -466,6 +480,8 @@ def build(name):
         # waypoints -> [(lat, lon, sid or None, name, is_stop, grade_or_None)]
         wps = []
         express = set()   # waypoints reached without intermediate stops
+        on_rail = set()   # waypoints reached along an existing railway
+        straight = set()  # waypoints reached in a straight line (hand-drawn alignments)
         for w in ln["stops"]:
             if isinstance(w, str):
                 if w not in st:     # a unique station name (e.g. a stop another new line created)
@@ -478,11 +494,16 @@ def build(name):
             elif "lat" not in w:   # {"id": existing station, "express": true}: no stops added on the way to it
                 s = st[w["id"]]
                 wps.append((float(s["lat"]), float(s["lon"]), w["id"], s["name"], True, w.get("grade")))
-                express.add(len(wps) - 1)
+                if w.get("express"):
+                    express.add(len(wps) - 1)
             else:
                 wps.append((w["lat"], w["lon"], w.get("id"), w.get("name"), not w.get("via"), w.get("grade")))
                 if w.get("express"):
                     express.add(len(wps) - 1)
+            if isinstance(w, dict) and w.get("follow") == "rail":   # the leg to this stop runs beside a railway
+                on_rail.add(len(wps) - 1)
+            if isinstance(w, dict) and w.get("follow") == "straight":   # drawn by hand: no routing
+                straight.add(len(wps) - 1)
         # split into stop-to-stop legs (with via points), add intermediate stops on long legs
         stops = []          # (lat, lon, sid, name, explicit)
         legs = []           # list of point lists between consecutive stops, with grade
@@ -496,8 +517,16 @@ def build(name):
             if not w[4]:
                 continue
             pts = [(p[0], p[1]) for p in cur]
-            if mode == "metro" and ln.get("follow_roads"):   # rail in a freeway/arterial corridor
-                routed = metro_road_path(pts)
+            if wps.index(w) in straight:
+                pass
+            elif mode != "brt" and wps.index(w) in on_rail:
+                routed = rail_path(pts)
+                if routed:
+                    pts = routed
+                else:
+                    report.append(f"{lid} {ln['name']}: no railway for a leg; kept straight")
+            elif mode == "metro" and ln.get("follow_roads"):   # rail in a freeway/arterial corridor
+                routed = metro_road_path(pts, ln.get("road_weights"))
                 if routed:
                     pts = routed
                 else:

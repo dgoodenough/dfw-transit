@@ -30,6 +30,9 @@ overrides applied on top: op, target, field, value, note.
   add_express       add line `field`: a copy of line `target` that stops only at the
                     `;`-separated stops in `value` (names or ids) and runs through the
                     rest; set its headway with a later set_headway row
+  run_over          line `target` runs on from its terminus over line `field`'s track to
+                    `field`'s stop `value` (name or id), serving its stops on the way, from
+                    `target`'s own opening (the track is `field`'s, already paid for)
 """
 import collections
 import copy
@@ -261,6 +264,8 @@ class Network:
                 self._reroute(ln, int(e["field"]), e["value"])
             elif op == "add_express":
                 self._add_express(ln, e["field"], e["value"])
+            elif op == "run_over":
+                self._run_over(ln, e["field"], e["value"])
             elif op in ("shift_line_years", "set_line_year"):
                 delta = int(e["value"]) if op == "shift_line_years" else int(e["value"]) - self._first_new_year(ln)
                 ex = self.cfg["existing_year"]
@@ -366,6 +371,34 @@ class Network:
         ln.stop_years = ln.stop_years[:a + 1] + [year] * (len(stops) - 2) + ln.stop_years[b:]
         ln.segments = ln.segments[:a] + segs + ln.segments[b:]
         self.variants.setdefault(ln.id, []).append((0, year, old, {"via": None, "reroute": year}))
+
+    def _run_over(self, ln, host_id, to):
+        """Extend `ln` from the end it shares with `host` over host's track to stop `to` (see module doc)."""
+        from .staging import resolve
+        if host_id not in self.lines:
+            raise KeyError(f"run_over {ln.id}: unknown line {host_id}")
+        host = self.lines[host_id]
+        if host.mode != ln.mode:
+            raise ValueError(f"run_over {ln.id} on {host_id}: modes differ ({ln.mode}, {host.mode})")
+        names = {k: s.name for k, s in self.stations.items()}
+        j = resolve(to, host.stop_ids, names)
+        ends = [(e, host.stop_ids.index(ln.stop_ids[e])) for e in (0, -1) if ln.stop_ids[e] in host.stop_ids]
+        if not ends:
+            raise ValueError(f"run_over {ln.id}: no terminus on {host_id}")
+        e, i = ends[0]
+        if e == -1:
+            self._reversed(ln)            # join at the start of ln
+        if j < i:
+            stops, years, segs = host.stop_ids[j:i + 1], host.stop_years[j:i + 1], host.segments[j:i]
+        else:
+            stops, years = host.stop_ids[i:j + 1][::-1], host.stop_years[i:j + 1][::-1]
+            segs = [Segment(s.year, s.grade, s.pts[::-1], s.km) for s in reversed(host.segments[i:j])]
+        y0 = ln.stop_years[0]
+        ln.stop_ids = stops[:-1] + ln.stop_ids
+        # served from the line's own opening, but never before the host's stop is built (host pays for it)
+        ln.stop_years = [max(y0, y) for y in years[:-1]] + ln.stop_years
+        ln.segments = [copy.deepcopy(s) for s in segs] + ln.segments
+        self.variants.pop(ln.id, None)
 
     def _add_express(self, base, new_id, stops):
         """A skip-stop copy of `base` (see module doc)."""

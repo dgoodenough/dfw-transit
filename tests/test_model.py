@@ -85,6 +85,24 @@ class NetworkTests(unittest.TestCase):
         self.assertEqual(net.lines["E17X"].headway_at(2070), 10)
 
 
+    def test_run_over_extends_a_line_on_anothers_track_at_no_track_cost(self):
+        net = Network.load()
+        ln, host = net.lines["F07"], net.lines["F02"]
+        n_stops, km = len(ln.stop_ids), ln.km
+        cost = sum(net.line_cost_musd(l) for l in net.lines.values())
+        net.apply_edits([{"op": "run_over", "target": "F07", "field": "F02", "value": "TCC Trinity River"}])
+        names = [net.stations[s].name for s in ln.stop_ids]
+        self.assertEqual(names[:3], ["TCC Trinity River", "Sundance Square", "Central Station"])
+        self.assertEqual(len(ln.stop_ids), n_stops + 2)
+        self.assertEqual(len(ln.segments), len(ln.stop_ids) - 1)
+        self.assertAlmostEqual(ln.km, km + sum(s.km for s in ln.segments[:2]), places=6)
+        # FW Blue's track and stations are already paid for; the extension runs from FW Purple's opening
+        self.assertAlmostEqual(sum(net.line_cost_musd(l) for l in net.lines.values()), cost, places=3)
+        self.assertGreaterEqual(min(ln.stop_years[:3]), ln.stop_years[2])
+        with self.assertRaises(ValueError):   # light rail can't borrow commuter track
+            net.apply_edits([{"op": "run_over", "target": "E25", "field": "E14", "value": "CityLine/Bush"}])
+
+
 class CostAndRerouteTests(unittest.TestCase):
     def test_cost_factor_falls_as_the_program_matures(self):
         from dfwt.network import cost_factor
