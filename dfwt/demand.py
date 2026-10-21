@@ -235,6 +235,84 @@ def activity_density(zones, r_km=0.8):
     return out
 
 
+def garages(zones, net, graph, cfg):
+    """Park & ride garages open in `graph`'s year: (is_pnr, spaces), one entry per graph
+    station. `zones` are the (grown or base) zones; a station's setting comes from the
+    base-year data. Shared by Access and the map's trip planner (webmap)."""
+    ac = cfg["access"]
+    year = graph.year
+    sids = graph.station_ids
+    slat = np.array([net.stations[s].lat for s in sids])
+    slon = np.array([net.stations[s].lon for s in sids])
+    sx, sy = geo.Projector().xy(slat, slon)
+    # which stations allow park & ride: commuter stations and each line's planned
+    # termini (where the garage gets built). A temporary end of a partly built line
+    # gets none, or every stub would look like a park & ride hub.
+    is_pnr = np.zeros(len(sids), dtype=bool)
+    spaces = np.zeros(len(sids))
+    sp = ac["pnr_spaces"]
+    idx = graph.sidx
+    for run in graph.runs:
+        if run.line.mode == "commuter":
+            for s in run.stops:
+                is_pnr[idx[s]] = True
+                spaces[idx[s]] = max(spaces[idx[s]], sp["commuter_station"])
+        full = net.lines.get(run.line.id, run.line)
+        for s in (full.stop_ids[0], full.stop_ids[-1], *full.pnr_stops):
+            if s in idx:
+                is_pnr[idx[s]] = True
+                spaces[idx[s]] = max(spaces[idx[s]], sp["terminus"])
+    # today's lots at existing suburban stations (DART has parking at most stations
+    # outside the core; access.pnr_existing approximates their size)
+    ex = ac.get("pnr_existing") or {}
+    if ex.get("enabled"):
+        from . import growth
+        base = getattr(zones, "base", zones)
+        cache = _SETTING.setdefault(id(base), {})
+        for run in graph.runs:
+            if run.line.status != "existing":
+                continue
+            for s in run.stops:
+                i = idx[s]
+                if sids[i] not in cache:
+                    st = net.stations[sids[i]]
+                    cache[sids[i]] = growth.setting(base, st.lat, st.lon, cfg)
+                if cache[sids[i]] in ex["settings"]:
+                    is_pnr[i] = True
+                    spaces[i] = max(spaces[i], ex["spaces"])
+    # optional lever: garages at selected suburban stations (Wiehle-Reston East style:
+    # a structured garage wrapped by development, so TOD uplift is unchanged). Only
+    # stations whose setting is suburban (growth.setting on base-year density), at
+    # least min_core_km from a downtown, and min_spacing_km from every other garage;
+    # outermost candidates first.
+    sub = ac.get("pnr_suburban") or {}
+    if sub.get("enabled") and year >= sub.get("from_year", 0):
+        from . import growth
+        base = getattr(zones, "base", zones)
+        cores = [c for c in cfg["cores"].values() if isinstance(c, dict)]
+        core_km = np.full(len(sids), np.inf)
+        for c in cores:
+            cx, cy = geo.Projector().xy(c["lat"], c["lon"])
+            core_km = np.minimum(core_km, np.sqrt((sx - cx) ** 2 + (sy - cy) ** 2))
+        cand = sorted({idx[s] for run in graph.runs if run.line.mode in sub["modes"] for s in run.stops
+                       if core_km[idx[s]] >= sub["min_core_km"] and not is_pnr[idx[s]]},
+                      key=lambda i: (-core_km[i], i))
+        cache = _SETTING.setdefault(id(base), {})
+        gap = sub.get("min_spacing_km", 0)
+        for i in cand:
+            if sub.get("setting"):
+                if sids[i] not in cache:
+                    st = net.stations[sids[i]]
+                    cache[sids[i]] = growth.setting(base, st.lat, st.lon, cfg)
+                if cache[sids[i]] != sub["setting"]:
+                    continue
+            if gap and is_pnr.any() and np.sqrt((sx[is_pnr] - sx[i]) ** 2 + (sy[is_pnr] - sy[i]) ** 2).min() < gap:
+                continue
+            is_pnr[i] = True
+            spaces[i] = sub["spaces"]
+    return is_pnr, spaces
+
+
 class Access:
     """Zone <-> station connectors for one year's open stations.
 
@@ -253,71 +331,8 @@ class Access:
         slat = np.array([net.stations[s].lat for s in sids])
         slon = np.array([net.stations[s].lon for s in sids])
         sx, sy = geo.Projector().xy(slat, slon)
-        # which stations allow park & ride: commuter stations and each line's planned
-        # termini (where the garage gets built). A temporary end of a partly built line
-        # gets none, or every stub would look like a park & ride hub.
-        is_pnr = np.zeros(len(sids), dtype=bool)
-        spaces = np.zeros(len(sids))
-        sp = ac["pnr_spaces"]
         idx = graph.sidx
-        for run in graph.runs:
-            if run.line.mode == "commuter":
-                for s in run.stops:
-                    is_pnr[idx[s]] = True
-                    spaces[idx[s]] = max(spaces[idx[s]], sp["commuter_station"])
-            full = net.lines.get(run.line.id, run.line)
-            for s in (full.stop_ids[0], full.stop_ids[-1], *full.pnr_stops):
-                if s in idx:
-                    is_pnr[idx[s]] = True
-                    spaces[idx[s]] = max(spaces[idx[s]], sp["terminus"])
-        # today's lots at existing suburban stations (DART has parking at most stations
-        # outside the core; access.pnr_existing approximates their size)
-        ex = ac.get("pnr_existing") or {}
-        if ex.get("enabled"):
-            from . import growth
-            base = getattr(zones, "base", zones)
-            cache = _SETTING.setdefault(id(base), {})
-            for run in graph.runs:
-                if run.line.status != "existing":
-                    continue
-                for s in run.stops:
-                    i = idx[s]
-                    if sids[i] not in cache:
-                        st = net.stations[sids[i]]
-                        cache[sids[i]] = growth.setting(base, st.lat, st.lon, cfg)
-                    if cache[sids[i]] in ex["settings"]:
-                        is_pnr[i] = True
-                        spaces[i] = max(spaces[i], ex["spaces"])
-        # optional lever: garages at selected suburban stations (Wiehle-Reston East style:
-        # a structured garage wrapped by development, so TOD uplift is unchanged). Only
-        # stations whose setting is suburban (growth.setting on base-year density), at
-        # least min_core_km from a downtown, and min_spacing_km from every other garage;
-        # outermost candidates first.
-        sub = ac.get("pnr_suburban") or {}
-        if sub.get("enabled") and year >= sub.get("from_year", 0):
-            from . import growth
-            base = getattr(zones, "base", zones)
-            cores = [c for c in cfg["cores"].values() if isinstance(c, dict)]
-            core_km = np.full(len(sids), np.inf)
-            for c in cores:
-                cx, cy = geo.Projector().xy(c["lat"], c["lon"])
-                core_km = np.minimum(core_km, np.sqrt((sx - cx) ** 2 + (sy - cy) ** 2))
-            cand = sorted({idx[s] for run in graph.runs if run.line.mode in sub["modes"] for s in run.stops
-                           if core_km[idx[s]] >= sub["min_core_km"] and not is_pnr[idx[s]]},
-                          key=lambda i: (-core_km[i], i))
-            cache = _SETTING.setdefault(id(base), {})
-            gap = sub.get("min_spacing_km", 0)
-            for i in cand:
-                if sub.get("setting"):
-                    if sids[i] not in cache:
-                        st = net.stations[sids[i]]
-                        cache[sids[i]] = growth.setting(base, st.lat, st.lon, cfg)
-                    if cache[sids[i]] != sub["setting"]:
-                        continue
-                if gap and is_pnr.any() and np.sqrt((sx[is_pnr] - sx[i]) ** 2 + (sy[is_pnr] - sy[i]) ** 2).min() < gap:
-                    continue
-                is_pnr[i] = True
-                spaces[i] = sub["spaces"]
+        is_pnr, spaces = garages(zones, net, graph, cfg)
         if not pnr:
             is_pnr[:] = False
         # people a garage can serve per day (one car per commuter, plus drop-offs)
