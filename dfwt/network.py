@@ -397,7 +397,8 @@ class Network:
         ln.stop_ids = stops[:-1] + ln.stop_ids
         # served from the line's own opening, but never before the host's stop is built (host pays for it)
         ln.stop_years = [max(y0, y) for y in years[:-1]] + ln.stop_years
-        ln.segments = [copy.deepcopy(s) for s in segs] + ln.segments
+        # the host's track, open for this line from its own opening (the host keeps paying for it)
+        ln.segments = [Segment(max(s.year, y0), s.grade, list(s.pts), s.km) for s in segs] + ln.segments
         self.variants.pop(ln.id, None)
 
     def _add_express(self, base, new_id, stops):

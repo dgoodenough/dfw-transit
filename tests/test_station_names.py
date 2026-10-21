@@ -45,7 +45,9 @@ class StationNameTests(unittest.TestCase):
                 return list(csv.DictReader(f))
         status = {r["line_id"]: r["status"] for r in rows("lines.csv")}
         st = {r["station_id"]: r for r in rows("stations.csv")}
-        existing = {r["station_id"] for r in rows("line_stops.csv") if status[r["line_id"]] == "existing"}
+        ex = config.load()["existing_year"]   # stations open today (an infill stop on today's line is new)
+        existing = {r["station_id"] for r in rows("line_stops.csv")
+                    if status[r["line_id"]] == "existing" and int(r["year_opens"]) <= ex}
         for m in self.mapping:
             for sid in existing:
                 s = st[sid]

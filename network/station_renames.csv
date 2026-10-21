@@ -1552,8 +1552,10 @@ XS0544,Enchanted Creek N,Collins / Bardin,32.674366,-97.092606,cross streets Col
 XS0544,Grand Prairie N,Belt Line / Gate One,32.772873,-97.000000,"nearest streets Belt Line (486 m), Gate One (488 m)"
 XS0545,Enchanted Creek NW,Caplin / Collins,32.667183,-97.093803,cross streets Caplin x Collins (294 m)
 XS0545,Grand Prairie N,Belt Line / Lone Star Parkway,32.765746,-97.000000,"nearest streets Belt Line (461 m), Lone Star Parkway (473 m)"
+XS0546,Collins / Caplin,Collins / Cravens Park,32.660000,-97.090000,"nearest streets Collins (58 m), Cravens Park (886 m)"
 XS0546,Enchanted Creek NW,Nathan Lowe / Collins,32.660000,-97.095000,"nearest streets Nathan Lowe (408 m), Collins (463 m)"
 XS0546,Grand Prairie N,I-30,32.758619,-97.000000,street East Interstate 30 (11 m)
+XS0547,Collins / Caplin,Collins / Cravens Park,32.660000,-97.090000,"nearest streets Collins (58 m), Cravens Park (886 m)"
 XS0547,Grand Prairie,Center / Small Hill,32.751492,-97.000000,cross streets Center x Small Hill (362 m)
 XS0547,Westover Hills S,Bellaire / Ranch View,32.700441,-97.398465,cross streets Bellaire x Ranch View (205 m)
 XS0548,Grand Prairie,Jefferson / Center,32.744365,-97.000000,cross streets Jefferson x Center (320 m)
