@@ -71,7 +71,7 @@ def write_results(ctx, nets, evals):
     L += ["## Plan by year", ""]
     cols = ["year", "pop_m", "jobs_m", "stations", "lines", "km_metro", "km_brt", "km_commuter", "capex_busd",
             "pop_covered_pct", "competitive_commutes", "daily_trips", "boardings_metro", "boardings_commuter",
-            "boardings_brt", "boardings_feeder_bus", "all_boardings", "boardings_per_trip",
+            "boardings_brt", "boardings_streetcar", "boardings_feeder_bus", "all_boardings", "boardings_per_trip",
             "pnr_full_garages", "jobs_45min", "avg_transit_min"]
     L += [_table(cols, [[r[c] if c == "year" else _fmt(r[c]) for c in cols] for r in plan["years"]]), ""]
 

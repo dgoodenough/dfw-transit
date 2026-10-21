@@ -88,6 +88,7 @@ X247,towne,Emporium / Town East,32.808804,-96.624036,cross streets Emporium x To
 X249,Great Restaurants,Irving West,32.855170,-96.992241,"one station, one spelling (the plan's)"
 X250,Las Colinas SW,Las Brisas / Walnut Hill,32.865192,-96.983665,cross streets Las Brisas x Walnut Hill (129 m)
 X252,Irving N,Northgate Drive,32.851703,-96.943125,street East Northgate Drive (4 m)
+X253,Chemsearch Boulevard,Northgate / Chemsearch,32.844351,-96.922285,"one station, one spelling (the plan's)"
 X253,Irving NE,Northgate / Chemsearch,32.843178,-96.920212,cross streets Northgate x Chemsearch (224 m)
 X253,Irving NE,Chemsearch Boulevard,32.844351,-96.922285,street Chemsearch Boulevard (7 m)
 X254,Irving E,Airport / John W Carpenter,32.832933,-96.902442,cross streets Airport x John W Carpenter (304 m)
@@ -294,6 +295,7 @@ XS0010,Gribble NW,Mercer / Valley View Lane,32.914000,-96.930500,cross streets M
 XS0010,Sargent E,C F Hawn / Lamar,32.741037,-96.762115,cross streets C F Hawn x Lamar (427 m)
 XS0010,University Park NW,NW Highway / Edgemere,32.866500,-96.798092,cross streets NW Highway x Edgemere (264 m)
 XS0011,University Park N,NW Highway / Thackery,32.866500,-96.789690,cross streets NW Highway x Thackery (247 m)
+XS0012,Buckner Boulevard,Buckner Boulevard / Oates,32.824139,-96.696101,"nearest streets Buckner Boulevard (0 m), Oates (610 m)"
 XS0012,Las Colinas N,SH-161 / Las Colinas Boulevard,32.906500,-96.955000,cross streets SH-161 x Las Colinas Boulevard (278 m)
 XS0012,University Park NE,NW Highway / Boedeker,32.866500,-96.781287,"nearest streets NW Highway (103 m), Boedeker (441 m)"
 XS0013,The Village NW,NW Highway / Caruth Haven,32.866500,-96.772884,cross streets NW Highway x Caruth Haven (349 m)
@@ -448,6 +450,7 @@ XS0078,Oldham SE,Larga / Webb Chapel Extension,32.861450,-96.863570,cross street
 XS0078,The Village E,Abrams / Southwestern,32.854181,-96.750796,cross streets Abrams x Southwestern (128 m)
 XS0079,Oldham E,Marsh / Webb Chapel,32.865557,-96.856737,"nearest streets Marsh (48 m), Webb Chapel (430 m)"
 XS0079,Vickery Meadows E,Abrams / Park,32.867149,-96.744141,cross streets Abrams x Park (161 m)
+XS0080,Buckner Boulevard,Buckner Boulevard / Oates,32.824139,-96.696101,"nearest streets Buckner Boulevard (0 m), Oates (610 m)"
 XS0080,NW Highway,NW Highway / Marsh,32.866069,-96.848505,"nearest streets NW Highway (334 m), Marsh (705 m)"
 XS0080,Oldham E,NW Highway,32.866069,-96.848505,street West Northwest Highway (334 m)
 XS0080,Vickery Meadows E,Abrams Road,32.873846,-96.741462,street Abrams Road (10 m)
@@ -803,6 +806,7 @@ XS0226,Bouchard N,Coit / Spring Valley,32.937095,-96.769823,cross streets Coit x
 XS0226,Park / Preston,Preston / Park,33.027411,-96.796131,"same interchange, one spelling"
 XS0227,Richardson W,Coit / Haymeadow,32.944191,-96.769645,cross streets Coit x Haymeadow (92 m)
 XS0227,Whispering Hills SE,Purdue / Walnut,32.917922,-96.695000,cross streets Purdue x Walnut (156 m)
+XS0228,Legacy / Preston Meadow,Legacy Drive,33.071162,-96.774847,street Legacy Drive (0 m)
 XS0228,Prestonwood SE,Belt Line / Coit,32.951286,-96.769468,cross streets Belt Line x Coit (53 m)
 XS0228,Whispering Hills E,Lawler / Yale,32.925022,-96.695000,cross streets Lawler x Yale (253 m)
 XS0229,Prestonwood SE,Coit / La Cosa,32.958382,-96.769290,cross streets Coit x La Cosa (132 m)
@@ -1561,6 +1565,7 @@ XS0550,Indian Hills SE,Belt Line / 3rd Street,32.730111,-97.000000,"nearest stre
 XS0551,Acosta / Marshall,Acosta / Belt Line,32.722984,-97.000000,"nearest streets Acosta (306 m), Belt Line (551 m)"
 XS0551,Edgecliff Village W,Hulen / Rock Quarry,32.671623,-97.399918,cross streets Hulen x Rock Quarry (53 m)
 XS0551,Indian Hills SE,Acosta / Marshall,32.722984,-97.000000,cross streets Acosta x Marshall (306 m)
+XS0552,Collins Street,Collins / Cravens Park,32.656508,-97.088155,"nearest streets Collins (0 m), Cravens Park (997 m)"
 XS0552,Edgecliff Village W,Hulen / Oakmont,32.664476,-97.399013,cross streets Hulen x Oakmont (351 m)
 XS0552,Lakeview W,Acosta / Nunez,32.715857,-97.000000,cross streets Acosta x Nunez (291 m)
 XS0553,Edgecliff Village W,Trail Lake / Hulen,32.657345,-97.397740,cross streets Trail Lake x Hulen (125 m)

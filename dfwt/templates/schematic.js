@@ -10,7 +10,7 @@
 const SD = D.schem;
 if (!SD) return;
 const NS = 'http://www.w3.org/2000/svg';
-const W = {metro: 0.24, commuter: 0.2, brt: 0.12};     // stroke widths, layout units (1 = min station spacing); BRT: solid, half weight
+const W = {metro: 0.24, commuter: 0.2, streetcar: 0.14, brt: 0.12};     // stroke widths, layout units (1 = min station spacing); BRT: solid, half weight
 const R_ST = 0.17, PITCH = SD.pitch;
 const el = (tag, attrs, parent) => {
   const e = document.createElementNS(NS, tag);
@@ -197,7 +197,7 @@ function draw() {
     if (!sidLines.has(s)) sidLines.set(s, []);
     sidLines.get(s).push(li);
   }
-  const order = {brt: 0, commuter: 1, metro: 2};
+  const order = {brt: 0, streetcar: 1, commuter: 2, metro: 3};
   const lines = S.lines.map((ln, li) => [ln, li]).filter(([ln]) => !hidden.has(ln.id))
     .sort((a, b) => order[a[0].mode] - order[b[0].mode]);
   const nodeState = new Map();     // node -> {open:Set(line idx), fut:Set}

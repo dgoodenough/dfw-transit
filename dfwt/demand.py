@@ -266,10 +266,11 @@ class Access:
                     is_pnr[idx[s]] = True
                     spaces[idx[s]] = max(spaces[idx[s]], sp["commuter_station"])
             full = net.lines.get(run.line.id, run.line)
+            term = sp.get(run.line.mode + "_terminus", sp["terminus"])   # smaller at BRT ends, none for streetcars
             for s in (full.stop_ids[0], full.stop_ids[-1], *full.pnr_stops):
-                if s in idx:
+                if s in idx and term > 0:
                     is_pnr[idx[s]] = True
-                    spaces[idx[s]] = max(spaces[idx[s]], sp["terminus"])
+                    spaces[idx[s]] = max(spaces[idx[s]], term)
         # today's lots at existing suburban stations (DART has parking at most stations
         # outside the core; access.pnr_existing approximates their size)
         ex = ac.get("pnr_existing") or {}

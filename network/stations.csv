@@ -249,30 +249,30 @@ X589,Midlothian,32.482400,-96.994200
 X055,Mansfield,32.567493,-97.142050
 X262,Victory Park,32.790890,-96.804995
 X258,Bachman Lake,32.806270,-96.849244
-X259,Irving Boulevard / Stemmons,32.801514,-96.839087
+X259,Irving Boulevard / Stemmons,32.800168,-96.841760
 X261,Harwood District,32.792781,-96.811228
 X505,Stonebriar,33.085864,-96.821381
 X249,Irving West,32.855170,-96.992241
-X250,Las Brisas / Walnut Hill,32.865192,-96.983665
+X250,Las Brisas / Walnut Hill,32.866253,-96.984189
 X506,Legacy Town Center,33.070049,-96.810228
 X562,Denton Drive / Belt Line,32.957299,-96.906069
 X566,Main / Frisco Street,33.151512,-96.828998
 X501,Frisco,33.150543,-96.823930
 X252,Northgate Drive,32.851703,-96.943125
-X254,Airport / John W Carpenter,32.832933,-96.902442
+X254,Airport / John W Carpenter,32.835245,-96.901190
 X563,New Koreatown,32.978541,-96.878695
-X272,Saint Augustine / Scyene,32.763735,-96.654433
+X272,Saint Augustine / Scyene,32.762374,-96.654452
 X275,Main / Galloway,32.766698,-96.599330
-X251,Irving,32.859056,-96.963966
+X251,Irving,32.857617,-96.962024
 X510,Custer / Legacy,33.053591,-96.729106
 X509,Independence / Legacy,33.056962,-96.751845
 X507,Preston / Legacy,33.066165,-96.788804
-X273,Military / Clary,32.769479,-96.637400
+X273,Military / Clary,32.768290,-96.637401
 X567,Prosper,33.238827,-96.806499
 X508,Coit / Legacy,33.065338,-96.769616
 X565,The Colony,33.090850,-96.856909
-X260,Market Center / Riverfront,32.792661,-96.819938
-X253,Northgate / Chemsearch,32.843178,-96.920212
+X260,Market Center / Riverfront,32.795336,-96.820972
+X253,Northgate / Chemsearch,32.844361,-96.920222
 X504,Dallas Parkway / Gaylord,33.099276,-96.823246
 X593,Main / Freeman,32.653377,-96.907193
 X529,Zang / Greenbriar,32.761614,-96.816138
@@ -299,22 +299,19 @@ X554,Bailey Boswell / Basswood,32.889496,-97.362584
 X036,Fair Oaks,32.785600,-97.383254
 X037,Jacksboro / Skyline,32.795679,-97.397625
 X556,36th Street / Deen,32.807445,-97.322807
-X274,Gross / Hillcrest,32.774943,-96.615901
+X274,Gross / Hillcrest,32.767435,-96.616953
 X568,Celina,33.324268,-96.784340
 X039,Lake Worth,32.811075,-97.429509
 X564,Hebron Parkway / Arbor Creek,33.027084,-96.864360
 X502,Stonebrook / Dallas Parkway,33.133649,-96.823891
-X257,Stemmons / Commonwealth,32.812191,-96.861891
-X255,Regal Row / John W Carpenter,32.821477,-96.886245
+X257,Stemmons / Commonwealth,32.812014,-96.861940
+X255,Regal Row / John W Carpenter,32.825110,-96.882729
 X551,Gainesville,33.625847,-97.140163
-X256,Mockingbird / John W Carpenter,32.815745,-96.878140
-X416,McKinnon / Pearl,32.796184,-96.807948
-X417,Uptown,32.803194,-96.799527
+X256,Mockingbird / John W Carpenter,32.817587,-96.870981
 X402,Grand Prairie,32.746853,-97.031938
 X400,Six Flags,32.751395,-97.070829
 X401,Great Southwest / Randol Mill,32.750442,-97.046297
 X418,Ross / Bennett,32.807364,-96.774329
-X415,Design District,32.788743,-96.818459
 X489,Berry / McCart,32.706084,-97.353596
 X398,Downtown Arlington,32.736406,-97.103904
 X396,Davis Drive,32.730204,-97.125244
@@ -537,3 +534,10 @@ X603,Custer / SH-121,33.118000,-96.740000
 X604,Coit / SH-121,33.111986,-96.770605
 X605,Preston / SH-121,33.104582,-96.800020
 X606,Spring Creek Parkway,33.057450,-96.692850
+XT01,Methodist Medical Center,32.760867,-96.817525
+XT02,Zang / 7th,32.756132,-96.823008
+XT03,Zang / Davis,32.748695,-96.824588
+XM01,Olive / Ross,32.789189,-96.803913
+XM02,McKinney / Pearl,32.793407,-96.802679
+XM03,McKinney / Allen,32.799088,-96.801012
+XM04,McKinney / Blackburn,32.803800,-96.799687

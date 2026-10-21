@@ -201,7 +201,7 @@ const lineColor = (() => {
 
 // line weights grow with zoom (0.75x at z10 to 1.35x at z16)
 const zf = () => Math.max(.75, Math.min(1.35, .75 + .1 * (map.getZoom() - 10)));
-const W = {metro: 4.5, commuter: 4, brt: 2.4};
+const W = {metro: 4.5, commuter: 4, streetcar: 2.8, brt: 2.4};
 const weightOf = mode => (W[mode] || W.metro) * zf();
 const bgColor = getComputedStyle(document.documentElement).getPropertyValue('--bg').trim() || '#f4f6f5';
 // "opened this interval" glows sit in their own pane, faded as a whole so overlaps don't darken
@@ -438,7 +438,7 @@ function drawLines() {
 // every BRT stop too from zoom 13. A line shows all of its stops or none of them. Where two or
 // more of the lines shown stop, the station is an interchange: a larger marker, and on
 // side-by-side track a capsule across the lines it serves.
-const STOPS_FROM = {metro: 11, commuter: 11, brt: 13};
+const STOPS_FROM = {metro: 11, commuter: 11, streetcar: 12, brt: 13};
 function drawStations() {
   stLayer.clearLayers();
   const Y = D.years[yi], z = map.getZoom(), yd = S.years[Y], served = new Map();
@@ -520,7 +520,7 @@ function metrics() {
   const d = (k, unit = '') => { if (!base) return ''; const v = m[k] - base[k]; if (Math.abs(v) < 0.05) return ''; const s = v > 0 ? '+' : '−';
     const a = Math.abs(v), good = unit === '$' ? v < 0 : v > 0; return ` <em class="${good ? 'up' : 'down'}">${s}${unit === '$' ? '$' + a.toFixed(1) + 'B' : unit === '%' ? a.toFixed(1) + ' pts' : fmt(Math.round(a))} vs ${refName}</em>`; };
   const k = v => v >= 1e6 ? (v / 1e6).toFixed(2) + 'M' : Math.round(v / 1000) + 'k';
-  const modes = [['boardings_metro', 'metro'], ['boardings_commuter', 'regional rail'], ['boardings_brt', 'BRT'], ['boardings_feeder_bus', 'feeder bus']]
+  const modes = [['boardings_metro', 'metro'], ['boardings_commuter', 'regional rail'], ['boardings_brt', 'BRT'], ['boardings_streetcar', 'streetcar'], ['boardings_feeder_bus', 'feeder bus']]
     .filter(([c]) => m[c]).map(([c, n]) => `${k(m[c])} ${n}`).join(' · ');
   $('metrics').innerHTML = [
     [(m.daily_trips >= 1e6 ? k(m.daily_trips) : fmt(m.daily_trips)) + d('daily_trips'), 'daily transit trips (each trip counted once)'],
@@ -544,7 +544,7 @@ function lineList() {
   // groups: each mode, then within it each region (where most of a line's stops are: Fort Worth,
   // Dallas, Collin County, other; webmap.line_region). A group's box shows or hides all its lines.
   const Y = D.years[yi], groups = [], R = D.regions || {other: 'Other'};
-  for (const m of ['metro', 'commuter', 'brt']) {
+  for (const m of ['metro', 'commuter', 'streetcar', 'brt']) {
     const ls = S.lines.filter(l => l.mode === m);
     if (!ls.length) continue;
     groups.push([D.modes[m], ls, 'mode']);
