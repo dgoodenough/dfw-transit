@@ -148,10 +148,9 @@ def write(nets, evals, out_path):
             "zones": tripplan.zone_points(zones) if feeds else [],
             "order": [k for k in (cfg.get("default_scenario"), "plan", "v1_baseline", "right_sized") if k in scen] +
                      [k for k in scen if k not in (cfg.get("default_scenario"), "plan", "v1_baseline", "right_sized")]}
-    # diagram view (dfwt/schematic.py): rail and the plan's BRT. BRT a scenario adds on top of the
-    # plan (the 2M arterial grid, ~1,000 stops) is shown on the map view only, as transit diagrams
-    # leave buses off; a layout over it would crumple.
-    data["schem"] = schematic.build(schematic.diagram_nets(nets))
+    # diagram view (dfwt/schematic.py): one layout per version (schematic.VERSIONS): Rail, BRT
+    # (every BRT line, the 2M arterial grid too) and All (rail and the plan's BRT corridors).
+    data["schem"] = schematic.build(nets)
     with open(TEMPLATE, encoding="utf-8") as f:
         html = f.read()
     css, js = (open(p, encoding="utf-8").read() for p in SCHEM_FILES)
