@@ -288,6 +288,6 @@ and what is left to decide). Fixed:
   arterials instead of cutting through neighborhoods (single-line stations moved onto them); the SH-114 Line (2M) follows
   SH-114 and runs on, express, to Roanoke (Westlake Solana - Roanoke, 2090).
 - **BRT ends**: a new BRT terminus that turns into a side street for its last few hundred meters
-  ends on the arterial instead (unless it ends at a station or where another new line stops).
+  ends on the arterial instead (unless that end is within a short walk of another line).
 - **Park-and-ride**: terminus garages sized per mode (none at streetcar ends).
 - **Scheduler**: re-checks the budget after holding cut-off lines back.

@@ -456,7 +456,7 @@ def build(name):
         used.add(sid)
         new_ids.append(sid)
         report.append(f"infill {item['name']} on {item['line']} ({d * 1000:.0f} m from the asked point), opens {item['year']}")
-    # stops more than one corridor asks for (two new lines meeting): never trimmed away
+    # stops the corridors ask for: a line ending near another's is not trimmed away from it
     spec_pts = [(ln["id"], w["lat"], w["lon"]) for ln in specs for w in ln["stops"]
                 if isinstance(w, dict) and "lat" in w and not w.get("via")]
     for ln in specs:
@@ -507,9 +507,9 @@ def build(name):
                 if routed:
                     pts = routed
                     # a new terminus a turn into a neighborhood: end on the arterial instead
-                    def snaps(q):   # ends at a station, or where another new line stops: keep it
-                        return nearest_existing(q[0], q[1])[1] * 1000 <= SNAP_M or any(
-                            o != lid and geo.hav_km(q[0], q[1], a, b) * 1000 <= SNAP_M for o, a, b in spec_pts)
+                    def snaps(q):   # ends in reach of a station, or of a stop another new line asks for: keep it
+                        return nearest_existing(q[0], q[1])[1] * 1000 <= TRANSFER_M or any(
+                            o != lid and geo.hav_km(q[0], q[1], a, b) * 1000 <= TRANSFER_M for o, a, b in spec_pts)
                     if w is wps[-1] and w[2] is None and not snaps(w):
                         pts = trim_tail(pts)
                         if pts[-1] != (w[0], w[1]):
