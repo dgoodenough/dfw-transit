@@ -18,6 +18,65 @@ LABELS = {"two_million": "2 million riders by 2100 (default)", "plan": "v2 plan,
           "downtown_main": "Downtown FW: Main St trunk", "downtown_jones": "Downtown FW: Jones St trunk",
           "downtown_events": "Downtown FW: Main St via Convention Center"}
 
+# Regions for the Lines panel. Each stop falls in one of four zones, split along county
+# lines that are nearly straight survey lines: the Tarrant / Dallas county line
+# (lon -97.035), the line between those two counties and Denton / Collin to their north
+# (lat 32.99), and the Denton / Collin county line (lon -96.84):
+#   south of 32.99, west of -97.035: Fort Worth (Tarrant, and Parker / Johnson beyond)
+#   south of 32.99, east of -97.035: Dallas (Dallas County, and Ellis / Kaufman / Rockwall)
+#   north of 32.99, east of -96.84:  Collin County
+#   north of 32.99, west of -96.84:  Denton County and beyond (no region of its own)
+# A line belongs to the region holding more than half of its stops; otherwise (a line
+# between regions, or one based in Denton County) it is "Other".
+REGIONS = {"fw": "Fort Worth", "dal": "Dallas", "col": "Collin County", "other": "Other"}
+
+
+def stop_zone(lat, lon):
+    if lat < 32.99:
+        return "fw" if lon < -97.035 else "dal"
+    return "col" if lon > -96.84 else "other"
+
+
+def line_region(stations, stop_ids):
+    zones = [stop_zone(stations[s].lat, stations[s].lon) for s in stop_ids]
+    for z in ("fw", "dal", "col"):
+        if zones.count(z) * 2 > len(zones):
+            return z
+    return "other"
+
+
+def reroutes(net, ln):
+    """A rerouted line's old routings: [(until year, Line)] (net.variants; see network._reroute)."""
+    return [(until, old) for _, until, old, it in net.variants.get(ln.id, []) if it.get("reroute")]
+
+
+def line_extras(net, ln):
+    """Display fields of a line beyond the model's: its region (Lines panel) and, for a rerouted
+    line, the old routing it runs until the new track opens (the diagram draws it in those
+    years from schematic paths[key + schematic.PRE])."""
+    out = {"region": line_region(net.stations, ln.stop_ids)}
+    for until, old in reroutes(net, ln):
+        out["pre"] = {"until": until, "segs": [[s.year, round(s.km, 2)] for s in old.segments]}
+    return out
+
+
+def drawn(net):
+    """The map's shared-track pieces (bundle.pieces) and where each station sits on them
+    (bundle.station_pieces). A rerouted line draws its old track too, until the new one opens."""
+    def segs(ln):
+        out = [(s.year, s.pts) for s in ln.segments]
+        have = {(tuple(s.pts[0]), tuple(s.pts[-1])) for s in ln.segments}
+        for until, old in reroutes(net, ln):
+            out += [(s.year, s.pts, until) for s in old.segments
+                    if (tuple(s.pts[0]), tuple(s.pts[-1])) not in have and (tuple(s.pts[-1]), tuple(s.pts[0])) not in have]
+        return out
+    lines = list(net.lines.values())
+    raw = bundle.pieces([(i, ln.mode, ln.status, ln.first_year, segs(ln)) for i, ln in enumerate(lines)])
+    stops = {i: ln.stop_ids + [s for _, old in reroutes(net, ln) for s in old.stop_ids if s not in ln.stop_ids]
+             for i, ln in enumerate(lines)}
+    st_piece = bundle.station_pieces(raw, {sid: (st.lon, st.lat) for sid, st in net.stations.items()}, stops)
+    return raw, st_piece
+
 
 def write(nets, evals, out_path):
     cfg = next(iter(nets.values())).cfg
@@ -45,22 +104,11 @@ def write(nets, evals, out_path):
                 "notes": ln.notes, "first": ln.first_year, "km": round(ln.km, 1),
                 "cost": m.get("cost_musd", 0), "value": m.get("value_per_musd", ""),
                 "load": m.get("peak_hour_load", 0),
-                "segs": [[s.year, round(s.km, 2)] for s in ln.segments],
+                "segs": [[s.year, round(s.km, 2)] for s in ln.segments], **line_extras(net, ln),
             })
         # drawn geometry: shared-track pieces, each with its lines in side-by-side order
-        def drawn_segs(ln):
-            """The line's track, plus a rerouted line's old track until the new one opens."""
-            out = [(s.year, s.pts) for s in ln.segments]
-            have = {(tuple(s.pts[0]), tuple(s.pts[-1])) for s in ln.segments}
-            for _, until, old, it in net.variants.get(ln.id, []):
-                if it.get("reroute"):
-                    out += [(s.year, s.pts, until) for s in old.segments
-                            if (tuple(s.pts[0]), tuple(s.pts[-1])) not in have and (tuple(s.pts[-1]), tuple(s.pts[0])) not in have]
-            return out
-        raw = bundle.pieces([(i, ln.mode, ln.status, ln.first_year, drawn_segs(ln)) for i, ln in enumerate(net.lines.values())])
+        raw, st_piece = drawn(net)
         pieces = [[geom_id(pts), [list(u) for u in users]] for pts, users in raw]
-        st_piece = bundle.station_pieces(raw, {sid: (st.lon, st.lat) for sid, st in net.stations.items()},
-                                         {ln_i: ln.stop_ids for ln_i, ln in enumerate(net.lines.values())})
         for sid, r in st_metrics.items():
             s = net.stations[sid]
             prev = stations.get(sid)
@@ -89,7 +137,7 @@ def write(nets, evals, out_path):
                      "boardings": {r["station_id"]: r["boardings_final"] for r in ev["stations"]}}
     data = {"years": cfg["years"], "boardPenalty": cfg["transfer"]["penalty_min"],
             "build": cfg["staging"]["construction_years"],
-            "modes": {m: v["label"] for m, v in cfg["modes"].items()},
+            "modes": {m: v["label"] for m, v in cfg["modes"].items()}, "regions": REGIONS,
             "geoms": geoms, "stations": stations, "scen": scen,
             "order": [k for k in (cfg.get("default_scenario"), "plan", "v1_baseline", "right_sized") if k in scen] +
                      [k for k in scen if k not in (cfg.get("default_scenario"), "plan", "v1_baseline", "right_sized")]}
