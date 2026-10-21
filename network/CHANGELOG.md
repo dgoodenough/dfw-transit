@@ -291,3 +291,7 @@ and what is left to decide). Fixed:
   ends on the arterial instead (unless that end is within a short walk of another line).
 - **Park-and-ride**: terminus garages sized per mode (none at streetcar ends).
 - **Scheduler**: re-checks the budget after holding cut-off lines back.
+- **Results**: the plan costs $103.1B (was $103.6B) and carries ~771k daily trips in 2100; the 2M
+  scenario reaches 2M in 2077 and ~2.23M daily trips in 2100 at $135.0B.
+- **Map and diagram**: a second station click works again (the trip layer swallowed it); track
+  still to come is grey in the diagram.
