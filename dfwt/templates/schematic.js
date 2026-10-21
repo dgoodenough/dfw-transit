@@ -255,7 +255,7 @@ function draw() {
   if (pick.length) rings();
   legendDraw();
 }
-// future track: a thin, faint hairline of the line's colour (no casing, no dashes),
+// future track: a thin, faint grey hairline (no colour, casing or dashes; schematic.css),
 // so the network still to come reads as a quiet plan behind the open one
 function stroke(g, ln, pts, fut, grow) {
   const d = dstr(pts), w = W[ln.mode] || W.metro, col = lineColor(ln.color);
