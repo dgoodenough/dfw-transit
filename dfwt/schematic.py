@@ -144,6 +144,7 @@ AXIS_EDGE = 35.0      # those within this many degrees of the axis in the real g
 AXIS_JOG, AXIS_JOG_KM = 65.0, 0.8   # (a hop shorter than AXIS_JOG_KM: AXIS_JOG degrees; small jogs stay on the axis)
 AXIS_MISS = 0.2       # unless that misses by more than this fraction of the edge's length
 AXIS_HOP_KM = 1.5     # strokes are laid heaviest first: lines squared x hop length (capped at this)
+AXIS_CROSS = True     # ... and an edge whose laying pushes one line across another stays free
 AXIS_KEEP = 0.6      # a stroke that can lay less than this share of its edges is left free
 AXIS_DP = 1.0         # directions of axis edges pay this per 45 degrees off the axis (VARIANTS)
 SMOOTH_W = 4.0        # a chain's course: its direction over +-this much (layout units)
@@ -644,53 +645,80 @@ def _smooth(lay, A, G, strokes, hop_km=AXIS_HOP_KM, unique=True):
                 M[np.ix_(ix, ix)] += wt * np.outer(c, c)
     rhs = A.reshape(-1).copy()
     Minv = np.linalg.inv(M)
-    x = Minv @ rhs
-    axes = {}
-    acc = np.zeros((0, 6))      # laid edges: a, b, u (2), length, scale
-    taken = set()               # (station, direction) of the laid edges
+    st = {"M": M, "rhs": rhs, "Minv": Minv, "x": Minv @ rhs, "acc": np.zeros((0, 6)),   # acc: a, b, u, length, scale
+          "axes": {}, "taken": set()}              # taken: (station, direction) of the laid edges
+    ea = np.array([ed["a"] for ed in lay.edges], int)
+    eb = np.array([ed["b"] for ed in lay.edges], int)
+
+    def lay_edge(e, k, check):
+        """Lay edge e along axis k if it holds; check: only if that adds no crossing."""
+        a, b = lay.edges[e]["a"], lay.edges[e]["b"]
+        d = k if (G[b] - G[a]) @ DIRS[k] >= 0 else k + 4
+        if unique and ((a, d) in st["taken"] or (b, (d + 4) % 8) in st["taken"]):
+            return False          # another edge already leaves that station that way
+        u = DIRS[d]
+        nr, ln = np.array([-u[1], u[0]]), float(np.linalg.norm(A[b] - A[a]))
+        ix = [2 * b, 2 * b + 1, 2 * a, 2 * a + 1]
+        cn = np.array([nr[0], nr[1], -nr[0], -nr[1]])     # across the axis
+        cu = np.array([u[0], u[1], -u[0], -u[1]])         # along it
+        # the two rows as rank-one updates of the inverse (Sherman-Morrison): a trial
+        # costs O(n); only an edge that is laid updates the whole inverse
+        Minv, x = st["Minv"], st["x"]
+        m1 = Minv[:, ix] @ cn
+        f1 = AXIS / (1 + AXIS * (cn @ m1[ix]))
+        x1 = x + m1 * (f1 * (0.0 - cn @ x[ix]))
+        m2 = Minv[:, ix] @ cu - m1 * (f1 * (m1[ix] @ cu))
+        f2 = AXIS_LEN / (1 + AXIS_LEN * (cu @ m2[ix]))
+        x1 = x1 + m2 * (f2 * (ln - cu @ x1[ix]))
+        cand = np.vstack([st["acc"], [a, b, u[0], u[1], ln, max(ln, 1.0)]])
+        ia, ib = cand[:, 0].astype(int), cand[:, 1].astype(int)
+        dv = x1.reshape(n, 2)[ib] - x1.reshape(n, 2)[ia]
+        across = np.abs(dv[:, 0] * -cand[:, 3] + dv[:, 1] * cand[:, 2])
+        along = dv[:, 0] * cand[:, 2] + dv[:, 1] * cand[:, 3]
+        if (across > AXIS_MISS * cand[:, 5]).any() or (along < 0.25 * cand[:, 4]).any():
+            return False          # it can't take the axis given those laid already: left free
+        if check and _n_crossings(x1.reshape(n, 2), ea, eb) > _n_crossings(x.reshape(n, 2), ea, eb):
+            return False          # it would push a line across another
+        st["Minv"] = Minv - np.outer(m1, m1 * f1) - np.outer(m2, m2 * f2)
+        st["M"][np.ix_(ix, ix)] += AXIS * np.outer(cn, cn) + AXIS_LEN * np.outer(cu, cu)
+        st["rhs"][ix] += AXIS_LEN * ln * cu
+        st["x"], st["acc"] = x1, cand
+        st["axes"][e] = k
+        st["taken"] |= {(a, d), (b, (d + 4) % 8)}
+        return True
+
+    def snapshot():
+        return {k: (v.copy() if hasattr(v, "copy") else v) for k, v in st.items()}
     for k, es in _axis_strokes(lay, G, strokes, hop_km):
-        before = (M.copy(), rhs.copy(), Minv.copy(), x, acc, dict(axes), set(taken))
-        laid = 0
-        for e in es:
-            if e in axes:
-                continue
-            a, b = lay.edges[e]["a"], lay.edges[e]["b"]
-            d = k if (G[b] - G[a]) @ DIRS[k] >= 0 else k + 4
-            if unique and ((a, d) in taken or (b, (d + 4) % 8) in taken):
-                continue          # another edge already leaves that station that way
-            u = DIRS[d]
-            nr, ln = np.array([-u[1], u[0]]), float(np.linalg.norm(A[b] - A[a]))
-            ix = [2 * b, 2 * b + 1, 2 * a, 2 * a + 1]
-            cn = np.array([nr[0], nr[1], -nr[0], -nr[1]])     # across the axis
-            cu = np.array([u[0], u[1], -u[0], -u[1]])         # along it
-            # the two rows as rank-one updates of the inverse (Sherman-Morrison): a trial
-            # costs O(n); only an edge that is laid updates the whole inverse
-            m1 = Minv[:, ix] @ cn
-            s1 = cn @ m1[ix]
-            f1 = AXIS / (1 + AXIS * s1)
-            x1 = x + m1 * (f1 * (0.0 - cn @ x[ix]))
-            m2 = Minv[:, ix] @ cu - m1 * (f1 * (m1[ix] @ cu))
-            s2 = cu @ m2[ix]
-            f2 = AXIS_LEN / (1 + AXIS_LEN * s2)
-            x1 = x1 + m2 * (f2 * (ln - cu @ x1[ix]))
-            cand = np.vstack([acc, [a, b, u[0], u[1], ln, max(ln, 1.0)]])
-            ia, ib = cand[:, 0].astype(int), cand[:, 1].astype(int)
-            dv = x1.reshape(n, 2)[ib] - x1.reshape(n, 2)[ia]
-            across = np.abs(dv[:, 0] * -cand[:, 3] + dv[:, 1] * cand[:, 2])
-            along = dv[:, 0] * cand[:, 2] + dv[:, 1] * cand[:, 3]
-            if (across > AXIS_MISS * cand[:, 5]).any() or (along < 0.25 * cand[:, 4]).any():
-                continue          # it can't take the axis given those laid already: left free
-            Minv -= np.outer(m1, m1 * f1)
-            Minv -= np.outer(m2, m2 * f2)
-            M[np.ix_(ix, ix)] += AXIS * np.outer(cn, cn) + AXIS_LEN * np.outer(cu, cu)
-            rhs[ix] += AXIS_LEN * ln * cu
-            x, acc = x1, cand
-            axes[e] = k
-            laid += 1
-            taken |= {(a, d), (b, (d + 4) % 8)}
+        es = [e for e in es if e not in st["axes"]]
+        before, n0 = snapshot(), _n_crossings(st["x"].reshape(n, 2), ea, eb)
+        laid = sum(lay_edge(e, k, False) for e in es)
+        if AXIS_CROSS and _n_crossings(st["x"].reshape(n, 2), ea, eb) > n0:
+            # the stroke pushed lines across others: lay it again edge by edge, leaving
+            # out the edges that do
+            st.update(before)
+            before = snapshot()
+            laid = sum(lay_edge(e, k, True) for e in es)
         if laid < AXIS_KEEP * len(es):     # only bits of it: that would make a staircase
-            M, rhs, Minv, x, acc, axes, taken = before
+            st.update(before)
+    M, rhs, axes = st["M"], st["rhs"], st["axes"]
     return np.linalg.solve(M, rhs).reshape(n, 2), axes
+
+
+def _n_crossings(P, ea, eb):
+    """Proper crossings among the straight station-to-station segments (ea[i], eb[i]) at
+    positions P, of segments that share no station."""
+    p, q = P[ea], P[eb]
+    lo, hi = np.minimum(p, q), np.maximum(p, q)
+    i, j = np.nonzero(np.triu(np.all((lo[:, None] <= hi[None]) & (lo[None] <= hi[:, None]), axis=2), 1))
+    keep = (ea[i] != ea[j]) & (ea[i] != eb[j]) & (eb[i] != ea[j]) & (eb[i] != eb[j])
+    i, j = i[keep], j[keep]
+
+    def orient(a, b, c):
+        return (b[:, 0] - a[:, 0]) * (c[:, 1] - a[:, 1]) - (b[:, 1] - a[:, 1]) * (c[:, 0] - a[:, 0])
+    d1, d2 = orient(p[j], q[j], p[i]), orient(p[j], q[j], q[i])
+    d3, d4 = orient(p[i], q[i], p[j]), orient(p[i], q[i], q[j])
+    return int(((d1 * d2 < -1e-12) & (d3 * d4 < -1e-12)).sum())
 
 
 def _ports(X, chains, through=None, axes=None, axis_dp=AXIS_DP):
@@ -1497,7 +1525,11 @@ def _place(lay, G, A, warped, water, log=None, w_anc=W_ANC, hop_km=AXIS_HOP_KM, 
         V0, V1 = X0[eb] - X0[ea], X[eb] - X[ea]
         n0 = np.linalg.norm(V0, axis=1)
         flip = np.nonzero((n0 > 0.2) & ((V0 * V1).sum(1) < -0.1 * n0 * n0))[0]
-        return np.union1d(np.nonzero(nearest() < floor)[0], np.array([[ea[f], eb[f]] for f in flip], int).reshape(-1))
+        # crowded: under the floor and closer than before the round (a spot already squeezed
+        # would otherwise undo every round)
+        near_now = nearest()
+        crowd = np.nonzero((near_now < floor) & (near_now < near0 - 1e-3))[0]
+        return np.union1d(crowd, np.array([[ea[f], eb[f]] for f in flip], int).reshape(-1))
 
     floor = min(STRAIGHT_SP, nearest().min())     # never more crowded than before (or STRAIGHT_SP)
     # all kinks are tried at once; those near trouble are put off and then tried a few
@@ -1512,6 +1544,7 @@ def _place(lay, G, A, warped, water, log=None, w_anc=W_ANC, hop_km=AXIS_HOP_KM, 
             break
         mid = lambda e: X[lay.edges[e]["a"], 0] + X[lay.edges[e]["b"], 0]  # noqa: E731
         order = sorted(cand, key=lambda e: (mid(e), e))
+        near0 = nearest()       # spacing before the round
         tried = {}
         for e in order[:STRAIGHT_FEW] if few else order:
             tried[e] = cand[e][0]

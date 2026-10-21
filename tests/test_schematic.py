@@ -211,6 +211,12 @@ class SchematicRuleTests(unittest.TestCase):
             self.assertLess(v[1], 0)                    # and still runs south (no station swapped)
             self.assertEqual(axes.get(lay.eidx[(a, b)]), 2)
 
+    def test_crossing_count(self):
+        # an X of two segments crosses once; segments sharing a station never count
+        P = np.array([(0, 0), (2, 2), (0, 2), (2, 0), (1, 3)], float)
+        self.assertEqual(schematic._n_crossings(P, np.array([0, 2]), np.array([1, 3])), 1)
+        self.assertEqual(schematic._n_crossings(P, np.array([0, 0]), np.array([1, 4])), 0)
+
     def test_line_turns_counts_bends_and_zigzags(self):
         # east, a 45 degree jog north-east, east again: two bends, one zig-zag
         nodes = [(0, 0), (2, 0), (3, 1), (5, 1), (7, 1)]
