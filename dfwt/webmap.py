@@ -2,12 +2,13 @@
 
 Everything the page needs is embedded as one JSON blob. The routing graph for
 each year is exported from the same Python model the reports use (runs, ride
-times, waits, transfer walks), so the in-page trip planner can't drift from it.
+times, waits, transfer walks), so the in-page trip planner can't drift from it; so
+are the access rules its door-to-door trips use (dfwt/tripplan.py).
 """
 import json
 import os
 
-from . import bundle, config, schematic
+from . import bundle, config, demand, schematic, tripplan
 from .graph import YearGraph
 
 TEMPLATE = os.path.join(os.path.dirname(__file__), "templates", "map.html")
@@ -91,6 +92,8 @@ def write(nets, evals, out_path):
         return gidx[key]
 
     scen = {}
+    zones = demand.Zones(cfg)   # base-year block groups: the trip planner's feeder zones and garages
+    feeds = False
     for key, net in nets.items():
         ev = evals[key]
         line_metrics = {r["line_id"]: r for r in ev["lines"]}
@@ -113,9 +116,9 @@ def write(nets, evals, out_path):
             s = net.stations[sid]
             prev = stations.get(sid)
             stations[sid] = [s.name, round(s.lat, 5), round(s.lon, 5), r["pop_1km"], r["jobs_1km"]] if not prev else prev
-        graphs, gkey, years = [], {}, {}
+        graphs, gkey, years, ygraphs = [], {}, {}, {}
         for y in ev["results"]:
-            g = YearGraph(net, y)
+            g = ygraphs[y] = YearGraph(net, y)
             runs = []
             wcap = cfg["wait"]["max_wait_min"]
             for run in g.runs:
@@ -134,11 +137,15 @@ def write(nets, evals, out_path):
             years[y] = gkey[k]
         scen[key] = {"label": LABELS.get(key, key), "lines": lines, "pieces": pieces, "stPiece": st_piece, "graphs": graphs, "yearGraph": years,
                      "metrics": ev["years"],
-                     "boardings": {r["station_id"]: r["boardings_final"] for r in ev["stations"]}}
+                     "boardings": {r["station_id"]: r["boardings_final"] for r in ev["stations"]},
+                     # door-to-door trips: the model's access rules, garages and feeder zones by year
+                     "trip": tripplan.export(zones, net, ygraphs)}
+        feeds = feeds or scen[key]["trip"]["feed"] is not None
     data = {"years": cfg["years"], "boardPenalty": cfg["transfer"]["penalty_min"],
             "build": cfg["staging"]["construction_years"],
             "modes": {m: v["label"] for m, v in cfg["modes"].items()}, "regions": REGIONS,
             "geoms": geoms, "stations": stations, "scen": scen,
+            "zones": tripplan.zone_points(zones) if feeds else [],
             "order": [k for k in (cfg.get("default_scenario"), "plan", "v1_baseline", "right_sized") if k in scen] +
                      [k for k in scen if k not in (cfg.get("default_scenario"), "plan", "v1_baseline", "right_sized")]}
     # diagram view (dfwt/schematic.py): rail and the plan's BRT. BRT a scenario adds on top of the
