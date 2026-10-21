@@ -1559,8 +1559,10 @@ XS0547,Westover Hills S,Bellaire / Ranch View,32.700441,-97.398465,cross streets
 XS0548,Grand Prairie,Jefferson / Center,32.744365,-97.000000,cross streets Jefferson x Center (320 m)
 XS0548,Westover Hills S,Arborlawn / Briarhaven,32.693237,-97.398828,cross streets Arborlawn x Briarhaven (226 m)
 XS0549,Benbrook E,International Plaza / Loop 820,32.686032,-97.399192,cross streets International Plaza x Loop 820 (220 m)
+XS0549,Collins / Caplin,Collins / Cravens Park,32.660000,-97.090000,"nearest streets Collins (58 m), Cravens Park (886 m)"
 XS0549,Indian Hills E,Skyline Road,32.737238,-97.000000,street Skyline Road (41 m)
 XS0550,Benbrook E,Overton Ridge / Rock Quarry,32.678828,-97.399555,cross streets Overton Ridge x Rock Quarry (267 m)
+XS0550,Collins / Caplin,Collins / Cravens Park,32.660000,-97.090000,"nearest streets Collins (58 m), Cravens Park (886 m)"
 XS0550,Indian Hills SE,Belt Line / 3rd Street,32.730111,-97.000000,"nearest streets Belt Line (543 m), 3rd Street (554 m)"
 XS0551,Acosta / Marshall,Acosta / Belt Line,32.722984,-97.000000,"nearest streets Acosta (306 m), Belt Line (551 m)"
 XS0551,Edgecliff Village W,Hulen / Rock Quarry,32.671623,-97.399918,cross streets Hulen x Rock Quarry (53 m)

@@ -66,7 +66,7 @@
    "color": "#7cb342",
    "grade": "surface",
    "spacing_km": 1.4,
-   "notes": "Expansion lever: Farmers Branch - Valwood - Freeport - DFW north - Grapevine - Southlake - Westlake, light metro on LBJ/SH-114 right-of-way",
+   "notes": "Expansion lever: Farmers Branch - Valwood - Freeport - DFW north - Grapevine - Southlake - Westlake - Roanoke, light metro on LBJ/SH-114 right-of-way",
    "stops": [
     "X129",
     {
@@ -132,6 +132,25 @@
      "name": "Westlake Solana",
      "lat": 32.969,
      "lon": -97.192
+    },
+    {
+     "via": true,
+     "lat": 32.9785,
+     "lon": -97.2
+    },
+    {
+     "via": true,
+     "lat": 32.988,
+     "lon": -97.2075
+    },
+    {
+     "via": true,
+     "lat": 33.0005,
+     "lon": -97.2255
+    },
+    {
+     "id": "X062",
+     "express": true
     }
    ],
    "stages": [
@@ -154,8 +173,14 @@
      "Southlake Town Square",
      "Westlake Solana",
      2090
+    ],
+    [
+     "Westlake Solana",
+     "X062",
+     2090
     ]
-   ]
+   ],
+   "follow_roads": true
   },
   {
    "id": "XP02",

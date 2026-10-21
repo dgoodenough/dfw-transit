@@ -42,6 +42,8 @@ E35,Ennis Line,commuter,proposed,#A0694E,,A7: long-range reserve; lowest value p
 E36,Waxahachie Line,commuter,proposed,#5F7466,,
 E37,Midlothian Line,commuter,proposed,#806070,,
 E38,SH-121 BRT,brt,proposed,#00838f,,A6: McKinney-Frisco-Legacy crosstown. Sketch alignment on SH-121 frontage roads; needs a real road-ROW routing pass.
+E50,Dallas Streetcar,streetcar,existing,#e57373,20,Today's Dallas Streetcar: Union Station - Oak Cliff - Bishop Arts.
+E51,M-Line Trolley,streetcar,existing,#8d6e63,15,Today's M-Line (McKinney Avenue Trolley): Arts District - Uptown - CityPlace.
 XC01,Dallas Inner Loop,metro,proposed,#ff6f00,,"Expansion lever: crosstown circumferential ~6 km from downtown, Love Field - SMU - Lakewood - Fair Park - Oak Cliff - West Dallas - Stemmons"
 XC02,Polk-Greenville Trunk,metro,proposed,#5d4037,,"Expansion lever: second north-south trunk through downtown Dallas (tunnel in the core), Polk St - Bishop Arts - Union Station - Deep Ellum - Old East Dallas - Lakewood - Lake Highlands"
 XC03,Collins Street Line,metro,proposed,#6a1b9a,,"Expansion lever: Arlington north-south light metro, Viridian - stadiums - east Arlington - Highlands"
