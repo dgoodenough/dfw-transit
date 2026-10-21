@@ -189,7 +189,7 @@ Definitions: *daily boardings* = weekday boardings on the modeled rail and BRT n
 | FW Pink | metro | 2046 | 21.6 | 1,463 | 441 | 7,267 | 4.97 | 637 | 5.3 |
 | DNT West | metro | 2045 | 31.2 | 6,114 | 1,990 | 29,435 | 4.81 | 1,733 | 14.4 |
 | McKinney Line | commuter | 2030 | 20.0 | 1,028 | 2,106 | 4,934 | 4.8 | 259 | 4.3 |
-| Jefferson Blvd BRT | brt | 2030 | 11.4 | 375 | 1,058 | 1,719 | 4.59 | 173 | 4.3 |
+| Jefferson Blvd BRT | brt | 2030 | 11.4 | 375 | 1,058 | 1,719 | 4.58 | 173 | 4.3 |
 | White Settlement BRT | brt | 2075 | 20.1 | 436 | 1,265 | 1,962 | 4.5 | 205 | 5.1 |
 | I-20 Crosstown | metro | 2043 | 72.9 | 10,068 | 3,171 | 42,194 | 4.19 | 2,362 | 19.7 |
 | DNT East | metro | 2039 | 63.9 | 10,491 | 12,268 | 33,516 | 3.19 | 2,393 | 19.9 |

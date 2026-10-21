@@ -16,8 +16,8 @@ info LONG_STUB: 5, info NEAR_MISS: 8, info SPACING: 253, info STAGE_DRIFT: 31, w
 - **DANGLING** FW Red: terminus Benbrook has no transfer within 600 m
 - **DANGLING** White Settlement BRT: terminus Lockheed Gate has no transfer within 600 m
 - **DANGLING** Riverside-Forest Hill BRT: terminus Melinda / California has no transfer within 600 m
-- **DANGLING** DNT West: terminus Elsie Faye Heggins / M Wright has no transfer within 600 m
 - **DANGLING** DNT West: terminus Frankford / Vail has no transfer within 600 m
+- **DANGLING** DNT West: terminus Elsie Faye Heggins / M Wright has no transfer within 600 m
 - **DANGLING** SH-360 Line: terminus Lake Port Village has no transfer within 600 m
 - **CURVE_RADIUS** FW Green: 1 curves tighter than 150 m (tightest 86 m)
 - **CURVE_RADIUS** FW Blue: 2 curves tighter than 150 m (tightest 84 m)
