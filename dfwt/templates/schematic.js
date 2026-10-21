@@ -4,14 +4,19 @@
    draws it, and reuses the page's state (S, scenKey, yi, hidden, pick) and
    functions (choose, fmt) so the plan switcher, year slider, line toggles and
    trip planner behave exactly as in the map view. Hooks in map.html call
-   Schem.draw() and Schem.trip(). */
+   Schem.draw() and Schem.trip().
+   There are several versions of the diagram (D.schem.versions: Rail, BRT, All),
+   each with its own layout (D.schem.sets[key]); the toggle next to Map/Diagram
+   picks one, remembered per viewer and kept in the URL (#diagram/rail). */
 (function () {
 'use strict';
-const SD = D.schem;
-if (!SD) return;
+const SDS = D.schem;
+if (!SDS || !SDS.sets) return;
+const VERS = SDS.versions.filter(([k]) => SDS.sets[k]);     // [[key, label, modes or null]]
+let SD = null, setKey = null;      // the version showing and its layout
 const NS = 'http://www.w3.org/2000/svg';
 const W = {metro: 0.24, commuter: 0.2, streetcar: 0.14, brt: 0.12};     // stroke widths, layout units (1 = min station spacing); BRT: solid, half weight
-const R_ST = 0.17, PITCH = SD.pitch;
+const R_ST = 0.17;
 const el = (tag, attrs, parent) => {
   const e = document.createElementNS(NS, tag);
   for (const k in attrs) if (attrs[k] !== null) e.setAttribute(k, attrs[k]);
@@ -22,12 +27,11 @@ const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)');
 
 // lineColor (the colour guard) is defined in map.html
 
-const nodeOf = new Map();
-SD.nodes.forEach((n, i) => n[2].forEach(s => nodeOf.set(s, i)));
-const eidx = new Map();
-SD.edges.forEach((e, i) => eidx.set(e[0] + ',' + e[1], i));
+const nodeOf = new Map(), eidx = new Map();
 const edgeOf = (u, w) => eidx.get(Math.min(u, w) + ',' + Math.max(u, w));
 const P = i => SD.nodes[i];
+// lines this version lays out (in any plan): a line it leaves out has no path in it
+const inSet = lid => Object.values(SD.paths).some(p => p[lid]);
 
 // ---------------------------------------------------------------- DOM
 const panel = $('panel');
@@ -45,11 +49,22 @@ const zoomBox = document.createElement('div'); zoomBox.id = 'schZoom';
 zoomBox.innerHTML = '<button type="button" aria-label="Zoom in">+</button><button type="button" aria-label="Zoom out">−</button><button type="button" aria-label="Fit to screen" style="font-size:.8rem">⤢</button>';
 document.body.appendChild(zoomBox);
 
-// view toggle in the panel, right under the title
+// view toggle in the panel, right under the title; beside it (diagram view only) the
+// version toggle: which modes the diagram shows, each version its own layout
+const togs = document.createElement('div');
+togs.className = 'togs';
 const tog = document.createElement('div');
 tog.className = 'viewtog'; tog.setAttribute('role', 'group'); tog.setAttribute('aria-label', 'View');
 tog.innerHTML = '<button type="button" data-v="map">Map</button><button type="button" data-v="diagram">Diagram</button>';
-panel.children[0].after(tog);
+const modeTitle = m => m ? m.map(x => D.modes[x] || x).join(', ') : 'Rail and the main BRT corridors';
+const vtog = document.createElement('div');
+vtog.className = 'viewtog vtog'; vtog.setAttribute('role', 'group'); vtog.setAttribute('aria-label', 'Diagram shows');
+vtog.innerHTML = VERS.map(([k, label, m]) => `<button type="button" data-s="${k}" title="${modeTitle(m)}">${label}</button>`).join('');
+togs.append(tog, vtog);
+panel.children[0].after(togs);
+if (VERS.length < 2) vtog.hidden = true;
+// a note on the diagram when the trip rides a line this version leaves out
+const note = document.createElement('div'); note.id = 'schNote'; note.setAttribute('role', 'status'); host.appendChild(note);
 
 // phone bottom sheet: in the diagram view it starts collapsed to the view toggle and
 // the year slider, so the diagram gets most of the screen; the handle opens it.
@@ -64,6 +79,7 @@ function setSheet(min) {
   handle.setAttribute('aria-expanded', String(!min));
   handle.lastChild.textContent = min ? 'Show details' : 'Hide details';
   if (active && !userMoved) requestAnimationFrame(fit);
+  if (note.style.display === 'flex') requestAnimationFrame(placeNote);
 }
 handle.addEventListener('click', () => { sheetChosen = true; setSheet(!panel.classList.contains('min')); });
 
@@ -73,9 +89,17 @@ legend.open = !matchMedia('(max-width: 640px)').matches;
 legend.innerHTML = '<summary>Legend</summary><div></div>';
 document.body.appendChild(legend);
 
-// ---------------------------------------------------------------- static layer: water
-for (const lk of SD.lakes) el('path', {class: 'lake', d: 'M' + lk.p.map(p => p.join(',')).join('L') + 'Z'}, G.water);
-for (const r of SD.rivers) el('path', {class: 'river', d: 'M' + r.p.map(p => p.join(',')).join('L')}, G.water);
+// ---------------------------------------------------------------- version: layout lookups and the static water layer
+function loadSet(k) {
+  setKey = k; SD = SDS.sets[k];
+  nodeOf.clear(); eidx.clear();
+  SD.nodes.forEach((n, i) => n[2].forEach(s => nodeOf.set(s, i)));
+  SD.edges.forEach((e, i) => eidx.set(e[0] + ',' + e[1], i));
+  G.water.textContent = '';
+  for (const lk of SD.lakes) el('path', {class: 'lake', d: 'M' + lk.p.map(p => p.join(',')).join('L') + 'Z'}, G.water);
+  for (const r of SD.rivers) el('path', {class: 'river', d: 'M' + r.p.map(p => p.join(',')).join('L')}, G.water);
+  vtog.querySelectorAll('button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.s === k)));
+}
 
 // ---------------------------------------------------------------- geometry
 function offsetPolyline(pieces) {
@@ -151,7 +175,7 @@ function computeSlots() {
 function slotOffset(ei, lid) {
   const ls = slots.get(ei) || [], k = ls.indexOf(lid);
   if (k < 0) return 0;
-  return (k - (ls.length - 1) / 2) * PITCH;
+  return (k - (ls.length - 1) / 2) * SD.pitch;
 }
 function linePath(lid, key = scenKey) {
   const pr = SD.paths[key] && SD.paths[key][lid];
@@ -423,16 +447,42 @@ function rings() {
     el('circle', {class: 'ring', cx: sh.x, cy: sh.y, r, 'stroke-width': 0.13}, G.ring);
   }
 }
+// the trip rides a line this version leaves out: say so, and offer the version showing most of it
+function tripNote(legs, yd) {
+  const rides = legs ? legs.filter(l => l.t === 'ride').map(l => S.lines[yd.runs[l.ri][0]]) : [];
+  const off = rides.filter(ln => !inSet(ln.id));
+  if (!off.length) { note.style.display = 'none'; return; }
+  const shows = k => rides.filter(ln => Object.values(SDS.sets[k].paths).some(p => p[ln.id])).length;
+  let best = setKey;
+  for (const [k] of VERS) if (shows(k) > shows(best)) best = k;
+  const label = k => VERS.find(v => v[0] === k)[1];
+  const modes = [...new Set(off.map(ln => (D.modes[ln.mode] || ln.mode).toLowerCase()))].join(' and ');
+  note.innerHTML = `<span>This trip also rides ${modes}, not on the ${label(setKey)} diagram.</span>` +
+    (best !== setKey ? `<button type="button" data-s="${best}">Show ${label(best)}</button>` : '') +
+    '<button type="button" class="x" aria-label="Dismiss">×</button>';
+  note.style.display = 'flex';
+  placeNote();
+}
+function placeNote() {     // phone: just above the bottom sheet
+  note.style.bottom = phone.matches ? (host.clientHeight - panel.getBoundingClientRect().top + 10) + 'px' : '';
+}
+note.addEventListener('click', e => {
+  const b = e.target.closest('button');
+  if (!b) return;
+  if (b.dataset.s) setVersion(b.dataset.s, true); else note.style.display = 'none';
+});
 function trip(legs, yd) {
   lastTrip = legs ? [legs, yd] : null;
   if (!active) return;
   G.trip.textContent = '';
   rings();
+  tripNote(legs, yd);
   if (!legs) return;
   const sidOf = n => n[0] === 'P' ? n.slice(1) : yd.runs[+n.slice(1).split(':')[0]][1][+n.split(':')[1]];
   for (const l of legs) {
     if (l.t === 'ride') {
       const ln = S.lines[yd.runs[l.ri][0]], f = nodeOf.get(sidOf(l.from)), t = nodeOf.get(sidOf(l.to));
+      if (!inSet(ln.id)) continue;      // not in this version (tripNote says so)
       const lp = cache.get(ln.id) || linePath(ln.id);
       if (!lp) continue;
       let best = null;
@@ -549,7 +599,7 @@ host.addEventListener('wheel', e => {
 const ptrs = new Map();
 let down = null, pinch = null;
 host.addEventListener('pointerdown', e => {
-  if (e.target.closest('#schPop')) return;
+  if (e.target.closest('#schPop, #schNote')) return;
   host.setPointerCapture(e.pointerId);
   ptrs.set(e.pointerId, [e.clientX, e.clientY]);
   if (ptrs.size === 1) down = {x: e.clientX, y: e.clientY, tx: view.tx, ty: view.ty, moved: false};
@@ -615,9 +665,10 @@ function legendDraw() {
   const ink = 'var(--st-ink)', fill = 'var(--st-fill)', grey = 'var(--muted)';
   let h = '';
   if (active) {
-    h += sample(`<line x1="1" y1="6" x2="37" y2="6" stroke="${grey}" stroke-width="5" stroke-linecap="round"/><circle cx="19" cy="6" r="3.6" fill="${fill}" stroke="${ink}" stroke-width="1.1"/>`, D.modes.metro);
-    h += sample(`<line x1="1" y1="6" x2="37" y2="6" stroke="${grey}" stroke-width="4.2" stroke-linecap="round"/><line x1="1" y1="6" x2="37" y2="6" stroke="${fill}" stroke-width="1.5" stroke-dasharray="10 6"/>`, D.modes.commuter);
-    h += sample(`<line x1="1" y1="6" x2="37" y2="6" stroke="${grey}" stroke-width="2.4" stroke-linecap="round"/>`, D.modes.brt);
+    const vm = (VERS.find(v => v[0] === setKey) || [])[2], has = m => !vm || vm.includes(m);   // the version's modes
+    if (has('metro')) h += sample(`<line x1="1" y1="6" x2="37" y2="6" stroke="${grey}" stroke-width="5" stroke-linecap="round"/><circle cx="19" cy="6" r="3.6" fill="${fill}" stroke="${ink}" stroke-width="1.1"/>`, D.modes.metro);
+    if (has('commuter')) h += sample(`<line x1="1" y1="6" x2="37" y2="6" stroke="${grey}" stroke-width="4.2" stroke-linecap="round"/><line x1="1" y1="6" x2="37" y2="6" stroke="${fill}" stroke-width="1.5" stroke-dasharray="10 6"/>`, D.modes.commuter);
+    if (has('brt')) h += sample(`<line x1="1" y1="6" x2="37" y2="6" stroke="${grey}" stroke-width="2.4" stroke-linecap="round"/>${has('metro') ? '' : `<circle cx="19" cy="6" r="3" fill="${fill}" stroke="${ink}" stroke-width="1"/>`}`, D.modes.brt);
     h += sample(`<line x1="1" y1="6" x2="37" y2="6" stroke="var(--glow)" stroke-width="11" stroke-linecap="round" opacity=".5"/><line x1="1" y1="6" x2="37" y2="6" stroke="${grey}" stroke-width="5" stroke-linecap="round"/>`, 'Opened this interval');
     h += sample(`<line x1="1" y1="6" x2="37" y2="6" stroke="${grey}" stroke-width="2.2" stroke-linecap="round" opacity=".4"/><circle cx="19" cy="6" r="2.2" fill="${fill}" stroke="${ink}" stroke-width=".9" opacity=".5"/>`, 'Not yet open');
     h += sample(`<line x1="1" y1="3" x2="37" y2="3" stroke="${grey}" stroke-width="2.6"/><line x1="1" y1="9" x2="37" y2="9" stroke="${grey}" stroke-width="2.6"/><rect x="15" y="-1" width="8" height="14" rx="4" fill="${fill}" stroke="${ink}" stroke-width="1.3"/>`, 'Interchange');
@@ -635,25 +686,29 @@ function legendDraw() {
 }
 
 // ---------------------------------------------------------------- waterways on the geographic map (toggleable overlay)
-if (typeof map !== 'undefined' && window.L && SD.geoWater) {
+if (typeof map !== 'undefined' && window.L && SDS.geoWater) {
   map.createPane('water').style.zIndex = 350;
   const water = getComputedStyle(document.documentElement).getPropertyValue('--water').trim() || '#d3e6f3';
   const rend = L.canvas({pane: 'water'}), wl = L.layerGroup();
-  for (const p of SD.geoWater.lakes) L.polygon(p, {renderer: rend, pane: 'water', stroke: false, fillColor: water, fillOpacity: 0.9, interactive: false}).addTo(wl);
-  for (const p of SD.geoWater.rivers) L.polyline(p, {renderer: rend, pane: 'water', color: water, weight: 3.5, opacity: 0.95, interactive: false}).addTo(wl);
+  for (const p of SDS.geoWater.lakes) L.polygon(p, {renderer: rend, pane: 'water', stroke: false, fillColor: water, fillOpacity: 0.9, interactive: false}).addTo(wl);
+  for (const p of SDS.geoWater.rivers) L.polyline(p, {renderer: rend, pane: 'water', color: water, weight: 3.5, opacity: 0.95, interactive: false}).addTo(wl);
   wl.addTo(map);
   if (typeof layerCtl !== 'undefined') layerCtl.addOverlay(wl, 'Waterways');
 }
 
-// ---------------------------------------------------------------- view switching (remembered; #diagram / #map in the URL)
+// ---------------------------------------------------------------- view switching (remembered; #map, #diagram or #diagram/<version> in the URL)
 let fitted = false;
+const hasSet = k => VERS.some(v => v[0] === k);
+function saveHash() {
+  try { history.replaceState(null, '', active ? '#diagram/' + setKey : '#map'); } catch (e) { /* file:// or sandboxed */ }
+}
 function setView(v, save) {
   active = v === 'diagram';
   document.body.classList.toggle('diagram', active);
   tog.querySelectorAll('button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.v === v)));
   if (save) {
     try { localStorage.setItem('dfwt.view', v); } catch (e) { /* storage unavailable */ }
-    try { history.replaceState(null, '', '#' + v); } catch (e) { /* file:// or sandboxed */ }
+    saveHash();
   }
   if (!sheetChosen) setSheet(active && phone.matches);
   if (active) {
@@ -661,19 +716,58 @@ function setView(v, save) {
     draw();
     if (lastTrip) trip(...lastTrip); else rings();
   } else {
-    hidePop(); tip.style.display = 'none';
+    hidePop(); tip.style.display = 'none'; note.style.display = 'none';
     map.invalidateSize();
     legendDraw();
   }
 }
+// another version: its own layout, so the view is fitted afresh
+function setVersion(k, save) {
+  if (!hasSet(k)) return;
+  if (save) {
+    try { localStorage.setItem('dfwt.diagram', k); } catch (e) { /* storage unavailable */ }
+  }
+  if (k !== setKey) {
+    loadSet(k);
+    hidePop(); tip.style.display = 'none';
+    dirty = true; lastY = null;
+    if (active) { fit(); draw(); if (lastTrip) trip(...lastTrip); else { rings(); note.style.display = 'none'; } }
+    else fitted = false;
+  }
+  if (save) saveHash();
+}
 tog.addEventListener('click', e => { const b = e.target.closest('button'); if (b) setView(b.dataset.v, true); });
-window.addEventListener('hashchange', () => { const h = location.hash.slice(1); if (h === 'diagram' || h === 'map') setView(h, false); });
-let initial = 'map';
-try { initial = localStorage.getItem('dfwt.view') || 'map'; } catch (e) { /* storage unavailable */ }
-const h0 = location.hash.slice(1);
-if (h0 === 'diagram' || h0 === 'map') initial = h0;
+vtog.addEventListener('click', e => { const b = e.target.closest('button'); if (b) setVersion(b.dataset.s, true); });
+function fromHash() {      // [view, version or null]
+  const [v, s] = location.hash.slice(1).split('/');
+  return v === 'diagram' || v === 'map' ? [v, hasSet(s) ? s : null] : [null, null];
+}
+window.addEventListener('hashchange', () => {
+  const [v, s] = fromHash();
+  if (s) setVersion(s, false);
+  if (v) setView(v, false);
+});
+let initial = 'map', set0 = SDS.default;
+try {
+  initial = localStorage.getItem('dfwt.view') || 'map';
+  const s = localStorage.getItem('dfwt.diagram');
+  if (hasSet(s)) set0 = s;
+} catch (e) { /* storage unavailable */ }
+const [hv, hs] = fromHash();
+if (hv) initial = hv;
+if (hs) set0 = hs;
+loadSet(hasSet(set0) ? set0 : VERS[0][0]);
 // locate(sid): screen position of a station in the diagram (used by the screenshot checks)
 const locate = sid => { const v = nodeOf.get(sid); return v === undefined ? null : [P(v)[0] * view.k + view.tx, P(v)[1] * view.k + view.ty]; };
-window.Schem = {draw, trip: (legs, yd) => trip(legs, yd), setView, locate, zoomAt};
+// focus(sid, z): centre a station in the free area at z times the fitted zoom (screenshot checks)
+const focus = (sid, z) => {
+  const v = nodeOf.get(sid);
+  if (v === undefined) return false;
+  const fa = freeArea();
+  view.k = fitK * z; view.tx = (fa[0] + fa[2]) / 2 - P(v)[0] * view.k; view.ty = (fa[1] + fa[3]) / 2 - P(v)[1] * view.k;
+  userMoved = true; apply();
+  return true;
+};
+window.Schem = {draw, trip: (legs, yd) => trip(legs, yd), setView, setVersion, version: () => setKey, locate, focus, zoomAt};
 setView(initial === 'diagram' ? 'diagram' : 'map', false);
 })();

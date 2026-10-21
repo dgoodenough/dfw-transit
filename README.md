@@ -38,7 +38,15 @@ A **Map / Diagram** toggle switches the same page to a Washington-Metro-style
 schematic: octilinear lines, bundled corridors and capsule interchanges, laid
 out at build time by [`dfwt/schematic.py`](dfwt/schematic.py) (a density-equalizing
 cartogram, then octilinear least squares) so every slider, plan and trip works
-on it too.
+on it too. The diagram comes in three versions, each with its own layout: **Rail**
+(metro / light rail, regional rail and streetcar; the default), **BRT** (every BRT
+line, the 2-million plan's arterial grid included) and **All** (rail and the main
+BRT corridors). Geography gives way to straight lines: a line that runs along one
+axis overall (the Fort Worth north-south trunk, the east-west lines out to Ridgmar)
+is drawn on that axis through its junctions, turns cost more than a little
+geographic fidelity, and a turn straight back (a zig-zag) costs more still. A
+trip that rides a mode the version leaves out says so and offers the version that
+shows it.
 
 The **trip planner** takes street addresses as well as stations (type one, or
 right-click / long-press any point on the map). Addresses are looked up with
