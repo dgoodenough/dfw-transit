@@ -18,12 +18,35 @@ def scenarios():
     return built()
 
 
+RAIL = dict((k, m) for k, _, m in schematic.VERSIONS)["rail"]
+
+
 class SchematicLayoutTests(unittest.TestCase):
+    """The default version of the diagram (Rail), laid out over every scenario."""
     @classmethod
     def setUpClass(cls):
-        cls.nets = schematic.diagram_nets({sc or "plan": Network.load(sc) for sc in [None] + scenarios()})
+        cls.raw = {sc or "plan": Network.load(sc) for sc in [None] + scenarios()}
+        cls.nets = schematic.version_nets(cls.raw, RAIL)
         cls.lay = schematic.compute(cls.nets)
         cls.js = schematic.to_json(cls.lay)
+
+    def test_versions_lay_out_only_their_modes(self):
+        for key, _, modes in schematic.VERSIONS:
+            nets = schematic.version_nets(self.raw, modes)
+            for k, net in nets.items():
+                if modes is None:      # All: rail and the plan's BRT (diagram_nets)
+                    self.assertEqual(set(net.lines), set(schematic.diagram_nets(self.raw)[k].lines))
+                else:
+                    self.assertEqual(set(net.lines), {l for l, ln in self.raw[k].lines.items() if ln.mode in modes})
+        self.assertIn(schematic.DEFAULT_VERSION, [k for k, _, _ in schematic.VERSIONS])
+
+    def test_lines_are_straight(self):
+        # the straightness rules: few bends and fewer zig-zags per line, no new crossings
+        q = schematic.quality(self.lay)
+        n = sum(1 for (k, _) in self.lay.paths if k in (self.lay.default, "plan"))
+        self.assertLess(q["bends"] / n, 6.0, q)
+        self.assertLess(q["zigzags"] / n, 2.0, q)
+        self.assertLessEqual(q["crossings"], q["geo_crossings"] + 10, q)
 
     def node(self, name):
         return next(n for n in self.lay.nodes if n["name"] == name)
@@ -113,6 +136,96 @@ class SchematicLayoutTests(unittest.TestCase):
         for n in ("Trinity River", "West Fork Trinity River", "Elm Fork Trinity River", "Lewisville Lake", "White Rock Lake"):
             self.assertIn(n, names)
         self.assertTrue(self.lay.water["rivers"] and self.lay.water["lakes"])
+
+
+def _toy(nodes, edges, paths, geo=None):
+    """A Layout by hand: nodes [(x, y)] (also the geography unless geo is given), edges
+    [(a, b)], paths {line: [nodes]} (all in the default plan)."""
+    lay = schematic.Layout()
+    for i, (x, y) in enumerate(nodes):
+        g = np.array(geo[i] if geo else (x, y), float)
+        lay.nodes.append({"sids": [str(i)], "name": str(i), "geo": g, "x": float(x), "y": float(y)})
+    for a, b in edges:
+        a, b = min(a, b), max(a, b)
+        lay.eidx[(a, b)] = len(lay.edges)
+        lay.edges.append({"a": a, "b": b, "lines": sorted(l for l, p in paths.items() if any({a, b} == {u, w} for u, w in zip(p, p[1:]))),
+                          "bend": None})
+    lay.paths = {("plan", l): (p, list(range(len(p)))) for l, p in paths.items()}
+    lay.seqs = [("plan", l, p) for l, p in sorted(paths.items())]
+    lay.default, lay.prime = "plan", set(range(len(lay.edges)))
+    lay.termini = {p[i] for p in paths.values() for i in (0, -1)}
+    return lay
+
+
+class SchematicRuleTests(unittest.TestCase):
+    """The straightness rules on small made-up networks."""
+
+    def test_turn_dp_irons_out_a_wiggle_but_keeps_a_real_turn(self):
+        # each edge leans a little off east, alternately north and south: one straight run
+        un = np.array([[0.0 if d == (1 if k % 2 else 0) else 0.3 for d in range(8)] for k in range(8)])
+        self.assertEqual(len(set(schematic._turn_dp(un))), 1)
+        # five edges east, then five north: the line turns once, to north
+        un = np.array([[0.0 if d == (0 if k < 5 else 2) else 2.0 for d in range(8)] for k in range(10)])
+        dirs = schematic._turn_dp(un)
+        self.assertEqual(dirs[:4], [0] * 4)
+        self.assertEqual(dirs[-4:], [2] * 4)
+
+    def test_turn_dp_pays_for_zigzags(self):
+        # a jog that saves a little deviation is not worth two turns and the zig-zag
+        un = np.zeros((7, 8)) + 1.0
+        un[:, 0] = 0.0
+        un[3, 0], un[3, 1] = 0.9, 0.0
+        self.assertEqual(schematic._turn_dp(un), [0] * 7)
+
+    def test_stroke_axis(self):
+        t = np.linspace(0, 10, 11)
+        k, stray = schematic.stroke_axis(np.stack([0.3 * np.sin(t), -t], 1))   # north-south, wiggling
+        self.assertEqual(k, 2)
+        self.assertLess(stray, schematic.AXIS_TOL)
+        k, stray = schematic.stroke_axis(np.stack([t, t + 0.1 * np.cos(t)], 1))
+        self.assertEqual(k, 1)
+
+    def test_strokes_run_straight_through_junctions(self):
+        # a trunk 0-1-2-3-4 (two lines) crossed at 2 by a branch line 5-2-6
+        nodes = [(0, 4), (0, 3), (0, 2), (0, 1), (0, 0), (-1, 2), (1, 2)]
+        edges = [(0, 1), (1, 2), (2, 3), (3, 4), (5, 2), (2, 6)]
+        lay = _toy(nodes, edges, {"T1": [0, 1, 2, 3, 4], "T2": [0, 1, 2, 3, 4], "B": [5, 2, 6]})
+        inc, _, _ = schematic._chains(lay)
+        strokes, _ = schematic._strokes(lay, inc, np.array(nodes, float))
+        self.assertIn(sorted([0, 1, 2, 3, 4]), [sorted(n) for n, _ in strokes])
+        self.assertIn(sorted([5, 2, 6]), [sorted(n) for n, _ in strokes])
+
+    def test_smooth_lays_a_trunk_on_its_axis(self):
+        # a north-south trunk (two lines) that drifts east by 22 degrees in its middle, and
+        # a branch leaving it at 2 to the west-north-west
+        geo = [(0, 8), (0.2, 6), (1.0, 4), (1.8, 2), (2.0, 0), (2.1, -2), (-2, 3.4), (-5, 4.5)]
+        edges = [(0, 1), (1, 2), (2, 3), (3, 4), (4, 5), (2, 6), (6, 7)]
+        lay = _toy(geo, edges, {"T1": [0, 1, 2, 3, 4, 5], "T2": [0, 1, 2, 3, 4, 5], "B": [7, 6, 2]})
+        A = np.array(geo, float)
+        inc, _, _ = schematic._chains(lay)
+        strokes, _ = schematic._strokes(lay, inc, A)
+        X, axes = schematic._smooth(lay, A, A, strokes)
+        for a, b in zip(range(5), range(1, 6)):        # every trunk edge is north-south now
+            v = X[b] - X[a]
+            self.assertLess(abs(v[0]), 0.1 * abs(v[1]), (a, b, v))
+            self.assertLess(v[1], 0)                    # and still runs south (no station swapped)
+            self.assertEqual(axes.get(lay.eidx[(a, b)]), 2)
+
+    def test_crossing_count(self):
+        # an X of two segments crosses once; segments sharing a station never count
+        P = np.array([(0, 0), (2, 2), (0, 2), (2, 0), (1, 3)], float)
+        self.assertEqual(schematic._n_crossings(P, np.array([0, 2]), np.array([1, 3])), 1)
+        self.assertEqual(schematic._n_crossings(P, np.array([0, 0]), np.array([1, 4])), 0)
+
+    def test_line_turns_counts_bends_and_zigzags(self):
+        # east, a 45 degree jog north-east, east again: two bends, one zig-zag
+        nodes = [(0, 0), (2, 0), (3, 1), (5, 1), (7, 1)]
+        lay = _toy(nodes, [(0, 1), (1, 2), (2, 3), (3, 4)], {"L": [0, 1, 2, 3, 4]})
+        self.assertEqual(schematic.line_turns(lay, [0, 1, 2, 3, 4]), (2, 1, 0))
+        # east then north (a real turn): one bend, no zig-zag
+        nodes = [(0, 0), (2, 0), (4, 0), (4, 2), (4, 4)]
+        lay = _toy(nodes, [(0, 1), (1, 2), (2, 3), (3, 4)], {"L": [0, 1, 2, 3, 4]})
+        self.assertEqual(schematic.line_turns(lay, [0, 1, 2, 3, 4]), (1, 0, 0))
 
 
 if __name__ == "__main__":

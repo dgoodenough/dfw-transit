@@ -44,9 +44,9 @@ E37,Midlothian Line,commuter,proposed,#806070,,
 E38,SH-121 BRT,brt,proposed,#00838f,,A6: McKinney-Frisco-Legacy crosstown. Sketch alignment on SH-121 frontage roads; needs a real road-ROW routing pass.
 E50,Dallas Streetcar,streetcar,existing,#e57373,20,Today's Dallas Streetcar: Union Station - Oak Cliff - Bishop Arts.
 E51,M-Line Trolley,streetcar,existing,#8d6e63,15,Today's M-Line (McKinney Avenue Trolley): Arts District - Uptown - CityPlace.
-XP01,SH-114 Line,metro,proposed,#7cb342,,"Expansion lever: Farmers Branch - Valwood - Freeport - DFW north - Grapevine - Southlake - Westlake - Roanoke, light metro on LBJ/SH-114 right-of-way"
+XP01,SH-114 Line,metro,proposed,#7cb342,,"Expansion lever: Farmers Branch - Las Colinas - DFW north - Grapevine - Southlake - Westlake - Trophy Club - Roanoke, light metro in the LBJ/SH-114 freeway corridor (beside TEXRail through Grapevine)"
 XP02,Coppell-Lewisville BRT,brt,proposed,#00838f,,Expansion lever: Cypress Waters - Coppell business parks - Vista Ridge - Old Town Lewisville
-XP05,Stemmons-Brookhollow BRT,brt,proposed,#00838f,,"Expansion lever: Inwood/Love Field - Brookhollow - Regal Row - Northwest Hwy - Royal/Luna - Valwood, the Stemmons/I-35E job corridor"
+XP05,Stemmons-Brookhollow BRT,brt,proposed,#00838f,,"Expansion lever: Victory - Market Center - Inwood/Love Field - Brookhollow - Regal Row - Northwest Hwy - Royal/Luna - Valwood, the Stemmons/I-35E job corridor"
 XP06,Dallas Parkway BRT,brt,proposed,#00838f,,"Expansion lever: Legacy West - Stonebriar - The Star - Frisco Station, the Dallas Parkway office corridor"
 XB01,Northwest Highway BRT,brt,proposed,#00838f,,Expansion lever: arterial BRT grid (dedicated lanes)
 XB02,Buckner Boulevard BRT,brt,proposed,#00838f,,Expansion lever: arterial BRT grid (dedicated lanes)

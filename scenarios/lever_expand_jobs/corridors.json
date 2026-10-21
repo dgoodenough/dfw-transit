@@ -66,7 +66,7 @@
    "color": "#7cb342",
    "grade": "surface",
    "spacing_km": 1.4,
-   "notes": "Expansion lever: Farmers Branch - Valwood - Freeport - DFW north - Grapevine - Southlake - Westlake - Roanoke, light metro on LBJ/SH-114 right-of-way",
+   "notes": "Expansion lever: Farmers Branch - Las Colinas - DFW north - Grapevine - Southlake - Westlake - Trophy Club - Roanoke, light metro in the LBJ/SH-114 freeway corridor (beside TEXRail through Grapevine)",
    "stops": [
     "X129",
     {
@@ -76,20 +76,45 @@
     },
     {
      "name": "Luna / LBJ",
-     "lat": 32.908,
-     "lon": -96.943
+     "lat": 32.9119,
+     "lon": -96.9437
+    },
+    {
+     "name": "Las Colinas Boulevard / SH-161",
+     "lat": 32.90846,
+     "lon": -96.95357,
+     "follow": "straight"
     },
     {
      "name": "Freeport",
-     "lat": 32.905,
-     "lon": -96.967
+     "lat": 32.9042,
+     "lon": -96.9664,
+     "follow": "straight"
+    },
+    {
+     "name": "John W Carpenter / Parkridge",
+     "lat": 32.9016,
+     "lon": -96.9748,
+     "follow": "straight"
+    },
+    {
+     "name": "John W Carpenter / Shorthorn",
+     "lat": 32.90284,
+     "lon": -96.98653,
+     "follow": "straight"
     },
     "X355",
     {
-     "name": "Freeport North",
-     "lat": 32.918,
-     "lon": -97.012
+     "name": "John W Carpenter / Jetstar",
+     "lat": 32.91124,
+     "lon": -97.00109
     },
+    {
+     "name": "Freeport North",
+     "lat": 32.91756,
+     "lon": -97.01254
+    },
+    "XI05",
     {
      "name": "DFW North Gate",
      "lat": 32.93,
@@ -103,20 +128,32 @@
     },
     "X318",
     {
-     "name": "Grapevine-Main",
-     "lat": 32.9337,
-     "lon": -97.0776,
-     "grade": "surface"
+     "id": "X078",
+     "follow": "rail"
     },
     {
-     "name": "Grapevine South",
-     "lat": 32.925,
-     "lon": -97.094
+     "name": "Ira E. Woods / SH-26",
+     "lat": 32.9317,
+     "lon": -97.09027,
+     "follow": "rail"
     },
     {
      "name": "Grapevine West",
      "lat": 32.925,
-     "lon": -97.11
+     "lon": -97.11,
+     "follow": "rail"
+    },
+    {
+     "via": true,
+     "lat": 32.9283,
+     "lon": -97.1163,
+     "follow": "straight"
+    },
+    {
+     "name": "Kimball / Southlake Boulevard",
+     "lat": 32.93981,
+     "lon": -97.11622,
+     "follow": "straight"
     },
     {
      "name": "Southlake Town Square",
@@ -124,29 +161,31 @@
      "lon": -97.134
     },
     {
-     "name": "Kirkwood",
-     "lat": 32.964,
-     "lon": -97.165
+     "name": "SH-114 / Carroll",
+     "lat": 32.953,
+     "lon": -97.13669
     },
     {
-     "name": "Westlake Solana",
-     "lat": 32.969,
-     "lon": -97.192
-    },
-    {
-     "via": true,
-     "lat": 32.9785,
-     "lon": -97.2
+     "name": "SH-114 / Southmost",
+     "lat": 32.95982,
+     "lon": -97.14764
     },
     {
      "via": true,
-     "lat": 32.988,
-     "lon": -97.2075
+     "lat": 32.9675,
+     "lon": -97.1557
     },
     {
-     "via": true,
-     "lat": 33.0005,
-     "lon": -97.2255
+     "name": "Westlake",
+     "lat": 32.9831,
+     "lon": -97.167,
+     "express": true
+    },
+    {
+     "name": "Trophy Club",
+     "lat": 32.9947,
+     "lon": -97.1998,
+     "express": true
     },
     {
      "id": "X062",
@@ -171,15 +210,21 @@
     ],
     [
      "Southlake Town Square",
-     "Westlake Solana",
+     "Westlake",
      2090
     ],
     [
-     "Westlake Solana",
+     "Westlake",
      "X062",
      2090
     ]
    ],
+   "road_weights": {
+    "motorway": 1.0,
+    "trunk": 1.0,
+    "primary": 1.8,
+    "secondary": 2.6
+   },
    "follow_roads": true
   },
   {
@@ -229,8 +274,15 @@
    "color": "#00838f",
    "grade": "surface",
    "spacing_km": 0.9,
-   "notes": "Expansion lever: Inwood/Love Field - Brookhollow - Regal Row - Northwest Hwy - Royal/Luna - Valwood, the Stemmons/I-35E job corridor",
+   "notes": "Expansion lever: Victory - Market Center - Inwood/Love Field - Brookhollow - Regal Row - Northwest Hwy - Royal/Luna - Valwood, the Stemmons/I-35E job corridor",
    "stops": [
+    "X137",
+    {
+     "via": true,
+     "lat": 32.799,
+     "lon": -96.824
+    },
+    "X082",
     "X134",
     {
      "name": "Brookhollow",
@@ -261,7 +313,7 @@
    ],
    "stages": [
     [
-     "X134",
+     "X137",
      "Valwood Parkway",
      2075
     ]

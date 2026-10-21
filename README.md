@@ -38,7 +38,15 @@ A **Map / Diagram** toggle switches the same page to a Washington-Metro-style
 schematic: octilinear lines, bundled corridors and capsule interchanges, laid
 out at build time by [`dfwt/schematic.py`](dfwt/schematic.py) (a density-equalizing
 cartogram, then octilinear least squares) so every slider, plan and trip works
-on it too.
+on it too. The diagram comes in three versions, each with its own layout: **Rail**
+(metro / light rail, regional rail and streetcar; the default), **BRT** (every BRT
+line, the 2-million plan's arterial grid included) and **All** (rail and the main
+BRT corridors). Geography gives way to straight lines: a line that runs along one
+axis overall (the Fort Worth north-south trunk, the east-west lines out to Ridgmar)
+is drawn on that axis through its junctions, turns cost more than a little
+geographic fidelity, and a turn straight back (a zig-zag) costs more still. A
+trip that rides a mode the version leaves out says so and offers the version that
+shows it.
 
 The **trip planner** takes street addresses as well as stations (type one, or
 right-click / long-press any point on the map). Addresses are looked up with
@@ -85,11 +93,11 @@ led to thirteen steps, and v2 implements the ones the data supports
 
 | | v1 plan | v2 plan (budget-constrained) | **2 million riders (default)** |
 |---|---|---|---|
-| Daily transit trips, 2050 (each trip counted once) | 324k | 370k | **1.03M** |
-| Daily transit trips, 2100 | 664k | 771k | **2.23M** (2M reached in 2077) |
-| Daily boardings, all modes, 2100 | 1.15M | 1.34M | **4.15M** |
-| Jobs the average resident reaches in 45 min, 2100 | 93k | 106k | **173k** |
-| Capital through 2100 (2025 $, lines, stations, garages) | $112.3B | $103.1B | **$135.0B** |
+| Daily transit trips, 2050 (each trip counted once) | 324k | 388k | **1.06M** |
+| Daily transit trips, 2100 | 664k | 788k | **2.25M** (2M reached in 2077) |
+| Daily boardings, all modes, 2100 | 1.15M | 1.37M | **4.18M** |
+| Jobs the average resident reaches in 45 min, 2100 | 93k | 110k | **173k** |
+| Capital through 2100 (2025 $, lines, stations, garages) | $112.3B | $103.2B | **$136.6B** |
 | Operating cost, 2100 (rail and BRT, per year) | $0.9B | $0.9B | **$1.6B** |
 | Validation: errors / islands | 1 / 10 | 0 / 0 | 0 / 0 |
 

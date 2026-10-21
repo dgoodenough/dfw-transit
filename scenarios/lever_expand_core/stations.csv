@@ -369,7 +369,7 @@ X034,Fort Worth,32.766514,-97.352986
 X012,Lockheed Gate,32.765491,-97.446112
 X496,Ridgmar Mall / BRT Transfer,32.742639,-97.440678
 X425,Kingsley / Wood,32.881345,-96.674518
-X355,Belt Line / Royal,32.910654,-96.993881
+X355,Belt Line / SH-114,32.907100,-96.993200
 X357,Belt Line / Walnut Hill,32.866355,-96.991785
 X457,Carrier South,32.775806,-97.047949
 X458,Great Southwest Parkway,32.752921,-97.045652
@@ -541,6 +541,14 @@ XM01,Olive / Ross,32.789189,-96.803913
 XM02,McKinney / Pearl,32.793407,-96.802679
 XM03,McKinney / Allen,32.799088,-96.801012
 XM04,McKinney / Blackburn,32.803800,-96.799687
+XI01,Pennsylvania / Henderson,32.739065,-97.335055
+XI02,Rock Island / Briery,32.815875,-96.994001
+XI03,Airport / Beach,32.773304,-97.283704
+XI04,Marsh / Arapaho,32.957675,-96.854707
+XI05,John W Carpenter / Freeport,32.922227,-97.024198
+XI06,NW Highway / Shady Brook,32.865394,-96.767451
+XI07,I-20 / Oriole,32.663043,-96.900316
+XI08,Shiloh / Forest,32.912515,-96.664836
 XS0001,Lemmon / Airdrome,32.841178,-96.833145
 XS0002,Mockingbird / Westside,32.838594,-96.819138
 XS0003,Mockingbird / Hillcrest,32.837102,-96.789783

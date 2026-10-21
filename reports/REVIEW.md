@@ -106,6 +106,9 @@ Ranked by how much they change the plan or its headline numbers.
 
 ## Left for later (small, not yet done)
 
+- A longer transfer penalty (5-8 min instead of 3): the model now trades one-seat rides for
+  faster trips with a change too readily; new interchanges add riders without cutting transfers
+  (reports/TRANSFERS.md). A model change with its own recalibration (owner, v2.12).
 - Riders on shared track wait for one line, not the combined frequency (+2.2% when
   fixed; needs recalibration) (service planner).
 - BRT stops on freeway main lanes (8), out-and-back spurs (HAIRPIN warnings), and an
