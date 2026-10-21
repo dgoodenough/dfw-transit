@@ -295,3 +295,34 @@ and what is left to decide). Fixed:
   scenario reaches 2M in 2077 and ~2.23M daily trips in 2100 at $135.0B.
 - **Map and diagram**: a second station click works again (the trip layer swallowed it); track
   still to come is grey in the diagram.
+
+## v2.12 — Fewer transfers: infill stations, SH-114 realigned
+
+A transfer analysis followed every modelled trip through the network (`reports/TRANSFERS.md`):
+which stations and line pairs carry the transfers, which trips need two or more, and where
+two lines cross or pass close with no station to change at. About 40 candidate fixes were
+tested one by one in the ridership model (an extra stop slows everyone riding through, so
+many lost riders); the ones that gained riders were tested together and kept only if each
+still added riders next to the others.
+
+- **Infill stations** (plan and 2M): Red/Orange at Main / Sherman Street (downtown Richardson,
+  Beltline Line) and NW Highway / Shady Brook; Red/Blue/Orange at Central / Hall (I-20
+  Crosstown and I-30); Blue at Shiloh / Forest (Garland); Orange at John W Carpenter /
+  Freeport (SH-114 Line in 2M); TRE at Rock Island / Briery (Beltline Line, Irving) and at
+  Airport / Beach with FW Green (Fort Worth); the TEXRail extension and FW Berry at
+  Pennsylvania / Henderson; Silver Line at Marsh / Arapaho (walk to DNT West's Belt Line /
+  Marsh); Midlothian Line at I-20 / Oriole (I-20 Crosstown). Each opens when both lines are
+  there.
+- **SH-114 Line** (2M), redrawn by the owner: in the LBJ/SH-114 freeway corridor without the
+  loops in Las Colinas, Freeport North and Southlake; beside TEXRail through Grapevine (Ira E.
+  Woods - Grapevine-Main Street - DFW Airport North); Trophy Club and Westlake stations on
+  SH-114 instead of the Kirkwood / Dove Road / Westlake Solana detour. Belt Line / Royal moves
+  onto the SH-114 crossing (Belt Line / SH-114). Its trains run on over the Green Line from
+  Farmers Branch to Victory (new `run_over` edit), so riders from Love Field, Market Center
+  and Victory reach Las Colinas and DFW north without changing at Farmers Branch.
+- **Stemmons-Brookhollow BRT** (2M) starts at Victory (via Medical/Market Center) instead of
+  Inwood/Love Field: one change from the I-20 Crosstown, I-30 and TRE.
+- **Walk link** Commerce / Harwood (D2) - Marilla / Pearl (DNT East).
+- `tools/gen_expansion.py`: a spec's `road_weights` (keep a line in its freeway), and stops
+  whose leg follows an existing railway (`"follow": "rail"`) or a hand-drawn straight line
+  (`"follow": "straight"`).
