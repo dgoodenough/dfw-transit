@@ -436,6 +436,8 @@ def schedule(scenario=None, log=print):
                 rows, test = fixed, Network.load(scenario, stage_rows=fixed)
         if not any(f[1] == "OVER_BUDGET" for f in check(test)):
             rows, test = _attach_islands(scenario, rows, test)
+            if any(f[1] == "OVER_BUDGET" for f in check(test)):   # shared track changed hands: try a smaller budget
+                continue
             moved = sum(1 for a, b in zip(net.stage_rows, rows) if a["year_opens"] != b["year_opens"])
             if log:
                 log(f"{moved} of {len(rows)} stages moved to their earliest affordable year "

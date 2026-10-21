@@ -15,6 +15,7 @@ Spec (JSON):
        {"id": "XP01", "name": "SH-114 Line", "mode": "metro", "color": "#e65100",
         "grade": "elevated",                   # default grade; a stop's "grade" applies from it onward
         "spacing_km": 1.3,                     # intermediate stops are added on longer gaps
+        "follow_roads": true,                  # metro: run in freeway/arterial corridors (default: straight)
         "notes": "...",
         "stops": ["X129",                      # an existing station id ...
                   {"name": "Valwood", "lat": 32.921, "lon": -96.919},     # ... or a new stop
@@ -372,6 +373,51 @@ def road_path(pts, name):
     return None
 
 
+TAIL_M, TAIL_TURN = 700.0, 60.0   # a BRT end that turns this sharply this close to the end stops at the turn
+
+
+def trim_tail(pts):
+    """(lat, lon) route ending at a new terminus: if it turns off its street (more than
+    TAIL_TURN degrees) within the last TAIL_M, cut it at that turn so the line ends on the
+    arterial instead of a block into a neighborhood. Returns the (possibly shorter) points."""
+    from dfwt import osmroute
+    P = [osmroute.xy(lon, lat) for lat, lon in pts]
+    if len(P) < 3:
+        return pts
+    acc, cut = 0.0, None
+    for i in range(len(P) - 2, 0, -1):   # walk back from the end
+        acc += math.dist(P[i], P[i + 1])
+        if acc > TAIL_M:
+            break
+        h1 = math.atan2(P[i][1] - P[i - 1][1], P[i][0] - P[i - 1][0])
+        h2 = math.atan2(P[i + 1][1] - P[i][1], P[i + 1][0] - P[i][0])
+        if abs(math.degrees((h2 - h1 + math.pi) % (2 * math.pi) - math.pi)) > TAIL_TURN and acc > 80:
+            cut = i   # keep the farthest such turn: everything after the first sharp turn goes
+    return pts[:cut + 1] if cut else pts
+
+
+_FREEWAYS = None
+
+
+def metro_road_path(pts):
+    """Route a rail line through its stations ((lat, lon) list) along freeway and arterial
+    corridors (light rail in a freeway or boulevard right-of-way rather than through
+    neighborhoods): freeways and major arterials preferred, changing roads costs a lot.
+    Returns (lat, lon) points or None."""
+    global _FREEWAYS
+    from dfwt import osmroute
+    if _FREEWAYS is None:
+        _FREEWAYS = osmroute.Graph("road", classes={"motorway", "trunk", "primary", "secondary"}, oneway=False)
+    w_cls = {"motorway": 1.0, "trunk": 1.0, "primary": 1.1, "secondary": 1.3}
+    xy = [osmroute.xy(lon, lat) for lat, lon in pts]
+    for snap, turn in ((700, 100), (1200, 135)):
+        P, _ = osmroute.route(_FREEWAYS, xy, max_turn=turn, snap_r=snap, w_cls=w_cls, turn_pen=1500.0, detour=1.8,
+                              snap_w=3.0)
+        if P:
+            return [(lat, lon) for lon, lat in (osmroute.ll(p) for p in _cut_loops(P))]
+    return None
+
+
 def build(name):
     cfg = config.load()
     base = config.path("network")
@@ -410,12 +456,16 @@ def build(name):
         used.add(sid)
         new_ids.append(sid)
         report.append(f"infill {item['name']} on {item['line']} ({d * 1000:.0f} m from the asked point), opens {item['year']}")
+    # stops the corridors ask for: a line ending near another's is not trimmed away from it
+    spec_pts = [(ln["id"], w["lat"], w["lon"]) for ln in specs for w in ln["stops"]
+                if isinstance(w, dict) and "lat" in w and not w.get("via")]
     for ln in specs:
         lid = ln["id"]
         mode = ln["mode"]
         spacing = ln.get("spacing_km", {"metro": 1.2, "brt": 0.8, "commuter": 6}[mode])
         # waypoints -> [(lat, lon, sid or None, name, is_stop, grade_or_None)]
         wps = []
+        express = set()   # waypoints reached without intermediate stops
         for w in ln["stops"]:
             if isinstance(w, str):
                 if w not in st:     # a unique station name (e.g. a stop another new line created)
@@ -425,8 +475,14 @@ def build(name):
                     w = hits[0]
                 s = st[w]
                 wps.append((float(s["lat"]), float(s["lon"]), w, s["name"], True, None))
+            elif "lat" not in w:   # {"id": existing station, "express": true}: no stops added on the way to it
+                s = st[w["id"]]
+                wps.append((float(s["lat"]), float(s["lon"]), w["id"], s["name"], True, w.get("grade")))
+                express.add(len(wps) - 1)
             else:
                 wps.append((w["lat"], w["lon"], w.get("id"), w.get("name"), not w.get("via"), w.get("grade")))
+                if w.get("express"):
+                    express.add(len(wps) - 1)
         # split into stop-to-stop legs (with via points), add intermediate stops on long legs
         stops = []          # (lat, lon, sid, name, explicit)
         legs = []           # list of point lists between consecutive stops, with grade
@@ -440,10 +496,28 @@ def build(name):
             if not w[4]:
                 continue
             pts = [(p[0], p[1]) for p in cur]
+            if mode == "metro" and ln.get("follow_roads"):   # rail in a freeway/arterial corridor
+                routed = metro_road_path(pts)
+                if routed:
+                    pts = routed
+                else:
+                    report.append(f"{lid} {ln['name']}: no road corridor for a leg; kept straight")
             if mode == "brt":   # BRT runs in the street: follow the roads, stops placed along them
                 routed = road_path(pts, ln["name"])
                 if routed:
                     pts = routed
+                    # a new terminus a turn into a neighborhood: end on the arterial instead
+                    def snaps(q):   # ends in reach of a station, or of a stop another new line asks for: keep it
+                        return nearest_existing(q[0], q[1])[1] * 1000 <= TRANSFER_M or any(
+                            o != lid and geo.hav_km(q[0], q[1], a, b) * 1000 <= TRANSFER_M for o, a, b in spec_pts)
+                    if w is wps[-1] and w[2] is None and not snaps(w):
+                        pts = trim_tail(pts)
+                        if pts[-1] != (w[0], w[1]):
+                            w = (pts[-1][0], pts[-1][1], None, None, True, w[5])
+                    if cur[0] is wps[0] and wps[0][2] is None and not snaps(wps[0]):
+                        pts = trim_tail(pts[::-1])[::-1]
+                        if pts[0] != (wps[0][0], wps[0][1]):
+                            stops[0] = (pts[0][0], pts[0][1], None, None, True, wps[0][5])
                 else:
                     report.append(f"{lid} {ln['name']}: no street route for a leg; kept straight")
             L = sum(geo.hav_km(*pts[i], *pts[i + 1]) for i in range(len(pts) - 1))
@@ -456,6 +530,8 @@ def build(name):
                     cuts += [(d, None) for d in brt_cuts(pts, bounds[k + 1], bounds[k])]
                     if k < len(anchors):
                         cuts.append(anchors[k])
+            elif wps.index(w) in express:
+                cuts = []
             else:
                 n_extra = max(0, round(L / spacing) - 1) if L > 1.45 * spacing else 0
                 cuts = [(L * (k + 1) / (n_extra + 1), None) for k in range(n_extra)]

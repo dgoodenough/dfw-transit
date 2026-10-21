@@ -275,3 +275,23 @@ and what is left to decide). Fixed:
 - **Map**: From/To station search; hidden lines are left out of trips (as if not built); BRT
   routes on one street draw as one stroke with route names on hover; operating cost on the
   capital card.
+
+## v2.11 — Streetcars, road corridors, BRT ends, I-30 through Uptown
+
+- **Dallas streetcars** (existing service): the Dallas Streetcar (Union Station - Bishop Arts -
+  Methodist Medical Center, every 20 min) and the McKinney Avenue M-Line Trolley (Olive / Ross -
+  Uptown, every 15 min). New `streetcar` mode: 18 km/h, 400 m walkshed, no park-and-ride.
+- **I-30 Line shares the I-20 Crosstown's tunnel**: from Victory it runs on with the I-20
+  Crosstown (Victory - Pearl - Central / Hall - Ross / Bennett) instead of its own Design
+  District / McKinnon / Uptown alignment: one tunnel north of downtown instead of two.
+- **Road corridors**: the Las Colinas-Mesquite Line's surface sections follow freeways and
+  arterials instead of cutting through neighborhoods (single-line stations moved onto them); the SH-114 Line (2M) follows
+  SH-114 and runs on, express, to Roanoke (Westlake Solana - Roanoke, 2090).
+- **BRT ends**: a new BRT terminus that turns into a side street for its last few hundred meters
+  ends on the arterial instead (unless that end is within a short walk of another line).
+- **Park-and-ride**: terminus garages sized per mode (none at streetcar ends).
+- **Scheduler**: re-checks the budget after holding cut-off lines back.
+- **Results**: the plan costs $103.1B (was $103.6B) and carries ~771k daily trips in 2100; the 2M
+  scenario reaches 2M in 2077 and ~2.23M daily trips in 2100 at $135.0B.
+- **Map and diagram**: a second station click works again (the trip layer swallowed it); track
+  still to come is grey in the diagram.

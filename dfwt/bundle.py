@@ -20,7 +20,7 @@ TOL = 30.0       # a sample this close to earlier track, running parallel, is on
 CELL = TOL
 PARALLEL = 0.9   # |cos| of the heading difference
 SIMPLIFY = 3.0   # Douglas-Peucker tolerance for the drawn pieces, m
-MODE_RANK = {"metro": 0, "commuter": 1, "brt": 2}
+MODE_RANK = {"metro": 0, "commuter": 1, "streetcar": 2, "brt": 3}
 
 
 def _dp(P, tol):

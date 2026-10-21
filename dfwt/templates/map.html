@@ -12,10 +12,10 @@
 /* Layout: full-bleed map with one docked control panel (bottom sheet on phones). */
 :root{
   --bg:#f4f6f5; --panel:#ffffff; --ink:#18212b; --muted:#566370; --rule:#d5dcdf; --accent:#c96f00;
-  --good:#1d7f4e; --bad:#b3123a; --chip:#eef2f3;
+  --good:#1d7f4e; --bad:#b3123a; --chip:#eef2f3; --bus:#2f6db5;
   --f-display:"Barlow Condensed","Arial Narrow",Arial,sans-serif; --f-ui:"Barlow","Helvetica Neue",Arial,sans-serif;
 }
-@media (prefers-color-scheme: dark){:root{--bg:#11171d;--panel:#18212a;--ink:#e7ecef;--muted:#9aa8b3;--rule:#2c3946;--accent:#f29a2e;--good:#4cc488;--bad:#ef6a86;--chip:#22303b;color-scheme:dark}}
+@media (prefers-color-scheme: dark){:root{--bg:#11171d;--panel:#18212a;--ink:#e7ecef;--muted:#9aa8b3;--rule:#2c3946;--accent:#f29a2e;--good:#4cc488;--bad:#ef6a86;--chip:#22303b;--bus:#6fa8ec;color-scheme:dark}}
 *{box-sizing:border-box}
 html,body{height:100%;margin:0;background:var(--bg);color:var(--ink);font-family:var(--f-ui);font-size:14px}
 #map{position:absolute;inset:0}
@@ -64,7 +64,37 @@ summary{cursor:pointer;font-weight:600;font-size:.9rem}
 #trip .leg{display:grid;grid-template-columns:8px minmax(0,1fr);gap:8px;margin:3px 0}
 #trip .leg i{border-radius:2px}
 .hint{color:var(--muted);font-size:.8rem}
-.od{gap:6px;margin:6px 0}.od input{flex:1;min-width:0;padding:5px 7px;border:1px solid var(--rule);border-radius:6px;background:var(--panel);color:var(--ink);font:inherit;font-size:.85rem}
+.od{display:flex;flex-direction:column;gap:6px;margin:6px 0}.od input{width:100%;min-width:0;padding:5px 7px;border:1px solid var(--rule);border-radius:6px;background:var(--panel);color:var(--ink);font:inherit;font-size:.85rem}
+.sugg{list-style:none;margin:2px 0 0;padding:3px;border:1px solid var(--rule);border-radius:6px;background:var(--panel);max-height:230px;overflow-y:auto}
+.sugg[hidden],.opts[hidden]{display:none}
+.sugg li{padding:5px 7px;border-radius:4px;cursor:pointer;font-size:.84rem;line-height:1.3}
+.sugg li[aria-selected=true],.sugg li[data-k]:hover{background:var(--chip)}
+.sugg li small{display:block;color:var(--muted);font-size:.74rem}
+.sugg li.msg{cursor:default;color:var(--muted);font-size:.8rem}
+.sugg .k{float:right;margin-left:8px;font-size:.66rem;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.opts{display:flex;flex-wrap:wrap;gap:2px 12px;font-size:.8rem;color:var(--muted);margin:0 0 6px}
+.opts label{display:inline-flex;align-items:center;gap:4px;color:var(--ink);cursor:pointer}
+#trip .leg i.acc{width:4px;margin-left:2px;border-radius:0}
+#trip .leg i.walk{background:repeating-linear-gradient(to bottom,var(--ink) 0 2px,transparent 2px 6px)}
+#trip .leg i.drive{background:repeating-linear-gradient(to bottom,var(--accent) 0 6px,transparent 6px 10px)}
+#trip .leg i.bus{background:repeating-linear-gradient(to bottom,var(--bus) 0 5px,transparent 5px 8px)}
+#trip .leg i.bike{background:repeating-linear-gradient(to bottom,var(--good) 0 4px,transparent 4px 8px)}
+#trip .note{margin-top:4px;font-size:.74rem}
+svg#tchart{width:100%;height:108px;display:block;margin-top:8px;touch-action:pan-y;cursor:crosshair}
+#tchart .ln{fill:none;stroke:var(--ink);stroke-width:2;stroke-linejoin:round}
+#tchart .ln2{fill:none;stroke:var(--muted);stroke-width:1.5;stroke-dasharray:3 3}
+#tchart .lnd{fill:var(--ink)} #tchart .ln2d{fill:var(--muted)}
+#tchart .grid{stroke:var(--rule);stroke-width:1}
+#tchart .xh{stroke:var(--accent);stroke-width:1;stroke-dasharray:2 2}
+#tchart .hov{stroke:var(--muted)}
+#tchart .now{fill:var(--accent);stroke:var(--panel);stroke-width:1.5}
+#tchart .hovd{fill:var(--ink);stroke:var(--panel);stroke-width:1.5}
+#tchart .hovd2{fill:var(--muted);stroke:var(--panel);stroke-width:1.5}
+#tchart text{font-size:9.5px;fill:var(--muted);font-family:var(--f-ui);font-variant-numeric:tabular-nums}
+.pinwrap{background:none;border:0}
+.pin{width:26px;height:26px;border-radius:50% 50% 50% 0;transform:rotate(-45deg);background:var(--accent);border:2px solid var(--panel);box-shadow:0 1px 4px rgba(0,0,0,.35);display:grid;place-items:center}
+.pin b{transform:rotate(45deg);color:var(--panel);font:700 12px var(--f-ui)}
+.ptbtn{gap:6px;margin-top:6px}
 .pop b{font-size:.95rem}.pop .m{color:var(--muted);font-size:.8rem;margin-top:3px;line-height:1.4}
 .chip{display:inline-block;padding:1px 7px;border-radius:9px;color:#fff;font-size:.72rem;margin:1px 3px 1px 0}
 a{color:var(--accent)}
@@ -84,7 +114,7 @@ a{color:var(--accent)}
 <aside id="panel">
   <div>
     <h1>DFW Transit</h1>
-    <div class="sub">A phased plan for Dallas–Fort Worth. Drag the year, switch plans, click two stations to plan a trip. Speculative, not an official plan.</div>
+    <div class="sub">A phased plan for Dallas–Fort Worth. Drag the year, switch plans, plan a trip from any address. Speculative, not an official plan.</div>
   </div>
   <div class="stack">
     <label class="l" for="scen">Plan</label>
@@ -104,10 +134,14 @@ a{color:var(--accent)}
   <div id="interval" class="interval" aria-live="polite"></div>
   <details open>
     <summary>Trip planner</summary>
-    <div class="row od"><input id="from" list="stlist" placeholder="From station" aria-label="From station" autocomplete="off">
-      <input id="to" list="stlist" placeholder="To station" aria-label="To station" autocomplete="off"></div>
-    <datalist id="stlist"></datalist>
-    <div id="trip"><p class="hint">Click an origin station, then a destination, or type their names.</p></div>
+    <div class="od">
+      <div class="ac"><input id="from" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="fromList" placeholder="From: station or address" aria-label="From: station or street address" autocomplete="off" spellcheck="false">
+        <ul id="fromList" class="sugg" role="listbox" aria-label="From suggestions" hidden></ul></div>
+      <div class="ac"><input id="to" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="toList" placeholder="To: station or address" aria-label="To: station or street address" autocomplete="off" spellcheck="false">
+        <ul id="toList" class="sugg" role="listbox" aria-label="To suggestions" hidden></ul></div>
+    </div>
+    <div id="tripOpts" class="opts" hidden></div>
+    <div id="trip"><p class="hint">Click a station, or type a station or a street address. Right-click (long-press on a phone) the map to start or end anywhere.</p></div>
   </details>
   <details>
     <summary>Lines</summary>
@@ -141,6 +175,7 @@ const basemaps = {
 basemaps[dark ? 'Dark gray' : 'Light gray'].addTo(map);
 const layerCtl = L.control.layers(basemaps, null, {position: 'topright'}).addTo(map);  // schematic: adds the Waterways overlay
 map.createPane('trip').style.zIndex = 430;   // a planned trip sits above the (dimmed) network
+map.getPane('trip').style.pointerEvents = 'none';   // the trip pane's canvas must not swallow clicks on stations and the map
 const tripR = L.canvas({pane: 'trip'});
 const lineLayer = L.layerGroup().addTo(map), stLayer = L.layerGroup().addTo(map), tripLayer = L.layerGroup().addTo(map);
 const dimNetwork = on => { map.getPane('overlayPane').style.opacity = on ? .35 : ''; map.getPane('glow').style.visibility = on ? 'hidden' : ''; };
@@ -201,7 +236,7 @@ const lineColor = (() => {
 
 // line weights grow with zoom (0.75x at z10 to 1.35x at z16)
 const zf = () => Math.max(.75, Math.min(1.35, .75 + .1 * (map.getZoom() - 10)));
-const W = {metro: 4.5, commuter: 4, brt: 2.4};
+const W = {metro: 4.5, commuter: 4, streetcar: 2.8, brt: 2.4};
 const weightOf = mode => (W[mode] || W.metro) * zf();
 const bgColor = getComputedStyle(document.documentElement).getPropertyValue('--bg').trim() || '#f4f6f5';
 // "opened this interval" glows sit in their own pane, faded as a whole so overlaps don't darken
@@ -438,7 +473,7 @@ function drawLines() {
 // every BRT stop too from zoom 13. A line shows all of its stops or none of them. Where two or
 // more of the lines shown stop, the station is an interchange: a larger marker, and on
 // side-by-side track a capsule across the lines it serves.
-const STOPS_FROM = {metro: 11, commuter: 11, brt: 13};
+const STOPS_FROM = {metro: 11, commuter: 11, streetcar: 12, brt: 13};
 function drawStations() {
   stLayer.clearLayers();
   const Y = D.years[yi], z = map.getZoom(), yd = S.years[Y], served = new Map();
@@ -491,7 +526,7 @@ function draw() {
   drawLines();
   drawStations();
   intervalSummary(Y, prevY, stateFn());
-  metrics(); lineList(); if (pick.length === 2) route();
+  metrics(); lineList(); if (ends[0] && ends[1]) replan(false);
   if (window.Schem) Schem.draw();  // schematic: redraw the diagram view
 }
 function intervalSummary(Y, prevY, state) {
@@ -520,7 +555,7 @@ function metrics() {
   const d = (k, unit = '') => { if (!base) return ''; const v = m[k] - base[k]; if (Math.abs(v) < 0.05) return ''; const s = v > 0 ? '+' : '−';
     const a = Math.abs(v), good = unit === '$' ? v < 0 : v > 0; return ` <em class="${good ? 'up' : 'down'}">${s}${unit === '$' ? '$' + a.toFixed(1) + 'B' : unit === '%' ? a.toFixed(1) + ' pts' : fmt(Math.round(a))} vs ${refName}</em>`; };
   const k = v => v >= 1e6 ? (v / 1e6).toFixed(2) + 'M' : Math.round(v / 1000) + 'k';
-  const modes = [['boardings_metro', 'metro'], ['boardings_commuter', 'regional rail'], ['boardings_brt', 'BRT'], ['boardings_feeder_bus', 'feeder bus']]
+  const modes = [['boardings_metro', 'metro'], ['boardings_commuter', 'regional rail'], ['boardings_brt', 'BRT'], ['boardings_streetcar', 'streetcar'], ['boardings_feeder_bus', 'feeder bus']]
     .filter(([c]) => m[c]).map(([c, n]) => `${k(m[c])} ${n}`).join(' · ');
   $('metrics').innerHTML = [
     [(m.daily_trips >= 1e6 ? k(m.daily_trips) : fmt(m.daily_trips)) + d('daily_trips'), 'daily transit trips (each trip counted once)'],
@@ -544,7 +579,7 @@ function lineList() {
   // groups: each mode, then within it each region (where most of a line's stops are: Fort Worth,
   // Dallas, Collin County, other; webmap.line_region). A group's box shows or hides all its lines.
   const Y = D.years[yi], groups = [], R = D.regions || {other: 'Other'};
-  for (const m of ['metro', 'commuter', 'brt']) {
+  for (const m of ['metro', 'commuter', 'streetcar', 'brt']) {
     const ls = S.lines.filter(l => l.mode === m);
     if (!ls.length) continue;
     groups.push([D.modes[m], ls, 'mode']);
@@ -574,22 +609,245 @@ function lineList() {
     i.onchange = () => { g.forEach(l => i.checked ? hidden.delete(l.id) : hidden.add(l.id)); draw(); };
   });
 }
-// ---- trip planner: Dijkstra over the exported year graph (same model as the reports) ----
-const pickMark = s => L.circleMarker([D.stations[s][1], D.stations[s][2]], {renderer: tripR, pane: 'trip', radius: 8, color: '#c96f00', weight: 3, fill: false}).addTo(tripLayer);
-const showTrip = () => { $('trip').closest('details').open = true; if (touch) $('trip').scrollIntoView({block: 'nearest', behavior: 'smooth'}); };
-function clearTrip() {
-  pick = []; $('from').value = $('to').value = ''; tripLayer.clearLayers(); dimNetwork(false); if (window.Schem) Schem.trip(null, null, pick);
-  $('trip').innerHTML = '<p class="hint">Click an origin station, then a destination.</p>';
+// ---- trip planner ----
+// Two kinds of trip. Station to station (click two stations): Dijkstra over the exported year
+// graph (same model as the reports). Door to door (a street address, a point on the map, or a
+// station at one end): the demand model's access rules, exported per year by dfwt/tripplan.py,
+// pick up to k access and egress stations (walk, drive to a garage, feeder bus, bike, drop-off,
+// each with its minutes), and one Dijkstra runs from all the access stations at once to all the
+// egress stations. The planner shows the fastest trip in clock minutes; tripOpts.model ranks paths
+// by the model's perceived minutes instead (waits x wait.weight, out-of-vehicle time x ovtW, the
+// drive-to-transit constant), as riders in the ridership model choose them (for checks).
+let ends = [null, null];   // From, To: {sid} (a station) or {lat, lon, label} (an address or a point)
+const tripOpts = {pnr: true, bike: false, kiss: false, model: false};
+const MODES = ['walk', 'pnr', 'feeder', 'bike', 'kiss'];
+const GEO_BOX = [-98.1, 32.2, -95.9, 33.6];   // lon/lat box addresses are searched in (the metroplex)
+const inBox = (lat, lon) => lon >= GEO_BOX[0] && lon <= GEO_BOX[2] && lat >= GEO_BOX[1] && lat <= GEO_BOX[3];
+const esc = s => String(s).replace(/[&<>"]/g, c => ({'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;'}[c]));
+const css = v => getComputedStyle(document.documentElement).getPropertyValue(v).trim();
+const hiddenKey = () => [...hidden].sort().join(',');
+const ptOf = e => e.sid ? {lat: D.stations[e.sid][1], lon: D.stations[e.sid][2], label: D.stations[e.sid][0], sid: e.sid} : e;
+const endLabel = e => e ? ptOf(e).label : '';
+const onAt = (ts, Y) => { let n = 0; for (const t of ts) if (t <= Y) n++; return n % 2 === 1; };   // [on, off, on, ...] years
+const projXY = (T, lat, lon) => [(lon - T.proj[1]) * T.proj[2], (lat - T.proj[0]) * T.proj[3]];   // geo.Projector
+// the model's peak drive (demand.Zones.drive_min): straight-line km x circuity / speed x congestion + terminal minutes
+function driveMin(T, A, B, Y) {
+  const [ax, ay] = projXY(T, A.lat, A.lon), [bx, by] = projXY(T, B.lat, B.lon);
+  return Math.hypot(ax - bx, ay - by) * T.drive.perKm * T.cong[Y] + T.drive.terminal;
 }
+// feeder buses serve a zone (census block group) whose activity density reaches the threshold that year
+let zonePts = null;
+function feedAt(T, p, Y) {
+  if (!T.feed || !D.zones.length) return false;
+  if (p._zi === undefined) {
+    if (!zonePts) { zonePts = []; for (let i = 0; i < D.zones.length; i += 2) zonePts.push(projXY(T, D.zones[i] / 1e4, D.zones[i + 1] / 1e4)); }
+    const [x, y] = projXY(T, p.lat, p.lon);
+    let bi = -1, bd = Infinity;
+    zonePts.forEach(([zx, zy], i) => { const d = (zx - x) ** 2 + (zy - y) ** 2; if (d < bd) { bd = d; bi = i; } });
+    p._zi = bd <= 25 ? bi : -1;   // more than 5 km from any block group: outside the modeled area
+  }
+  if (p._zi < 0) return false;
+  const v = T.feed[p._zi];
+  return Array.isArray(v) ? onAt(v, Y) : v > 0 && Y >= v;
+}
+// one year's routing graph as adjacency lists (hidden lines: as if not built). Nodes: a platform
+// per station (0..nS-1), then one per (run, stop). Edges [to, minutes, wait]: wait >= 0 marks a
+// boarding, which costs the wait (x a weight) plus the transfer penalty.
+function tripGraph(gi) {
+  const key = gi + '|' + hiddenKey();
+  S._tg = S._tg || new Map();
+  if (S._tg.has(key)) return S._tg.get(key);
+  const g = S.graphs[gi], sids = [...new Set(g.runs.flatMap(r => r[1]))].sort();
+  const nS = sids.length, idx = new Map(sids.map((s, i) => [s, i])), adj = sids.map(() => []), info = [], at = sids.map(() => []), runSt = [];
+  g.runs.forEach(([li, stops, hops, wait], ri) => {
+    if (hidden.has(S.lines[li].id)) return;
+    let prev = -1;
+    stops.forEach((s, k) => {
+      const n = adj.length, p = idx.get(s);
+      adj.push([]); info[n] = [ri, k]; at[p].push(n);
+      adj[p].push([n, 0, wait]); adj[n].push([p, 0, -1]);
+      if (prev >= 0) { adj[prev].push([n, hops[k - 1], -1]); adj[n].push([prev, hops[k - 1], -1]); }
+      prev = n;
+    });
+    runSt.push([...new Set(stops.map(s => idx.get(s)))].sort((a, b) => a - b));
+  });
+  for (const [x, y, w] of g.walks) { const a = idx.get(x), b = idx.get(y); adj[a].push([b, w, -1]); adj[b].push([a, w, -1]); }
+  const T = S.trip, xy = sids.map(s => projXY(T, D.stations[s][1], D.stations[s][2]));
+  const G = {gi, g, sids, idx, nS, adj, info, at, runSt, xy};
+  if (S._tg.size > 40) S._tg.delete(S._tg.keys().next().value);
+  S._tg.set(key, G);
+  return G;
+}
+// multi-source / multi-target Dijkstra: src and tgt map nodes to start and end costs
+function dijkstra(G, src, tgt, waitW) {
+  const n = G.adj.length, dist = new Float64Array(n).fill(Infinity), prev = new Int32Array(n).fill(-1), h = [];
+  const push = (d, v) => { h.push([d, v]); let i = h.length - 1; while (i) { const p = (i - 1) >> 1; if (h[p][0] <= h[i][0]) break; [h[p], h[i]] = [h[i], h[p]]; i = p; } };
+  const pop = () => { const top = h[0], last = h.pop();
+    if (h.length) { h[0] = last; let i = 0; for (;;) { const l = 2 * i + 1, r = l + 1; let m = i;
+      if (l < h.length && h[l][0] < h[m][0]) m = l; if (r < h.length && h[r][0] < h[m][0]) m = r; if (m === i) break; [h[m], h[i]] = [h[i], h[m]]; i = m; } }
+    return top; };
+  for (const [v, c] of src) if (c < dist[v]) { dist[v] = c; push(c, v); }
+  let best = Infinity, end = -1;
+  while (h.length) {
+    const [d, u] = pop();
+    if (d > dist[u]) continue;
+    if (d >= best) break;
+    const t = tgt.get(u);
+    if (t !== undefined && d + t < best) { best = d + t; end = u; }
+    for (const [v, w, wait] of G.adj[u]) {
+      const nd = d + (wait >= 0 ? wait * waitW + D.boardPenalty : w);
+      if (nd < dist[v]) { dist[v] = nd; prev[v] = u; push(nd, v); }
+    }
+  }
+  return {prev, end, best};
+}
+// a found path as the legs route() lists and draws (node keys 'P' + station, 'L' + run:stop),
+// with its clock minutes (actual waits; each transfer costs the transfer penalty)
+function pathLegs(G, R) {
+  const nodes = [];
+  for (let u = R.end; u >= 0; u = R.prev[u]) nodes.unshift(u);
+  const key = n => n < G.nS ? 'P' + G.sids[n] : `L${G.info[n][0]}:${G.info[n][1]}`;
+  const legs = [];
+  let min = -D.boardPenalty;
+  for (let i = 1; i < nodes.length; i++) {
+    const u = nodes[i - 1], v = nodes[i];
+    const e = G.adj[u].filter(x => x[0] === v).sort((a, b) => a[1] - b[1])[0];
+    if (u < G.nS && v >= G.nS) { legs.push({t: 'wait', ri: G.info[v][0], at: key(u), min: e[2]}); min += e[2] + D.boardPenalty; }
+    else if (u >= G.nS && v >= G.nS) {
+      const l = legs[legs.length - 1], ri = G.info[v][0];
+      if (l && l.t === 'ride' && l.ri === ri) { l.to = key(v); l.min += e[1]; } else legs.push({t: 'ride', ri, from: key(u), to: key(v), min: e[1]});
+      min += e[1];
+    } else if (u < G.nS && v < G.nS) { legs.push({t: 'walk', from: key(u), to: key(v), min: e[1]}); min += e[1]; }
+  }
+  const last = nodes[nodes.length - 1], st = last < G.nS ? last : G.idx.get(G.g.runs[G.info[last][0]][1][G.info[last][1]]);
+  return {legs, min, a: nodes[0], b: st};
+}
+// access (or egress) stations from a point, as demand.Access picks them: each station's best mode
+// by clock minutes (perceived with tripOpts.model; ties to the earlier mode: walk, drive, feeder, bike, drop-off), then the
+// nearest stop of each line run, best first, up to k (demand._diverse_nearest)
+function connectors(G, T, R, Y, p, egress) {
+  const [px, py] = projXY(T, p.lat, p.lon), c = T.cong[Y], feed = R.feeder && feedAt(T, p, Y), best = [];
+  for (let i = 0; i < G.nS; i++) {
+    const d = Math.hypot(G.xy[i][0] - px, G.xy[i][1] - py);
+    let b = null;
+    const opt = (m, t, o, x = 0) => { const gen = tripOpts.model ? t + T.ovtW * o + x : t; if (!b || gen < b[0]) b = [gen, t, m, d]; };
+    if (d <= R.walkKm) { const t = d * R.walkPerKm; opt(0, t, t); }
+    const pr = R.pnr, gar = T.garages[G.sids[i]];
+    if (!egress && tripOpts.pnr && gar && onAt(gar, Y) && d <= pr.maxKm && d >= pr.minKm) opt(1, d * pr.perKm * c + pr.pen, pr.pen, T.pnrPen);
+    const f = R.feeder;
+    if (feed && d <= f.maxKm && (!egress || f.egress)) opt(2, f.ovt + d * f.perKm * c, f.ovt);
+    const bk = R.bike;
+    if (bk && tripOpts.bike && d <= bk.maxKm && (!egress || bk.egress)) { const t = d * bk.perKm + bk.pen; opt(3, t, t); }
+    const kr = R.kiss;
+    if (!egress && kr && tripOpts.kiss && d <= kr.maxKm) opt(4, d * kr.perKm * c + kr.pen, kr.pen);
+    best.push(b);
+  }
+  const cand = [];
+  for (const st of G.runSt) {
+    let bi = -1;
+    for (const i of st) if (best[i] && (bi < 0 || best[i][0] < best[bi][0])) bi = i;
+    if (bi >= 0) cand.push(bi);
+  }
+  cand.sort((a, b) => best[a][0] - best[b][0]);
+  return cand.slice(0, T.k).map(i => ({i, gen: best[i][0], t: best[i][1], mode: MODES[best[i][2]], km: best[i][3]}));
+}
+// one year, door to door: {total (clock min) or null, drive, legs, acc, egr, gi}
+function doorYear(Y, A, B) {
+  const T = S.trip, gi = S.yearGraph[Y], drive = driveMin(T, A, B, Y);
+  if (gi === undefined) return {total: null, drive};
+  const G = tripGraph(gi), R = T.rules[T.yearRules[Y]];
+  const acc = connectors(G, T, R, Y, A, false), egr = connectors(G, T, R, Y, B, true);
+  if (!acc.length || !egr.length) return {total: null, drive, none: !acc.length ? 'from' : 'to'};
+  const src = new Map(), tgt = new Map();
+  for (const a of acc) if (!(src.get(a.i) <= a.gen)) src.set(a.i, a.gen);
+  // leave from a line node (on alighting): every trip rides at least once, as in the model
+  for (const e of egr) for (const n of G.at[e.i]) if (!(tgt.get(n) <= e.gen)) tgt.set(n, e.gen);
+  const r = dijkstra(G, src, tgt, tripOpts.model ? T.waitW : 1);
+  if (r.end < 0) return {total: null, drive};
+  const p = pathLegs(G, r), pick1 = (xs, i) => xs.filter(x => x.i === i).sort((u, v) => u.gen - v.gen)[0];
+  const a = pick1(acc, p.a), e = pick1(egr, p.b);
+  a.sid = G.sids[a.i]; e.sid = G.sids[e.i];
+  // modelMin: the same path in the model's minutes (waits as perceived, demand._paths), for checks
+  return {total: a.t + p.min + e.t, drive, legs: p.legs, acc: a, egr: e, gi, rule: R,
+          modelMin: r.best - a.gen + a.t - e.gen + e.t - D.boardPenalty};
+}
+// one year, station to station (as route(): waits as they are, no access legs)
+function stationYear(Y, a, b) {
+  const T = S.trip, gi = S.yearGraph[Y], drive = driveMin(T, ptOf({sid: a}), ptOf({sid: b}), Y);
+  if (gi === undefined || a === b) return {total: null, drive};
+  const G = tripGraph(gi);
+  if (!G.idx.has(a) || !G.idx.has(b)) return {total: null, drive};
+  const r = dijkstra(G, new Map([[G.idx.get(a), 0]]), new Map([[G.idx.get(b), 0]]), 1);
+  return {total: r.end < 0 ? null : pathLegs(G, r).min, drive};
+}
+// every year of the plan for the chosen trip (cached: the network only changes in some years,
+// but congestion moves drive and bus times every year until its cap)
+const seriesCache = new Map();
+function tripSeries() {
+  const [a, b] = ends, door = !(a.sid && b.sid), A = ptOf(a), B = ptOf(b), T = S.trip;
+  const key = [scenKey, hiddenKey(), A.lat, A.lon, B.lat, B.lon, door, door && Object.values(tripOpts).join()].join('|');
+  if (seriesCache.has(key)) return seriesCache.get(key);
+  const gv = Object.values(T.garages).flat(), memo = new Map();
+  const val = D.years.map(Y => {
+    const k = door ? [S.yearGraph[Y], T.yearRules[Y], T.cong[Y], gv.filter(t => t <= Y).length, feedAt(T, A, Y), feedAt(T, B, Y)].join('|') : S.yearGraph[Y];
+    if (!memo.has(k)) memo.set(k, door ? doorYear(Y, A, B) : stationYear(Y, a.sid, b.sid));
+    return {...memo.get(k), drive: driveMin(T, A, B, Y)};
+  });
+  if (seriesCache.size > 30) seriesCache.delete(seriesCache.keys().next().value);
+  seriesCache.set(key, val);
+  return val;
+}
+
+const pickMark = s => L.circleMarker([D.stations[s][1], D.stations[s][2]], {renderer: tripR, pane: 'trip', radius: 8, color: '#c96f00', weight: 3, fill: false, interactive: false}).addTo(tripLayer);
+const pin = (p, letter) => L.marker([p.lat, p.lon], {keyboard: false, interactive: false, icon: L.divIcon({className: 'pinwrap', html: `<div class="pin"><b>${letter}</b></div>`,
+  iconSize: [26, 26], iconAnchor: [13, 31]})}).addTo(tripLayer);
+const endMark = (e, letter) => e.sid ? pickMark(e.sid) : pin(e, letter);
+const showTrip = () => { $('trip').closest('details').open = true; if (touch) $('trip').scrollIntoView({block: 'nearest', behavior: 'smooth'}); };
+const clearBtn = ' <button type="button" class="clear" onclick="clearTrip()">Clear</button>';
+const START_HINT = '<p class="hint">Click a station, or type a station or a street address. Right-click (long-press on a phone) the map to start or end anywhere.</p>';
+function syncInputs() { $('from').value = endLabel(ends[0]); $('to').value = endLabel(ends[1]); }
+function clearTrip() {
+  ends = [null, null]; pick = []; syncInputs(); tripLayer.clearLayers(); dimNetwork(false); if (window.Schem) Schem.trip(null, null, pick);
+  $('tripOpts').hidden = true; $('trip').innerHTML = START_HINT;
+}
+// a station clicked (map or diagram): fills From, then To; a third click starts over
 function choose(sid) {
-  if (pick.length === 2) pick = [];
-  pick.push(sid);
-  $(pick.length === 1 ? 'from' : 'to').value = D.stations[sid][0];
-  if (pick.length === 1) $('to').value = '';
-  if (pick.length === 1) {
-    tripLayer.clearLayers(); dimNetwork(false); pickMark(sid); if (window.Schem) Schem.trip(null, null, pick);
-    $('trip').innerHTML = `<p class="hint">From <b>${D.stations[sid][0]}</b>. Now click a destination.</p>`; showTrip();
-  } else route();
+  if (ends[0] && ends[1]) ends = [{sid}, null];
+  else ends[ends[0] ? 1 : 0] = {sid};
+  syncInputs(); replan(false);
+}
+function setEnd(i, e) { ends[i] = e; syncInputs(); replan(true); }
+function replan(fit) {
+  const [a, b] = ends;
+  if (a && b && a.sid && b.sid) { pick = [a.sid, b.sid]; $('tripOpts').hidden = true; route(); return; }
+  if (a && b) { doorRoute(fit); return; }
+  tripLayer.clearLayers(); dimNetwork(false); $('tripOpts').hidden = true;
+  pick = [a, b].filter(e => e && e.sid).map(e => e.sid);
+  if (window.Schem) Schem.trip(null, null, pick);
+  if (!a && !b) { $('trip').innerHTML = START_HINT; return; }
+  const e = a || b;
+  endMark(e, a ? 'A' : 'B');
+  if (fit && !e.sid) map.panTo([e.lat, e.lon]);
+  $('trip').innerHTML = `<p class="hint">${a ? 'From' : 'To'} <b>${esc(endLabel(e))}</b>. Now ${a ? 'click a destination station or type an address' : 'choose where from'}.${clearBtn}</p>`;
+  showTrip();
+}
+// the ride itself: list rows, and the route drawn through the stops it rides
+function transitLegs(legs, yd) {
+  const sidOf = n => n[0] === 'P' ? n.slice(1) : yd.runs[+n.slice(1).split(':')[0]][1][+n.split(':')[1]];
+  const runPts = (ri, f, t) => { const k0 = +f.split(':')[1], k1 = +t.split(':')[1], st = yd.runs[ri][1];
+    return (k0 <= k1 ? st.slice(k0, k1 + 1) : st.slice(k1, k0 + 1).reverse()).map(s => [D.stations[s][1], D.stations[s][2]]); };
+  const tripW = 6 * zf();
+  let h = '';
+  for (const l of legs) {
+    if (l.t === 'ride') { const ln = S.lines[yd.runs[l.ri][0]], f = sidOf(l.from), t = sidOf(l.to);
+      h += `<div class="leg"><i style="background:${ln.color}"></i><span><b>${ln.name}</b> ${D.stations[f][0]} → ${D.stations[t][0]} · ${Math.round(l.min)} min</span></div>`;
+      const pts = runPts(l.ri, l.from, l.to);
+      L.polyline(pts, {renderer: tripR, pane: 'trip', color: bgColor, weight: tripW + 4, lineJoin: 'round', interactive: false}).addTo(tripLayer);
+      L.polyline(pts, {renderer: tripR, pane: 'trip', color: lineColor(ln.color, ln.mode), weight: tripW, lineJoin: 'round', interactive: false}).addTo(tripLayer); }
+    else if (l.t === 'walk') h += `<div class="leg"><i style="background:var(--rule)"></i><span>Walk ${D.stations[sidOf(l.from)][0]} → ${D.stations[sidOf(l.to)][0]} · ${Math.round(l.min)} min</span></div>`;
+    else h += `<div class="leg"><i style="background:var(--rule)"></i><span class="hint">Wait about ${Math.round(l.min)} min</span></div>`;
+  }
+  return h;
 }
 function route() {
   const Y = D.years[yi], yd = S.years[Y], [a, b] = pick;
@@ -608,14 +866,16 @@ function route() {
     for (const [v, w, info] of adj.get(u) || []) { const nd = d + w; if (nd < (dist.get(v) ?? Infinity)) { dist.set(v, nd); prev.set(v, [u, info]); heap.push([nd, v]); } }
   }
   tripLayer.clearLayers(); dimNetwork(false); if (window.Schem) Schem.trip(null, null, pick);  // schematic: clear the diagram route
-  const A = D.stations[a][0], B = D.stations[b][0], clear = ' <button type="button" class="clear" onclick="clearTrip()">Clear</button>';
+  const A = D.stations[a][0], B = D.stations[b][0], clear = clearBtn;
   const served = s => yd.runs.some(([, stops]) => stops.includes(s));
   if (a === b || !dist.has('P' + b)) {
     const why = a === b ? 'That is the same station twice; pick a different destination.'
       : !served(a) || !served(b) ? `${!served(a) ? A : B} has no service in ${Y} in this plan.`
       : `No route from ${A} to ${B} in ${Y}.` + (yi < D.years.length - 1 ? ' Try a later year.' : '');
     if (a !== b) pick.forEach(pickMark);
-    $('trip').innerHTML = `<p class="hint">${why}${clear}</p>`; if (a === b) pick = [a]; showTrip(); return;
+    $('trip').innerHTML = `<p class="hint">${why}${clear}</p>` + (a !== b ? chartBox() : '');
+    if (a === b) { pick = [a]; ends[1] = null; } else tripChart(tripSeries());
+    showTrip(); return;
   }
   const path = []; let u = 'P' + b; while (prev.has(u)) { const [p, info] = prev.get(u); path.unshift([p, u, info]); u = p; }
   const legs = [];
@@ -625,39 +885,217 @@ function route() {
     else if (info.t === 'walk') legs.push({t: 'walk', from: p, to: v, min: w});
     else if (info.t === 'board') legs.push({t: 'wait', ri: info.ri, at: p, min: w - D.boardPenalty});
   }
-  const sidOf = n => n[0] === 'P' ? n.slice(1) : yd.runs[+n.slice(1).split(':')[0]][1][+n.split(':')[1]];
   const total = dist.get('P' + b) - D.boardPenalty;
   let h = `<div class="tot">${A} → ${B}: ${Math.round(total)} min</div><div class="hint">${Y} network, station to station` +
     (hidden.size ? ', without the hidden lines' : '') + `.${clear}</div>`;
-  const runPts = (ri, f, t) => { const k0 = +f.split(':')[1], k1 = +t.split(':')[1], st = yd.runs[ri][1];
-    return (k0 <= k1 ? st.slice(k0, k1 + 1) : st.slice(k1, k0 + 1).reverse()).map(s => [D.stations[s][1], D.stations[s][2]]); };
-  const tripW = 6 * zf();
-  for (const l of legs) {
-    if (l.t === 'ride') { const ln = S.lines[yd.runs[l.ri][0]], f = sidOf(l.from), t = sidOf(l.to);
-      h += `<div class="leg"><i style="background:${ln.color}"></i><span><b>${ln.name}</b> ${D.stations[f][0]} → ${D.stations[t][0]} · ${Math.round(l.min)} min</span></div>`;
-      const pts = runPts(l.ri, l.from, l.to);   // through the stops it rides, not a straight line
-      L.polyline(pts, {renderer: tripR, pane: 'trip', color: bgColor, weight: tripW + 4, lineJoin: 'round', interactive: false}).addTo(tripLayer);
-      L.polyline(pts, {renderer: tripR, pane: 'trip', color: lineColor(ln.color, ln.mode), weight: tripW, lineJoin: 'round', interactive: false}).addTo(tripLayer); }
-    else if (l.t === 'walk') h += `<div class="leg"><i style="background:var(--rule)"></i><span>Walk ${D.stations[sidOf(l.from)][0]} → ${D.stations[sidOf(l.to)][0]} · ${Math.round(l.min)} min</span></div>`;
-    else h += `<div class="leg"><i style="background:var(--rule)"></i><span class="hint">Wait about ${Math.round(l.min)} min</span></div>`;
-  }
+  h += transitLegs(legs, yd);
   pick.forEach(pickMark);
   dimNetwork(true);
-  $('trip').innerHTML = h; showTrip(); if (window.Schem) Schem.trip(legs, yd, pick);  // schematic: highlight the route
+  $('trip').innerHTML = h + chartBox(); tripChart(tripSeries());
+  showTrip(); if (window.Schem) Schem.trip(legs, yd, pick);  // schematic: highlight the route
 }
-// type-ahead station search for the trip planner (keyboard, screen readers, small screens)
+// access and egress legs: wording, and their dashed style on the map and in the list
+const ACCESS = {walk: ['Walk', 'walk'], pnr: ['Drive', 'drive'], kiss: ['Get dropped off', 'drive'], feeder: ['Bus', 'bus'], bike: ['Bike or scooter', 'bike']};
+const legStyle = kind => ({walk: {color: css('--ink'), dashArray: '1 7', weight: 4}, drive: {color: css('--accent'), dashArray: '10 7', weight: 3.5},
+  bus: {color: css('--bus'), dashArray: '6 4 1 4', weight: 3.5}, bike: {color: css('--good'), dashArray: '4 5', weight: 3.5}}[kind]);
+function accessRow(c, p, egress, R) {
+  if (c.t < 0.5 && c.mode === 'walk') return '';   // the trip starts or ends at the station itself
+  const [verb, kind] = ACCESS[c.mode], st = D.stations[c.sid][0];
+  const what = c.mode === 'pnr' ? `${verb} ${Math.round(c.t)} min to the ${st} garage`
+    : egress ? `${verb} ${Math.round(c.t)} min from ${st}` : `${verb} ${Math.round(c.t)} min to ${st}`;
+  const note = c.mode === 'feeder' ? ` <span class="hint">(every ${R.feeder.headway} min; walk to the stop and wait included)</span>`
+    : c.mode === 'pnr' ? ' <span class="hint">(park and walk in included)</span>' : '';
+  L.polyline(egress ? [[D.stations[c.sid][1], D.stations[c.sid][2]], [p.lat, p.lon]] : [[p.lat, p.lon], [D.stations[c.sid][1], D.stations[c.sid][2]]],
+    {renderer: tripR, pane: 'trip', lineCap: 'round', interactive: false, ...legStyle(kind)}).addTo(tripLayer);
+  return `<div class="leg"><i class="acc ${kind}"></i><span>${what}${note} · ${c.km.toFixed(1)} km</span></div>`;
+}
+function doorRoute(fit) {
+  const Y = D.years[yi], [ea, eb] = ends, A = ptOf(ea), B = ptOf(eb), ser = tripSeries(), r = ser[yi];
+  tripLayer.clearLayers(); dimNetwork(false);
+  const head = `<div class="hint">${Y} network, door to door` + (hidden.size ? ', without the hidden lines' : '') + `.${clearBtn}</div>`;
+  const drive = `<div class="hint">Driving alone at rush hour: about <b>${Math.round(r.drive)} min</b>.</div>`;
+  tripOptions();
+  if (r.total === null) {
+    pick = [ea, eb].filter(e => e.sid).map(e => e.sid);
+    if (window.Schem) Schem.trip(null, null, pick);
+    endMark(ea, 'A'); endMark(eb, 'B');
+    const first = ser.findIndex((s, i) => i > yi && s.total !== null);
+    const R = S.trip.rules[S.trip.yearRules[Y]];
+    const why = r.none ? `No station of this plan's ${Y} network is within reach of ${esc(r.none === 'from' ? A.label : B.label)} ` +
+      `(the model walks up to ${R.walkKm} km` + (r.none === 'from' && tripOpts.pnr ? `, drives up to ${R.pnr.maxKm} km to a garage` : '') +
+      (R.feeder ? `, takes a feeder bus up to ${R.feeder.maxKm} km where it's dense enough` : '') + ').'
+      : `No transit route from ${esc(A.label)} to ${esc(B.label)} in ${Y}.`;
+    $('trip').innerHTML = `<p class="hint">${why}${first > 0 ? ` The first comes in ${D.years[first]}.` : ''}${clearBtn}</p>` + drive + chartBox();
+  } else {
+    const yd = S.graphs[r.gi];
+    let h = `<div class="tot">${esc(A.label)} → ${esc(B.label)}: ${Math.round(r.total)} min</div>` + head;
+    h += accessRow(r.acc, A, false, r.rule) + transitLegs(r.legs, yd) + accessRow(r.egr, B, true, r.rule);
+    h += drive + '<div class="hint note">Getting to and from stations is estimated as the model does it: straight-line distance, average speeds, feeder buses standing in for local routes.</div>';
+    pick = [r.acc.sid, r.egr.sid];
+    endMark(ea, 'A'); endMark(eb, 'B');
+    dimNetwork(true);
+    $('trip').innerHTML = h + chartBox();
+    if (window.Schem) Schem.trip(r.legs, yd, pick);   // the diagram highlights the ride
+  }
+  tripChart(ser);
+  if (fit) {
+    const pts = [[A.lat, A.lon], [B.lat, B.lon]], rr = $('panel').getBoundingClientRect(), sheet = rr.width > innerWidth * .6;
+    if (r.total !== null) pts.push([D.stations[r.acc.sid][1], D.stations[r.acc.sid][2]], [D.stations[r.egr.sid][1], D.stations[r.egr.sid][2]]);
+    map.fitBounds(L.latLngBounds(pts), {maxZoom: 14, ...(sheet ? {paddingTopLeft: [24, 24], paddingBottomRight: [24, innerHeight - rr.top + 24]}
+      : {paddingTopLeft: [rr.right + 24, 24], paddingBottomRight: [24, 24]})});
+  }
+  showTrip();
+}
+// which ways of reaching a station the traveller has: driving to a garage, and the levers this plan
+// enables in some year (bike or scooter, getting dropped off)
+function tripOptions() {
+  const T = S.trip, any = k => T.rules.some(r => r[k]);
+  const box = (k, label) => `<label><input type="checkbox" data-o="${k}" ${tripOpts[k] ? 'checked' : ''}> ${label}</label>`;
+  $('tripOpts').innerHTML = '<span>Reach stations by:</span>' + box('pnr', 'driving to a garage') + (any('bike') ? box('bike', 'bike or scooter') : '') + (any('kiss') ? box('kiss', 'drop-off') : '');
+  $('tripOpts').hidden = false;
+  $('tripOpts').querySelectorAll('input').forEach(i => i.onchange = () => { tripOpts[i.dataset.o] = i.checked; replan(false); });
+}
+
+// ---- the trip, year by year: transit door to door (solid) and driving alone (dashed) ----
+const chartBox = () => '<div class="tchart"><svg id="tchart" aria-label="Trip minutes by year"></svg><div class="hint" id="tchartKey"></div></div>';
+function tripChart(ser) {
+  const svg = $('tchart'); if (!svg) return;
+  const n = ser.length, W = Math.max(220, Math.round($('trip').clientWidth || 300)), H = 108, l = 30, r = 8, t = 12, b = 16;
+  const vals = ser.flatMap(s => [s.total, s.drive]).filter(v => v !== null && isFinite(v)), mx = Math.max(10, ...vals);
+  const step = [5, 10, 15, 20, 30, 40, 50, 60, 90, 120, 180].find(s => mx / s <= 3.5) || 240, top = Math.ceil(mx * 1.04 / step) * step;
+  const X = i => l + i / (n - 1) * (W - l - r), Yp = v => t + (1 - v / top) * (H - t - b);
+  let g = '';
+  for (let v = 0; v <= top; v += step) g += `<line class="grid" x1="${l}" x2="${W - r}" y1="${Yp(v).toFixed(1)}" y2="${Yp(v).toFixed(1)}"/><text x="${l - 4}" y="${(Yp(v) + 3).toFixed(1)}" text-anchor="end">${v}</text>`;
+  g += `<text x="${l + 3}" y="${t - 1}">min</text>`;
+  D.years.forEach((y, i) => { if (y % 25 === 0 || i === 0 || i === n - 1) g += `<text x="${X(i).toFixed(1)}" y="${H - 3}" text-anchor="${i === 0 ? 'start' : i === n - 1 ? 'end' : 'middle'}">${y}</text>`; });
+  const line = (key, cls) => {   // a gap wherever a year has no value
+    let out = '', run = [];
+    const flush = () => { if (run.length > 1) out += `<polyline class="${cls}" points="${run.join(' ')}"/>`; else if (run.length) out += `<circle class="${cls}d" r="1.6" cx="${run[0].split(',')[0]}" cy="${run[0].split(',')[1]}"/>`; run = []; };
+    ser.forEach((s, i) => { if (s[key] === null || !isFinite(s[key])) flush(); else run.push(`${X(i).toFixed(1)},${Yp(s[key]).toFixed(1)}`); });
+    flush(); return out;
+  };
+  g += line('drive', 'ln2') + line('total', 'ln');
+  const now = ser[yi], nv = now.total !== null ? now.total : now.drive;
+  g += `<line class="xh" id="tcX" x1="${X(yi)}" x2="${X(yi)}" y1="${t}" y2="${H - b}"/><circle class="now" r="4" cx="${X(yi).toFixed(1)}" cy="${Yp(nv).toFixed(1)}"/>`;
+  g += '<line class="xh hov" id="tcH" y1="' + t + '" y2="' + (H - b) + '" visibility="hidden"/><circle class="hovd" id="tcD" r="3" visibility="hidden"/><circle class="hovd2" id="tcD2" r="3" visibility="hidden"/>';
+  svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
+  svg.innerHTML = g;
+  const say = i => { const s = ser[i];
+    return `<b>${D.years[i]}</b>: ` + (s.total !== null ? `transit ${Math.round(s.total)} min` : 'no transit route') + ` · driving ${Math.round(s.drive)} min`; };
+  const keyText = say(yi) + '. Solid: transit · dashed: driving alone. Tap or click a year to go there.';
+  $('tchartKey').innerHTML = keyText;
+  const at = e => { const rc = svg.getBoundingClientRect(), x = (e.clientX - rc.left) / rc.width * W; return Math.max(0, Math.min(n - 1, Math.round((x - l) / (W - l - r) * (n - 1)))); };
+  svg.onpointermove = svg.onpointerdown = e => {
+    const i = at(e), s = ser[i], x = X(i).toFixed(1), set = (id, v, cy) => { const c = $(id); c.setAttribute('visibility', v === null ? 'hidden' : 'visible'); if (v !== null) { c.setAttribute('cx', x); c.setAttribute('cy', Yp(v).toFixed(1)); } };
+    const hl = $('tcH'); hl.setAttribute('x1', x); hl.setAttribute('x2', x); hl.setAttribute('visibility', 'visible');
+    set('tcD', s.total); set('tcD2', s.drive);
+    $('tchartKey').innerHTML = say(i) + (i === yi ? '' : '. Click to show this year.');
+  };
+  svg.onpointerleave = () => { ['tcH', 'tcD', 'tcD2'].forEach(id => $(id) && $(id).setAttribute('visibility', 'hidden')); $('tchartKey').innerHTML = keyText; };
+  svg.onclick = e => { const i = at(e); if (i !== yi) { yi = i; $('slider').value = yi; draw(); } };
+}
+
+// ---- From / To: stations by name, or any address (geocoded by Photon, OpenStreetMap data) ----
+const geoURL = q => `https://photon.komoot.io/api/?q=${encodeURIComponent(q)}&lat=32.8&lon=-97.0&limit=8&bbox=${GEO_BOX.join(',')}`;
+function placeOf(f) {
+  const p = f.properties || {}, [lon, lat] = (f.geometry || {}).coordinates || [];
+  const street = [p.housenumber, p.street].filter(Boolean).join(' '), name = p.name || street;
+  const town = p.city || p.locality || p.district || p.county || '';
+  const sub = [name !== street ? street : '', town, p.postcode].filter(Boolean).join(', ');
+  return {lat, lon, label: name + (town && name !== town ? ', ' + town : ''), sub};
+}
+function combo(i) {
+  const inp = $(i ? 'to' : 'from'), list = $(i ? 'toList' : 'fromList');
+  let items = [], act = -1, timer = null, ctl = null, msg = '';
+  const close = () => { list.hidden = true; inp.setAttribute('aria-expanded', 'false'); inp.removeAttribute('aria-activedescendant'); act = -1; };
+  const render = () => {
+    list.innerHTML = items.map((it, k) => `<li role="option" id="${list.id}-${k}" data-k="${k}" aria-selected="${k === act}"><span class="k">${it.sid ? 'Station' : it.coords ? 'Point' : 'Address'}</span>${esc(it.label)}` +
+      (it.sub ? `<small>${esc(it.sub)}</small>` : '') + '</li>').join('') + (msg ? `<li class="msg" role="presentation">${msg}</li>` : '');
+    list.hidden = (!items.length && !msg) || document.activeElement !== inp; inp.setAttribute('aria-expanded', String(!list.hidden));
+    if (act >= 0) inp.setAttribute('aria-activedescendant', `${list.id}-${act}`); else inp.removeAttribute('aria-activedescendant');
+  };
+  const stations = q => {
+    const ql = q.toLowerCase(), names = [...S._byName.keys()].filter(nm => nm.toLowerCase().includes(ql));
+    names.sort((x, y) => (y.toLowerCase().startsWith(ql) - x.toLowerCase().startsWith(ql)) || x.localeCompare(y));
+    return names.slice(0, 5).map(nm => ({sid: S._byName.get(nm), label: nm}));
+  };
+  const take = it => { close(); clearTimeout(timer); if (ctl) ctl.abort(); setEnd(i, it.sid ? {sid: it.sid} : {lat: it.lat, lon: it.lon, label: it.label}); };
+  async function search(q) {
+    if (ctl) ctl.abort();
+    ctl = new AbortController();
+    try {
+      const res = await fetch(geoURL(q), {signal: ctl.signal});
+      if (!res.ok) throw new Error('HTTP ' + res.status);
+      const places = ((await res.json()).features || []).map(placeOf).filter(p => isFinite(p.lat) && inBox(p.lat, p.lon) && p.label);
+      if (inp.value.trim() !== q) return;
+      const seen = new Set();
+      items = items.filter(x => !x.lat || x.coords).concat(places.filter(p => !seen.has(p.label + p.sub) && seen.add(p.label + p.sub)).slice(0, 5));
+      msg = places.length || items.length ? '' : `No address in the DFW area matches “${esc(q)}”.`;
+    } catch (e) {
+      if (e.name === 'AbortError') return;
+      msg = 'Address search is unavailable right now (offline?). Station names still work.';
+    }
+    render();
+  }
+  inp.addEventListener('input', () => {
+    const q = inp.value.trim(); clearTimeout(timer); if (ctl) ctl.abort();
+    items = q ? stations(q) : []; msg = ''; act = -1;
+    const ll = q.match(/^(-?\d{1,3}\.\d+)\s*[, ]\s*(-?\d{1,3}\.\d+)$/);   // "32.78, -96.80"
+    if (ll && inBox(+ll[1], +ll[2])) items.unshift({lat: +ll[1], lon: +ll[2], label: `${(+ll[1]).toFixed(5)}, ${(+ll[2]).toFixed(5)}`, coords: true});
+    else if (q.length >= 3) { msg = 'Searching addresses…'; timer = setTimeout(() => search(q), 350); }
+    render();
+  });
+  inp.addEventListener('keydown', e => {
+    if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+      if (!items.length) return;
+      e.preventDefault(); act = (act + (e.key === 'ArrowDown' ? 1 : items.length - 1) + (act < 0 && e.key === 'ArrowUp' ? 1 : 0)) % items.length; render();
+    } else if (e.key === 'Enter') {
+      const q = inp.value.trim(), exact = S._byName.get(q);
+      if (act >= 0) take(items[act]); else if (exact) take({sid: exact}); else if (items.length) take(items[0]);
+      else if (q.length >= 3) { clearTimeout(timer); search(q).then(() => { if (items.length && inp.value.trim() === q) take(items[0]); }); }
+      e.preventDefault();
+    } else if (e.key === 'Escape') close();
+  });
+  list.addEventListener('mousedown', e => e.preventDefault());   // keep the focus in the input
+  list.addEventListener('click', e => { const li = e.target.closest('li[data-k]'); if (li) take(items[+li.dataset.k]); });
+  inp.addEventListener('blur', () => setTimeout(() => { clearTimeout(timer); if (ctl) ctl.abort(); close(); }, 120));
+  inp.addEventListener('change', () => {   // a station name typed in full still works on its own
+    const q = inp.value.trim(), sid = S._byName.get(q);
+    if (sid && !(ends[i] && ends[i].sid === sid)) setEnd(i, {sid});
+    else if (!q && ends[i]) setEnd(i, null);
+  });
+}
+combo(0); combo(1);
+// any point on the map: right-click, or long-press on a touch screen (Leaflet's contextmenu)
+async function nameOf(p) {
+  try {
+    const res = await fetch(`https://photon.komoot.io/reverse?lat=${p.lat}&lon=${p.lon}`);
+    const f = ((await res.json()).features || [])[0];
+    if (f && ends.includes(p)) { const q = placeOf(f); p.label = q.label || p.label; syncInputs(); replan(false); }
+  } catch (e) { /* offline: keep the coordinates */ }
+}
+map.on('contextmenu', e => {
+  const {lat, lng} = e.latlng;
+  if (!inBox(lat, lng)) return;
+  const div = document.createElement('div');
+  div.className = 'pop';
+  div.innerHTML = `<b>This point</b><div class="m">${lat.toFixed(5)}, ${lng.toFixed(5)}</div><div class="row ptbtn"><button type="button" data-i="0">Trip from here</button><button type="button" data-i="1">Trip to here</button></div>`;
+  const pp = L.popup(panelPad()).setLatLng(e.latlng).setContent(div).openOn(map);
+  div.onclick = ev => {
+    const b = ev.target.closest('button'); if (!b) return;
+    map.closePopup(pp);
+    const p = {lat, lon: lng, label: `Point ${lat.toFixed(4)}, ${lng.toFixed(4)}`};
+    const i = +b.dataset.i;
+    ends[i] = p; syncInputs(); replan(false); nameOf(p);
+  };
+});
+// station names for the From / To search (stations this plan ever serves)
 function stationList() {
   const ids = new Set(Object.values(S.years).flatMap(g => g.runs.flatMap(r => r[1])));
   const byName = new Map();
   for (const s of ids) if (!byName.has(D.stations[s][0])) byName.set(D.stations[s][0], s);
   S._byName = byName;
-  $('stlist').innerHTML = [...byName.keys()].sort().map(n => `<option value="${n.replace(/"/g, '&quot;')}">`).join('');
 }
-const odPick = () => {
-  const a = S._byName.get($('from').value.trim()), b = S._byName.get($('to').value.trim());
-  if (a && b) { pick = [a, b]; route(); } else if (a && !b && document.activeElement !== $('to')) { pick = []; choose(a); }
-};
-$('from').onchange = odPick; $('to').onchange = odPick;
 stationList();
 $('slider').oninput = e => { yi = +e.target.value; draw(); };
 $('scen').onchange = e => { scenKey = e.target.value; S = D.scen[scenKey]; stationList(); draw(); };   // hidden lines stay hidden

@@ -29,7 +29,7 @@ grow out of a small first phase, and think "oh, there's actually a path to this.
 A source-of-truth set of network tables, a model that scores any plan against
 real population and jobs data, and an [interactive map](https://dgoodenough.github.io/dfw-transit/)
 ([source](docs/index.html)) with a
-**time slider**, a **plan switcher** (v2 vs. the original v1) and a click-two-stations
+**time slider**, a **plan switcher** (v2 vs. the original v1) and a door-to-door
 **trip planner**. Drag the slider and the network builds itself out year by year,
 with the plan's numbers alongside: commutes where transit beats driving, jobs
 reachable in 45 minutes, residents near a station, and capital spent.
@@ -39,6 +39,19 @@ schematic: octilinear lines, bundled corridors and capsule interchanges, laid
 out at build time by [`dfwt/schematic.py`](dfwt/schematic.py) (a density-equalizing
 cartogram, then octilinear least squares) so every slider, plan and trip works
 on it too.
+
+The **trip planner** takes street addresses as well as stations (type one, or
+right-click / long-press any point on the map). Addresses are looked up with
+[Photon](https://photon.komoot.io/) (OpenStreetMap data), limited to the metroplex;
+station names work offline. A trip is the model's own: the same rules the demand
+model uses to reach stations (walk up to the walk distance, drive to a park & ride
+garage, the feeder bus where a block group is dense enough, bike or drop-off where a
+plan enables them; [`dfwt/tripplan.py`](dfwt/tripplan.py) exports them per year), then
+the ride, then the walk or bus at the far end: the fastest such trip in clock minutes,
+next to the model's rush-hour drive. A chart under the
+trip shows its door-to-door minutes and the drive for every year of the plan; click a
+year to jump there. Access legs are straight-line estimates, and the feeder bus stands
+in for the real local routes.
 
 ![The diagram view, 2070 network](docs/img/diagram-desktop.png)
 
@@ -72,11 +85,11 @@ led to thirteen steps, and v2 implements the ones the data supports
 
 | | v1 plan | v2 plan (budget-constrained) | **2 million riders (default)** |
 |---|---|---|---|
-| Daily transit trips, 2050 (each trip counted once) | 327k | 376k | **1.10M** |
-| Daily transit trips, 2100 | 666k | 781k | **2.24M** (2M reached in 2076) |
-| Daily boardings, all modes, 2100 | 1.15M | 1.35M | **4.17M** |
-| Jobs the average resident reaches in 45 min, 2100 | 93k | 107k | **172k** |
-| Capital through 2100 (2025 $, lines, stations, garages) | $112.3B | $103.6B | **$134.8B** |
+| Daily transit trips, 2050 (each trip counted once) | 324k | 370k | **1.03M** |
+| Daily transit trips, 2100 | 664k | 771k | **2.23M** (2M reached in 2077) |
+| Daily boardings, all modes, 2100 | 1.15M | 1.34M | **4.15M** |
+| Jobs the average resident reaches in 45 min, 2100 | 93k | 106k | **173k** |
+| Capital through 2100 (2025 $, lines, stations, garages) | $112.3B | $103.1B | **$135.0B** |
 | Operating cost, 2100 (rail and BRT, per year) | $0.9B | $0.9B | **$1.6B** |
 | Validation: errors / islands | 1 / 10 | 0 / 0 | 0 / 0 |
 
@@ -99,8 +112,8 @@ Live numbers are in [`reports/RESULTS.md`](reports/RESULTS.md).
   (station years, colors, demand, costs) are computed, not stored, so they can't
   drift. In v1, station and track years disagreed on 238 of 642 links.
 - **One config.** Speeds, waits, costs, walk distances and thresholds all live in
-  [`config.json`](config.json). The map's trip planner uses the routing graph
-  exported by the same model, so it can't disagree with the reports.
+  [`config.json`](config.json). The map's trip planner uses the routing graph and
+  the access rules exported by the same model, so it can't disagree with the reports.
 - **Plans are scenarios.** [`scenarios/`](scenarios/README.md) holds alternatives
   as overlays: the untouched v1 plan, the v2 plan's hand-set phasing from before
   the optimizer, and a "right-sized" version with suburban metro as BRT. Every build compares them side by side.

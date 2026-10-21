@@ -12,6 +12,7 @@ body.diagram #map{visibility:hidden}
 #schem .ln{fill:none;stroke-linecap:round;stroke-linejoin:round}
 #schem .case{fill:none;stroke:var(--st-fill);stroke-linecap:round;stroke-linejoin:round}
 #schem .fut{opacity:.4}
+#schem .ln.fut{stroke:var(--muted);opacity:.45}   /* track still to come: grey, not the line's colour */
 #schem #sch-st .fut,#schem #sch-conn .fut{opacity:.45}
 #schem .glow{fill:none;stroke:var(--glow);stroke-linecap:round;stroke-linejoin:round;opacity:var(--glow-o)}
 /* year change: new track draws itself in, new stations and glows fade in */

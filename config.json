@@ -100,6 +100,13 @@
       "default_headway_min": 20,
       "capacity_pphpd": 6000,
       "label": "Regional / commuter rail"
+    },
+    "streetcar": {
+      "cruise_kmh": 18,
+      "stop_penalty_min": 0.6,
+      "default_headway_min": 20,
+      "capacity_pphpd": 1200,
+      "label": "Streetcar"
     }
   },
   "wait": {
@@ -127,7 +134,8 @@
       "terminus": 1500,
       "commuter_station": 400,
       "brt_terminus": 400,
-      "_doc": "Garage spaces: line termini (BRT termini smaller), every commuter station. Charged at garage_musd_per_space (~$30k a structured space) with the station."
+      "_doc": "Garage spaces: line termini (BRT termini smaller), every commuter station. Charged at garage_musd_per_space (~$30k a structured space) with the station.",
+      "streetcar_terminus": 0
     },
     "pnr_people_per_space": 0.95,
     "pnr_min_km": 1.2,
@@ -217,7 +225,8 @@
     "walkshed_m": {
       "metro": 800,
       "brt": 800,
-      "commuter": 1600
+      "commuter": 1600,
+      "streetcar": 400
     }
   },
   "demand": {
@@ -243,6 +252,11 @@
       "surface": 140,
       "elevated": 240,
       "tunnel": 600
+    },
+    "streetcar": {
+      "surface": 60,
+      "elevated": 150,
+      "tunnel": 400
     }
   },
   "station_cost_musd": {
@@ -250,7 +264,8 @@
     "brt": 4,
     "commuter": 20,
     "metro": 50,
-    "metro_tunnel": 200
+    "metro_tunnel": 200,
+    "streetcar": 3
   },
   "standards": {
     "_doc": "Stop-spacing bands (km) used by validate. Sources in reports/DESIGN_STANDARDS.md.",
@@ -266,6 +281,10 @@
       "commuter": [
         2.5,
         16
+      ],
+      "streetcar": [
+        0.2,
+        1.0
       ]
     },
     "hairpin_deg": 25,
@@ -303,22 +322,29 @@
       "commuter": [
         15.0,
         2
+      ],
+      "streetcar": [
+        1.0,
+        2
       ]
     },
     "max_km_per_stage": {
       "metro": 15,
       "brt": 25,
-      "commuter": 50
+      "commuter": 50,
+      "streetcar": 10
     },
     "max_km_per_interval": {
       "metro": 25,
       "brt": 40,
-      "commuter": 80
+      "commuter": 80,
+      "streetcar": 15
     },
     "construction_years": {
       "metro": 5,
       "brt": 2,
-      "commuter": 4
+      "commuter": 4,
+      "streetcar": 3
     },
     "max_stub_years": 20
   },
@@ -374,10 +400,26 @@
     "check_radius_m": {
       "metro": 150,
       "commuter": 175,
-      "brt": 25
+      "brt": 25,
+      "streetcar": 20
     },
     "straighten_move_max_m": 800,
-    "straighten_move_far_m": 1500
+    "straighten_move_far_m": 1500,
+    "streetcar": {
+      "Rmin": 25,
+      "Rmax": 2000,
+      "vmax_kmh": 50,
+      "alat": 1.5,
+      "jerk": 0.6,
+      "Lp": 40,
+      "Ltmin": 0,
+      "min_spiral_m": 0,
+      "tol": {
+        "surface": 10,
+        "elevated": 10,
+        "tunnel": 30
+      }
+    }
   },
   "growth": {
     "_doc": "Zone population and jobs by year (dfwt/growth.py). Multipliers are relative to the base data (2020 population, 2022 jobs) and interpolated between years; the mid case follows NCTCOG Mobility 2050 (12.4M in 2050) and flattens toward 2100 as national growth stalls (Census 2023 projections). low/high are alternatives for scenarios. TOD adds growth within radius_m of stations opened after existing_year (full within full_radius_m), ramping in along a logistic curve (half at ramp_mid_years, width ramp_width_years). Uplift depends on the station's setting (by people+jobs density within 800 m) times a mode factor; net_new_share of it is new to the region and the rest is drawn from elsewhere (rail mostly moves growth around: Cervero & Seskins; NITC station-area studies).",
@@ -453,12 +495,14 @@
       "mode_factor_pop": {
         "metro": 1.0,
         "commuter": 0.5,
-        "brt": 0.4
+        "brt": 0.4,
+        "streetcar": 0.3
       },
       "mode_factor_jobs": {
         "metro": 1.0,
         "commuter": 0.5,
-        "brt": 0.7
+        "brt": 0.7,
+        "streetcar": 0.5
       },
       "net_new_share": 0.2,
       "upzone_existing_year": null
@@ -481,7 +525,8 @@
       "mode_factor": {
         "metro": 1.0,
         "commuter": 0.75,
-        "brt": 0.8
+        "brt": 0.8,
+        "streetcar": 0.5
       },
       "job_centers": {
         "jobs_share": 0.0,
@@ -636,7 +681,8 @@
     "usd_per_revenue_hour": {
       "metro": 250,
       "brt": 150,
-      "commuter": 400
+      "commuter": 400,
+      "streetcar": 180
     },
     "span_hours": 18,
     "layover": 1.15,

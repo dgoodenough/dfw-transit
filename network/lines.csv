@@ -42,3 +42,5 @@ E35,Ennis Line,commuter,proposed,#A0694E,,A7: long-range reserve; lowest value p
 E36,Waxahachie Line,commuter,proposed,#5F7466,,
 E37,Midlothian Line,commuter,proposed,#806070,,
 E38,SH-121 BRT,brt,proposed,#00838f,,A6: McKinney-Frisco-Legacy crosstown. Sketch alignment on SH-121 frontage roads; needs a real road-ROW routing pass.
+E50,Dallas Streetcar,streetcar,existing,#e57373,20,Today's Dallas Streetcar: Union Station - Oak Cliff - Bishop Arts.
+E51,M-Line Trolley,streetcar,existing,#8d6e63,15,Today's M-Line (McKinney Avenue Trolley): Arts District - Uptown - CityPlace.

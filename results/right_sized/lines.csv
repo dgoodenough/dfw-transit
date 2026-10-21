@@ -1,44 +1,46 @@
 line_id,name,mode,status,first_year,last_year,km,stops,avg_spacing_km,headway_min,cost_musd,daily_commuters_peak_link,peak_hour_load,capacity_used_pct,passenger_km
-F01,FW Green,metro,proposed,2039,2047,21.9,13,1.83,6.0,4947,4805,1096,9.1,61587
-F02,FW Blue,metro,proposed,2045,2060,23.0,15,1.65,6.0,2653,2738,624,5.2,28700
-F03,FW Orange,metro,proposed,2035,2040,11.5,15,0.82,6.0,4301,2448,558,4.7,14139
-F04,FW Pink,metro,proposed,2046,2068,21.6,16,1.44,6.0,1463,2778,633,5.3,32950
-F05,FW Berry,metro,proposed,2051,2070,25.4,7,4.23,6.0,3029,2334,532,4.4,43718
-F06,FW Red,metro,proposed,2056,2056,13.7,6,2.75,6.0,1685,1473,336,2.8,15961
-F07,FW Purple,metro,proposed,2039,2044,7.6,7,1.27,6.0,814,2025,462,3.8,14097
-E01,White Settlement BRT,brt,proposed,2075,2080,20.1,12,1.83,8.0,436,901,206,5.1,7830
-E02,Riverside-Forest Hill BRT,brt,proposed,2033,2038,21.6,11,2.16,8.0,660,331,76,1.9,3595
-E04,Jacksboro BRT,brt,proposed,2031,2036,14.9,10,1.65,8.0,484,1310,299,7.5,7782
-E05,TexPress Expansion,commuter,proposed,2030,2035,19.8,7,3.3,20.0,1047,999,228,3.8,12796
-E07,SE TexRail,commuter,proposed,2033,2038,30.4,6,6.08,20.0,1436,532,121,2.0,10988
-E08,FTW/Denton,commuter,proposed,2048,2053,56.2,11,5.62,20.0,2276,713,163,2.7,20941
-E09,TEXRail,commuter,existing,2025,2025,42.1,8,6.01,15.0,0,1362,310,5.2,46600
-E10,TRE,commuter,existing,2025,2025,54.2,10,6.03,15.0,0,3738,852,14.2,107335
-E11,A-train,commuter,existing,2025,2025,33.8,6,6.77,15.0,0,580,132,2.2,16548
-E12,Orange Line,metro,existing,2025,2025,65.8,30,2.27,10.0,0,7808,1780,14.8,244763
-E13,Green Line,metro,existing,2025,2025,45.7,24,1.99,10.0,0,4881,1113,9.3,135361
-E14,Red Line,metro,existing,2025,2025,44.6,25,1.86,10.0,0,4667,1064,8.9,63295
-E15,Blue Line,metro,existing,2025,2025,50.3,22,2.4,10.0,0,7597,1732,14.4,244353
-E16,DNT West,metro,proposed,2044,2049,31.2,17,1.95,6.0,6293,6729,1534,12.8,124266
-E17,DNT East,metro,proposed,2039,2056,63.9,35,1.88,6.0,10513,10839,2471,20.6,398762
-E18,Las Colinas-Mesquite Line,metro,proposed,2051,2061,42.6,27,1.64,6.0,5401,8923,2034,17.0,237758
-E19,I-20 Crosstown,brt,proposed,2043,2068,72.9,39,1.92,6.0,2292,7010,1598,40.0,160958
-E20,Silver Line,metro,existing,2025,2025,44.5,10,4.94,10.0,0,2914,664,5.5,75309
-E21,Beltline Line,brt,proposed,2031,2069,147.5,65,2.31,8.0,4031,2880,657,16.4,110363
-E22,I-30 Line,brt,proposed,2048,2065,60.1,34,1.82,6.0,1111,2908,663,16.6,85394
-E23,SH-360 Line,brt,proposed,2058,2073,72.1,36,2.06,6.0,1737,1799,410,10.3,81969
-E24,FW Crosstown Loop,brt,proposed,2031,2068,66.3,30,2.21,8.0,1759,858,196,4.9,24447
-E25,McKinney Line,commuter,proposed,2030,2030,20.0,5,5.0,20.0,1028,1139,260,4.3,17295
-E26,Legacy Line,metro,proposed,2041,2041,44.7,24,1.94,6.0,1852,4067,927,7.7,73415
-E27,Ross Avenue BRT,brt,proposed,2030,2030,13.2,8,1.88,8.0,433,4231,965,24.1,25962
-E28,Forest Lane BRT,brt,proposed,2030,2030,14.7,8,2.09,8.0,476,3767,859,21.5,38933
-E29,Jefferson Blvd BRT,brt,proposed,2030,2035,11.4,6,2.28,8.0,375,1135,259,6.5,9287
-E30,Alvarado Line,commuter,proposed,2036,2041,44.8,8,6.4,20.0,2034,1043,238,4.0,19838
-E31,Bowie Line,commuter,proposed,2064,2070,104.7,8,14.95,20.0,3701,747,170,2.8,11546
-E32,Gainesville Line,commuter,proposed,2033,2073,107.4,8,15.34,20.0,3965,383,87,1.5,6315
-E33,Sherman Line,commuter,proposed,2030,2063,85.4,9,10.67,20.0,3373,596,136,2.3,20558
-E34,Terrell Line,commuter,proposed,2030,2038,55.3,11,5.53,20.0,2701,385,88,1.5,10283
-E35,Ennis Line,commuter,proposed,2075,2075,54.8,4,18.27,20.0,1779,394,90,1.5,7455
-E36,Waxahachie Line,commuter,proposed,2068,2073,35.6,4,11.88,20.0,1275,87,20,0.3,2967
-E37,Midlothian Line,commuter,proposed,2030,2035,29.1,7,4.85,20.0,1482,537,122,2.0,8750
-E38,SH-121 BRT,brt,proposed,2030,2031,31.1,9,3.89,8.0,951,1192,272,6.8,21138
+F01,FW Green,metro,proposed,2039,2048,21.9,13,1.83,6.0,4944,4806,1096,9.1,61596
+F02,FW Blue,metro,proposed,2045,2060,23.0,15,1.65,6.0,2653,2739,624,5.2,28708
+F03,FW Orange,metro,proposed,2035,2040,11.5,15,0.82,6.0,4301,2448,558,4.7,14141
+F04,FW Pink,metro,proposed,2046,2067,21.6,16,1.44,6.0,1463,2779,634,5.3,32956
+F05,FW Berry,metro,proposed,2052,2071,25.4,7,4.23,6.0,3018,2335,532,4.4,43726
+F06,FW Red,metro,proposed,2056,2056,13.7,6,2.75,6.0,1685,1473,336,2.8,15962
+F07,FW Purple,metro,proposed,2039,2044,7.6,7,1.27,6.0,814,2026,462,3.8,14099
+E01,White Settlement BRT,brt,proposed,2075,2080,20.1,12,1.83,8.0,436,902,206,5.1,7831
+E02,Riverside-Forest Hill BRT,brt,proposed,2033,2038,21.6,11,2.16,8.0,660,332,76,1.9,3596
+E04,Jacksboro BRT,brt,proposed,2031,2036,14.9,10,1.65,8.0,484,1310,299,7.5,7783
+E05,TexPress Expansion,commuter,proposed,2030,2035,19.8,7,3.3,20.0,1047,1000,228,3.8,12798
+E07,SE TexRail,commuter,proposed,2033,2038,30.4,6,6.08,20.0,1436,532,121,2.0,10992
+E08,FTW/Denton,commuter,proposed,2048,2053,56.2,11,5.62,20.0,2276,713,163,2.7,20945
+E09,TEXRail,commuter,existing,2025,2025,42.1,8,6.01,15.0,0,1362,310,5.2,46608
+E10,TRE,commuter,existing,2025,2025,54.2,10,6.03,15.0,0,3872,883,14.7,109281
+E11,A-train,commuter,existing,2025,2025,33.8,6,6.77,15.0,0,580,132,2.2,16549
+E12,Orange Line,metro,existing,2025,2025,65.8,30,2.27,10.0,0,7782,1774,14.8,246177
+E13,Green Line,metro,existing,2025,2025,45.7,24,1.99,10.0,0,4885,1114,9.3,135109
+E14,Red Line,metro,existing,2025,2025,44.6,25,1.86,10.0,0,4444,1013,8.4,60931
+E15,Blue Line,metro,existing,2025,2025,50.3,22,2.4,10.0,0,7266,1657,13.8,238454
+E16,DNT West,metro,proposed,2045,2050,31.2,17,1.95,6.0,6279,6822,1556,13.0,123704
+E17,DNT East,metro,proposed,2039,2056,63.9,35,1.88,6.0,10491,10901,2485,20.7,389041
+E18,Las Colinas-Mesquite Line,metro,proposed,2052,2061,45.5,27,1.75,6.0,5685,8030,1831,15.3,214904
+E19,I-20 Crosstown,brt,proposed,2043,2066,72.9,39,1.92,6.0,2197,6050,1379,34.5,156861
+E20,Silver Line,metro,existing,2025,2025,44.5,10,4.94,10.0,0,2908,663,5.5,75293
+E21,Beltline Line,brt,proposed,2031,2064,147.5,65,2.31,8.0,4031,2855,651,16.3,109948
+E22,I-30 Line,brt,proposed,2052,2068,59.9,34,1.82,6.0,1043,4853,1106,27.7,94069
+E23,SH-360 Line,brt,proposed,2059,2072,72.1,36,2.06,6.0,1737,1800,410,10.3,81357
+E24,FW Crosstown Loop,brt,proposed,2031,2068,66.3,30,2.21,8.0,1762,858,196,4.9,24455
+E25,McKinney Line,commuter,proposed,2030,2030,20.0,5,5.0,20.0,1028,1138,259,4.3,17289
+E26,Legacy Line,metro,proposed,2041,2041,44.7,24,1.94,6.0,1852,4109,937,7.8,74275
+E27,Ross Avenue BRT,brt,proposed,2030,2030,13.2,8,1.88,8.0,433,4848,1105,27.6,28629
+E28,Forest Lane BRT,brt,proposed,2030,2030,14.7,8,2.09,8.0,476,3560,812,20.3,36197
+E29,Jefferson Blvd BRT,brt,proposed,2030,2035,11.4,6,2.28,8.0,375,859,196,4.9,6209
+E30,Alvarado Line,commuter,proposed,2036,2041,44.8,8,6.4,20.0,2034,1043,238,4.0,19841
+E31,Bowie Line,commuter,proposed,2064,2069,104.7,8,14.95,20.0,3701,747,170,2.8,11548
+E32,Gainesville Line,commuter,proposed,2033,2073,107.4,8,15.34,20.0,3965,383,87,1.5,6316
+E33,Sherman Line,commuter,proposed,2030,2062,85.4,9,10.67,20.0,3373,596,136,2.3,20601
+E34,Terrell Line,commuter,proposed,2030,2038,55.3,11,5.53,20.0,2701,379,87,1.4,10295
+E35,Ennis Line,commuter,proposed,2075,2075,54.8,4,18.27,20.0,1779,394,90,1.5,7461
+E36,Waxahachie Line,commuter,proposed,2068,2073,35.6,4,11.88,20.0,1275,88,20,0.3,2968
+E37,Midlothian Line,commuter,proposed,2030,2035,29.1,7,4.85,20.0,1482,532,121,2.0,8744
+E38,SH-121 BRT,brt,proposed,2030,2031,31.1,9,3.89,8.0,951,1195,273,6.8,20988
+E50,Dallas Streetcar,streetcar,existing,2025,2025,3.9,4,1.29,20.0,0,1,0,0.0,1
+E51,M-Line Trolley,streetcar,existing,2025,2025,2.6,5,0.66,15.0,0,110,25,2.1,199
