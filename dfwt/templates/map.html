@@ -141,6 +141,7 @@ const basemaps = {
 basemaps[dark ? 'Dark gray' : 'Light gray'].addTo(map);
 const layerCtl = L.control.layers(basemaps, null, {position: 'topright'}).addTo(map);  // schematic: adds the Waterways overlay
 map.createPane('trip').style.zIndex = 430;   // a planned trip sits above the (dimmed) network
+map.getPane('trip').style.pointerEvents = 'none';   // its canvas covers the map: clicks go through to the stations
 const tripR = L.canvas({pane: 'trip'});
 const lineLayer = L.layerGroup().addTo(map), stLayer = L.layerGroup().addTo(map), tripLayer = L.layerGroup().addTo(map);
 const dimNetwork = on => { map.getPane('overlayPane').style.opacity = on ? .35 : ''; map.getPane('glow').style.visibility = on ? 'hidden' : ''; };
@@ -575,7 +576,7 @@ function lineList() {
   });
 }
 // ---- trip planner: Dijkstra over the exported year graph (same model as the reports) ----
-const pickMark = s => L.circleMarker([D.stations[s][1], D.stations[s][2]], {renderer: tripR, pane: 'trip', radius: 8, color: '#c96f00', weight: 3, fill: false}).addTo(tripLayer);
+const pickMark = s => L.circleMarker([D.stations[s][1], D.stations[s][2]], {renderer: tripR, pane: 'trip', radius: 8, color: '#c96f00', weight: 3, fill: false, interactive: false}).addTo(tripLayer);
 const showTrip = () => { $('trip').closest('details').open = true; if (touch) $('trip').scrollIntoView({block: 'nearest', behavior: 'smooth'}); };
 function clearTrip() {
   pick = []; $('from').value = $('to').value = ''; tripLayer.clearLayers(); dimNetwork(false); if (window.Schem) Schem.trip(null, null, pick);
