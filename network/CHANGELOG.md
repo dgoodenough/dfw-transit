@@ -296,14 +296,19 @@ and what is left to decide). Fixed:
 - **Map and diagram**: a second station click works again (the trip layer swallowed it); track
   still to come is grey in the diagram.
 
-## v2.12 — Fewer transfers: infill stations, SH-114 realigned
+## v2.12 — Infill stations, one-seat links, SH-114 realigned, straighter diagrams
 
 A transfer analysis followed every modelled trip through the network (`reports/TRANSFERS.md`):
 which stations and line pairs carry the transfers, which trips need two or more, and where
 two lines cross or pass close with no station to change at. About 40 candidate fixes were
 tested one by one in the ridership model (an extra stop slows everyone riding through, so
 many lost riders); the ones that gained riders were tested together and kept only if each
-still added riders next to the others.
+still added riders next to the others. **They add riders (+2% in 2100) by making trips faster
+and reaching new areas, not by cutting transfers:** with the model's 3-minute transfer penalty,
+many riders trade a slow one-seat ride for a faster trip with a change at a new interchange, so
+transfers per commute stay about level (0.33 to 0.34 in the plan, 0.47 in 2M, same commutes).
+Three-seat rides fall where a one-seat link appears (SH-114 and the Stemmons BRT to Victory).
+A longer transfer penalty is noted for a later round.
 
 - **Infill stations** (plan and 2M): Red/Orange at Main / Sherman Street (downtown Richardson,
   Beltline Line) and NW Highway / Shady Brook; Red/Blue/Orange at Central / Hall (I-20
@@ -312,7 +317,7 @@ still added riders next to the others.
   Airport / Beach with FW Green (Fort Worth); the TEXRail extension and FW Berry at
   Pennsylvania / Henderson; Silver Line at Marsh / Arapaho (walk to DNT West's Belt Line /
   Marsh); Midlothian Line at I-20 / Oriole (I-20 Crosstown). Each opens when both lines are
-  there.
+  there. The plan costs $103.2B (+$0.1B) and carries ~788k daily trips in 2100 (was ~771k).
 - **SH-114 Line** (2M), redrawn by the owner: in the LBJ/SH-114 freeway corridor without the
   loops in Las Colinas, Freeport North and Southlake; beside TEXRail through Grapevine (Ira E.
   Woods - Grapevine-Main Street - DFW Airport North); Trophy Club and Westlake stations on
@@ -323,6 +328,14 @@ still added riders next to the others.
 - **Stemmons-Brookhollow BRT** (2M) starts at Victory (via Medical/Market Center) instead of
   Inwood/Love Field: one change from the I-20 Crosstown, I-30 and TRE.
 - **Walk link** Commerce / Harwood (D2) - Marilla / Pearl (DNT East).
+- **2M schedule**: rescheduled with the new values; DNT East (2043) and the I-20 Crosstown
+  (2037) move earlier, the I-30 (2056) and Las Colinas-Mesquite (2063) lines later. ~1.06M
+  daily trips in 2050 (was 1.03M), ~2.25M in 2100, 2M reached in 2077; $136.6B (more is built
+  before unit costs fall).
+- **Diagram**: Rail / BRT / All versions, each laid out for its own lines (Rail is the default),
+  with straightness rules: long runs on their axis, a cost per bend and more for zig-zags,
+  straight-through lines kept opposite at junctions, and no run laid across another line.
+  The Rail diagram has about half the bends of the old all-modes diagram.
 - `tools/gen_expansion.py`: a spec's `road_weights` (keep a line in its freeway), and stops
   whose leg follows an existing railway (`"follow": "rail"`) or a hand-drawn straight line
   (`"follow": "straight"`).

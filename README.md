@@ -93,11 +93,11 @@ led to thirteen steps, and v2 implements the ones the data supports
 
 | | v1 plan | v2 plan (budget-constrained) | **2 million riders (default)** |
 |---|---|---|---|
-| Daily transit trips, 2050 (each trip counted once) | 324k | 370k | **1.03M** |
-| Daily transit trips, 2100 | 664k | 771k | **2.23M** (2M reached in 2077) |
-| Daily boardings, all modes, 2100 | 1.15M | 1.34M | **4.15M** |
-| Jobs the average resident reaches in 45 min, 2100 | 93k | 106k | **173k** |
-| Capital through 2100 (2025 $, lines, stations, garages) | $112.3B | $103.1B | **$135.0B** |
+| Daily transit trips, 2050 (each trip counted once) | 324k | 388k | **1.06M** |
+| Daily transit trips, 2100 | 664k | 788k | **2.25M** (2M reached in 2077) |
+| Daily boardings, all modes, 2100 | 1.15M | 1.37M | **4.18M** |
+| Jobs the average resident reaches in 45 min, 2100 | 93k | 110k | **173k** |
+| Capital through 2100 (2025 $, lines, stations, garages) | $112.3B | $103.2B | **$136.6B** |
 | Operating cost, 2100 (rail and BRT, per year) | $0.9B | $0.9B | **$1.6B** |
 | Validation: errors / islands | 1 / 10 | 0 / 0 | 0 / 0 |
 
