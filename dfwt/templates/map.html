@@ -649,7 +649,9 @@ function forYou() {
   $('foryouBody').innerHTML =
     `<p><b>How often (${Y}, as modelled):</b> ${freq.length ? freq.join('; ') : 'no lines run'}. These are rush-hour frequencies; a wait is counted as half the gap between vehicles, at most 12 min.</p>` +
     `<p><b>Hours:</b> ` + (op.span_hours ? `the operating cost assumes ${op.span_hours} hours of service a day (about ${hr(5)}–${hr(5 + op.span_hours)}) at these frequencies, ${op.days_per_year} days a year. ` : '') +
-    `Late-night (owl) service would be an operating add-on on top of that: it is not costed here, and the model doesn't count riders for it. The ridership model counts weekday rush-hour commutes only, so nothing here says how often anything runs at 1 a.m. or on a Sunday.</p>` +
+    (op.late && op.late.lines ? `From ${op.late.from_year} the main lines (${op.late.lines.map(l => (S.lines.find(x => x.id === l) || {name: l}).name).join(', ')}) run on to about 2 a.m., every ${op.late.headway_min} min, with late feeder buses: that is in the operating cost, but the model doesn't count late-night riders. `
+      : `Late-night (owl) service would be an operating add-on on top of that: it is not costed here, and the model doesn't count riders for it. `) +
+    `The ridership model counts weekday rush-hour commutes only, so nothing here says how busy anything is at 1 a.m. or on a Sunday.</p>` +
     `<p><b>Cost:</b> ${cap}${run}Who pays (sales tax, federal grants, fares) is not decided here.</p>` +
     `<p><b>Fares:</b> not modelled. The ridership model charges no fare, so read its numbers as if fares stay low enough not to change who rides; no fare level is proposed.</p>` +
     `<p><b>Access:</b> new stations are assumed step-free (level boarding, ramps or lifts), as US law (the ADA) requires of new stations. Whether a walk to a station is lit, shaded or safe is not modelled.</p>` +
