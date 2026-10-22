@@ -112,6 +112,20 @@ def cmd_schedule(args):
     return 0
 
 
+def cmd_values(args):
+    from . import evaluate
+    cfg = config.load(scenario=args.scenario)
+    net = Network.load(args.scenario, cfg)
+    ctx = evaluate.Context(cfg) if config.has_overlay(args.scenario) else evaluate.Context()
+    rows = evaluate.final_values(ctx, net, procs=args.procs)
+    evaluate.write_final_values(config.path("results", net.name), rows)
+    for r in sorted(rows, key=lambda r: -(r["value_per_musd"] or 0)):
+        print(f"  {r['line_id']:6} {net.host_line(r['line_id']).name if not r['host'] else r['line_id'] + ' (via ' + r['host'] + ')':32}"
+              f" {r['marginal_final']:>8,} trips  ${r['cost_shared_musd']:>7,}M  {r['value_per_musd']}")
+    print(f"wrote {config.path('results', net.name, 'line_values.csv')}")
+    return 0
+
+
 def cmd_trip(args):
     from .graph import YearGraph
     net = Network.load(args.scenario)
@@ -238,6 +252,9 @@ def main(argv=None):
     rd = sub.add_parser("ridership", help="daily boardings and growth for chosen years (any year, e.g. 2100)")
     rd.add_argument("--scenario")
     rd.add_argument("--years", default="2025,2050,2070,2100")
+    va = sub.add_parser("values", help="line values for the build order (final-year leave-one-out, ~20-30 min)")
+    va.add_argument("--scenario")
+    va.add_argument("--procs", type=int, default=3)
     t = sub.add_parser("trip")
     t.add_argument("origin")
     t.add_argument("dest")
@@ -261,7 +278,7 @@ def main(argv=None):
     args = p.parse_args(argv)
     return {"validate": cmd_validate, "build": cmd_build, "trip": cmd_trip, "stage": cmd_stage,
             "optimize": cmd_optimize, "align": cmd_align,
-            "ridership": cmd_ridership, "schedule": cmd_schedule}[args.cmd](args)
+            "ridership": cmd_ridership, "schedule": cmd_schedule, "values": cmd_values}[args.cmd](args)
 
 
 if __name__ == "__main__":

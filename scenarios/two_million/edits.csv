@@ -25,11 +25,11 @@ set_headway,E34,2030,15,15 min from opening (plan default 20)
 set_headway,E34,2045,10,regional rail 10 min all day
 set_headway,E37,2030,15,15 min from opening (plan default 20)
 set_headway,E37,2045,10,regional rail 10 min all day
-set_headway,E31,2030,15,15 min clockface on long outer lines
-set_headway,E32,2030,15,15 min clockface on long outer lines
-set_headway,E33,2030,15,15 min clockface on long outer lines
-set_headway,E35,2030,15,15 min clockface on long outer lines
-set_headway,E36,2030,15,15 min clockface on long outer lines
+set_headway,E31,2030,30,"every 30 min: a rural line (review 2: 15 min cost ~$60M a year for 0.6% of trips)"
+set_headway,E32,2030,30,"every 30 min: a rural line (review 2: 15 min cost ~$60M a year for 0.6% of trips)"
+set_headway,E33,2030,30,"every 30 min: a rural line (review 2: 15 min cost ~$60M a year for 0.6% of trips)"
+set_headway,E35,2030,30,"every 30 min: a rural line (review 2: 15 min cost ~$60M a year for 0.6% of trips)"
+set_headway,E36,2030,30,"every 30 min: a rural line (review 2: 15 min cost ~$60M a year for 0.6% of trips)"
 set_headway,E01,2030,6,BRT every 6 min (plan default 8)
 set_headway,E02,2030,6,BRT every 6 min (plan default 8)
 set_headway,E04,2030,6,BRT every 6 min (plan default 8)
@@ -60,3 +60,4 @@ through_route,E07,E11,Mansfield-Denton-Carrollton,and on over the A-train to Tri
 set_line,E25,mode,metro,McKinney corridor (DART-owned) built as light rail
 through_route,E14,E25,Red Line,Red Line runs on from Parker Road to McKinney: no transfer
 run_over,XP01,E13,X137,"SH-114 trains run on over the Green Line from Farmers Branch to Victory: one seat to Love Field, Market Center and Victory"
+set_line,XE01,cruise_kmh,60,express bus in managed lanes: about 60 km/h between its five stops

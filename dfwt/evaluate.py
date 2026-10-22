@@ -9,6 +9,7 @@ Outputs (build/<scenario>/):
   stations.csv   one row per station: opening year, lines, nearby activity,
                  boardings (final year)
 """
+import copy
 import csv
 import os
 
@@ -113,10 +114,13 @@ def run_year(ctx, net, year, want_loads=True):
     return res
 
 
-def feeder_opex_musd(cfg, r):
-    """Feeder buses' operating cost ($M/yr): their daily boardings x cost per boarding x days."""
+def feeder_opex_musd(cfg, r, year):
+    """Feeder buses' operating cost ($M/yr): their daily boardings x cost per boarding x days,
+    plus late-night feeders (operating.late_night) as a share of that."""
     oc = cfg.get("operating") or {}
-    return r.get("feeder_boardings", 0.0) * oc.get("feeder_usd_per_boarding", 0.0) * oc.get("days_per_year", 0) / 1e6
+    late = oc.get("late_night") or {}
+    owl = late.get("feeder_share", 0.0) if year >= late.get("from_year", 9999) else 0.0
+    return r.get("feeder_boardings", 0.0) * oc.get("feeder_usd_per_boarding", 0.0) * oc.get("days_per_year", 0) / 1e6 * (1 + owl)
 
 
 def calibrate_asc(ctx, net, lo=-4.0, hi=2.0, tol=0.01, log=None):
@@ -189,6 +193,64 @@ def _without_job(args):
     return lid, y, r["daily_trips"]
 
 
+def _final_job(args):
+    key, lid = args
+    net = _POOL["nets"][key]
+    r = run_year(_POOL["ctx"], net.without(lid) if lid else net, _POOL["final"], want_loads=False)
+    return key, lid, r["daily_trips"]
+
+
+def final_values(ctx, net, procs=None, log=print):
+    """The scheduler's ranking (staging, priority value_per_musd), the same whatever order the
+    lines open in: each proposed line's daily trips lost when it is removed from the finished
+    network (final year), per $M of its share of capital at 2025 prices (Network.shared_cost_musd).
+    A line through-routed into another (edits through_route) is measured on the network
+    without that join. Returns rows: line_id, host, marginal_final, cost_shared_musd, value_per_musd."""
+    from .network import Network
+    final = max(ctx.cfg["years"])
+    procs = procs or max(1, min(3, (os.cpu_count() or 2) - 1))
+    nets = {"": net}
+    tables, edits = Network.read_tables(None if net.name == "plan" else net.name)
+    for lid in net.absorbed:
+        # without its join; if a later join onto the same host needed it (a chain), without that too
+        cut = next(i for i, e in enumerate(edits) if e["op"] == "through_route" and e["field"] == lid)
+        try:
+            nets[lid] = Network.from_raw(copy.deepcopy(tables), edits[:cut] + edits[cut + 1:], net.cfg, net.name)
+        except ValueError:
+            keep = [e for i, e in enumerate(edits) if not (e["op"] == "through_route" and i >= cut
+                                                           and e["target"] == edits[cut]["target"])]
+            nets[lid] = Network.from_raw(copy.deepcopy(tables), keep, net.cfg, net.name)
+    measured = [("", ln.id) for ln in net.lines.values() if ln.status != "existing" and ln.first_year <= final]
+    measured += [(lid, lid) for lid in net.absorbed if lid in nets[lid].lines and nets[lid].lines[lid].status != "existing"]
+    jobs = sorted({(k, None) for k, _ in measured}) + measured
+    _POOL.update(ctx=ctx, nets=nets, final=final)
+    if procs <= 1:
+        res = [_final_job(j) for j in jobs]
+    else:
+        import multiprocessing as mp
+        with mp.get_context("fork").Pool(procs) as pool:
+            res = pool.map(_final_job, jobs, chunksize=1)
+    trips = {(k, lid): v for k, lid, v in res}
+    rows = []
+    for key, lid in measured:
+        n = nets[key]
+        m = trips[(key, None)] - trips[(key, lid)]
+        c = n.shared_cost_musd(n.lines[lid])
+        rows.append({"line_id": lid, "host": net.absorbed.get(lid, "") if key else "", "marginal_final": round(m),
+                     "cost_shared_musd": round(c), "value_per_musd": round(m / c, 2) if c else ""})
+    if log:
+        log(f"  {net.name}: final-year values for {len(rows)} lines ({len(nets) - 1} through-routed)")
+    return rows
+
+
+def write_final_values(out_dir, rows):
+    os.makedirs(out_dir, exist_ok=True)
+    with open(os.path.join(out_dir, "line_values.csv"), "w", newline="", encoding="utf-8") as f:
+        w = csv.DictWriter(f, fieldnames=list(rows[0].keys()), lineterminator="\n")
+        w.writeheader()
+        w.writerows(rows)
+
+
 def _pool_map(fn, items, ctx, net, final, procs):
     """Map fn over items in forked workers that share ctx and net (or inline when procs <= 1)."""
     _POOL.update(ctx=ctx, net=net, final=final)
@@ -228,7 +290,7 @@ def evaluate(ctx, net, line_values=True, log=print, procs=None):
         row = {"year": y, "stations": r["n_st"], "lines": r["n_lines"],
                "km_metro": round(km["metro"]), "km_brt": round(km["brt"]), "km_commuter": round(km["commuter"]),
                "capex_busd": round(capex / 1000, 1),
-               "opex_busd_per_year": round((sum(net.opex_musd(y).values()) + feeder_opex_musd(cfg, r)) / 1000, 2),
+               "opex_busd_per_year": round((sum(net.opex_musd(y).values()) + feeder_opex_musd(cfg, r, y)) / 1000, 2),
                "spent_busd": round(sum(v for yy, v in spend.items() if yy <= y) / 1000, 1),
                "budget_busd": round(per_year * (y - cfg["existing_year"]) / 1000, 1),
                "pop_covered_pct": round(pcov * 100, 1), "jobs_covered_pct": round(jcov * 100, 1),
@@ -273,13 +335,14 @@ def evaluate(ctx, net, line_values=True, log=print, procs=None):
             "capacity_used_pct": round(peak_hour / (60 / ln.headway_at(final) * vcap[ln.mode]) * 100, 1),
             "passenger_km": round(pkm),
         })
+    ev_values = None
     if line_values:
-        # Two views of each proposed line's value, because each misleads alone:
-        #  at_opening - commutes lost if the line is removed in the year it opens
-        #               (fair to trunks that later get shared with branches)
-        #  final      - commutes lost if removed from the finished network
-        #               (fair to lines whose value depends on what is built later)
-        # measured in daily transit trips (each counted once)
+        # Two views of each proposed line's value, in daily transit trips (each counted once):
+        #  at_opening - commutes lost if the line is removed in the year it opens (reported)
+        #  final      - commutes lost if removed from the finished network; with the line's
+        #               share of capital it gives value_per_musd, which the 2M schedule ranks
+        #               by: neither depends on the order lines open in (at_opening does, and
+        #               ranking by it made the order flip between builds)
         base = {y: results[y]["daily_trips"] for y in years}
         jobs = []
         for row in line_rows:
@@ -289,18 +352,19 @@ def evaluate(ctx, net, line_values=True, log=print, procs=None):
                 continue
             y0 = min(y for y in years if y >= row["first_year"])
             row["_y0"] = y0
-            jobs += [(row["line_id"], y0), (row["line_id"], final)]
+            jobs.append((row["line_id"], y0))
         without = {(lid, y): v for lid, y, v in _pool_map(_without_job, jobs, ctx, net, final, procs)}
+        fv = final_values(ctx, net, procs, log=log)
+        by_line = {r["line_id"]: r for r in fv if not r["host"]}
         for row in line_rows:
             y0 = row.pop("_y0", None)
             if y0 is None:
                 continue
-            m0 = base[y0] - without[(row["line_id"], y0)]
-            m1 = base[final] - without[(row["line_id"], final)]
-            row["marginal_at_opening"] = round(m0)
-            row["marginal_final"] = round(m1)
-            best = max(m0, m1)
-            row["value_per_musd"] = round(best / row["cost_musd"], 2) if row["cost_musd"] else ""
+            v = by_line[row["line_id"]]
+            row["marginal_at_opening"] = round(base[y0] - without[(row["line_id"], y0)])
+            row["marginal_final"] = v["marginal_final"]
+            row["value_per_musd"] = v["value_per_musd"]   # order-independent (final_values), what the scheduler ranks by
+        ev_values = fv
         log(f"  {net.name}: line values for {sum(1 for r in line_rows if r['status'] != 'existing')} proposed lines")
 
     act = ctx.station_activity(net)
@@ -316,7 +380,7 @@ def evaluate(ctx, net, line_values=True, log=print, procs=None):
                         "modes": ";".join(sorted({net.lines[l].mode for l in st_lines[sid]})),
                         "pop_1km": round(act[sid][0]), "jobs_1km": round(act[sid][1]),
                         "boardings_final": round(float(fr["boardings"][bi])) if bi is not None else 0})
-    return {"years": year_rows, "lines": line_rows, "stations": st_rows, "results": results}
+    return {"years": year_rows, "lines": line_rows, "stations": st_rows, "results": results, "line_values": ev_values}
 
 
 LINE_VALUE_COLS = ("marginal_at_opening", "marginal_final", "value_per_musd")
@@ -351,9 +415,15 @@ def carry_line_values(out_dir, ev):
                 row[k] = float(v) if "." in v else int(v)
             except (TypeError, ValueError):
                 row[k] = ""
-        # the riders carry over; the cost is this build's (shared track moves with opening order)
-        if row["marginal_final"] != "" and row.get("cost_musd"):
-            row["value_per_musd"] = round(max(row["marginal_at_opening"] or 0, row["marginal_final"]) / row["cost_musd"], 2)
+    fv = os.path.join(out_dir, "line_values.csv")   # final_values, which `dfwt values` refreshes between builds
+    if os.path.exists(fv):
+        with open(fv, encoding="utf-8") as f:
+            vals = {r["line_id"]: r for r in csv.DictReader(f) if not r["host"]}
+        for row in ev["lines"]:
+            if row["line_id"] in vals and row["status"] != "existing":
+                v = vals[row["line_id"]]
+                row["marginal_final"] = int(v["marginal_final"])
+                row["value_per_musd"] = float(v["value_per_musd"]) if v["value_per_musd"] else ""
     if os.path.exists(stamp):
         with open(stamp, encoding="utf-8") as f:
             ev["line_values_from"] = json.load(f).get("full_build")
@@ -361,6 +431,8 @@ def carry_line_values(out_dir, ev):
 
 def write(out_dir, ev):
     os.makedirs(out_dir, exist_ok=True)
+    if ev.get("line_values"):
+        write_final_values(out_dir, ev["line_values"])
     for name in ("years", "lines", "stations"):
         rows = ev[name]
         if not rows:

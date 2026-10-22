@@ -97,6 +97,7 @@ class Line:
     segments: list = field(default_factory=list)
     service: list = field(default_factory=list)   # [(from_year, headway_min)], sorted
     pnr_stops: list = field(default_factory=list)  # former termini (through-routed) that keep a garage
+    cruise_kmh: float = 0.0   # this line's average running speed, if not its mode's (an express bus on a freeway)
 
     def headway_at(self, year):
         hw = self.headway
@@ -304,7 +305,7 @@ class Network:
             elif op == "set_headway":
                 ln.service = sorted([x for x in ln.service if x[0] != int(e["field"] or 0)] + [(int(e["field"] or 0), float(e["value"]))])
             elif op == "set_line":
-                setattr(ln, e["field"], float(e["value"]) if e["field"] == "headway" else e["value"])
+                setattr(ln, e["field"], float(e["value"]) if e["field"] in ("headway", "cruise_kmh") else e["value"])
             elif op == "through_route":
                 self._through_route(ln, e["field"], e.get("value") or "")
             elif op == "reroute":
@@ -489,7 +490,7 @@ class Network:
                         if ln.stop_years[i] <= year:
                             cur.stops.append(sid)
                             cur.hop_km.append(acc)
-                            cur.hop_min.append(acc / mode["cruise_kmh"] * 60 * slow + mode["stop_penalty_min"])
+                            cur.hop_min.append(acc / (ln.cruise_kmh or mode["cruise_kmh"]) * 60 * slow + mode["stop_penalty_min"])
                             acc, i1 = 0.0, i
                         continue
                     if len(cur.stops) > 1:
@@ -550,8 +551,43 @@ class Network:
                 track += self.segment_cost(ln, i)
         first_line = self._station_first_line()
         stops = sum(self.stop_cost(ln, i) for i, (sid, y) in enumerate(zip(ln.stop_ids, ln.stop_years))
-                    if ex < y <= by_year and first_line.get((sid, ln.mode)) == ln.id)
-        return track + stops
+                    if ex < y <= by_year and first_line.get((sid, ln.mode)) == ln.id and sid not in ln.stop_ids[:i])
+        items = sum(c * cost_factor(self.cfg, y, ln.mode) for y, c, _ in self.capital_items(ln) if ex < y <= by_year)
+        return track + stops + items
+
+    def capital_items(self, ln):
+        """[(year, $M at 2025 prices, note)]: fixed works charged with a line (config
+        capital_items: e.g. a pocket track where it runs over another line's track), in the year
+        its borrowed track opens (or its first year)."""
+        out = []
+        for it in self.cfg.get("capital_items") or []:
+            if isinstance(it, dict) and it.get("line_id") == ln.id:
+                ys = [s.year for s in ln.segments if s.borrowed] or [ln.first_year]
+                out.append((min(ys), float(it["musd"]), it.get("note", "")))
+        return out
+
+    def shared_cost_musd(self, ln):
+        """A line's share of capital at 2025 prices, for ranking lines (it doesn't depend on
+        which opens first): each new track piece and station platform is split evenly among the
+        lines of its mode that use it, without the program's falling cost factor. Today's track
+        and stations cost nothing."""
+        ex = self.cfg["existing_year"]
+        track, plat = collections.defaultdict(list), collections.defaultdict(list)
+        for other in self.lines.values():
+            for i, s in enumerate(other.segments):
+                track[(other.mode, frozenset((other.stop_ids[i], other.stop_ids[i + 1])))].append((s.year, other.id))
+            for sid, y in zip(other.stop_ids, other.stop_years):
+                plat[(sid, other.mode)].append((y, other.id))
+        cost = 0.0
+        for i, s in enumerate(ln.segments):
+            users = track[(ln.mode, frozenset((ln.stop_ids[i], ln.stop_ids[i + 1])))]
+            if min(users)[0] > ex:
+                cost += self.segment_cost(ln, i) / cost_factor(self.cfg, s.year, ln.mode) / len({u for _, u in users})
+        for i, (sid, y) in enumerate(zip(ln.stop_ids, ln.stop_years)):
+            users = plat[(sid, ln.mode)]
+            if min(users)[0] > ex and sid not in ln.stop_ids[:i]:
+                cost += self.stop_cost(ln, i) / cost_factor(self.cfg, y, ln.mode) / len({u for _, u in users})
+        return cost + sum(c for y, c, _ in self.capital_items(ln) if y > ex)
 
     def opex_musd(self, year):
         """Operating cost ($M/yr) of the service running in `year`, by mode (config.operating):
@@ -562,9 +598,13 @@ class Network:
         if not oc:
             return {}
         out = collections.Counter()
+        late = oc.get("late_night") or {}
+        owl = set(late.get("lines", [])) if year >= late.get("from_year", NEVER) else set()
         for r in self.runs(year):
             hw = r.line.headway_at(year)
             veh_h = 2 * sum(r.hop_min) / hw * oc["span_hours"] * oc["layover"]
+            if r.line.id in owl:   # trunk lines on to about 2 a.m. (config operating.late_night)
+                veh_h += 2 * sum(r.hop_min) / late["headway_min"] * late["hours"] * oc["layover"]
             out[r.line.mode] += veh_h * oc["usd_per_train_hour"][r.line.mode] * oc["days_per_year"] / 1e6
         return dict(out)
 

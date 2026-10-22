@@ -760,9 +760,15 @@ function tripGraph(gi) {
   const nS = sids.length, idx = new Map(sids.map((s, i) => [s, i])), adj = sids.map(() => []), info = [], at = sids.map(() => []), runSt = [];
   g.runs.forEach(([li, stops, hops, wait], ri) => {
     if (hidden.has(S.lines[li].id)) return;
-    let prev = -1;
+    let prev = -1, first = -1;
+    const ring = stops.length > 3 && stops[0] === stops[stops.length - 1];
     stops.forEach((s, k) => {
+      if (ring && k === stops.length - 1) {   // a ring rides on through its first stop
+        adj[prev].push([first, hops[k - 1], -1]); adj[first].push([prev, hops[k - 1], -1]);
+        return;
+      }
       const n = adj.length, p = idx.get(s);
+      if (!k) first = n;
       adj.push([]); info[n] = [ri, k]; at[p].push(n);
       adj[p].push([n, 0, wait]); adj[n].push([p, 0, -1]);
       if (prev >= 0) { adj[prev].push([n, hops[k - 1], -1]); adj[n].push([prev, hops[k - 1], -1]); }
@@ -1024,7 +1030,12 @@ const rideKind = (ln, hw) => `<span class="hint">(${MODE_NAME[ln.mode] || ln.mod
 function transitLegs(legs, yd) {
   const Y = D.years[yi];
   const sidOf = n => n[0] === 'P' ? n.slice(1) : yd.runs[+n.slice(1).split(':')[0]][1][+n.split(':')[1]];
-  const runStops = (ri, f, t) => { const k0 = +f.split(':')[1], k1 = +t.split(':')[1], st = yd.runs[ri][1];
+  const runStops = (ri, f, t) => { const k0 = +f.split(':')[1], k1 = +t.split(':')[1], st = yd.runs[ri][1], n = st.length - 1;
+    if (n > 2 && st[0] === st[n] && Math.abs(k1 - k0) > n / 2) {   // a ring (Beltline): the short way round, through its first stop
+      const out = [], s = k1 > k0 ? -1 : 1;
+      for (let k = k0; ; k = (k + s + n) % n) { out.push(st[k]); if (k === k1) break; }
+      return out;
+    }
     return k0 <= k1 ? st.slice(k0, k1 + 1) : st.slice(k1, k0 + 1).reverse(); };
   const tripW = 6 * zf();
   let h = '';
@@ -1050,8 +1061,9 @@ function route() {
   const Y = D.years[yi], yd = S.years[Y], [a, b] = pick;
   const X = boardExtra(), adj = new Map(), add = (u, v, w, info) => { if (!adj.has(u)) adj.set(u, []); adj.get(u).push([v, w, info]); };
   yd.runs.forEach(([li, stops, hops, wait], ri) => !hidden.has(S.lines[li].id) && stops.forEach((s, k) => {   // hidden lines: as if not built
-    const n = `L${ri}:${k}`;
-    add('P' + s, n, wait + D.boardPenalty + X, {t: 'board', ri}); add(n, 'P' + s, 0, {t: 'alight'});
+    const ring = stops.length > 3 && stops[0] === stops[stops.length - 1], end = ring && k === stops.length - 1;
+    const n = end ? `L${ri}:0` : `L${ri}:${k}`;   // a ring rides on through its first stop
+    if (!end) { add('P' + s, n, wait + D.boardPenalty + X, {t: 'board', ri}); add(n, 'P' + s, 0, {t: 'alight'}); }
     if (k) { const p = `L${ri}:${k - 1}`; add(p, n, hops[k - 1], {t: 'ride', ri}); add(n, p, hops[k - 1], {t: 'ride', ri}); }
   }));
   for (const [x, y, w] of yd.walks) { add('P' + x, 'P' + y, w, {t: 'walk'}); add('P' + y, 'P' + x, w, {t: 'walk'}); }

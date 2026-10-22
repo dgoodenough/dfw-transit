@@ -69,7 +69,7 @@ def station_grades(net):
     for ln in net.lines.values():
         for i, sid in enumerate(ln.stop_ids):
             near = {ln.segments[k].grade for k in (i - 1, i) if 0 <= k < len(ln.segments)}
-            g = "tunnel" if "tunnel" in near else next((x for x in sorted(near) if x != "surface"), None)
+            g = "tunnel" if "tunnel" in near else next((x for x in sorted(near) if x not in ("surface", "freeway")), None)
             if g:
                 out.setdefault(sid, {})[ln.mode] = g
     return out

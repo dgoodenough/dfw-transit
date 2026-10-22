@@ -241,11 +241,12 @@
     "gravity_iterations": 25
   },
   "cost_musd_per_km": {
-    "_doc": "Capital cost per route-km by mode and grade, 2025 USD, at recent US peer levels: DART Silver Line and the TEXRail extension ~$45-50M/km (new track on freight right-of-way), US light rail $100-200M/km at grade, center-running arterial BRT $25-55M/km (Houston University BRT ~$55M/km), US subway $500M+/km. cost_efficiency then lowers them as a steady program matures.",
+    "_doc": "Capital cost per route-km by mode and grade, 2025 USD, at recent US peer levels: DART Silver Line and the TEXRail extension ~$45-50M/km (new track on freight right-of-way), US light rail $100-200M/km at grade, center-running arterial BRT $25-55M/km (Houston University BRT ~$55M/km), US subway $500M+/km; an express bus in a freeway's managed lanes (grade freeway) only pays for ramps, signs and signal priority at its ends. cost_efficiency then lowers them as a steady program matures.",
     "brt": {
       "surface": 30,
       "elevated": 80,
-      "tunnel": 300
+      "tunnel": 300,
+      "freeway": 1.5
     },
     "commuter": {
       "surface": 45,
@@ -691,6 +692,14 @@
       "commuter": 900,
       "streetcar": 250
     },
-    "feeder_usd_per_boarding": 6
+    "feeder_usd_per_boarding": 6,
+    "late_night": {
+      "_doc": "Late-night service (review 2, downtown residents): the trunk lines run on to about 2 a.m. every 20 min, with late feeder buses (a share of the feeder cost). Operating cost only: the commute model doesn't count late-night riders.",
+      "from_year": 2030,
+      "hours": 3,
+      "headway_min": 20,
+      "lines": ["E12", "E13", "E14", "E15", "F03", "E10"],
+      "feeder_share": 0.05
+    }
   }
 }

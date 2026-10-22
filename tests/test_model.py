@@ -467,6 +467,47 @@ if __name__ == "__main__":
     unittest.main()
 
 
+class ScheduleRuleTests(unittest.TestCase):
+    """The 2M build order (review 2): values that don't depend on opening order, deadlines,
+    fixed works and late-night operating cost."""
+    @classmethod
+    def setUpClass(cls):
+        cls.net = Network.load("two_million")
+
+    def test_shared_cost_does_not_depend_on_opening_order(self):
+        before = {lid: self.net.shared_cost_musd(ln) for lid, ln in self.net.lines.items()}
+        moved = Network.load("two_million")
+        moved.apply_edits([{"op": "shift_line_years", "target": "E26", "field": "", "value": "-12"},
+                           {"op": "shift_line_years", "target": "E17", "field": "", "value": "20"}])
+        for lid, ln in moved.lines.items():
+            self.assertAlmostEqual(moved.shared_cost_musd(ln), before[lid], places=6, msg=lid)
+        self.assertNotAlmostEqual(moved.line_cost_musd(moved.lines["E26"]), self.net.line_cost_musd(self.net.lines["E26"]))
+
+    def test_deadlines_follow_end_stations_not_stage_numbers(self):
+        from dfwt import staging
+        rows = [dict(r) for r in self.net.stage_rows]
+        want = {(rows[i]["line_id"], rows[i]["from_stop"], rows[i]["to_stop"]): y for i, y in staging._deadlines(self.net, rows).items()}
+        self.assertEqual(want[("E22", "Davis Drive", "Jefferson / Belt Line")], 2038)   # Arlington in the 2030s
+        for r in rows:
+            r["stage"] = str(100 - int(r["stage"]))
+        again = {(rows[i]["line_id"], rows[i]["from_stop"], rows[i]["to_stop"]): y for i, y in staging._deadlines(self.net, rows).items()}
+        self.assertEqual(want, again)
+
+    def test_capital_item_is_charged_with_its_line(self):
+        ln = self.net.lines["XP01"]
+        (y, musd, _), = self.net.capital_items(ln)
+        self.assertEqual(musd, 400)
+        self.assertEqual(y, min(s.year for s in ln.segments if s.borrowed))
+
+    def test_late_night_service_costs_more(self):
+        import copy
+        cfg = copy.deepcopy(self.net.cfg)
+        cfg["operating"].pop("late_night")
+        plain = Network.load("two_million", cfg)
+        self.assertGreater(sum(self.net.opex_musd(2050).values()), sum(plain.opex_musd(2050).values()))
+        self.assertEqual(sum(self.net.opex_musd(2028).values()), sum(plain.opex_musd(2028).values()))
+
+
 class StagingTests(unittest.TestCase):
     def test_inferred_stages_round_trip(self):
         from dfwt import staging
