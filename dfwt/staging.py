@@ -357,7 +357,7 @@ def over_budget(net, last_year):
     for y in range(cfg["existing_year"] + 1, last_year + 1):
         cum_s += spend.get(y, 0.0)
         cum_b += per_year
-        if cum_s > cum_b * (1 + cfg["budget"]["tolerance"]) and (worst is None or cum_s - cum_b > worst[1]):
+        if cum_s > cum_b * (1 + cfg["budget"]["tolerance"]) + 1e-6 and (worst is None or cum_s - cum_b > worst[1]):   # (rounding at the limit)
             worst = (y, cum_s - cum_b)
     return worst
 

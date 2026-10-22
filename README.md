@@ -116,19 +116,21 @@ led to thirteen steps, and v2 implements the ones the data supports
 
 | | v1 plan | v2 plan (budget-constrained) | **2 million riders (default)** |
 |---|---|---|---|
-| Daily transit trips, 2050 (each trip counted once) | 324k | 388k | **1.06M** |
-| Daily transit trips, 2100 | 664k | 788k | **2.25M** (2M reached in 2077) |
-| Daily boardings, all modes, 2100 | 1.15M | 1.37M | **4.18M** |
-| Jobs the average resident reaches in 45 min, 2100 | 93k | 110k | **173k** |
-| Capital through 2100 (2025 $, lines, stations, garages) | $112.3B | $103.2B | **$136.6B** |
-| Operating cost, 2100 (rail and BRT, per year) | $0.9B | $0.9B | **$1.6B** |
+| Daily transit trips, 2050 (each trip counted once) | 319k | 370k | **866k** (705k on the low growth path) |
+| Daily transit trips, 2100 | 632k | 756k | **1.88M** (1.17M on the low growth path) |
+| Daily boardings, all modes, 2100 | 1.03M | 1.24M | **3.42M** |
+| Jobs the average resident reaches in 45 min, 2100 | 91k | 107k | **169k** |
+| Capital through 2100 (2025 $, lines, stations, garages) | $112.2B | $103.2B | **$136.4B** |
+| Operating cost, 2100 (per year: trains, buses, feeder buses, late-night service) | $2.6B | $2.7B | **$4.8B** |
 | Validation: errors / islands | 1 / 10 | 0 / 0 | 0 / 0 |
 
 The **2 million riders** scenario adds an arterial BRT grid on real streets (10 weak corridors left out), an SH-114 metro, job-campus BRT and
 infill stations, the D2 subway downtown, the Red Line on to McKinney, regional rail to Weatherford, Greenville and Cleburne by the
 2090s, through-running regional rail, frequent service, 15-minute feeder buses, bike and walk access, moderate upzoning with 20% of
-growth steered to station areas, and parking pricing (downtown prices double by 2050, $5/day at the densest job centers; 1.85M in
-2100 without it). It stays within the flat $2.3B/yr budget for lines, stations and garages at 2025 peer unit costs that fall 25% by
+growth steered to station areas, and parking pricing (downtown prices double by 2050, $5/day at the densest job centers). With the
+2026 review's more realistic model (a 5-minute transfer penalty, faster driving on long trips, slower BRT, operating cost per
+train-hour) it no longer reaches 2 million: **about 1.9M daily trips in 2100 on the mid growth path, 1.2M on the low one**, so
+read the headline as a range. It stays within the flat $2.3B/yr budget for lines, stations and garages at 2025 peer unit costs that fall 25% by
 2055 as a steady program matures; feeder buses and operations are extra (see `scenarios/two_million/config.json`).
 Ridership is a model estimate calibrated to today's ~80k rail
 boardings; treat the long-range numbers as orders of magnitude.
@@ -148,8 +150,14 @@ Live numbers are in [`reports/RESULTS.md`](reports/RESULTS.md).
 - **Plans are scenarios.** [`scenarios/`](scenarios/README.md) holds alternatives
   as overlays: the untouched v1 plan, the v2 plan's hand-set phasing from before
   the optimizer, and a "right-sized" version with suburban metro as BRT. Every build compares them side by side.
-- **Phasing follows demand.** Each line is valued by the commutes lost if it's
-  removed, both in its opening year and in 2070, divided by its cost.
+- **Phasing follows demand, and doesn't flip between builds.** In the 2 million
+  scenario each line is valued by the trips lost if it's removed from the 2100 network
+  (on one land use, the network's with everything open), per $M of its share of
+  capital (shared track and stations split among their lines, 2025 prices), so the value
+  doesn't depend on which line opens first (`python -m dfwt values`). The schedule starts
+  from the generated stages every time, takes lines by value with a few rules (downtown
+  cores no later than in the budget plan, every county's fair share of the money, every
+  city over 150,000 served by about 2040, no short stubs), and a second run moves nothing.
 - **Geometry stays buildable.** Commuter rail follows existing rail, metro follows
   existing right-of-way, BRT follows ROW only, and river tunnels are minimized.
 - **Portable stack.** Python 3 + numpy, and Leaflet. It runs anywhere, with tests
@@ -175,9 +183,11 @@ pip install -r requirements.txt
 python -m dfwt validate                 # check the plan (also: --scenario v1_baseline)
 python -m dfwt build --quick            # routine: every year 2025-2100, all scenarios (~30 min); keeps the
                                         #   last full build's per-line values
-python -m dfwt build                    # full: also re-measures each line's value (~70 min). Run it when
+python -m dfwt build                    # full: also re-measures each line's value (~80 min). Run it when
                                         #   lines are added, cut or extended, demand assumptions change,
                                         #   or many opening years move
+python -m dfwt values --scenario two_million   # line values for the build order (~25 min)
+python -m dfwt schedule --scenario two_million --write
 python -m dfwt ridership --scenario two_million --years 2050,2100   # a few years, fast
 python -m dfwt trip "Midlothian" "Union Station" --year 2050
 python -m unittest discover -s tests
@@ -185,8 +195,9 @@ python -m unittest discover -s tests
 
 The model: 4,276 census block groups (2020 population, 2022 LODES jobs) as
 zones. Walk or park-and-ride to stations, wait half the headway, and ride at
-speeds that depend on stop spacing. A transfer costs 3 minutes. Each trip is
-compared with a peak-hour drive. Commute flows come from LODES when the raw
+speeds that depend on stop spacing. A transfer costs 5 minutes. Each trip is
+compared with a peak-hour drive whose speed rises with distance (local streets, then
+freeway). Commute flows come from LODES when the raw
 file is present ([`data/README.md`](data/README.md)); otherwise they come from a
 gravity model, so trust the comparisons more than the absolute counts. Limits
 and backlog: [`reports/KNOWN_ISSUES.md`](reports/KNOWN_ISSUES.md).
