@@ -162,7 +162,10 @@ def write(nets, evals, out_path):
     data = {"years": cfg["years"], "boardPenalty": cfg["transfer"]["penalty_min"],
             "build": cfg["staging"]["construction_years"],
             "modes": {m: v["label"] for m, v in cfg["modes"].items()}, "regions": REGIONS,
-            "operating": {k: cfg["operating"][k] for k in ("span_hours", "days_per_year")},
+            # "What it means for you": the costed service day; feeder buses are in the operating cost
+            # when the model prices them (operating.feeder_usd_per_boarding)
+            "operating": {**{k: cfg["operating"][k] for k in ("span_hours", "days_per_year")},
+                          "feeder": bool(cfg["operating"].get("feeder_usd_per_boarding"))},
             "geoms": geoms, "stations": stations, "scen": scen,
             "zones": tripplan.zone_points(zones) if feeds else [],
             "order": [k for k in (cfg.get("default_scenario"), "plan", "v1_baseline", "right_sized") if k in scen] +

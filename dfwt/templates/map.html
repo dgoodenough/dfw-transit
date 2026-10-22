@@ -552,13 +552,15 @@ function stationHtml(sid) {
   for (const [li, stops] of yd.runs) if (stops.includes(sid) && !hidden.has(S.lines[li].id)) lis.add(li);
   const chips = [...lis].map(li => `<span class="chip" style="background:${S.lines[li].color};color:${inkOn(S.lines[li].color)}">${esc(S.lines[li].name)}</span>`).join('');
   const op = stationOpen()[sid] || {}, modes = Object.keys(op).sort((a, b) => op[a] - op[b]), one = modes.length === 1;
-  const when = md => op[md] <= D.years[0] ? 'runs today' : (op[md] <= Y ? 'opened ' : 'opens ') + op[md];
+  // not open yet: building takes the mode's construction years (config staging.construction_years)
+  const when = md => op[md] <= D.years[0] ? 'runs today' : op[md] <= Y ? 'opened ' + op[md]
+    : `opens ${op[md]}` + (D.build[md] ? ` (construction about ${op[md] - D.build[md]}–${op[md]})` : '');
   const gr = (S.grades || {})[sid] || {}, where = md => GRADE_NAME[gr[md]] || 'street-level';
   const sameGrade = new Set(modes.map(where)).size <= 1;
   const cap = t => t.charAt(0).toUpperCase() + t.slice(1);
   const rows = modes.map(md => cap(MODE_NAME[md] || md) + ' ' + when(md) + (sameGrade ? '' : ', ' + where(md)));
   if (sameGrade && modes.length) rows.push(cap(where(modes[0])) + ' platform' + (one ? '' : 's'));
-  if (modes.some(md => op[md] > D.years[0])) rows.push('New platforms step-free (assumed)');
+  if (modes.some(md => op[md] > D.years[0])) rows.push('Step-free (assumed: every new station is)');
   const b = S.boardings[sid], last = D.years[D.years.length - 1];
   if (b) rows.push(`About ${roundAbout(b).toLocaleString()} daily boardings in ${last} (model: weekday commutes only)`);
   rows.push(`${fmt(st[3])} residents · ${fmt(st[4])} jobs within 1 km (today)`);
@@ -598,6 +600,8 @@ function intervalSummary(Y, prevY, state) {
   $('interval').innerHTML = `<b>${span}</b>` + (opened.length ? opened.sort((a, b) => b[1] - a[1]).map(row).join('') : '<div class="none">Nothing new</div>') +
     (building.length ? `<b style="display:block;margin-top:6px">Under construction</b>` + building.sort((a, b) => a[2] - b[2]).map(row).join('') : '');
 }
+// what the operating cost covers (feeder buses since the model prices them per boarding)
+const runWhat = () => (D.operating || {}).feeder ? 'the rail, BRT and feeder buses' : 'the rail and BRT';
 function metrics() {
   const Y = D.years[yi], m = S.metrics.find(r => r.year === Y);
   // compare with the budget-constrained plan (or, for the plan itself, with v1)
@@ -615,7 +619,7 @@ function metrics() {
     [big(m.daily_trips) + d('daily_trips'), 'daily transit trips (each trip counted once)'],
     [big(m.all_boardings), `boardings a day${per ? `, ≈${per.toFixed(1)} per trip (each change of vehicle counts, feeder buses too)` : ''}: ${modes}`],
     [big(m.jobs_45min) + d('jobs_45min'), 'jobs the average resident reaches by transit in 45 min'],
-    ['$' + m.capex_busd.toFixed(1) + 'B' + d('capex_busd', '$'), 'capital spent since 2025' + (m.opex_busd_per_year != null ? ` · $${m.opex_busd_per_year.toFixed(1)}B a year to run the rail and BRT` : '')],
+    ['$' + m.capex_busd.toFixed(1) + 'B' + d('capex_busd', '$'), 'capital spent since 2025' + (m.opex_busd_per_year != null ? ` · $${m.opex_busd_per_year.toFixed(1)}B a year to run ${runWhat()}` : '')],
   ].map(([a, b]) => `<div class="metric"><b>${a}</b><span>${b}</span></div>`).join('');
   const series = sc => sc.metrics.map(r => r.daily_trips);
   const all = series(S).concat(ref ? series(ref) : []).concat([2e6]), max = Math.max(...all) * 1.05;
@@ -639,14 +643,17 @@ function forYou() {
     return `${MODE_NAME[md]} every ${lo === hi ? lo : lo + '–' + hi} min`; });
   const pop = m.pop_m * 1e6, usd = v => '$' + Math.round(v).toLocaleString(), op = D.operating || {};
   const cap = S.budget ? `the plan budgets <b>$${S.budget.toFixed(1)}B a year</b> for construction (2025 dollars). Spread over the region's ${m.pop_m.toFixed(1)}M residents in ${Y}, that is about <b>${usd(S.budget * 1e9 / pop)} per resident a year</b>. ` : '';
-  const run = m.opex_busd_per_year != null ? `Running the rail and BRT costs about $${m.opex_busd_per_year.toFixed(1)}B a year in ${Y}, about <b>${usd(m.opex_busd_per_year * 1e9 / pop)} per resident a year</b> (feeder buses not included). ` : '';
+  const run = m.opex_busd_per_year != null ? `Running ${runWhat()} costs about $${m.opex_busd_per_year.toFixed(1)}B a year in ${Y}, about <b>${usd(m.opex_busd_per_year * 1e9 / pop)} per resident a year</b>${op.feeder ? '' : ' (feeder buses not included)'}. ` : '';
+  // the costed service day, read as starting about 5 a.m.
+  const hr = h => { h = ((Math.round(h) % 24) + 24) % 24; return (h % 12 || 12) + (h < 12 ? ' a.m.' : ' p.m.'); };
   $('foryouBody').innerHTML =
     `<p><b>How often (${Y}, as modelled):</b> ${freq.length ? freq.join('; ') : 'no lines run'}. These are rush-hour frequencies; a wait is counted as half the gap between vehicles, at most 12 min.</p>` +
-    `<p><b>Hours:</b> the model counts weekday rush-hour commutes only. Early-morning, late-night and weekend service is not modelled, so nothing here says what runs at 4:30 a.m. or 11 p.m.` +
-    (op.span_hours ? ` The operating cost assumes ${op.span_hours} hours of service a day at these frequencies, ${op.days_per_year} days a year.` : '') + `</p>` +
+    `<p><b>Hours:</b> ` + (op.span_hours ? `the operating cost assumes ${op.span_hours} hours of service a day (about ${hr(5)}–${hr(5 + op.span_hours)}) at these frequencies, ${op.days_per_year} days a year. ` : '') +
+    `Late-night (owl) service would be an operating add-on on top of that: it is not costed here, and the model doesn't count riders for it. The ridership model counts weekday rush-hour commutes only, so nothing here says how often anything runs at 1 a.m. or on a Sunday.</p>` +
     `<p><b>Cost:</b> ${cap}${run}Who pays (sales tax, federal grants, fares) is not decided here.</p>` +
     `<p><b>Fares:</b> not modelled. The ridership model charges no fare, so read its numbers as if fares stay low enough not to change who rides; no fare level is proposed.</p>` +
     `<p><b>Access:</b> new stations are assumed step-free (level boarding, ramps or lifts), as US law (the ADA) requires of new stations. Whether a walk to a station is lit, shaded or safe is not modelled.</p>` +
+    `<p><b>Rents and displacement:</b> rents tend to rise near new stations, which can push out people who already live there and ride. The model counts growth near stations but not who is displaced; keeping homes affordable near stations would take housing policy the region would have to adopt alongside a plan like this.</p>` +
     `<p class="hint">A hypothetical plan: nothing here is funded, scheduled or promised.</p>`;
 }
 function lineList() {
@@ -694,14 +701,16 @@ function lineList() {
 // ridership model choose them, so the trip shown is the one the ridership counts; the minutes
 // shown are clock minutes. tripOpts.model = false ranks by clock minutes instead (for checks).
 let ends = [null, null];   // From, To: {sid} (a station) or {lat, lon, label} (an address or a point)
-const tripOpts = {pnr: false, bike: false, kiss: false, model: true};
-try { const o = JSON.parse(localStorage.getItem('dfwt.tripOpts') || '{}'); for (const k of ['pnr', 'bike', 'kiss']) if (typeof o[k] === 'boolean') tripOpts[k] = o[k]; } catch (e) { /* no storage */ }
+const tripOpts = {pnr: false, bike: false, kiss: false, fewer: false, model: true};
+try { const o = JSON.parse(localStorage.getItem('dfwt.tripOpts') || '{}'); for (const k of ['pnr', 'bike', 'kiss', 'fewer']) if (typeof o[k] === 'boolean') tripOpts[k] = o[k]; } catch (e) { /* no storage */ }
 // the access-station cap: wider than the model's (max_access_stations), since a cut on the nearest
 // stops can prune the station on the right line
 const K_MIN = 16;
 // a garage whose drive takes more than this share of the drive alone isn't offered (drive almost
 // all the way, then ride a stop or two)
 const PNR_MAX_SHARE = .6;
+// "Fewer changes": each boarding counts this many minutes more when ranking (not in the minutes shown)
+const FEWER_MIN = 10, boardExtra = () => tripOpts.fewer ? FEWER_MIN : 0;
 const MODES = ['walk', 'pnr', 'feeder', 'bike', 'kiss'];
 const GEO_BOX = [-98.1, 32.2, -95.9, 33.6];   // lon/lat box addresses are searched in (the metroplex)
 const inBox = (lat, lon) => lon >= GEO_BOX[0] && lon <= GEO_BOX[2] && lat >= GEO_BOX[1] && lat <= GEO_BOX[3];
@@ -769,7 +778,7 @@ function tripGraph(gi) {
   return G;
 }
 // multi-source / multi-target Dijkstra: src and tgt map nodes to start and end costs
-function dijkstra(G, src, tgt, waitW) {
+function dijkstra(G, src, tgt, waitW, extra = 0) {
   const n = G.adj.length, dist = new Float64Array(n).fill(Infinity), prev = new Int32Array(n).fill(-1), h = [];
   const push = (d, v) => { h.push([d, v]); let i = h.length - 1; while (i) { const p = (i - 1) >> 1; if (h[p][0] <= h[i][0]) break; [h[p], h[i]] = [h[i], h[p]]; i = p; } };
   const pop = () => { const top = h[0], last = h.pop();
@@ -785,7 +794,7 @@ function dijkstra(G, src, tgt, waitW) {
     const t = tgt.get(u);
     if (t !== undefined && d + t < best) { best = d + t; end = u; }
     for (const [v, w, wait] of G.adj[u]) {
-      const nd = d + (wait >= 0 ? wait * waitW + D.boardPenalty : w);
+      const nd = d + (wait >= 0 ? wait * waitW + D.boardPenalty + extra : w);
       if (nd < dist[v]) { dist[v] = nd; prev[v] = u; push(nd, v); }
     }
   }
@@ -856,14 +865,14 @@ function doorYear(Y, A, B, every = false) {
   for (const a of acc) if (!(src.get(a.i) <= a.gen)) src.set(a.i, a.gen);
   // leave from a line node (on alighting): every trip rides at least once, as in the model
   for (const e of egr) for (const n of G.at[e.i]) if (!(tgt.get(n) <= e.gen)) tgt.set(n, e.gen);
-  const r = dijkstra(G, src, tgt, tripOpts.model ? T.waitW : 1);
+  const X = boardExtra(), r = dijkstra(G, src, tgt, tripOpts.model ? T.waitW : 1, X);
   if (r.end < 0) return {total: null, drive};
   const p = pathLegs(G, r), pick1 = (xs, i) => xs.filter(x => x.i === i).sort((u, v) => u.gen - v.gen)[0];
   const a = pick1(acc, p.a), e = pick1(egr, p.b);
   a.sid = G.sids[a.i]; e.sid = G.sids[e.i];
   // modelMin: the same path in the model's minutes (waits as perceived, demand._paths), for checks
   return {total: a.t + p.min + e.t, drive, legs: p.legs, acc: a, egr: e, gi, rule: R,
-          modelMin: r.best - a.gen + a.t - e.gen + e.t - D.boardPenalty};
+          modelMin: r.best - a.gen + a.t - e.gen + e.t - D.boardPenalty - X * p.legs.filter(l => l.t === 'wait').length};
 }
 // one year, station to station (as route(): waits as they are, no access legs)
 function stationYear(Y, a, b) {
@@ -871,7 +880,7 @@ function stationYear(Y, a, b) {
   if (gi === undefined || a === b) return {total: null, drive};
   const G = tripGraph(gi);
   if (!G.idx.has(a) || !G.idx.has(b)) return {total: null, drive};
-  const r = dijkstra(G, new Map([[G.idx.get(a), 0]]), new Map([[G.idx.get(b), 0]]), 1);
+  const r = dijkstra(G, new Map([[G.idx.get(a), 0]]), new Map([[G.idx.get(b), 0]]), 1, boardExtra());
   return {total: r.end < 0 ? null : pathLegs(G, r).min, drive};
 }
 // every year of the plan for the chosen trip (cached: the network only changes in some years,
@@ -879,7 +888,7 @@ function stationYear(Y, a, b) {
 const seriesCache = new Map();
 function tripSeries() {
   const [a, b] = ends, door = !(a.sid && b.sid), A = ptOf(a), B = ptOf(b), T = S.trip;
-  const key = [scenKey, hiddenKey(), A.lat, A.lon, B.lat, B.lon, door, door && Object.values(tripOpts).join()].join('|');
+  const key = [scenKey, hiddenKey(), A.lat, A.lon, B.lat, B.lon, door, Object.values(tripOpts).join()].join('|');
   if (seriesCache.has(key)) return seriesCache.get(key);
   const gv = Object.values(T.garages).flat(), memo = new Map();
   const val = D.years.map(Y => {
@@ -913,7 +922,7 @@ function choose(sid) {
 function setEnd(i, e) { ends[i] = e; syncInputs(); replan(true); }
 function replan(fit) {
   const [a, b] = ends;
-  if (a && b && a.sid && b.sid) { pick = [a.sid, b.sid]; $('tripOpts').hidden = true; route(); return; }
+  if (a && b && a.sid && b.sid) { pick = [a.sid, b.sid]; tripOptions(true); route(); return; }
   if (a && b) { doorRoute(fit); return; }
   tripLayer.clearLayers(); dimNetwork(false); $('tripOpts').hidden = true;
   pick = [a, b].filter(e => e && e.sid).map(e => e.sid);
@@ -1039,10 +1048,10 @@ function transitLegs(legs, yd) {
 }
 function route() {
   const Y = D.years[yi], yd = S.years[Y], [a, b] = pick;
-  const adj = new Map(), add = (u, v, w, info) => { if (!adj.has(u)) adj.set(u, []); adj.get(u).push([v, w, info]); };
+  const X = boardExtra(), adj = new Map(), add = (u, v, w, info) => { if (!adj.has(u)) adj.set(u, []); adj.get(u).push([v, w, info]); };
   yd.runs.forEach(([li, stops, hops, wait], ri) => !hidden.has(S.lines[li].id) && stops.forEach((s, k) => {   // hidden lines: as if not built
     const n = `L${ri}:${k}`;
-    add('P' + s, n, wait + D.boardPenalty, {t: 'board', ri}); add(n, 'P' + s, 0, {t: 'alight'});
+    add('P' + s, n, wait + D.boardPenalty + X, {t: 'board', ri}); add(n, 'P' + s, 0, {t: 'alight'});
     if (k) { const p = `L${ri}:${k - 1}`; add(p, n, hops[k - 1], {t: 'ride', ri}); add(n, p, hops[k - 1], {t: 'ride', ri}); }
   }));
   for (const [x, y, w] of yd.walks) { add('P' + x, 'P' + y, w, {t: 'walk'}); add('P' + y, 'P' + x, w, {t: 'walk'}); }
@@ -1063,7 +1072,7 @@ function route() {
       : `No route from ${A} to ${B} in ${Y}.` + (yi < D.years.length - 1 ? ' Try a later year.' : '');
     if (a !== b) pick.forEach(pickMark);
     $('trip').innerHTML = `<p class="hint">${why}${clear}</p>` + (a !== b ? chartBox() : '');
-    if (a === b) { pick = [a]; ends[1] = null; syncInputs(); pick.forEach(pickMark); } else tripChart(tripSeries());
+    if (a === b) { pick = [a]; ends[1] = null; syncInputs(); pick.forEach(pickMark); $('tripOpts').hidden = true; } else tripChart(tripSeries());
     showTrip(); return;
   }
   const path = []; let u = 'P' + b; while (prev.has(u)) { const [p, info] = prev.get(u); path.unshift([p, u, info]); u = p; }
@@ -1072,12 +1081,12 @@ function route() {
     const w = dist.get(v) - dist.get(p);
     if (info.t === 'ride') { const l = legs[legs.length - 1]; if (l && l.t === 'ride' && l.ri === info.ri) { l.to = v; l.min += w; } else legs.push({t: 'ride', ri: info.ri, from: p, to: v, min: w}); }
     else if (info.t === 'walk') legs.push({t: 'walk', from: p, to: v, min: w});
-    else if (info.t === 'board') legs.push({t: 'wait', ri: info.ri, at: p, min: w - D.boardPenalty});
+    else if (info.t === 'board') legs.push({t: 'wait', ri: info.ri, at: p, min: w - D.boardPenalty - X});
   }
-  const total = dist.get('P' + b) - (legs.some(l => l.t === 'wait') ? D.boardPenalty : 0);   // the first boarding is no transfer
+  const nB = legs.filter(l => l.t === 'wait').length, total = dist.get('P' + b) - nB * X - (nB ? D.boardPenalty : 0);   // the first boarding is no transfer
   let h = `<div class="tot">${A} → ${B}: ${Math.round(total)} min</div><div class="hint">${Y} network, station to station` +
     (hidden.size ? ', without the hidden lines' : '') + `.${clear}</div>`;
-  h += transitLegs(legs, yd);
+  h += transitLegs(legs, yd) + selfPowered(ptOf({sid: a}), ptOf({sid: b}), S.trip.rules[S.trip.yearRules[Y]]);
   pick.forEach(pickMark);
   dimNetwork(true);
   $('trip').innerHTML = h + chartBox(); tripChart(tripSeries());
@@ -1116,7 +1125,7 @@ function doorRoute(fit) {
       (R.feeder ? `, takes a feeder bus up to ${R.feeder.maxKm} km where it's dense enough` : '') + ').' +
       (r.none === 'from' && !tripOpts.pnr ? ' If you can drive to a station, tick “I can drive to a station”.' : '')
       : `No transit route from ${esc(A.label)} to ${esc(B.label)} in ${Y}.`;
-    $('trip').innerHTML = `<p class="hint">${why}${first > 0 ? ` The first comes in ${D.years[first]}.` : ''}${clearBtn}</p>` + near + drive + chartBox();
+    $('trip').innerHTML = `<p class="hint">${why}${first > 0 ? ` The first comes in ${D.years[first]}.` : ''}${clearBtn}</p>` + near + drive + selfPowered(A, B, R) + chartBox();
   } else {
     const yd = S.graphs[r.gi];
     let h = `<div class="tot">${esc(A.label)} → ${esc(B.label)}: ${Math.round(r.total)} min</div>` + head;
@@ -1142,15 +1151,18 @@ function doorRoute(fit) {
   }
   showTrip();
 }
-// short trips: walking (or biking, if ticked) the whole way, at the model's access speeds
+// short trips (under SELF_KM straight-line km): walking, and biking, the whole way at the model's
+// access speeds (biking: the plan's bike / scooter speed where it has one)
+const SELF_KM = 5;
 function selfPowered(A, B, R) {
-  const T = S.trip, [ax, ay] = projXY(T, A.lat, A.lon), [bx, by] = projXY(T, B.lat, B.lon), d = Math.hypot(ax - bx, ay - by), out = [];
-  if (d <= 2.5) out.push(`walking the whole way about ${Math.round(d * R.walkPerKm)} min`);
-  if (R.bike && tripOpts.bike && d <= R.bike.maxKm) out.push(`biking the whole way about ${Math.round(d * R.bike.perKm)} min`);
-  return out.length ? `<div class="hint">Or: ${out.join('; ')}.</div>` : '';
+  const T = S.trip, [ax, ay] = projXY(T, A.lat, A.lon), [bx, by] = projXY(T, B.lat, B.lon), d = Math.hypot(ax - bx, ay - by);
+  if (d > SELF_KM) return '';
+  const bk = R.bike || (T.rules.find(r => r.bike) || {}).bike, out = [`walk the whole way: ${Math.round(d * R.walkPerKm)} min`];
+  if (bk) out.push(`bike the whole way: ${Math.round(d * bk.perKm)} min`);
+  return `<div class="hint">Or ${out.join('; or ')}.</div>`;
 }
 // the fastest trip in clock minutes, from every station within reach (the model ranks by perceived minutes)
-function clockBest(Y, A, B) { const m = tripOpts.model; tripOpts.model = false; try { return doorYear(Y, A, B, true); } finally { tripOpts.model = m; } }
+function clockBest(Y, A, B) { const m = tripOpts.model, f = tripOpts.fewer; tripOpts.model = tripOpts.fewer = false; try { return doorYear(Y, A, B, true); } finally { tripOpts.model = m; tripOpts.fewer = f; } }
 // "Nearest: Lovers Lane (Red, Orange) 0.6 km · runs today": the nearest stations the model's access rules
 // reach from p in the selected year (walk, feeder bus, garage if driving is ticked, bike / drop-off if
 // ticked), or the first year one comes within reach
@@ -1185,13 +1197,14 @@ function nearLine(p) {
 }
 // which ways of reaching a station the traveller has: driving to a garage, and the levers this plan
 // enables in some year (bike or scooter, getting dropped off)
-function tripOptions() {
+function tripOptions(stations = false) {
   const T = S.trip, any = k => T.rules.some(r => r[k]);
   const box = (k, label) => `<label><input type="checkbox" data-o="${k}" ${tripOpts[k] ? 'checked' : ''}> ${label}</label>`;
-  $('tripOpts').innerHTML = box('pnr', 'I can drive to a station') + (any('bike') ? box('bike', 'bike or scooter') : '') + (any('kiss') ? box('kiss', 'I can get dropped off') : '');
+  const fewer = `<label title="Each change of vehicle counts as ${FEWER_MIN} more minutes when choosing the trip"><input type="checkbox" data-o="fewer" ${tripOpts.fewer ? 'checked' : ''}> fewer changes</label>`;
+  $('tripOpts').innerHTML = stations ? fewer : box('pnr', 'I can drive to a station') + (any('bike') ? box('bike', 'bike or scooter') : '') + (any('kiss') ? box('kiss', 'I can get dropped off') : '') + fewer;
   $('tripOpts').hidden = false;
   $('tripOpts').querySelectorAll('input').forEach(i => i.onchange = () => { tripOpts[i.dataset.o] = i.checked;
-    try { localStorage.setItem('dfwt.tripOpts', JSON.stringify({pnr: tripOpts.pnr, bike: tripOpts.bike, kiss: tripOpts.kiss})); } catch (e) { /* no storage */ }
+    try { localStorage.setItem('dfwt.tripOpts', JSON.stringify({pnr: tripOpts.pnr, bike: tripOpts.bike, kiss: tripOpts.kiss, fewer: tripOpts.fewer})); } catch (e) { /* no storage */ }
     replan(false); });
 }
 
