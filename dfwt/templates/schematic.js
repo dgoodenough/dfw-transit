@@ -17,6 +17,7 @@ let SD = null, setKey = null;      // the version showing and its layout
 const NS = 'http://www.w3.org/2000/svg';
 const W = {metro: 0.24, commuter: 0.2, streetcar: 0.14, brt: 0.12};     // stroke widths, layout units (1 = min station spacing); BRT: solid, half weight
 const R_ST = 0.17;
+const CONN_GAP = 0.9;      // markers further apart than this (layout units, edge to edge) are linked by a dashed walk
 const el = (tag, attrs, parent) => {
   const e = document.createElementNS(NS, tag);
   for (const k in attrs) if (attrs[k] !== null) e.setAttribute(k, attrs[k]);
@@ -26,6 +27,24 @@ const el = (tag, attrs, parent) => {
 const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)');
 
 // lineColor (the colour guard) is defined in map.html
+// On the BRT diagram every route shares one colour in the data (#00838f), so the routes get
+// tints by area (Fort Worth green-teal, Dallas teal, Collin blue, other indigo), each route a
+// little lighter or darker than its neighbours in the list, so one can be followed by eye.
+const TINT = {fw: 152, dal: 186, col: 208, other: 232};
+const hex = (h, sat, l) => {
+  const f = n => { const k = (n + h / 30) % 12, a = sat * Math.min(l, 1 - l); return Math.round(255 * (l - a * Math.max(-1, Math.min(k - 3, 9 - k, 1)))).toString(16).padStart(2, '0'); };
+  return '#' + f(0) + f(8) + f(4);
+};
+let tints = new Map();
+function makeTints() {
+  tints = new Map();
+  if (setKey !== 'brt') return;
+  const by = {};
+  for (const ln of S.lines) if (ln.mode === 'brt') (by[TINT[ln.region] ? ln.region : 'other'] ||= []).push(ln.id);
+  for (const [r, ids] of Object.entries(by)) [...new Set(ids)].sort().forEach((id, i) =>
+    tints.set(id, hex(TINT[r] + [0, 14, -14, 7, -7][i % 5], 0.85, [0.3, 0.4, 0.25, 0.36, 0.45][(i * 2) % 5])));
+}
+const colorOf = ln => lineColor(tints.get(ln.id) || ln.color, ln.mode);
 
 const nodeOf = new Map(), eidx = new Map();
 const edgeOf = (u, w) => eidx.get(Math.min(u, w) + ',' + Math.max(u, w));
@@ -56,10 +75,10 @@ togs.className = 'togs';
 const tog = document.createElement('div');
 tog.className = 'viewtog'; tog.setAttribute('role', 'group'); tog.setAttribute('aria-label', 'View');
 tog.innerHTML = '<button type="button" data-v="map">Map</button><button type="button" data-v="diagram">Diagram</button>';
-const modeTitle = m => m ? m.map(x => D.modes[x] || x).join(', ') : 'Rail and the main BRT corridors';
+const modeTitle = m => m ? m.map(x => D.modes[x] || x).join(', ') : "Rail and the plan's main BRT corridors (every BRT route is on the BRT diagram)";
 const vtog = document.createElement('div');
 vtog.className = 'viewtog vtog'; vtog.setAttribute('role', 'group'); vtog.setAttribute('aria-label', 'Diagram shows');
-vtog.innerHTML = VERS.map(([k, label, m]) => `<button type="button" data-s="${k}" title="${modeTitle(m)}">${label}</button>`).join('');
+vtog.innerHTML = VERS.map(([k, label, m]) => `<button type="button" data-s="${k}" title="${modeTitle(m)}">${label.replace(/ (corridors)$/, ' <span class="vx">$1</span>')}</button>`).join('');
 togs.append(tog, vtog);
 panel.children[0].after(togs);
 if (VERS.length < 2) vtog.hidden = true;
@@ -205,6 +224,7 @@ function linePath(lid, key = scenKey) {
 let active = false, dirty = true, cache = new Map(), drawnNodes = [];
 let lastY = null, lastOpen = new Set(), drawnRuns = [];   // year and open stations of the previous draw (for the year-change animation)
 const sidLines = new Map();     // sid -> served line indices this year
+const openLines = new Set();    // lines with open track this year
 function draw() {
   if (!active) { dirty = true; return; }
   dirty = false;
@@ -216,6 +236,8 @@ function draw() {
   for (const g of [G.future, G.glow, G.lines, G.conn, G.st]) g.textContent = '';
   cache = new Map();
   drawnRuns = [];
+  openLines.clear();
+  makeTints();
   sidLines.clear();
   for (const [li, stops] of yd.runs) for (const s of stops) {
     if (!sidLines.has(s)) sidLines.set(s, []);
@@ -239,7 +261,8 @@ function draw() {
       if (a === undefined || b === undefined) return;
       const pts = lp.pts.slice(a, b + 1);
       drawnRuns.push({pts, fut: st === 'fut'});
-      if (st === 'new') el('path', {class: 'glow' + (anim ? ' fadein' : ''), d: dstr(pts), style: sw(2.7 * (W[ln.mode] || W.metro))}, G.glow);
+      if (st === 'new') el('path', {class: 'glow' + (anim ? ' fadein' : ''), d: dstr(pts), style: sw(2.7 * (W[ln.mode] || W.metro)), 'data-l': ln.id}, G.glow);
+      if (st !== 'fut') openLines.add(ln.id);
       stroke(st === 'fut' ? G.future : G.lines, ln, pts, st === 'fut', st === 'new' && anim);
     };
     for (let k = 0; k < r.segs.length; k++) {
@@ -253,7 +276,7 @@ function draw() {
       const v = lp.path[j], st = ns(v);
       const open = SD.nodes[v][2].some(s => (sidLines.get(s) || []).includes(li));
       (open ? st.open : st.fut).add(li);
-      if (!r.only && (k === 0 || k === lp.stopAt.length - 1)) st.term = true;
+      if (!r.only && (k === 0 || k === lp.stopAt.length - 1) && lp.path[0] !== lp.path[lp.path.length - 1]) st.term = true;   // a ring has no terminus
     });
   }
   // stations
@@ -265,10 +288,20 @@ function draw() {
     R.set(v, shape);
     drawnNodes.push({v, open, st, shape});
   }
-  for (const [a, b] of SD.transfers) {
-    const A = drawnNodes.find(n => n.v === a), B = drawnNodes.find(n => n.v === b);
+  // every walk link the model uses (SD.transfers: stations within the walk radius, or linked
+  // in transfers.csv): a solid link when the two markers sit side by side, a dashed walk when
+  // the layout keeps them further apart
+  const byNode = new Map(drawnNodes.map(n => [n.v, n]));
+  for (const [a, b, , longWalk] of SD.transfers) {
+    const A = byNode.get(a), B = byNode.get(b);
     if (!A || !B) continue;
     const cls = A.open && B.open ? '' : ' fut', xy = [A.shape.x, A.shape.y, B.shape.x, B.shape.y];
+    const ba = A.shape.box, bb = B.shape.box;
+    const gap = Math.hypot(Math.max(0, ba[0] - bb[2], bb[0] - ba[2]), Math.max(0, ba[1] - bb[3], bb[1] - ba[3]));
+    if (gap > CONN_GAP) {
+      el('line', {class: 'conn-w' + cls + (longWalk ? ' lw' : ''), x1: xy[0], y1: xy[1], x2: xy[2], y2: xy[3], 'stroke-width': 0.09, 'stroke-dasharray': '0.01 0.2'}, G.conn);
+      continue;
+    }
     el('line', {class: 'conn-o' + cls, x1: xy[0], y1: xy[1], x2: xy[2], y2: xy[3], 'stroke-width': 0.24}, G.conn);
     el('line', {class: 'conn-i' + cls, x1: xy[0], y1: xy[1], x2: xy[2], y2: xy[3], 'stroke-width': 0.12}, G.conn);
   }
@@ -278,19 +311,25 @@ function draw() {
   placeLabels();
   if (pick.length) rings();
   legendDraw();
+  if (popNode !== null) {      // an open popup follows the year, plan and hidden lines
+    if (byNode.has(popNode)) showPop(popNode); else hidePop();
+  } else if (popLine) {
+    if (cache.has(popLine.id)) showLinePop(popLine.id, popLine.x, popLine.y); else hidePop();
+  }
+  if (hlLine && !cache.has(hlLine)) highlight(null); else if (hlLine) highlight(hlLine);
 }
 // future track: a thin, faint grey hairline (no colour, casing or dashes; schematic.css),
 // so the network still to come reads as a quiet plan behind the open one
 function stroke(g, ln, pts, fut, grow) {
-  const d = dstr(pts), w = W[ln.mode] || W.metro, col = lineColor(ln.color);
+  const d = dstr(pts), w = (W[ln.mode] || W.metro) * (setKey === 'brt' ? 1.35 : 1), col = colorOf(ln), l = ln.id;
   if (fut) {
-    el('path', {class: 'ln fut', d, stroke: col, style: sw(w * 0.45)}, g);
+    el('path', {class: 'ln fut', d, stroke: col, style: sw(w * 0.45), 'data-l': l}, g);
   } else if (ln.mode === 'commuter') {
-    const grp = el('g', {class: grow ? 'fadein' : ''}, g);
+    const grp = el('g', {class: grow ? 'fadein' : '', 'data-l': l}, g);
     el('path', {class: 'ln', d, stroke: col, style: sw(w)}, grp);
     el('path', {class: 'case', d, style: sw(w * 0.36), 'stroke-dasharray': '0.5 0.3'}, grp);
   } else {
-    el('path', {class: 'ln' + (grow ? ' grow' : ''), d, stroke: col, style: sw(w), pathLength: grow ? 1 : null}, g);
+    el('path', {class: 'ln' + (grow ? ' grow' : ''), d, stroke: col, style: sw(w), pathLength: grow ? 1 : null, 'data-l': l}, g);
   }
 }
 // marker at node v: the smallest rounded rectangle, aligned to one of the four
@@ -365,9 +404,14 @@ function placeLabels() {
     }
   }
   for (const n of drawnNodes) addBox(n.shape.box);
-  // viewport (in layout units) so off-screen labels don't block on-screen ones
-  const fa = freeArea(), x0 = (fa[0] - view.tx) / k, y0 = (fa[1] - view.ty) / k, x1 = (Math.min(fa[2] + 44, host.clientWidth - 4) - view.tx) / k, y1 = (fa[3] - view.ty) / k, m = 6;
+  // viewport (in layout units) so off-screen labels don't block on-screen ones; labels may run
+  // past the free area on the right, but not under the zoom buttons
+  const fa = freeArea(), x0 = (fa[0] - view.tx) / k, y0 = (fa[1] - view.ty) / k, x1 = (host.clientWidth - 6 - view.tx) / k, y1 = (fa[3] - view.ty) / k, m = 6;
   const inView = b => b[0] >= x0 && b[2] <= x1 && b[1] >= y0 && b[3] <= y1;
+  if (zoomBox.offsetParent) {
+    const zr = zoomBox.getBoundingClientRect(), hr = host.getBoundingClientRect(), g = 6;
+    addBox([(zr.left - hr.left - g - view.tx) / k, (zr.top - hr.top - g - view.ty) / k, (zr.right - hr.left + g - view.tx) / k, (zr.bottom - hr.top + g - view.ty) / k]);
+  }
   // area names: overview only, nearest spot (spiral search) clear of stations and lines
   if (kf < 2.4) {
     const cpx = small ? 12 : 14.5, cfs = cpx / k;
@@ -377,9 +421,10 @@ function placeLabels() {
       // nearest spot clear of open lines (faint future ones may pass under it) within ~9% of the view's diagonal (an area name labels an
       // area, not a point); failing that, one crossing a line or two (the label has a
       // halo); failing that, no label rather than a misleading one
+      // (cx, cy) is the area's core station (schematic.py): the name stands beside it
       let best = null;
-      const reach = Math.max(60, Math.min(130, 0.09 * Math.hypot(fa[2] - fa[0], fa[3] - fa[1])));
-      for (const [maxR, maxCost] of [[reach, 0], [reach, 4], [45, 8]]) {
+      const reach = Math.max(45, Math.min(92, 0.06 * Math.hypot(fa[2] - fa[0], fa[3] - fa[1])));
+      for (const [maxR, maxCost] of [[reach * 0.6, 0], [reach * 0.6, 3], [reach, 0], [reach, 4], [reach, 8], [reach, 14], [reach * 2.2, 1e9]]) {
         for (const r of [0, 8, 16, 24, 34, 45, 60, 75, 92, 110, 130]) {
           if (best || r > maxR) break;
           const nA = r ? 16 : 1;
@@ -402,37 +447,117 @@ function placeLabels() {
   const lines = n => n.st.open.size + n.st.fut.size;
   const cand = drawnNodes.filter(n => { const s = n.shape; return (n.open || showFut) && s.x > x0 - m && s.x < x1 + m && s.y > y0 - m && s.y < y1 + m; });
   cand.sort((a, b) => (b.open - a.open) || (lines(b) - lines(a)) || (b.st.term - a.st.term) || ((lead(a.v) !== a.v) - (lead(b.v) !== b.v)) || (a.v - b.v));
+  // route names at the ends of the BRT routes (they share one colour on the map): placed
+  // before the minor stations' names, after the interchanges' and termini's
+  const pills = routePills(k, fs);
+  const nMajor = cand.filter(n => lines(n) > 1 || n.st.term).length;
   // a repeated name is skipped within 190 px; a variant ("Irving W3" near "Irving")
   // only while zoomed out, so every distinct name shows when zoomed well in
   const gap = 3 / k, padX = fs * 0.45, padY = fs * 0.12, near = 190 / k, nearVariant = near * Math.max(0, Math.min(1, (4 - kf) / 3));
+  const lm = fs * 0.12;          // a label just touching a line counts as on it
   const placed = new Map();       // group lead -> [[x, y, name]] of its placed labels
-  for (const n of cand) {
+  cand.forEach((n, ci) => {
+    if (ci === nMajor) placePills(pills);
     const s = n.shape, g = lead(n.v), name = SD.nodes[n.v][3];
-    if ((placed.get(g) || []).some(([x, y, nm]) => Math.hypot(x - s.x, y - s.y) < (nm === name ? near : nearVariant))) continue;
-    const w = meas.measureText(name).width / k, h = fs * 1.05, bx = s.box;
-    const ex = (bx[2] - bx[0]) / 2, ey = (bx[3] - bx[1]) / 2;
-    const dx = ex + gap, dy = ey + gap, dd = Math.min(ex, ey) * 0.72 + gap;
-    const opts = [[s.x + dx, s.y - h / 2], [s.x - dx - w, s.y - h / 2], [s.x + dd, s.y - dd - h], [s.x + dd, s.y + dd],
-      [s.x - dd - w, s.y - dd - h], [s.x - dd - w, s.y + dd], [s.x - w / 2, s.y - dy - h], [s.x - w / 2, s.y + dy]];
-    // an interchange may also stand a little further off (still clearly its own)
-    if (lines(n) > 1) { const f = fs * 0.9; opts.push([s.x + dx + f, s.y - h / 2], [s.x - dx - w - f, s.y - h / 2], [s.x - w / 2, s.y - dy - h - f * 0.6], [s.x - w / 2, s.y + dy + f * 0.6]); }
+    if ((placed.get(g) || []).some(([x, y, nm]) => Math.hypot(x - s.x, y - s.y) < (nm === name ? near : nearVariant))) return;
+    const bx = s.box, ex = (bx[2] - bx[0]) / 2, ey = (bx[3] - bx[1]) / 2;
+    const dx = ex + gap, dy = ey + gap, dd = Math.min(ex, ey) * 0.72 + gap, f = fs * 0.9;
     let best = null, bc = 1e9, bl = 0;
-    opts.forEach(([bx, by], i) => {
-      const b = [bx, by, bx + w, by + h];
-      if (hits(b) || !inView(b)) return;
-      const lcost = lineCost(b), c = lcost * 3 + i * 0.25 + (i >= 8 ? 2 : 0);
-      if (c < bc) { bc = c; best = b; bl = lcost; }
-    });
-    if (!best) continue;
+    // a long name may also be set on two lines
+    for (const rows of wrapName(name)) {
+      const w = Math.max(...rows.map(r => meas.measureText(r).width)) / k, h = fs * 1.05 * rows.length;
+      const opts = [[s.x + dx, s.y - h / 2], [s.x - dx - w, s.y - h / 2], [s.x + dd, s.y - dd - h], [s.x + dd, s.y + dd],
+        [s.x - dd - w, s.y - dd - h], [s.x - dd - w, s.y + dd], [s.x - w / 2, s.y - dy - h], [s.x - w / 2, s.y + dy],
+        // a little further off, still clearly its own
+        [s.x + dx + f, s.y - h / 2], [s.x - dx - w - f, s.y - h / 2], [s.x - w / 2, s.y - dy - h - f * 0.6], [s.x - w / 2, s.y + dy + f * 0.6],
+        [s.x + dd + f * 0.7, s.y - dd - h - f * 0.7], [s.x + dd + f * 0.7, s.y + dd + f * 0.7], [s.x - dd - w - f * 0.7, s.y - dd - h - f * 0.7], [s.x - dd - w - f * 0.7, s.y + dd + f * 0.7]];
+      opts.forEach(([ox, oy], i) => {
+        const b = [ox, oy, ox + w, oy + h];
+        if (hits(b) || !inView(b)) return;
+        const lcost = lineCost([b[0] - lm, b[1] - lm, b[2] + lm, b[3] + lm]);
+        const c = lcost * 3 + i * 0.25 + (i >= 8 ? 2.5 : 0) + (rows.length > 1 ? 1.5 : 0);
+        if (c < bc) { bc = c; best = {b, rows, h}; bl = lcost; }
+      });
+    }
+    if (!best) return;
     const minor = lines(n) <= 1 && !n.st.term;
-    if (minor && bl > (kf < 2.5 ? 2 : 5)) continue;      // zoomed well in, a name is worth crossing a line
-    addBox([best[0] - padX, best[1] - padY, best[2] + padX, best[3] + padY]);
+    if (minor && bl > (kf < 2.5 ? 2 : 6)) return;      // zoomed well in, a name is worth crossing a line
+    const b = best.b;
+    addBox([b[0] - padX, b[1] - padY, b[2] + padX, b[3] + padY]);
     if (!placed.has(g)) placed.set(g, []);
     placed.get(g).push([s.x, s.y, name]);
-    const t = el('text', {class: 'lbl' + (n.open ? '' : ' fut') + (lines(n) > 1 ? ' x' : ''), x: best[0].toFixed(3),
-      y: (best[1] + h * 0.8).toFixed(3), 'font-size': fs.toFixed(4), 'stroke-width': (2.6 / k).toFixed(4)}, G.lbl);
-    t.textContent = name;
+    const t = el('text', {class: 'lbl' + (n.open ? '' : ' fut') + (lines(n) > 1 ? ' x' : ''), x: b[0].toFixed(3),
+      y: (b[1] + fs * 1.05 * 0.8).toFixed(3), 'font-size': fs.toFixed(4), 'stroke-width': (2.6 / k).toFixed(4)}, G.lbl);
+    if (best.rows.length === 1) t.textContent = name;
+    else best.rows.forEach((r, i) => { const ts = el('tspan', {x: b[0].toFixed(3), dy: i ? (fs * 1.05).toFixed(4) : 0}, t); ts.textContent = r; });
+  });
+  if (nMajor >= cand.length) placePills(pills);
+
+  // ---- route pills: candidates per open BRT route end, placed greedily where clear
+  function routePills(k, fs) {
+    const out = [];
+    if (kf < 1.25 && setKey !== 'brt') return out;
+    const pf = fs * 0.86;
+    meas.font = `700 ${pf * k}px Barlow, "Helvetica Neue", Arial, sans-serif`;
+    for (const [key, lp] of cache) {
+      const id = key.split('#')[0], ln = lineOf(id);
+      if (key.includes('#') || !ln || ln.mode !== 'brt' || !openLines.has(id) || hidden.has(id)) continue;
+      const txt = shortName(ln), w = meas.measureText(txt).width / k + pf * 0.8, h = pf * 1.35;
+      for (const end of lp.path[0] === lp.path[lp.path.length - 1] ? [0] : [0, 1]) {     // a ring: one name
+        const pts = end ? lp.pts.slice().reverse() : lp.pts, v = end ? lp.path[lp.path.length - 1] : lp.path[0];
+        const nd = drawnNodes.find(d => d.v === v);
+        if (!nd) continue;
+        let j = 1; while (j < pts.length - 1 && Math.hypot(pts[j][0] - pts[0][0], pts[j][1] - pts[0][1]) < 1e-6) j++;
+        const ux = pts[0][0] - pts[j][0], uy = pts[0][1] - pts[j][1], L = Math.hypot(ux, uy) || 1;
+        out.push({id, ln, txt, w, h, pf, x: nd.shape.x, y: nd.shape.y, box: nd.shape.box, ux: ux / L, uy: uy / L});
+      }
+    }
+    meas.font = `500 ${px}px Barlow, "Helvetica Neue", Arial, sans-serif`;
+    return out;
   }
+  function placePills(list) {
+    const done = new Set();
+    for (const p of list) {
+      if (done.has(p.id + (p.ux > 0) + (p.uy > 0) + p.x)) continue;
+      const ex = (p.box[2] - p.box[0]) / 2 + gap * 2, ey = (p.box[3] - p.box[1]) / 2 + gap * 2;
+      const cands = [];
+      // straight on past the terminus first, then round it, then stacked a row further out
+      for (let r = 0; r < 3; r++) {
+        const cx = p.x + p.ux * (ex + p.w / 2 + r * p.w * 0.3), cy = p.y + p.uy * (ey + p.h / 2 + r * p.h);
+        cands.push([cx, cy]);
+        for (const [sx, sy] of [[1, 0], [-1, 0], [0, -1], [0, 1]]) cands.push([p.x + sx * (ex + p.w / 2) + sx * r * p.w * 0.2, p.y + sy * (ey + p.h / 2 + r * p.h * 1.1) + (sx ? (r - 1) * p.h * 1.1 : 0)]);
+      }
+      for (const [cx, cy] of cands) {
+        const b = [cx - p.w / 2, cy - p.h / 2, cx + p.w / 2, cy + p.h / 2];
+        if (!inView(b) || hits(b) || lineCost(b) > 1) continue;
+        addBox([b[0] - gap, b[1] - gap, b[2] + gap, b[3] + gap]);
+        const g = el('g', {class: 'pill', 'data-l': p.id}, G.lbl), col = colorOf(p.ln);
+        el('rect', {x: b[0], y: b[1], width: p.w, height: p.h, rx: p.h / 2, fill: col, 'stroke-width': (1.2 / k).toFixed(4)}, g);
+        const t = el('text', {x: cx, y: cy + p.pf * 0.36, 'font-size': p.pf.toFixed(4), fill: inkOn(col)}, g);
+        t.textContent = p.txt;
+        done.add(p.id + (p.ux > 0) + (p.uy > 0) + p.x);
+        break;
+      }
+    }
+  }
+}
+// a station name as one row, and (over WRAP characters) as two rows broken at the slash or
+// space nearest its middle ("Southwestern Medical / District/Parkland")
+const WRAP = 20;
+function wrapName(name) {
+  const out = [[name]];
+  if (name.length <= WRAP) return out;
+  let best = -1, bd = 1e9;
+  for (let i = 1; i < name.length - 1; i++) {
+    const c = name[i];
+    if (c !== ' ' && c !== '/') continue;
+    const d = Math.abs(i - name.length / 2) - (c === '/' ? 2 : 0);
+    if (d < bd) { bd = d; best = i; }
+  }
+  if (best < 0) return out;
+  const a = name.slice(0, best + (name[best] === '/' ? 1 : 0)).trim(), b = name.slice(best + 1).trim();
+  if (a && b) out.push([a, b]);
+  return out;
 }
 
 // ---------------------------------------------------------------- trip overlay
@@ -500,8 +625,42 @@ function trip(legs, yd) {
   }
 }
 
+// ---------------------------------------------------------------- route highlight
+// Hovering a line (mouse) or tapping it lights that route up and fades the rest; a tap also
+// opens a small card with its name and ends. A tap elsewhere clears it.
+let hlLine = null, hoverLine = null;
+function highlight(id) {
+  hlLine = id;
+  const on = hoverLine || hlLine;
+  host.classList.toggle('hl', !!on);
+  vp.querySelectorAll('[data-l]').forEach(e => e.classList.toggle('on', e.getAttribute('data-l') === on));
+}
+function setHover(id) {
+  if (id === hoverLine) return;
+  hoverLine = id; highlight(hlLine);
+}
+function nearestLine(px, py, maxPx) {
+  const x = (px - view.tx) / view.k, y = (py - view.ty) / view.k, lim = maxPx / view.k;
+  let best = null, bd = lim;
+  for (const [key, lp] of cache) {
+    const id = key.split('#')[0];
+    if (hidden.has(id)) continue;
+    const pts = lp.pts;
+    for (let i = 0; i + 1 < pts.length; i++) {
+      const [ax, ay] = pts[i], [bx, by] = pts[i + 1];
+      if (Math.min(ax, bx) - lim > x || Math.max(ax, bx) + lim < x || Math.min(ay, by) - lim > y || Math.max(ay, by) + lim < y) continue;
+      const dx = bx - ax, dy = by - ay, L2 = dx * dx + dy * dy || 1, t = Math.max(0, Math.min(1, ((x - ax) * dx + (y - ay) * dy) / L2));
+      const d = Math.hypot(x - ax - t * dx, y - ay - t * dy);
+      if (d < bd) { bd = d; best = id; }
+    }
+  }
+  return best;
+}
+const lineOf = id => S.lines.find(l => l.id === id);
+const shortName = ln => ln.name.replace(/\s+(BRT|Line)$/i, '');
+
 // ---------------------------------------------------------------- popup / tooltip
-let popNode = null;
+let popNode = null, popLine = null;
 function popupHtml(v) {
   // mirrors the map popup in map.html: name, serving lines, residents/jobs, boardings
   const sids = SD.nodes[v][2], served = sids.filter(s => sidLines.has(s));
@@ -512,15 +671,32 @@ function popupHtml(v) {
   return `<div class="pop"><b>${SD.nodes[v][3]}</b><div>${chips}</div><div class="m">${fmt(st[3])} residents · ${fmt(st[4])} jobs within 1 km` +
     (b ? `<br>${fmt(b)} competitive commuters board here by ${D.years[D.years.length - 1]} (end of plan)` : '') + `</div></div>`;
 }
+function lineHtml(id) {
+  const ln = lineOf(id), lp = cache.get(id);
+  if (!ln || !lp) return '';
+  const ends = [lp.path[0], lp.path[lp.path.length - 1]].map(v => SD.nodes[v][3]);
+  const Y = D.years[yi], open = openLines.has(id);
+  return `<div class="pop"><span class="chip" style="background:${colorOf(ln)};color:${inkOn(colorOf(ln))}">${ln.name}</span>` +
+    `<div class="m">${D.modes[ln.mode] || ln.mode} · ${ends[0]} – ${ends[1]}` +
+    (open ? '' : `<br>Not open in ${Y}${ln.first ? ` (opens ${ln.first})` : ''}`) + `</div></div>`;
+}
+function showLinePop(id, x, y) {
+  popNode = null; popLine = {id, x, y};
+  pop.innerHTML = '<button type="button" class="x" aria-label="Close">×</button>' + lineHtml(id);
+  pop.querySelector('.x').onclick = e => { e.stopPropagation(); hidePop(); highlight(null); };
+  pop.style.display = 'block';
+  posPop();
+}
 function showPop(v) {
-  popNode = v;
+  popNode = v; popLine = null;
   pop.innerHTML = '<button type="button" class="x" aria-label="Close">×</button>' + popupHtml(v);
   pop.querySelector('.x').onclick = e => { e.stopPropagation(); hidePop(); };
   pop.style.display = 'block';
   posPop();
 }
-function hidePop() { popNode = null; pop.style.display = 'none'; }
+function hidePop() { popNode = null; popLine = null; pop.style.display = 'none'; }
 function posPop() {
+  if (popLine) { pop.style.left = (popLine.x * view.k + view.tx) + 'px'; pop.style.top = (popLine.y * view.k + view.ty) + 'px'; return; }
   if (popNode === null) return;
   const n = drawnNodes.find(d => d.v === popNode);
   if (!n) { hidePop(); return; }
@@ -539,7 +715,12 @@ function nearest(px, py, maxPx, openOnly) {
 }
 function clickAt(px, py) {
   const n = nearest(px, py, 14, true);
-  if (!n) { hidePop(); return; }
+  if (!n) {
+    const id = nearestLine(px, py, 12);
+    if (id) { highlight(id); showLinePop(id, (px - view.tx) / view.k, (py - view.ty) / view.k); }
+    else { hidePop(); highlight(null); }
+    return;
+  }
   const sids = SD.nodes[n.v][2], sid = sids.find(s => sidLines.has(s)) || sids[0];
   showPop(n.v);
   choose(sid);
@@ -576,7 +757,7 @@ function fit() {
   // (pan to reach them) so the two downtowns get room; the height still fits
   if ((b1 - b0) / (a1 - a0) > 1.3 * (y1 - y0) / (x1 - x0)) {
     const xs = SD.nodes.map(n => n[0]).sort((a, b) => a - b), q = p => xs[Math.round(p * (xs.length - 1))];
-    x0 = Math.max(x0, q(0.07) - 1.5); x1 = Math.min(x1, q(0.93) + 1.5);
+    x0 = Math.max(x0, q(0.03) - 1.5); x1 = Math.min(x1, q(0.97) + 1.5);
   }
   view.k = fitK = Math.min((a1 - a0) / (x1 - x0), (b1 - b0) / (y1 - y0));
   view.tx = (a0 + a1) / 2 - (x0 + x1) / 2 * view.k;
@@ -611,9 +792,13 @@ host.addEventListener('pointerdown', e => {
 });
 host.addEventListener('pointermove', e => {
   const r = host.getBoundingClientRect();
-  if (!ptrs.has(e.pointerId)) {        // hover tooltip
-    const n = e.pointerType === 'mouse' ? nearest(e.clientX - r.left, e.clientY - r.top, 10, false) : null;
+  if (!ptrs.has(e.pointerId)) {        // hover tooltip: a station's name, or a line's (lit up)
+    if (e.pointerType !== 'mouse') return;
+    const px = e.clientX - r.left, py = e.clientY - r.top, n = nearest(px, py, 10, false);
+    const id = n ? null : nearestLine(px, py, 7);
+    setHover(id);
     if (n) { tip.textContent = SD.nodes[n.v][3]; tip.style.left = (n.shape.x * view.k + view.tx) + 'px'; tip.style.top = (n.shape.y * view.k + view.ty) + 'px'; tip.style.display = 'block'; }
+    else if (id) { tip.textContent = lineOf(id).name; tip.style.left = px + 'px'; tip.style.top = py + 'px'; tip.style.display = 'block'; }
     else tip.style.display = 'none';
     return;
   }
@@ -643,7 +828,7 @@ const up = e => {
 };
 host.addEventListener('pointerup', up);
 host.addEventListener('pointercancel', up);
-host.addEventListener('pointerleave', () => { tip.style.display = 'none'; });
+host.addEventListener('pointerleave', () => { tip.style.display = 'none'; setHover(null); });
 host.addEventListener('dblclick', e => { const r = host.getBoundingClientRect(); zoomAt(e.clientX - r.left, e.clientY - r.top, 2); });
 host.addEventListener('keydown', e => {
   const c = [host.clientWidth / 2, host.clientHeight / 2], step = 60;
@@ -669,6 +854,8 @@ function legendDraw() {
     if (has('metro')) h += sample(`<line x1="1" y1="6" x2="37" y2="6" stroke="${grey}" stroke-width="5" stroke-linecap="round"/><circle cx="19" cy="6" r="3.6" fill="${fill}" stroke="${ink}" stroke-width="1.1"/>`, D.modes.metro);
     if (has('commuter')) h += sample(`<line x1="1" y1="6" x2="37" y2="6" stroke="${grey}" stroke-width="4.2" stroke-linecap="round"/><line x1="1" y1="6" x2="37" y2="6" stroke="${fill}" stroke-width="1.5" stroke-dasharray="10 6"/>`, D.modes.commuter);
     if (has('brt')) h += sample(`<line x1="1" y1="6" x2="37" y2="6" stroke="${grey}" stroke-width="2.4" stroke-linecap="round"/>${has('metro') ? '' : `<circle cx="19" cy="6" r="3" fill="${fill}" stroke="${ink}" stroke-width="1"/>`}`, D.modes.brt);
+    if (setKey === 'brt') h += sample(['fw', 'dal', 'col', 'other'].map((r, i) => `<line x1="${1 + i * 9.5}" y1="6" x2="${8 + i * 9.5}" y2="6" stroke="${lineColor(hex(TINT[r], 0.85, 0.36), 'brt')}" stroke-width="3.2" stroke-linecap="round"/>`).join(''),
+      'BRT by area: Fort Worth, Dallas, Collin, other');
     h += sample(`<line x1="1" y1="6" x2="37" y2="6" stroke="var(--glow)" stroke-width="11" stroke-linecap="round" opacity=".5"/><line x1="1" y1="6" x2="37" y2="6" stroke="${grey}" stroke-width="5" stroke-linecap="round"/>`, 'Opened this interval');
     h += sample(`<line x1="1" y1="6" x2="37" y2="6" stroke="${grey}" stroke-width="2.2" stroke-linecap="round" opacity=".4"/><circle cx="19" cy="6" r="2.2" fill="${fill}" stroke="${ink}" stroke-width=".9" opacity=".5"/>`, 'Not yet open');
     h += sample(`<line x1="1" y1="3" x2="37" y2="3" stroke="${grey}" stroke-width="2.6"/><line x1="1" y1="9" x2="37" y2="9" stroke="${grey}" stroke-width="2.6"/><rect x="15" y="-1" width="8" height="14" rx="4" fill="${fill}" stroke="${ink}" stroke-width="1.3"/>`, 'Interchange');
@@ -729,7 +916,7 @@ function setVersion(k, save) {
   }
   if (k !== setKey) {
     loadSet(k);
-    hidePop(); tip.style.display = 'none';
+    hidePop(); tip.style.display = 'none'; hoverLine = null; highlight(null);
     dirty = true; lastY = null;
     if (active) { fit(); draw(); if (lastTrip) trip(...lastTrip); else { rings(); note.style.display = 'none'; } }
     else fitted = false;
