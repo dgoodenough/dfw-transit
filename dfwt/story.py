@@ -83,8 +83,8 @@ def _years_csv(key):
     p = config.path("results", key, "years.csv")
     if not os.path.exists(p):
         return []
-    keep = ("year", "daily_trips", "all_boardings", "pop", "jobs", "capex_busd", "opex_busd_per_year",
-            "pop_800m", "jobs_45min", "stations")
+    keep = ("year", "daily_trips", "all_boardings", "pop_m", "jobs_m", "capex_busd", "opex_busd_per_year",
+            "pop_covered_pct", "jobs_45min", "stations")
     out = []
     for r in csv.DictReader(open(p, encoding="utf-8")):
         out.append({k: float(r[k]) for k in keep if r.get(k) not in (None, "")})
@@ -195,6 +195,8 @@ def compute(log=print):
                     legs, _ = g.itinerary(a, b)
                     if any(k == "ride" for k, *_ in legs):
                         t = round(sum(m for *_, m in legs))
+                        if sc == "two_million" and y == 2100:   # the lines the trip rides, for its map
+                            row["lines"] = list(dict.fromkeys(run.line.id for k, _, _, run, _ in legs if k == "ride"))
                 row["ride"][f"{sc}_{y}"] = t
                 row["jobs45"][f"{sc}_{y}"] = int(round(float(runs[(sc, y)]["jobs45"][oz]), -2))
         row["opens"] = min(net.station_mode_years()[names[o]].values())

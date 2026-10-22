@@ -28,6 +28,7 @@ side-by-side comparison to `reports/SCENARIOS.md` and the map.
 | Scenario | What it is |
 |---|---|
 | `two_million` | **The default on the map.** 2 million daily transit trips by 2100: the plan plus the expansion package (as add/patch tables), the frequent-service headways (`edits.csv`), and access and moderate land-use policies (`config.json`). |
+| `current_track` | Today's system and service only (the DART Silver Line included), the region grown to 2100 around it: no new lines, infill stations or frequency upgrades. The baseline the story (`docs/index.html`) compares the proposal with. |
 | `v1_baseline` | The v1 plan exactly as it was before the panel review (full copy of the migrated v1 tables, no service upgrades, no extra transfers). |
 | `v2_phasing` | The v2 plan's hand-set phasing from before the optimizer's build order was adopted (its `stages.csv`). |
 | `right_sized` | Step A8: the three long suburban metro lines (SH-360, I-30, I-20 Crosstown) built as BRT instead. |
