@@ -63,17 +63,20 @@ garage is never offered when the drive to it would cover most of the trip. Each 
 what it is (light rail, regional rail, BRT bus, streetcar) and how often it comes; stations
 that share a name carry their line in brackets. Next to the trip is the model's rush-hour
 drive (an estimate: local streets for the first few km, then freeway speeds, slowed by
-congestion), and the page says plainly when driving is faster than any transit trip. Once
+congestion), and the page says plainly when driving is faster than any transit trip. A
+"fewer changes" box counts each change of vehicle as 10 extra minutes when choosing the
+trip, and trips under 5 km also show walking and biking the whole way. Once
 From is set, a "Nearest" line lists the stations within reach that year, or the year the
 first one comes within reach. A chart under the trip shows its door-to-door minutes and
 the drive for every year of the plan; click a year to jump there. Access legs are
 straight-line estimates, and the feeder bus stands in for the real local routes.
 
 A **What it means for you** section in the panel says what the selected plan and year
-model and what they leave out: rush-hour frequencies by mode, that late-night and weekend
-service is not modelled, the capital budget and operating cost per resident per year, that
-fares are not modelled, and that new stations are assumed step-free. Station popups give
-each mode's opening year, whether the platform is at street level, elevated or underground,
+model and what they leave out: rush-hour frequencies by mode, the service day the operating
+cost assumes (late-night service is not costed or modelled), the capital budget and
+operating cost per resident per year, that fares are not modelled, that new stations are
+assumed step-free, and that the model doesn't capture displacement near new stations. Station popups give
+each mode's opening year (and construction window before it opens), whether the platform is at street level, elevated or underground,
 and the model's daily boardings in 2100.
 
 ![The diagram view, 2070 network](docs/img/diagram-desktop.png)
