@@ -27,8 +27,9 @@ grow out of a small first phase, and think "oh, there's actually a path to this.
 ## What I built
 
 A source-of-truth set of network tables, a model that scores any plan against
-real population and jobs data, and an [interactive map](https://dgoodenough.github.io/dfw-transit/)
-([source](docs/index.html)) with a
+real population and jobs data, a [scrolling story](https://dgoodenough.github.io/dfw-transit/)
+([source](docs/index.html)) on why the plan is feasible, and an [interactive map](https://dgoodenough.github.io/dfw-transit/map.html)
+([source](docs/map.html)) with a
 **time slider**, a **plan switcher** (v2 vs. the original v1) and a door-to-door
 **trip planner**. Drag the slider and the network builds itself out year by year,
 with the plan's numbers alongside: commutes where transit beats driving, jobs
@@ -175,7 +176,8 @@ flowchart LR
   Z["data/ census + LODES zones"] --> M
   M --> V[validate]
   M --> R["results/ + reports/RESULTS.md"]
-  M --> W["docs/index.html<br/>map + trip planner"]
+  M --> W["docs/map.html<br/>map + trip planner"]
+  M --> ST["docs/index.html<br/>the story"]
 ```
 
 ```
@@ -212,8 +214,8 @@ dfwt/       the Python model, CLI, map template
 data/       census/LODES zones and OSM extracts (inputs)
 results/    per-scenario CSV outputs (generated)
 reports/    RESULTS + VALIDATION (generated), panel review, design standards, known issues
-docs/       the interactive map (generated; published on GitHub Pages)
-index.html  redirect so the Pages site root opens the map
+docs/       the story (index.html) and the interactive map (map.html), generated; published on GitHub Pages
+index.html  redirect so the Pages site root opens docs/
 tools/      migrate_v1.py and apply_v2_changes.py (how v2 was derived), fetch_waterways.py
 tests/      unit tests
 archive/v1/ the complete v1 project, frozen (PowerShell/C# pipeline, tables, maps, notes)

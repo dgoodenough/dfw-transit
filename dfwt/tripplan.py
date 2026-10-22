@@ -1,4 +1,4 @@
-"""Door-to-door trips for the map's trip planner (docs/index.html).
+"""Door-to-door trips for the map's trip planner (docs/map.html).
 
 The page plans a trip from any address: an access leg to a station, the ride, and an
 egress leg. It reaches stations by the demand model's rules (dfwt/demand.py Access,
