@@ -113,6 +113,12 @@ def run_year(ctx, net, year, want_loads=True):
     return res
 
 
+def feeder_opex_musd(cfg, r):
+    """Feeder buses' operating cost ($M/yr): their daily boardings x cost per boarding x days."""
+    oc = cfg.get("operating") or {}
+    return r.get("feeder_boardings", 0.0) * oc.get("feeder_usd_per_boarding", 0.0) * oc.get("days_per_year", 0) / 1e6
+
+
 def calibrate_asc(ctx, net, lo=-4.0, hi=2.0, tol=0.01, log=None):
     """Set ctx.cfg.ridership.asc so the calibration year's network carries the
     calibration boardings (config.ridership.calibration), by bisection. Needed
@@ -222,7 +228,7 @@ def evaluate(ctx, net, line_values=True, log=print, procs=None):
         row = {"year": y, "stations": r["n_st"], "lines": r["n_lines"],
                "km_metro": round(km["metro"]), "km_brt": round(km["brt"]), "km_commuter": round(km["commuter"]),
                "capex_busd": round(capex / 1000, 1),
-               "opex_busd_per_year": round(sum(net.opex_musd(y).values()) / 1000, 2),
+               "opex_busd_per_year": round((sum(net.opex_musd(y).values()) + feeder_opex_musd(cfg, r)) / 1000, 2),
                "spent_busd": round(sum(v for yy, v in spend.items() if yy <= y) / 1000, 1),
                "budget_busd": round(per_year * (y - cfg["existing_year"]) / 1000, 1),
                "pop_covered_pct": round(pcov * 100, 1), "jobs_covered_pct": round(jcov * 100, 1),
@@ -245,7 +251,8 @@ def evaluate(ctx, net, line_values=True, log=print, procs=None):
 
     fr = results[final]
     g = YearGraph(net, final)       # same runs, in the same order, as the evaluated graph
-    caps = {m: cfg["modes"][m]["capacity_pphpd"] for m in cfg["modes"]}
+    # capacity actually run: vehicles an hour at the line's 2100 headway x vehicle capacity
+    vcap = {m: cfg["modes"][m]["vehicle_capacity"] for m in cfg["modes"]}
     line_rows = []
     for ln in net.lines.values():
         runs = [(i, run) for i, run in enumerate(g.runs) if run.line is ln]
@@ -263,7 +270,7 @@ def evaluate(ctx, net, line_values=True, log=print, procs=None):
             "km": round(ln.km, 1), "stops": len(set(ln.stop_ids)), "avg_spacing_km": round(spacing, 2),
             "headway_min": ln.headway_at(final), "cost_musd": round(net.line_cost_musd(ln)),
             "daily_commuters_peak_link": round(peak), "peak_hour_load": round(peak_hour),
-            "capacity_used_pct": round(peak_hour / caps[ln.mode] * 100, 1),
+            "capacity_used_pct": round(peak_hour / (60 / ln.headway_at(final) * vcap[ln.mode]) * 100, 1),
             "passenger_km": round(pkm),
         })
     if line_values:

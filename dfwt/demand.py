@@ -90,8 +90,17 @@ class Zones:
     cong = 1.0  # peak drive-time multiplier for the year (growth.grown_zones sets it)
 
     def drive_min(self, dist):
-        d = self.cfg["drive"]
-        return dist * (d["circuity"] / d["speed_kmh"] * 60 * self.cong) + d["terminal_min"]
+        return drive_minutes(self.cfg["drive"], dist, self.cong)
+
+
+def drive_minutes(d, dist, cong=1.0):
+    """Peak drive minutes for straight-line km `dist` (config.drive): road km = dist x circuity,
+    the first local_km on local streets at local_kmh, the rest at freeway_kmh (longer trips use
+    freeways), the moving part x congestion, plus terminal minutes (parking, walking in)."""
+    road = dist * d["circuity"]
+    local = np.minimum(road, d["local_km"])
+    moving = local / d["local_kmh"] * 60 + (road - local) / d["freeway_kmh"] * 60
+    return moving * cong + d["terminal_min"]
 
 
 def gravity(zones, cfg, beta=None):

@@ -505,7 +505,8 @@ class Network:
     def opex_musd(self, year):
         """Operating cost ($M/yr) of the service running in `year`, by mode (config.operating):
         revenue vehicle-hours = 2 directions x run minutes / headway x service hours a day
-        x layover/recovery, x cost per revenue hour x weekday-equivalent days."""
+        x layover/recovery, x cost per train (or bus) hour x weekday-equivalent days. Feeder buses
+        are added by evaluate.run_year (they depend on riders)."""
         oc = self.cfg.get("operating")
         if not oc:
             return {}
@@ -513,7 +514,7 @@ class Network:
         for r in self.runs(year):
             hw = r.line.headway_at(year)
             veh_h = 2 * sum(r.hop_min) / hw * oc["span_hours"] * oc["layover"]
-            out[r.line.mode] += veh_h * oc["usd_per_revenue_hour"][r.line.mode] * oc["days_per_year"] / 1e6
+            out[r.line.mode] += veh_h * oc["usd_per_train_hour"][r.line.mode] * oc["days_per_year"] / 1e6
         return dict(out)
 
     def segment_cost(self, ln, i):

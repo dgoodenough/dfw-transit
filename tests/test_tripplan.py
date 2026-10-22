@@ -82,8 +82,12 @@ class TripPlanExportTests(unittest.TestCase):
     def test_drive_matches_the_model(self):
         d = self.out["drive"]
         gz = growth.grown_zones(self.zones, self.net, 2050, self.cfg)
-        for km in (1.0, 12.5, 50.0):
-            self.assertAlmostEqual(km * d["perKm"] * self.out["cong"][2050] + d["terminal"], gz.drive_min(km), places=2)
+        for km in (1.0, 12.5, 50.0):   # the page's driveMin: local streets, then freeway
+            road = km * d["circuity"]
+            local = min(road, d["localKm"])
+            moving = local / d["localKmh"] * 60 + (road - local) / d["freewayKmh"] * 60
+            self.assertAlmostEqual(moving * self.out["cong"][2050] + d["terminal"], gz.drive_min(km), places=2)
+        self.assertLess(gz.drive_min(40.0) / gz.drive_min(4.0), 10 * 0.6)   # long trips average a higher speed
 
     def test_zone_points_round_trip(self):
         pts = tripplan.zone_points(self.zones)

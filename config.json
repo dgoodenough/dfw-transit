@@ -84,30 +84,31 @@
       "cruise_kmh": 63,
       "stop_penalty_min": 1.2,
       "default_headway_min": 6,
-      "capacity_pphpd": 12000,
-      "label": "Metro / light rail"
+      "label": "Metro / light rail",
+      "vehicle_capacity": 450
     },
     "brt": {
-      "cruise_kmh": 38,
+      "cruise_kmh": 30,
       "stop_penalty_min": 0.9,
       "default_headway_min": 8,
-      "capacity_pphpd": 4000,
-      "label": "Bus rapid transit"
+      "label": "Bus rapid transit",
+      "vehicle_capacity": 100
     },
     "commuter": {
       "cruise_kmh": 72,
       "stop_penalty_min": 1.4,
       "default_headway_min": 20,
-      "capacity_pphpd": 6000,
-      "label": "Regional / commuter rail"
+      "label": "Regional / commuter rail",
+      "vehicle_capacity": 700
     },
     "streetcar": {
       "cruise_kmh": 18,
       "stop_penalty_min": 0.6,
       "default_headway_min": 20,
-      "capacity_pphpd": 1200,
-      "label": "Streetcar"
-    }
+      "label": "Streetcar",
+      "vehicle_capacity": 120
+    },
+    "_doc": "vehicle_capacity: riders per train or bus at a practical peak load (3-car light rail, articulated BRT, 4-car regional rail); a line's capacity is vehicles an hour x this."
   },
   "wait": {
     "_doc": "Expected wait = headway / 2, capped (riders time arrivals on long headways). Waits count `weight` times in-vehicle minutes, as riders perceive them (planning practice 2-3x), in routing, the logit and the competitive-commute test.",
@@ -118,7 +119,8 @@
   "transfer": {
     "walk_radius_m": 400,
     "walk_speed_kmh": 4.8,
-    "penalty_min": 3
+    "penalty_min": 5,
+    "_doc": "Walk links between platforms within walk_radius_m; each boarding after the first adds penalty_min (5 = middle of practice, 8 a sensitivity; was 3 until the 2026 review)."
   },
   "access": {
     "_doc": "How people reach stations. Walk to anything within walk_max_m; drive (park & ride) to garages within pnr_max_km but not closer than pnr_min_km (people that close walk): commuter rail stations, each line's planned termini, today's lots at existing suburban stations (pnr_existing) and optional suburban garages (pnr_suburban). Garages hold pnr_spaces cars (DART Parker Road ~2,000, TRE/TEXRail stations 175-1,000); each space serves pnr_people_per_space commuters a day (75% full x 1.1 per car x 1.15 with drop-offs). Riders a full garage turns away take their best access without parking (pnr_overflow_fallback). Today's local buses are the feeder grid (30 min in denser areas); faster grids are a lever. Riders choose their access mode, connector stations and route by perceived minutes: out-of-vehicle time weighs 2.5x and driving to a garage carries the drive-to-transit constant (ridership.pnr_asc_offset, in in-vehicle minutes), the same terms the mode choice uses. circuity applies to drive access, walk_circuity to walking. The micromobility, kiss_ride and pnr_suburban blocks are levers, off by default.",
@@ -170,7 +172,7 @@
       "_doc": "Lever (off by default): bike / e-scooter access. Only `share` of commuters will ride (a market segment, so it can't turn everyone into a cyclist); they reach stations within max_km at speed_kmh plus penalty_min (unlock, secure parking), and ride on to work if egress.",
       "enabled": false,
       "from_year": 2030,
-      "share": 0.15,
+      "share": 0.06,
       "max_km": 3,
       "speed_kmh": 14,
       "circuity": 1.3,
@@ -183,7 +185,7 @@
       "from_year": 2030,
       "share": 0.1,
       "max_km": 6,
-      "penalty_min": 6
+      "penalty_min": 16
     },
     "pnr_existing": {
       "_doc": "Today's park & ride lots at existing rail stations outside the core (DART has lots at most suburban stations, roughly 100-2,000 spaces each; an approximation until the real inventory is loaded).",
@@ -195,10 +197,12 @@
     }
   },
   "drive": {
-    "_doc": "Peak-period door-to-door drive baseline (v1 calibration).",
-    "speed_kmh": 38,
+    "_doc": "Peak-period door-to-door drive baseline: road km = straight-line km x circuity; the first local_km on local streets at local_kmh, the rest at freeway_kmh (longer trips use freeways; flat 38 km/h made 30-50 km trips about twice as long as people drive them, owner review 2026), the moving part x congestion, plus terminal minutes.",
     "circuity": 1.35,
-    "terminal_min": 8,
+    "local_km": 5,
+    "local_kmh": 30,
+    "freeway_kmh": 72,
+    "terminal_min": 5,
     "congestion": {
       "_doc": "Peak drive times (moving part) grow per_decade from base_year, capped; BRT running time takes brt_share of the increase. TTI travel-time index: about +3% per decade nationally and in DFW. Mild on purpose: congestion forecasts usually overshoot.",
       "base_year": 2025,
@@ -560,7 +564,7 @@
   },
   "ridership": {
     "_doc": "Daily riders from the commute model (dfwt/demand.py). Each commute chooses drive, transit or walk/bike the whole way (multinomial logit, drive is the reference). Transit utility: asc + b_ivt*(drive - transit door-to-door minutes) - b_ovt_extra*(access + egress minutes) - b_ratio*(how far transit exceeds 1x the drive time, as a ratio) + 0.125/$ x (driving cost avoided at drive_usd_per_km + parking avoided at paid-parking destinations). FTA/MWCOG ranges: IVT -0.02..-0.03/min, out-of-vehicle 2-3x. asc is calibrated so the 2025 network carries today's rail ridership with today's buses as feeders; active.asc so ~2% walk or bike. Transit commuters x telework; daily trips = commuters x round_trip / work_share_of_transit_trips; boardings = trips x boardings per trip (from the load assignment). Drive-to-transit has its own constant (pnr_asc_offset, as in MPO models: parking, walking in from the lot), set so about half of 2025 rail riders drive to a garage, near DART's on-board surveys; riders without a car (no_car) can't.",
-    "asc": -0.7969,
+    "asc": 0.3594,
     "b_ivt_per_min": 0.025,
     "b_ovt_extra_per_min": 0.0375,
     "b_per_dollar": 0.125,
@@ -637,7 +641,7 @@
     "drive_usd_per_km": 0.2,
     "active": {
       "_doc": "Walk/bike the whole way, an alternative in the logit for trips up to max_km: blended speed, effort per minute weighted like out-of-vehicle time, asc calibrated so ~2% of commuters walk or bike (ACS: DFW ~1.5-2%).",
-      "asc": -1.6719,
+      "asc": -0.6953,
       "max_km": 8,
       "speed_kmh": 10,
       "circuity": 1.3,
@@ -677,15 +681,16 @@
     "2055": 0.75
   },
   "operating": {
-    "_doc": "Operating cost, reported per year (not in the capital budget): revenue vehicle-hours = 2 directions x run minutes / headway x service hours x layover/recovery; $ per revenue hour per train or bus; weekday-equivalent days. Feeder buses are not included.",
-    "usd_per_revenue_hour": {
-      "metro": 250,
-      "brt": 150,
-      "commuter": 400,
-      "streetcar": 180
-    },
+    "_doc": "Operating cost, reported per year (not in the capital budget): revenue train/bus-hours = 2 directions x run minutes / headway x service hours x layover/recovery; $ per train (2-3 cars) or bus hour (US peer NTD ranges); weekday-equivalent days; feeder buses at $ per boarding.",
     "span_hours": 18,
     "layover": 1.15,
-    "days_per_year": 300
+    "days_per_year": 300,
+    "usd_per_train_hour": {
+      "metro": 700,
+      "brt": 180,
+      "commuter": 900,
+      "streetcar": 250
+    },
+    "feeder_usd_per_boarding": 6
   }
 }
