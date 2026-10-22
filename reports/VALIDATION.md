@@ -16,8 +16,8 @@ info LONG_STUB: 4, info NEAR_MISS: 10, info SPACING: 255, info STAGE_DRIFT: 31, 
 - **DANGLING** FW Red: terminus Benbrook has no transfer within 600 m
 - **DANGLING** White Settlement BRT: terminus Lockheed Gate has no transfer within 600 m
 - **DANGLING** Riverside-Forest Hill BRT: terminus Melinda / California has no transfer within 600 m
-- **DANGLING** DNT West: terminus Frankford / Vail has no transfer within 600 m
 - **DANGLING** DNT West: terminus Elsie Faye Heggins / M Wright has no transfer within 600 m
+- **DANGLING** DNT West: terminus Frankford / Vail has no transfer within 600 m
 - **DANGLING** SH-360 Line: terminus Lake Port Village has no transfer within 600 m
 - **CURVE_RADIUS** FW Green: 1 curves tighter than 150 m (tightest 86 m)
 - **CURVE_RADIUS** FW Blue: 2 curves tighter than 150 m (tightest 84 m)
@@ -359,6 +359,10 @@ info LONG_STUB: 4, info NEAR_MISS: 10, info SPACING: 255, info STAGE_DRIFT: 31, 
 - **LONG_STUB** Gainesville Line: Bailey Boswell / Basswood has been a temporary terminus since 2033
 - **LONG_STUB** Sherman Line: Main / Frisco Street has been a temporary terminus since 2030
 - **LONG_STUB** FW Pink: John Peter Smith has been a temporary terminus since 2046
+
+## `current_track`
+
+info SPACING: 57, warn STAGE_TOO_BIG: 6
 
 ## `right_sized`
 
