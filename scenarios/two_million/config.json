@@ -63,6 +63,9 @@
       {"line_id": "E22", "from_stop": "Cockrell Hill Road", "to_stop": "Commerce / Fort Worth Avenue", "by": 2038, "why": "Arlington's first rail in the 2030s (review 2, D2): I-30 Line Dallas - Grand Prairie - Arlington"},
       {"line_id": "E22", "from_stop": "Jefferson / Belt Line", "to_stop": "Cockrell Hill Road", "by": 2038, "why": "Arlington's first rail in the 2030s"},
       {"line_id": "E22", "from_stop": "Davis Drive", "to_stop": "Jefferson / Belt Line", "by": 2038, "why": "Arlington's first rail in the 2030s: Downtown Arlington, the stadiums, Six Flags"},
+      {"line_id": "E22", "from_stop": "Handley", "to_stop": "Davis Drive", "by": 2042, "why": "Arlington - Fort Worth with FW Blue (residents review 2): tested, +9k daily trips in 2050 and +31k in 2060 against the value order (-4k in 2040)"},
+      {"line_id": "F02", "from_stop": "Handley", "to_stop": "Central Station", "by": 2042, "why": "FW Blue to Handley with the I-30 Line: one ride Dallas - Arlington - downtown Fort Worth"},
+      {"line_id": "F02", "from_stop": "Central Station", "to_stop": "7th Street / Carroll", "by": 2042, "why": "FW Blue's first stage, which the Handley stage attaches to"},
       {"line_id": "XE02", "from_stop": "X275", "to_stop": "X141", "by": 2032, "why": "every city over 150,000 served by about 2040: Mesquite (its rail comes in the 2050s-70s; the 2100 value can't see an interim bus)"},
       {"line_id": "XE03", "from_stop": "X500", "to_stop": "X125", "by": 2032, "why": "every city over 150,000 served by about 2040: McKinney (until the Red Line arrives)"}
     ]
