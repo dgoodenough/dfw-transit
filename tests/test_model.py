@@ -493,6 +493,15 @@ class ScheduleRuleTests(unittest.TestCase):
         again = {(rows[i]["line_id"], rows[i]["from_stop"], rows[i]["to_stop"]): y for i, y in staging._deadlines(self.net, rows).items()}
         self.assertEqual(want, again)
 
+    def test_values_use_land_use_with_everything_open(self):
+        from dfwt import evaluate
+        ex = self.net.cfg["existing_year"]
+        a = evaluate._all_open(self.net)
+        self.assertEqual(set(a.lines), set(self.net.lines))
+        self.assertTrue(all(y <= ex + 1 for ln in a.lines.values() for y in ln.stop_years))
+        self.assertTrue(all(s.year <= ex + 1 for ln in a.lines.values() for s in ln.segments))
+        self.assertGreater(max(s.year for s in self.net.lines["E17"].segments), ex + 1)   # the network itself is untouched
+
     def test_capital_item_is_charged_with_its_line(self):
         ln = self.net.lines["XP01"]
         (y, musd, _), = self.net.capital_items(ln)

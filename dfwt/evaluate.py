@@ -78,10 +78,10 @@ def coverage(ctx, net, year):
     return float(z.pop[near].sum() / z.pop.sum()), float(z.jobs[near].sum() / z.jobs.sum())
 
 
-def run_year(ctx, net, year, want_loads=True):
+def run_year(ctx, net, year, want_loads=True, inputs=None):
     g = YearGraph(net, year)
     g.skim()
-    z, od = ctx.year_inputs(net, year)
+    z, od = inputs or ctx.year_inputs(net, year)
     res = demand.evaluate(z, od, net, g, ctx.cfg, want_loads=want_loads)
     res["graph"] = g
     res["pop"], res["jobs"] = float(z.pop.sum()), float(z.jobs.sum())
@@ -196,14 +196,34 @@ def _without_job(args):
 def _final_job(args):
     key, lid = args
     net = _POOL["nets"][key]
-    r = run_year(_POOL["ctx"], net.without(lid) if lid else net, _POOL["final"], want_loads=False)
+    r = run_year(_POOL["ctx"], net.without(lid) if lid else net, _POOL["final"], want_loads=False,
+                 inputs=_POOL["inputs"][key])
     return key, lid, r["daily_trips"]
+
+
+def _all_open(net):
+    """The network with every station and track piece open from the year after today: final_values
+    takes its land use (station-area growth, growth steered to stations) from this, so a line's
+    value doesn't depend on the order lines open in, nor on its own stations' land use."""
+    ex = net.cfg["existing_year"]
+    out = copy.copy(net)
+    out.lines = {}
+    for lid, ln in net.lines.items():
+        c = copy.copy(ln)
+        c.stop_years = [min(y, ex + 1) for y in ln.stop_years]
+        c.segments = [copy.copy(s) for s in ln.segments]
+        for s in c.segments:
+            s.year = min(s.year, ex + 1)
+        out.lines[lid] = c
+    out.variants = {}
+    return out
 
 
 def final_values(ctx, net, procs=None, log=print, only=None):
     """The scheduler's ranking (staging, priority value_per_musd), the same whatever order the
     lines open in: each proposed line's daily trips lost when it is removed from the finished
-    network (final year), per $M of its share of capital at 2025 prices (Network.shared_cost_musd).
+    network (final year, on the land use of the network with everything open, _all_open), per $M
+    of its share of capital at 2025 prices (Network.shared_cost_musd).
     A line through-routed into another (edits through_route) is measured on the network
     without that join. Returns rows: line_id, host, marginal_final, cost_shared_musd, value_per_musd."""
     from .network import Network
@@ -226,7 +246,10 @@ def final_values(ctx, net, procs=None, log=print, only=None):
         measured = [(k, lid) for k, lid in measured if lid in only]
         nets = {k: v for k, v in nets.items() if k == "" or k in only}
     jobs = sorted({(k, None) for k, _ in measured}) + measured
-    _POOL.update(ctx=ctx, nets=nets, final=final)
+    # one land use per network, from it with everything open (the run with the line and the one
+    # without it share it: the value is what the line does for travel)
+    inputs = {k: ctx.year_inputs(_all_open(n), final) for k, n in nets.items()}
+    _POOL.update(ctx=ctx, nets=nets, final=final, inputs=inputs)
     if procs <= 1:
         res = [_final_job(j) for j in jobs]
     else:
