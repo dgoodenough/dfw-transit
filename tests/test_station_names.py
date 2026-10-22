@@ -66,3 +66,19 @@ class StationNameTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class StationIdTests(unittest.TestCase):
+    def test_generated_ids_are_registered_where_they_stand(self):
+        # tools/gen_expansion.py keeps an id per place (scenarios/station_ids.csv), so regenerating
+        # a scenario doesn't renumber its stations
+        from dfwt import geo
+        with open(config.path("scenarios", "station_ids.csv"), encoding="utf-8") as f:
+            reg = {r["station_id"]: r for r in csv.DictReader(f)}
+        for sc in ("lever_expand_package", "lever_expand_max"):
+            with open(config.path("scenarios", sc, "stations.csv"), encoding="utf-8") as f:
+                for r in csv.DictReader(f):
+                    if r["station_id"].startswith("XS"):
+                        g = reg[r["station_id"]]
+                        d = geo.hav_km(float(r["lat"]), float(r["lon"]), float(g["lat"]), float(g["lon"]))
+                        self.assertLess(d, 0.4, (sc, r["station_id"]))

@@ -47,6 +47,8 @@ TABLES = {
     "transfers.csv": ["station_a", "station_b", "walk_min", "note"],
 }
 SNAP_M = 250
+REGISTRY = "station_ids.csv"   # scenarios/station_ids.csv: every generated station id, append-only
+REUSE_M = 150                  # a new stop within this of a registered one keeps its id
 TRANSFER_M = 650   # explicit walk links up to this distance (the model links <= 400 m by itself)
 
 
@@ -88,6 +90,36 @@ def load_spec(name, seen=None):
     return lines, overrides + spec.get("stage_overrides", []), infill
 
 
+class StationIds:
+    """Stable ids for generated stations: a stop at a registered place keeps its id across
+    regenerations and scenarios; a new place gets the next free id, appended to the registry."""
+
+    def __init__(self):
+        self.path = config.path("scenarios", REGISTRY)
+        self.rows = read(os.path.dirname(self.path), REGISTRY) if os.path.exists(self.path) else []
+        self.claimed = set()
+
+    def get(self, lat, lon, name):
+        best, bd = None, REUSE_M / 1000
+        for r in self.rows:
+            if r["station_id"] in self.claimed or abs(float(r["lat"]) - lat) > 0.01:
+                continue
+            d = geo.hav_km(lat, lon, float(r["lat"]), float(r["lon"]))
+            if d <= bd:
+                best, bd = r["station_id"], d
+        if best is None:
+            best = f"XS{max((int(r['station_id'][2:]) for r in self.rows), default=0) + 1:04d}"
+            self.rows.append({"station_id": best, "lat": f"{lat:.6f}", "lon": f"{lon:.6f}", "name": name})
+        self.claimed.add(best)
+        return best
+
+    def save(self):
+        with open(self.path, "w", newline="", encoding="utf-8") as f:
+            w = csv.DictWriter(f, fieldnames=["station_id", "lat", "lon", "name"], lineterminator="\n")
+            w.writeheader()
+            w.writerows(self.rows)
+
+
 def add_infill(t, st, item, new_id):
     """Insert an infill stop on an existing line (and on every same-mode line sharing that
     track) at the track point nearest item's lat/lon. The track keeps its year; the stop opens
@@ -110,7 +142,7 @@ def add_infill(t, st, item, new_id):
                 best = (d, int(r["seq"]), k, p)
     d, seq, k, p = best
     a, b = stops[seq - 1]["station_id"], stops[seq]["station_id"]
-    sid = new_id
+    sid = new_id(p[1], p[0], item["name"])
     st[sid] = {"station_id": sid, "name": item["name"], "lat": f"{p[1]:.6f}", "lon": f"{p[0]:.6f}"}
     t["stations.csv"].append(st[sid])
     # every same-mode line running a <-> b gets the stop
@@ -433,7 +465,9 @@ def rail_path(pts):
 
 
 def build(name):
-    cfg = config.load()
+    global _ROADS, _FREEWAYS, _RAILS
+    _ROADS = _FREEWAYS = _RAILS = None   # routing splits graph edges: a fresh graph per scenario, so output
+    cfg = config.load()                  # doesn't depend on what was generated before in this process
     base = config.path("network")
     out = config.path("scenarios", name)
     t = {k: read(base, k) for k in TABLES}
@@ -449,7 +483,7 @@ def build(name):
     from dfwt.naming import Namer, keys
     namer = Namer()
     taken = set().union(*(keys(r["name"]) for r in t["stations.csv"]))
-    counter = 1
+    ids = StationIds()
     report = []
 
     def nearest_existing(lat, lon):
@@ -465,8 +499,7 @@ def build(name):
 
     new_ids = []
     for item in infill:
-        sid, d = add_infill(t, st, item, f"XS{counter:04d}")
-        counter += 1
+        sid, d = add_infill(t, st, item, ids.get)
         used.add(sid)
         new_ids.append(sid)
         report.append(f"infill {item['name']} on {item['line']} ({d * 1000:.0f} m from the asked point), opens {item['year']}")
@@ -551,7 +584,7 @@ def build(name):
                     report.append(f"{lid} {ln['name']}: no street route for a leg; kept straight")
             L = sum(geo.hav_km(*pts[i], *pts[i + 1]) for i in range(len(pts) - 1))
             if mode == "brt":   # stations it passes are stops; regular stops fill the gaps between them
-                served = {sid: (float(st[sid]["lat"]), float(st[sid]["lon"])) for sid in used}
+                served = {sid: (float(st[sid]["lat"]), float(st[sid]["lon"])) for sid in sorted(used)}
                 anchors = brt_anchors(pts, L, served, {cur[0][2], w[2]})
                 bounds = [0.0] + [d for d, _ in anchors] + [L]
                 cuts = []
@@ -595,9 +628,8 @@ def build(name):
                     sid = cand
                     report.append(f"{lid}: snapped {nm or 'stop'} to {st[cand]['name']} ({d * 1000:.0f} m)")
                 else:
-                    sid = f"XS{counter:04d}"
-                    counter += 1
                     nm = nm or place_name(lat, lon, gaz, namer, taken)
+                    sid = ids.get(lat, lon, nm)
                     st[sid] = {"station_id": sid, "name": nm, "lat": f"{lat:.6f}", "lon": f"{lon:.6f}"}
                     t["stations.csv"].append(st[sid])
                     new_ids.append(sid)
@@ -620,6 +652,14 @@ def build(name):
                 at = (float(s_["lat"]), float(s_["lon"]))
                 if mode == "brt" and len(leg) > 2 and geo.hav_km(*leg[end], *at) <= 0.25:
                     continue    # a station beside the street: the bus stops on the street, no detour
+                if mode == "metro" and len(leg) > 2:
+                    # a routed rail leg: cut it where it passes the station, so it doesn't run on
+                    # past the station and double back (spikes, tight curves)
+                    k = min(range(len(leg)), key=lambda q: geo.hav_km(*leg[q], *at))
+                    if end == 0 and 0 < k < len(leg) - 1:
+                        del leg[:k]
+                    elif end == -1 and 0 < k < len(leg) - 1:
+                        del leg[k + 1:]
                 leg[end] = at
         # stage years per segment
         ref = {}
@@ -668,7 +708,7 @@ def build(name):
     linked = {frozenset((r["station_a"], r["station_b"])) for r in t["transfers.csv"]}
     for sid in new_ids:
         a = st[sid]
-        for oid in list(used):
+        for oid in sorted(used):
             if oid == sid:
                 continue
             b = st[oid]
@@ -683,6 +723,7 @@ def build(name):
     fix_infill_years(t, {i["name"]: int(i["year"]) for i in infill})
     for k in TABLES:
         write(out, k, t[k])
+    ids.save()
     print("\n".join(report))
 
 

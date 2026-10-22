@@ -35,7 +35,7 @@ E19,7,extension,Outlet Mall,Center / Main,2059,,,,,optimizer
 E19,8,extension,Parks Mall,Outlet Mall,2059,,,,,optimizer
 E19,9,extension,Berry / Stalcup,Parks Mall,2066,,,,,optimizer
 E20,1,starter,DFW Airport Terminal B,Shiloh Road,2025,,,,,
-E21,1,starter,Main / Galloway,Rowlett,2031,,,,,optimizer
+E21,1,starter,#1,Rowlett,2031,,,,,optimizer
 E21,2,extension,Rowlett,1st Street / Castle,2031,,,,,optimizer
 E21,3,extension,1st Street / Castle,Belt Line / Quorum,2035,,,,,optimizer
 E21,4,extension,Belt Line / Quorum,Downtown Carrollton,2035,,,,,optimizer
@@ -43,7 +43,7 @@ E21,5,extension,Downtown Carrollton,Belt Line / Irving Boulevard,2036,,,,,optimi
 E21,6,extension,Belt Line / Irving Boulevard,Jefferson / Belt Line,2037,,,,,optimizer
 E21,7,extension,Jefferson / Belt Line,FM 1382 / Old Straus,2037,,,,,optimizer
 E21,8,extension,FM 1382 / Old Straus,Wilmer,2054,,,,,optimizer
-E21,9,extension,Wilmer,Bryan-Belt Line / Davis,2055,,,,,optimizer
+E21,9,extension,Wilmer,#66,2055,,,,,optimizer: closes the ring at Main / Galloway
 E22,1,starter,Cockrell Hill Road,Commerce / Fort Worth Avenue,2052,,,,,optimizer
 E22,2,extension,Commerce / Fort Worth Avenue,Garland Road / Buckner Boulevard,2052,,,,,optimizer
 E22,3,extension,Jefferson / Belt Line,Cockrell Hill Road,2060,,,,,optimizer
@@ -103,6 +103,6 @@ XC01,3,extension,X572,X531,2085,,,,,expansion lever (hand-staged)
 XC01,4,extension,X531,X258,2090,,,,,expansion lever (hand-staged)
 XC02,1,starter,X302,X517,2080,,,,,expansion lever (hand-staged)
 XC02,2,extension,X517,X179,2085,,,,,expansion lever (hand-staged)
-XC02,3,extension,XS0018,X302,2090,,,,,expansion lever (hand-staged)
+XC02,3,extension,XS0572,X302,2090,,,,,expansion lever (hand-staged)
 XC03,1,starter,X438,X399,2075,,,,,expansion lever (hand-staged)
 XC03,2,extension,X399,X284,2080,,,,,expansion lever (hand-staged)

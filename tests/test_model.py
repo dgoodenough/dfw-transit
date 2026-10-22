@@ -101,6 +101,29 @@ class NetworkTests(unittest.TestCase):
         self.assertGreaterEqual(min(ln.stop_years[:3]), ln.stop_years[2])
         with self.assertRaises(ValueError):   # light rail can't borrow commuter track
             net.apply_edits([{"op": "run_over", "target": "E25", "field": "E14", "value": "CityLine/Bush"}])
+        self.assertIn(net.lines["F07"].stop_ids[2], ln.pnr_stops)   # the old terminus keeps its garage
+
+    def test_infill_stops_open_with_their_own_track(self):
+        # TEXRail x FW Berry (infill.csv, no partner): each line stops there from its own opening
+        for sc, lines in ((None, ("E05", "F05")), ("two_million", ("E09", "F05"))):
+            net = Network.load(sc)
+            for lid in lines:
+                ln = net.lines[lid]
+                k = ln.stop_ids.index("XI01")
+                self.assertEqual(ln.stop_years[k], max(s.year for s in ln.segments[max(k - 1, 0):k + 1]), (sc, lid))
+                self.assertLess(ln.stop_years[k], 2100)
+
+    def test_no_new_garages_downtown(self):
+        self.assertTrue(self.net.in_core("X187"))           # Union Station
+        self.assertFalse(self.net.in_core("X328"))           # a Beltline stop out east
+
+    def test_beltline_is_a_ring(self):
+        ln = self.net.lines["E21"]
+        self.assertEqual(ln.stop_ids[0], ln.stop_ids[-1])
+        g = YearGraph(self.net, 2100)
+        a, b = g.sidx[ln.stop_ids[-2]], g.sidx[ln.stop_ids[1]]
+        legs, _ = g.itinerary(a, b)
+        self.assertEqual([k for k, *_ in legs], ["wait", "ride"])   # rides on through Main / Galloway
 
 
 class CostAndRerouteTests(unittest.TestCase):

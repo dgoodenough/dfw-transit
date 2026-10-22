@@ -517,6 +517,7 @@ XS0106,Eagle Ford E,Kingbridge / Singleton,32.775294,-96.865000,cross streets Ki
 XS0106,Reinhardt S,Forney Road / Wimbelton,32.778901,-96.690363,"nearest streets Forney Road (86 m), Wimbelton (292 m)"
 XS0107,Fair Park E,Military Parkway,32.771744,-96.689468,street Military Parkway (104 m)
 XS0107,Winnetka Heights Historic District NW,I-30 / Postal,32.767941,-96.865000,cross streets I-30 x Postal (231 m)
+XS0108,Greenville Avenue / Richmond,Lowest Greenville,32.817000,-96.770000,"one station, one spelling (the plan's)"
 XS0108,Wheatley Place Historic District E,Scyene Circle,32.764588,-96.688573,street Scyene Circle (66 m)
 XS0108,Winnetka Heights Historic District NW,Colorado / Jacqueline,32.760588,-96.865000,cross streets Colorado x Jacqueline (124 m)
 XS0109,Balch Springs NW,Hume / Hillburn,32.757425,-96.687759,cross streets Hume x Hillburn (244 m)
@@ -762,6 +763,7 @@ XS0210,Cowley NW,Ohio / Park,33.025500,-96.787500,cross streets Ohio x Park (178
 XS0210,Fruitdale SW,56th Street / Veterans,32.688167,-96.780836,cross streets 56th Street x Veterans (191 m)
 XS0211,Cowley N,Park Boulevard,33.025500,-96.778750,street West Park Boulevard (145 m)
 XS0211,Fruitdale S,56th Street / Bonnie View,32.686534,-96.772669,cross streets 56th Street x Bonnie View (427 m)
+XS0211,Preston / Lloyd,Preston / Plano Parkway,33.013074,-96.795321,"one station, one spelling (the plan's)"
 XS0212,Cowley N,Coit / Park,33.025500,-96.770000,cross streets Coit x Park (136 m)
 XS0212,Fruitdale S,Bonnie View Road,32.684900,-96.764502,street Bonnie View Road (355 m)
 XS0213,Cowley NE,Park / Woodburn Corners,33.025500,-96.761250,cross streets Park x Woodburn Corners (195 m)
@@ -799,6 +801,7 @@ XS0223,Plano Road / Miller,Plano Road / LBJ,32.889524,-96.695048,"nearest street
 XS0224,Bethard SW,Miller Road,32.896622,-96.695000,street Miller Road (228 m)
 XS0224,Kiest Boulevard,Kiest / Blue Ridge Boulevard,32.705717,-96.883254,"nearest streets Kiest (0 m), Blue Ridge Boulevard (604 m)"
 XS0224,Plano NE,Shiloh / 18th Street,33.025500,-96.665000,cross streets Shiloh x 18th Street (184 m)
+XS0224,Spring Creek / Communications,Spring Creek / Dallas Parkway,33.065414,-96.828990,"one station, one spelling (the plan's)"
 XS0225,Bouchard N,Coit / Kit,32.930000,-96.770000,cross streets Coit x Kit (203 m)
 XS0225,Park / Winding Hollow,Winding Hollow / Park,33.027558,-96.804762,"same interchange, one spelling"
 XS0226,Bethard NW,Purdue / Forest,32.910822,-96.695000,cross streets Purdue x Forest (199 m)
@@ -939,6 +942,7 @@ XS0283,Frisco SE,Wade / Nancy Jane,33.129057,-96.800000,cross streets Wade x Nan
 XS0283,Hebron E,Park / Willow Bend,33.025500,-96.813750,cross streets Park x Willow Bend (259 m)
 XS0284,Cowley NW,Winding Hollow / Park,33.025500,-96.805000,cross streets Winding Hollow x Park (235 m)
 XS0284,Frisco SE,Preston Vineyard Drive,33.136246,-96.800000,street Preston Vineyard Drive (168 m)
+XS0284,Stemmons / I-35,I-35,32.995907,-96.953753,"one station, one spelling (the plan's)"
 XS0284,Winding Hollow / Park,Winding Hollow Lane,33.025500,-96.805000,street Winding Hollow Lane (57 m)
 XS0285,Cowley NW,Preston / Park,33.025500,-96.796250,cross streets Preston x Park (218 m)
 XS0285,Frisco E,Hickory Street,33.143434,-96.800000,street Hickory Street (249 m)
@@ -1586,6 +1590,7 @@ XS0557,Moselle NW,Cleburne Road / Woodway,32.642000,-97.379173,cross streets Cle
 XS0557,Westchester by Norstar NE,Carrier / Crossland,32.680586,-97.003138,cross streets Carrier x Crossland (344 m)
 XS0558,Bonnie Brae / Willowwood,Willowwood / Bonnie Brae,33.197904,-97.161388,"same interchange, one spelling"
 XS0558,Moselle NW,McCart / Cleburne Road,32.642000,-97.370609,cross streets McCart x Cleburne Road (208 m)
+XS0558,Skillman / McCommas,Mockingbird / Skillman,32.833096,-96.763217,"one station, one spelling (the plan's)"
 XS0558,Virginia / Saint Gabriel,Saint Gabriel Way,33.203423,-96.719268,street Saint Gabriel Way (350 m)
 XS0559,Moselle NW,Southpark / Westcreek,32.642000,-97.362046,"nearest streets Southpark (456 m), Westcreek (456 m)"
 XS0560,Moselle N,Crowley Road / Altamesa,32.642000,-97.353482,"nearest streets Crowley Road (468 m), Altamesa (759 m)"
@@ -1656,9 +1661,11 @@ XS0586,Dalworthington Gardens W,Arkansas / Woodside,32.705000,-97.174091,cross s
 XS0586,Keller SW,Main / Wall-Price-Keller,32.917514,-97.253740,cross streets Main x Wall-Price-Keller (162 m)
 XS0587,Dalworthington Gardens W,Arkansas / Spanish,32.705000,-97.165455,cross streets Arkansas x Spanish (336 m)
 XS0587,Keller W,Whitley Road,32.923757,-97.249370,street Whitley Road (235 m)
+XS0588,Collins Street,Collins / Viridian Park,32.791273,-97.097720,"one station, one spelling (the plan's)"
 XS0588,Dalworthington Gardens,Roosevelt / Arkansas,32.705000,-97.156818,cross streets Roosevelt x Arkansas (219 m)
 XS0588,Keller W,Bear Creek / Keller Parkway,32.930000,-97.245000,"nearest streets Bear Creek (330 m), Keller Parkway (480 m)"
 XS0588,Walton Walker Boulevard,Walton Walker / Loop 12,32.789830,-96.919458,"nearest streets Walton Walker (0 m), Loop 12 (494 m)"
+XS0589,Collins / Brown,Collins / Green Oaks,32.782648,-97.097338,"one station, one spelling (the plan's)"
 XS0589,Dalworthington Gardens,Bowen / Arkansas,32.705000,-97.148182,cross streets Bowen x Arkansas (222 m)
 XS0589,Melody Hills W,Great Southwest / Meacham,32.829618,-97.329478,"nearest streets Great Southwest (106 m), Meacham (520 m)"
 XS0590,Dalworthington Gardens E,Arkansas / Westchester Drive,32.705000,-97.139545,cross streets Arkansas x Westchester Drive (407 m)
