@@ -49,22 +49,26 @@ Method
    bent edge) solve a linear least-squares problem: each straight edge lies
    along its direction (perpendicular residual, weight ramped up), has a
    chain-smoothed target length (even station spacing), and every node is
-   weakly anchored to its pre-warped position; transfer pairs are pulled
-   together. Node pairs and drawn pieces of different corridors that are too
+   weakly anchored to its pre-warped position; walk-linked stations that
+   couldn't merge (transfer pairs: within the walk radius, or linked in
+   transfers.csv) are pulled to sit side by side, hard (W_XFER, and already
+   in step 3's smoothing, W_XFER_S), a long explicit link only gently. Node pairs and drawn pieces of different corridors that are too
    close become linearized separation rows on the next solve (active set).
    Directions are re-assigned for N_ASSIGN rounds, then frozen; edges that
    still collapse or sit far off their direction, or that hold two stations
    under the minimum spacing, get one bend. Then the geography gives way to
    straight lines where there is room: a bend whose chain runs straight on in
    one of its leg directions, a jog (a line running on 45° off for a few edges
-   and back), and a short stub at a terminus turning 45° off its line, are
+   and back), a V or a 135° turn along a line, across junctions too (_kinks;
+   only where that lowers the turn cost of every line on those edges), and a
+   short stub at a terminus turning 45° off its line, are
    tried straight; those the relaxation can't hold, that crowd a station or
    that turn an edge round (two stations swapping places), keep their kink
    (kinks near trouble are put off and retried a few at a time).
    Steps 4-5 are chaotic (a small change can tip a junction elsewhere), so they
-   run once per VARIANT and the drawing with the best quality() is kept: fewest
-   bends, zig-zags, sharp turns, crossings beyond the geography's, and edges
-   drawn backwards.
+   run once per VARIANT (in parallel processes) and the drawing with the best
+   quality() is kept: fewest bends, zig-zags, sharp turns, crossings beyond
+   the geography's, edges drawn backwards and walk-linked pairs left apart.
 6. **Exact octilinearity and spacing.** A least-norm projection makes every
    straight edge exactly octilinear; each bent edge is drawn as two octilinear
    legs. If any two stations were still under MIN_SP, the whole layout is
@@ -103,7 +107,9 @@ PITCH = 0.30          # offset between parallel lines in a corridor
 MERGE_KM = 0.04       # always merge stations closer than this
 MERGE_NAME_KM = 0.40  # merge same-named stations closer than this
 MERGE_LINKED_KM = 0.15  # merge transfer-linked stations closer than this
-CONNECTOR_MAX = 1.6   # transfer pairs closer than this on the diagram get a connector
+CONNECTOR_MAX = 1.6   # a transfer connector longer than this is drawn dashed (a walk), not as a solid link
+W_XFER_S = 25.0       # walk-linked stations (transfers) are pulled this hard to sit side by side in _smooth,
+W_XFER = 4.0          # ... and in the least-squares relaxation (a stop-to-stop edge's length weighs W_LEN)
 LABEL_GROUP = 8.0     # same-named stations (ignoring a compass suffix) this close share one label when zoomed out
 LAKE_SCALE = 0.8      # lakes are drawn a little smaller than their local scale
 LAKE_ASPECT = 3.0     # a lake's blob is at most this elongated
@@ -121,8 +127,11 @@ N_ASSIGN, N_RELAX, N_STRAIGHTEN = 10, 14, 30
 # compute() lays out each of these and keeps the best: how strongly stations keep to their
 # pre-warped places (w_anc, W_ANC) and the cap on hop length when ranking axis strokes
 # (hop_km, AXIS_HOP_KM: short-hop multi-line trunks first, or long lines first), and whether
-# two axis edges may leave a station the same way (unique: no)
-VARIANTS = ({"w_anc": 0.05, "hop_km": 1.5, "unique": True}, {"w_anc": 0.15, "hop_km": 99.0, "unique": False})
+# two axis edges may leave a station the same way (unique: no), each with the walk-link pulls
+# (W_XFER_S, W_XFER) at full strength and weaker (xfer)
+VARIANTS = tuple(dict(v, xfer=x) for x in (1.0, 0.6, 0.35) for v in
+                 ({"w_anc": 0.05, "hop_km": 1.5, "unique": True}, {"w_anc": 0.15, "hop_km": 99.0, "unique": False}))
+MAX_PROCS = 2         # variants laid out in parallel at most (each holds a few dense n x n matrices)
 STRAIGHT_FEW = 3      # kinks put off in phase 3 are tried this many at a time
 W_REP = 12.0
 W_LEN = 1.5
@@ -155,6 +164,7 @@ ZZ_HOPS = 3
 ZZ_LEN = 4.0          # quality(): two opposite turns this close (layout units) make a zig-zag
 T_THROUGH = 0.5       # per line running straight through a junction, per 45 degrees its ports turn
 DIRS = np.array([(math.cos(k * math.pi / 4), math.sin(k * math.pi / 4)) for k in range(8)])
+CITY_KM = 1.2         # an area name stands beside the busiest station this close to its centre
 CITIES = [("Fort Worth", 32.7555, -97.3308), ("Dallas", 32.7810, -96.7990), ("Denton", 33.2148, -97.1331),
           ("Arlington", 32.7357, -97.1081), ("DFW Airport", 32.8998, -97.0403), ("Plano", 33.0198, -96.6989)]
 
@@ -214,6 +224,11 @@ def _angdiff(a, b):
     return min(d, 2 * math.pi - d)
 
 
+XFER_KEEP = 0.5       # (a pair the warp spread apart keeps this share of that, see _xfer_pairs)
+XFER_LONG = 0.1      # (an explicit transfers.csv link beyond the walk radius: this fraction of the pull)
+XFER_FAR, W_APART = 1.6, 4.0    # quality(): a walk-linked pair drawn this many times its pull distance apart costs this
+
+
 class Layout:
     """Result: nodes (station groups) with positions, edges with optional bends,
     line orders per edge, transfer connectors and schematized water."""
@@ -227,6 +242,8 @@ class Layout:
         self.water = {"rivers": [], "lakes": []}
         self.labels = []       # (text, x, y, kind)
         self.scale = 1.0       # the uniform rescale the minimum spacing needed
+        self.w_xfer = (W_XFER_S, W_XFER)
+        self.xfer_t = None     # _xfer_pairs, set by _place
 
 
 # ---------------------------------------------------------------- graph
@@ -358,9 +375,11 @@ def _union(nets):
         if a != b and (a, b) not in lay.eidx:
             tr.add((a, b))
     lay.transfers = sorted(tr)
+    lay.walk_km = radius
     lay.modes = modes
     lay.seqs = [(k, lid, path) for (k, lid), (path, _) in sorted(lay.paths.items())]
-    lay.termini = {path[i] for _, _, path in lay.seqs for i in (0, -1)}
+    # a ring (its stop list ends where it starts, e.g. the Beltline) has no terminus
+    lay.termini = {path[i] for _, _, path in lay.seqs for i in (0, -1) if path[0] != path[-1]}
     # the default plan's edges: the straightness rules follow its routings (the others'
     # alternatives are laid out too, but don't bend its trunks)
     default = next(iter(nets.values())).cfg.get("default_scenario")
@@ -510,6 +529,89 @@ def _chains(lay):
     return inc, key, chains
 
 
+TURN_COST = (0.0, 1.0, 3.0, 8.0, 50.0)     # _turn_cost: a turn by 0, 45, 90, 135, 180 degrees
+
+
+def _line_dirs(lay, path, dirs, bent, override=None):
+    """A line's drawn directions along a node path, from the assigned directions (a bent edge
+    gives its two legs; override {edge: direction} replaces some): [(direction, edge, from node)]."""
+    out = []
+    for u, w in zip(path, path[1:]):
+        e = lay.eidx[(min(u, w), max(u, w))]
+        fwd = lay.edges[e]["a"] == u
+        if override and e in override:
+            ds = [override[e]]
+        elif e in dirs:
+            ds = [dirs[e]]
+        elif e in bent:
+            ds = list(bent[e])
+        else:
+            return None
+        out += [((d if fwd else (d + 4) % 8), e, u) for d in (ds if fwd else ds[::-1])]
+    return out
+
+
+def _turn_cost(lay, dirs, bent, edges, override):
+    """Turn cost (TURN_COST per turn, plus one more for a turn straight back within ZZ_HOPS
+    pieces) of the default plan's lines that use any of `edges`, with `override` applied."""
+    edges, total = set(edges), 0.0
+    for key, _, path in lay.seqs:
+        if (lay.default is not None and key != lay.default) or not edges & set(_path_edges(lay, path)):
+            continue
+        ds = _line_dirs(lay, path, dirs, bent, override)
+        if not ds:
+            continue
+        last = None
+        for k in range(1, len(ds)):
+            t = (ds[k][0] - ds[k - 1][0]) % 8
+            t = t - 8 if t > 4 else t
+            if t:
+                total += TURN_COST[abs(t)]
+                if last and last[0] * t < 0 and k - last[1] <= ZZ_HOPS:
+                    total += 1.0
+                last = (t, k)
+    return total
+
+
+def _path_edges(lay, path):
+    return [lay.eidx[(min(u, w), max(u, w))] for u, w in zip(path, path[1:])]
+
+
+def _kinks(lay, dirs, bent=None):
+    """Kinks along the default plan's lines, as (run [(edge, from node)], new direction): the
+    middle run of a V or a 45-degree jog (at most ZZ_HOPS straight edges between a turn and
+    one back), turned towards the line's course, and the shorter run (at most ZZ_HOPS edges) at
+    a 135-degree turn, turned 45 degrees to ease it."""
+    out = []
+    for key, _, path in lay.seqs:
+        if lay.default is not None and key != lay.default:
+            continue
+        runs = []          # [direction or None, [(straight edge, from node)], all straight]
+        for d, e, u in _line_dirs(lay, path, dirs, bent or {}) or []:
+            if runs and runs[-1][0] == d and (e in dirs) == runs[-1][2] and (e in dirs):
+                runs[-1][1].append((e, u))
+            elif runs and runs[-1][0] == d and runs[-1][1][-1][0] == e:
+                continue          # the second leg of a bent edge running on
+            else:
+                runs.append([d, [(e, u)], e in dirs])
+        turn = lambda a, b: ((b - a) % 8) - 8 if (b - a) % 8 > 4 else (b - a) % 8  # noqa: E731
+        for i in range(1, len(runs)):
+            A, B = runs[i - 1], runs[i]
+            if A[0] is None or B[0] is None:
+                continue
+            t = turn(A[0], B[0])
+            sg = 1 if t > 0 else -1
+            if abs(t) == 3:
+                for r, nd in sorted(((A, (A[0] + sg) % 8), (B, (B[0] - sg) % 8)), key=lambda c: len(c[0][1])):
+                    if r[2] and len(r[1]) <= ZZ_HOPS:
+                        out.append((r[1], nd))
+                        break
+            elif abs(t) in (1, 2) and i + 1 < len(runs) and B[2] and len(B[1]) <= ZZ_HOPS:
+                if turn(B[0], runs[i + 1][0]) == -t:
+                    out.append((B[1], (B[0] - sg) % 8))
+    return out
+
+
 def _passes(lay):
     """{node: {(e1, e2): how many lines run e1 -> node -> e2}} (e1 < e2): each line counts
     once per scenario that runs it so (the default scenario DEFAULT_W times), so the
@@ -519,9 +621,11 @@ def _passes(lay):
         if key.endswith(PRE):
             continue
         w = DEFAULT_W if key == lay.default else 1.0
-        for k in range(1, len(ns) - 1):
+        ring = len(ns) > 3 and ns[0] == ns[-1]
+        for k in range(1, len(ns) - 1 + ring):        # a ring runs on through where it closes
+            nxt = ns[k + 1] if k + 1 < len(ns) else ns[1]
             e1 = lay.eidx[(min(ns[k - 1], ns[k]), max(ns[k - 1], ns[k]))]
-            e2 = lay.eidx[(min(ns[k], ns[k + 1]), max(ns[k], ns[k + 1]))]
+            e2 = lay.eidx[(min(ns[k], nxt), max(ns[k], nxt))]
             if e1 != e2:
                 out[ns[k]][(min(e1, e2), max(e1, e2))] += w
     return out
@@ -644,6 +748,18 @@ def _smooth(lay, A, G, strokes, hop_km=AXIS_HOP_KM, unique=True):
                 ix = [2 * v + d, 2 * u + d, 2 * w + d]
                 M[np.ix_(ix, ix)] += wt * np.outer(c, c)
     rhs = A.reshape(-1).copy()
+    for a, b, t, f in _xfer_pairs(lay, _radius(lay)):
+        g = A[b] - A[a]
+        g = g / (np.linalg.norm(g) + 1e-9) * t
+        w = lay.w_xfer[0] * f
+        for d in range(2):
+            ia, ib = 2 * a + d, 2 * b + d
+            M[ia, ia] += w
+            M[ib, ib] += w
+            M[ia, ib] -= w
+            M[ib, ia] -= w
+            rhs[ib] += w * g[d]
+            rhs[ia] -= w * g[d]
     Minv = np.linalg.inv(M)
     st = {"M": M, "rhs": rhs, "Minv": Minv, "x": Minv @ rhs, "acc": np.zeros((0, 6)),   # acc: a, b, u, length, scale
           "axes": {}, "taken": set()}              # taken: (station, direction) of the laid edges
@@ -928,6 +1044,37 @@ def _radius(lay):
     return r
 
 
+def _xfer_pairs(lay, rad, P=None):
+    """[(a, b, target distance, weight factor)] for the transfer pairs (walk-linked stations
+    drawn as separate nodes), set once per layout from the pre-warped positions P
+    (lay.xfer_t). A pair within the walk radius is pulled to sit side by side, just clear of
+    each other's bundles (or XFER_KEEP of its pre-warped distance, up to twice that, where the
+    warp spread a dense core: pulling every pair there tight would crush it), the closer
+    the harder; a longer explicit link (transfers.csv) only gently, to a distance growing
+    with the walk."""
+    if P is None and getattr(lay, "xfer_t", None) is not None:
+        return lay.xfer_t
+    out = []
+    walk = getattr(lay, "walk_km", 0.4) or 0.4
+    partners = collections.Counter(v for t in lay.transfers for v in t)
+    for a, b in lay.transfers:
+        d = float(np.linalg.norm(lay.nodes[a]["geo"] - lay.nodes[b]["geo"]))
+        # a station walk-linked to several others (a downtown web of links) is pulled by each
+        # less, so the web doesn't crush the core
+        share = 1 / math.sqrt(max(partners[a], partners[b]))
+        need = max(MIN_SP * SP_AIM, rad[a] + rad[b] + 0.6)
+        t = need * max(1.0, d / walk)
+        if P is not None:
+            t = max(t, min(XFER_KEEP * float(np.linalg.norm(P[a] - P[b])), 2 * t))
+        out.append((a, b, t, float(np.clip(0.25 / max(d, 1e-3), 0.5, 2.5)) * share if d <= walk * 1.01 else XFER_LONG * share))
+    return out
+
+
+def _walk_pair(lay, a, b):
+    """Are nodes a and b within the walk radius (not just linked in transfers.csv)?"""
+    return float(np.linalg.norm(lay.nodes[a]["geo"] - lay.nodes[b]["geo"])) <= (getattr(lay, "walk_km", 0.4) or 0.4) * 1.01
+
+
 def _seg_dist(p, a, b):
     ab = b - a
     t = np.clip(((p - a) @ ab) / max(ab @ ab, 1e-12), 0, 1)
@@ -960,11 +1107,12 @@ def _solve(lay, X, anchor, dirs, bent, L, wp, rep, wanc):
             row({2 * b + c: wp, 2 * a + c: -wp, ia: -wp * u1[c], ia + 1: -wp * u2[c]}, 0.0)
         row({ia: W_LEN}, W_LEN * L[e] / 2)
         row({ia + 1: W_LEN}, W_LEN * L[e] / 2)
-    for (a, b) in lay.transfers:
+    for a, b, t, f in _xfer_pairs(lay, _radius(lay)):
         g = X[b] - X[a]
         g = g / (np.linalg.norm(g) + 1e-9)
+        w = lay.w_xfer[1] * f
         for c in range(2):
-            row({2 * b + c: 0.6, 2 * a + c: -0.6}, 0.6 * g[c] * MIN_SP * 1.3)
+            row({2 * b + c: w, 2 * a + c: -w}, w * g[c] * t)
     for coefs, b in rep:
         row(coefs, b)
     N = np.zeros((nv, nv))
@@ -1361,13 +1509,12 @@ def _compute(nets, log=None):
     lay = _union(nets)
     G = np.array([nd["geo"] for nd in lay.nodes])
     water = _load_water()
-    proj = geo.Projector()
-    cities = np.array([proj.xy(lat, lon) for _, lat, lon in CITIES])
-    extra = [cities] + [r for _, _, _, rings in water for r in rings]
+    extra = [r for _, _, _, rings in water for r in rings]
     A, *warped = _prewarp(G, [(e["a"], e["b"]) for e in lay.edges], [len(e["lines"]) for e in lay.edges], extra)
+    args = [(copy.deepcopy(lay), G, A, warped, water, None, var) for var in VARIANTS]
+    outs = _run_variants(args)
     best = None
-    for i, var in enumerate(VARIANTS):
-        out = _place(copy.deepcopy(lay), G, A, warped, water, log, **var)
+    for i, (var, out) in enumerate(zip(VARIANTS, outs)):
         q = quality(out)
         if log:
             log(f"variant {i} {var}: {q}")
@@ -1376,8 +1523,32 @@ def _compute(nets, log=None):
     return best[1]
 
 
-def _place(lay, G, A, warped, water, log=None, w_anc=W_ANC, hop_km=AXIS_HOP_KM, unique=True, axis_dp=AXIS_DP):
+def _place_args(a):
+    lay, G, A, warped, water, log, var = a
+    return _place(lay, G, A, warped, water, log, **var)
+
+
+def _run_variants(args):
+    """_place for each variant, in parallel processes where the platform allows (each is
+    deterministic on its own, so the result doesn't depend on how they are run)."""
+    n = min(len(args), os.cpu_count() or 1, MAX_PROCS)
+    if n > 1:
+        try:
+            import concurrent.futures
+            import multiprocessing
+            ctx = multiprocessing.get_context("fork")
+            with concurrent.futures.ProcessPoolExecutor(n, mp_context=ctx, initializer=_blas_one_thread) as ex:
+                return list(ex.map(_place_args, args))
+        except (ValueError, OSError, AssertionError, RuntimeError, ImportError,
+                concurrent.futures.process.BrokenProcessPool):
+            pass          # no fork (Windows), or already inside a worker process: one after another
+    return [_place_args(a) for a in args]
+
+
+def _place(lay, G, A, warped, water, log=None, w_anc=W_ANC, hop_km=AXIS_HOP_KM, unique=True, axis_dp=AXIS_DP, xfer=1.0):
     n = len(lay.nodes)
+    lay.w_xfer = (W_XFER_S * xfer, W_XFER * xfer)
+    lay.xfer_t = _xfer_pairs(lay, _radius(lay), A)
     inc, key, chains = _chains(lay)
     strokes, mate = _strokes(lay, inc, A)
     through = _through(lay, chains, mate)
@@ -1462,7 +1633,7 @@ def _place(lay, G, A, warped, water, log=None, w_anc=W_ANC, hop_km=AXIS_HOP_KM, 
         (dirs if was[0] == "d" else bent)[e] = was[1]
 
     def candidates():
-        out = {}
+        out, nk = {}, [0]
         for e, legs2 in sorted(bent.items()):
             ed = lay.edges[e]
             cont = collections.Counter()
@@ -1517,6 +1688,23 @@ def _place(lay, G, A, warped, water, log=None, w_anc=W_ANC, hop_km=AXIS_HOP_KM, 
                     for i in range(k, j):
                         out.setdefault(es[i], (("d", dirs[es[i]]), d if lay.edges[es[i]]["a"] == nodes[i] else (d + 4) % 8))
                 k = j
+        # along each line of the default plan, across junctions too: a V or a jog (a short run
+        # turned 90 or 45 degrees off and back) is turned halfway back (straight back for 45),
+        # and a sharp turn (135 degrees) is eased by turning the shorter run 45 degrees; only
+        # where that lowers the turn cost (TURN_COST) of every line using those edges
+        for run, nd in _kinks(lay, dirs, bent):
+            es = [e for e, _ in run]
+            if any(e in out for e in es):
+                continue
+            new = {e: (nd if lay.edges[e]["a"] == u else (nd + 4) % 8) for e, u in run}
+            if any((X[lay.edges[e]["b"]] - X[lay.edges[e]["a"]]) @ DIRS[d] <= 0 for e, d in new.items()):
+                continue          # never against the edge
+            if _turn_cost(lay, dirs, bent, es, new) < _turn_cost(lay, dirs, bent, es, {}) - 1e-9:
+                for e, d in new.items():
+                    out[e] = (("d", dirs[e]), d)
+                nk[0] += 1
+        if log:
+            log(f"kinks: {nk[0]} candidates")
         return out
 
     ea, eb = [ed["a"] for ed in lay.edges], [ed["b"] for ed in lay.edges]
@@ -1629,12 +1817,33 @@ def _place(lay, G, A, warped, water, log=None, w_anc=W_ANC, hop_km=AXIS_HOP_KM, 
                 (i, al), (j, be) = _decompose(v)
                 ed["bend"] = tuple(X[a] + DIRS[i] * al) if al > 1e-6 and be > 1e-6 else None
     _order_lines(lay, X, chains, key)
-    _water(lay, A, X, water, warped[1:])
-    for (name, _, _), p in zip(CITIES, _carry(A, X, warped[0])):
-        lay.labels.append((name, float(p[0]), float(p[1]), "city"))
+    _water(lay, A, X, water, warped)
+    for name, v in _city_cores(lay):
+        lay.labels.append((name, float(X[v, 0]), float(X[v, 1]), "city"))
     lay.X = X
     lay.chains = chains
     return lay
+
+
+def _city_cores(lay):
+    """[(area name, node)]: each of CITIES is named beside its core station, the one with the
+    most lines within CITY_KM of its centre (else the nearest station), so the name sits on
+    its downtown and not wherever the warp carried the centre's point."""
+    proj = geo.Projector()
+    G = np.array([nd["geo"] for nd in lay.nodes])
+    nl = collections.Counter()
+    for ed in lay.edges:
+        for v in (ed["a"], ed["b"]):
+            nl[v] += len(ed["lines"])
+    out = []
+    for name, lat, lon in CITIES:
+        c = np.array(proj.xy(lat, lon))
+        d = np.linalg.norm(G - c, axis=1)
+        near = np.nonzero(d < CITY_KM)[0]
+        v = int(min(near, key=lambda v: (-nl[v], d[v]))) if len(near) else int(d.argmin())
+        if d[v] < 5 * CITY_KM:     # an area this version doesn't serve gets no name
+            out.append((name, v))
+    return out
 
 
 def drawn_dirs(lay, path):
@@ -1681,8 +1890,9 @@ def quality(lay):
     """How clean the drawing is, over the lines of the default plan and of the plan: bends,
     zig-zags and sharp turns along the lines, edge crossings drawn against those in the real
     geography (straight station-to-station segments), edges drawn backwards (more than 90
-    degrees off the real direction), and score = bends + 2 zig-zags + 5 sharp turns +
-    3 crossings beyond the geography's + 5 backwards + 20 x (uniform rescale - 1)."""
+    degrees off the real direction), walk-linked interchanges drawn apart (more than XFER_FAR
+    times the distance they are pulled to), and score = bends + 2 zig-zags + 5 sharp turns +
+    3 crossings beyond the geography's + 5 backwards + 20 x (uniform rescale - 1) + W_APART apart."""
     keys = {k for k in (lay.default, "plan") if k}
     bends = zz = sharp = 0
     for (key, _), (path, _) in sorted(lay.paths.items()):
@@ -1700,9 +1910,16 @@ def quality(lay):
     # 90 degrees) from where its far end really is
     back = sum(1 for e in lay.prime if (np.array([lay.nodes[lay.edges[e]["b"]][c] - lay.nodes[lay.edges[e]["a"]][c] for c in "xy"]) @
                                        (lay.nodes[lay.edges[e]["b"]]["geo"] - lay.nodes[lay.edges[e]["a"]]["geo"])) < 0)
-    score = bends + 2 * zz + 5 * sharp + 3 * max(0, xd - xg) + 5 * back + 20 * (getattr(lay, "scale", 1.0) - 1)
+    # interchanges pulled apart: walk-linked pairs (within the walk radius) drawn further apart
+    # than XFER_FAR times the distance they are pulled to
+    apart = 0
+    for a, b, t, f in _xfer_pairs(lay, _radius(lay)):
+        A, B = lay.nodes[a], lay.nodes[b]
+        apart += _walk_pair(lay, a, b) and math.hypot(A["x"] - B["x"], A["y"] - B["y"]) > XFER_FAR * t * getattr(lay, "scale", 1.0)
+    score = (bends + 2 * zz + 5 * sharp + 3 * max(0, xd - xg) + 5 * back + 20 * (getattr(lay, "scale", 1.0) - 1) +
+             W_APART * apart)
     return {"bends": bends, "zigzags": zz, "sharp": sharp, "crossings": xd, "geo_crossings": xg, "backwards": back,
-            "score": round(float(score), 1)}
+            "apart": apart, "score": round(float(score), 1)}
 
 
 def edge_polyline(lay, e):
@@ -1729,9 +1946,11 @@ def to_json(lay):
     paths = collections.defaultdict(dict)
     for (key, lid), (path, stop_at) in sorted(lay.paths.items()):
         paths[key][lid] = [path, stop_at]
-    near = [list(t) for t in lay.transfers
-            if math.hypot(lay.nodes[t[0]]["x"] - lay.nodes[t[1]]["x"], lay.nodes[t[0]]["y"] - lay.nodes[t[1]]["y"]) <= CONNECTOR_MAX]
-    return {"nodes": nodes, "edges": edges, "paths": paths, "transfers": near,
+    # every walk link the model uses is drawn: [a, b, 1 if it is long on the diagram (a dashed
+    # walk), 1 if it is a longer walk than the walk radius (a transfers.csv link)]
+    conn = [[a, b, int(math.hypot(lay.nodes[a]["x"] - lay.nodes[b]["x"], lay.nodes[a]["y"] - lay.nodes[b]["y"]) > CONNECTOR_MAX),
+             int(not _walk_pair(lay, a, b))] for a, b in lay.transfers]
+    return {"nodes": nodes, "edges": edges, "paths": paths, "transfers": conn,
             "rivers": rivers, "lakes": lakes, "labels": labels, "pitch": PITCH, "lead": label_groups(lay)}
 
 
@@ -1752,7 +1971,7 @@ def diagram_nets(nets):
 # (key, label, modes; None = rail and the plan's BRT corridors, as diagram_nets).
 VERSIONS = (("rail", "Rail", ("metro", "commuter", "streetcar")),
             ("brt", "BRT", ("brt",)),
-            ("all", "All", None))
+            ("all", "Rail + BRT corridors", None))
 DEFAULT_VERSION = "rail"
 
 

@@ -40,13 +40,18 @@ out at build time by [`dfwt/schematic.py`](dfwt/schematic.py) (a density-equaliz
 cartogram, then octilinear least squares) so every slider, plan and trip works
 on it too. The diagram comes in three versions, each with its own layout: **Rail**
 (metro / light rail, regional rail and streetcar; the default), **BRT** (every BRT
-line, the 2-million plan's arterial grid included) and **All** (rail and the main
-BRT corridors). Geography gives way to straight lines: a line that runs along one
+line, the 2-million plan's arterial grid included, tinted by area) and **Rail + BRT
+corridors** (rail and the plan's main BRT corridors: all 47 routes on top of the rail
+network would not stay legible, so the full BRT network has its own version).
+Geography gives way to straight lines: a line that runs along one
 axis overall (the Fort Worth north-south trunk, the east-west lines out to Ridgmar)
 is drawn on that axis through its junctions, turns cost more than a little
-geographic fidelity, and a turn straight back (a zig-zag) costs more still. A
-trip that rides a mode the version leaves out says so and offers the version that
-shows it.
+geographic fidelity, and a turn straight back (a zig-zag) costs more still. Every
+walk transfer the model uses (stations within the walk radius, or linked in
+`transfers.csv`) is drawn: the layout pulls such stations side by side, and a pair
+it can't bring together gets a dotted walk link. Hover or tap a line to light up
+its route; BRT routes are named at their ends. A trip that rides a mode the version
+leaves out says so and offers the version that shows it.
 
 The **trip planner** takes street addresses as well as stations (type one, or
 right-click / long-press any point on the map). Addresses are looked up with
