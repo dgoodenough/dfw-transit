@@ -54,6 +54,12 @@ stop slows everyone riding through it, so many lost riders.
   | Orange at SH-114 / Freeport | +1.9k / +1.3k | +0.5k / +0.7k |
   | Walk link Commerce / Harwood - Marilla / Pearl (2M) | +0.7k / +1.0k | |
 
+  **Correction (v2.13):** in the v2.12 full build of the 2M scenario the TEXRail x FW Berry stop
+  opened in 2105, after the horizon, because infill opening years were stored as offsets from
+  the track's year and the 2M schedule moved the track. So the 2M full-build totals below don't
+  include it; the +7.7k is from the test, which opened it directly. From v2.13 every infill stop
+  opens with its own line's track there, or when its partner line arrives (`network/infill.csv`).
+
 - **Dropped** (lost riders or too little for the cost): a commuter hub where FW Green crosses
   the rail lines north of Fort Worth Central (slows four lines), TRE at Stemmons / Commonwealth,
   Hi Line, Lamar Street; Red/Blue at Corinth (-5.3k: slows the trunk); I-30/SH-360 at Collins

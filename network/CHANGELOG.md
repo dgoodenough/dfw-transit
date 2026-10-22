@@ -339,3 +339,86 @@ A longer transfer penalty is noted for a later round.
 - `tools/gen_expansion.py`: a spec's `road_weights` (keep a line in its freeway), and stops
   whose leg follows an existing railway (`"follow": "rail"`) or a hand-drawn straight line
   (`"follow": "straight"`).
+
+## v2.13 — A more realistic model, a stable build order, every region served
+
+From the second review (experts, six residents across the region, and a downtown group).
+
+**The model is more realistic, and the headline is now a range.**
+- A change of vehicle costs 5 minutes (3 before; 8 is a sensitivity).
+- The drive it competes with gets faster on long trips: local streets first, then freeway
+  speed, so Mesquite - Wilmer is about 42 min by car, not 67.
+- BRT runs at 30 km/h on average; drop-off works like park & ride; 6% of commuters will bike
+  to a station.
+- Operating cost is per train or bus hour plus feeder buses (about twice the old figure).
+- The capacity check uses the frequency each line actually runs.
+- With the review's fixes below, **the 2 million riders scenario carries ~866k daily trips in
+  2050 and ~1.88M in 2100 (was 1.06M and 2.25M); 2 million is no longer reached by 2100.** On
+  the low growth path it is ~705k and ~1.17M. The budget plan carries ~370k and ~756k (was
+  388k and 788k). Capital is about the same ($136.4B and $103.2B); operating cost in 2100 is $4.8B
+  and $2.7B a year.
+
+**The 2M build order no longer flips between builds.**
+- Before, the schedule ranked lines by the last build's values, and shared track was charged
+  to whichever line opened first, so DNT East and the I-30 Line swapped decades from build to
+  build.
+- Each line is now valued by the trips lost when it is removed from the 2100 network, on one
+  land use (the network's with everything open), per $M of its share of capital (shared track
+  and stations split among their lines, 2025 prices). Through-routed lines (Red Line to
+  McKinney, TRE to Alvarado and Terrell, TEXRail to Primrose, Mansfield-Denton) are measured
+  too. `python -m dfwt values` computes them (`results/two_million/line_values.csv`).
+- The schedule starts from the generated stages every time and charges each shared piece once,
+  in the earliest year a stage opens it. Two schedules in a row are identical, and a line's
+  value is identical under two different schedules.
+
+**Rules for the order (owner decisions).**
+- Stages of plan lines that reach downtown Dallas or Fort Worth open no later than in the
+  budget plan: FW Green and FW Blue 2042, DNT East and the I-20 Crosstown 2043, FW Pink 2046,
+  DNT West 2047.
+- Arlington's first rail by 2038: the I-30 Line from Dallas via Grand Prairie to Downtown
+  Arlington, the stadiums and Six Flags. On to Handley with FW Blue by about 2043 (tested:
+  +9k daily trips in 2050 and +31k in 2060).
+- A county's next line goes ahead of the value order once its share of population of the money
+  committed so far covers it. Denton County's BRTs open in 2029-30; its share of capital still
+  tops out near 7% (12% of people), because its projects are all low-cost BRT. Weatherford
+  (2061), Greenville (2063) and Cleburne (2075) are no longer pinned to the 2090s.
+- Every city over 150,000 is served by about 2040 (Frisco 2043 is the latest).
+- No new line opens as a stub of fewer than 8 stops ahead of the rest of it.
+
+**New and changed service.**
+- **Express buses** in freeway managed lanes (cheap: stops, ramps and garages):
+  - I-35E Express: Waxahachie - Red Oak - Belt Line - Oak Cliff - Union Station, every 15 min,
+    2027. It is the best value per dollar in the scenario.
+  - Mesquite Express (I-30) and McKinney Express (US-75 to Parker Road) by 2032, decades
+    ahead of their rail.
+- Rural regional rail (Bowie, Gainesville, Sherman, Ennis, Waxahachie) every 30 min, not 15.
+- Streetcars every 10 min from 2030.
+- Late-night service to about 2 a.m. on the Red, Blue, Green, Orange, FW Orange lines and the
+  TRE, with late feeder buses: in the operating cost (the commute model doesn't count its riders).
+- $400M for a Victory pocket track and the junctions where SH-114 trains join the Green Line.
+- Tested and not adopted: a TRE skip-stop express (no gain) and the M-Line on to Deep Ellum
+  (no gain in a commute model that doesn't see evening or visitor trips).
+
+**Fixes.**
+- Infill stations open with their own line's track there, or when their partner line arrives
+  (`network/infill.csv`). TEXRail x FW Berry opened in 2105 in v2.12's 2M build;
+  `reports/TRANSFERS.md` is corrected.
+- No new park & ride garages inside the downtown cores.
+- `run_over`: the old terminus keeps its garage, a line can't borrow its own stops, and
+  borrowed track never makes the borrower its owner.
+- The Beltline BRT is a closed ring (no ride - walk - ride on the same line at Main / Galloway).
+- `tools/gen_expansion.py`: generated stations keep their ids (`scenarios/station_ids.csv`), and
+  regenerating is byte-identical.
+
+**Map and diagram.**
+- The trip planner ranks trips as the model's riders would, and shows clock minutes. Park &
+  ride is off by default, and the drive estimate matches the model.
+- New: "What it means for you" (frequencies, hours, cost per resident) and a "near me" summary.
+- Station popups show the opening year and the construction window.
+- Duplicate station names now name their line.
+- Diagram:
+  - every walk link between stations is drawn;
+  - "All" is now "Rail + BRT corridors";
+  - BRT routes are named and tinted by area;
+  - area names sit at each city's core station;
+  - fewer label collisions.

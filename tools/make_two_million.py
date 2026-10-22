@@ -74,9 +74,16 @@ def main():
     new_stages = [r for r in pkg["stages.csv"] if r["line_id"] not in base_lines]
     restaged = {r["line_id"] for r in extra.get("stages.csv", []) if r["line_id"] in base_lines}
     # a full table (the plan's stages, then the new lines'), which `schedule --write` replaces in place
-    write("stages.csv", [r for r in base["stages.csv"] if r["line_id"] not in restaged]
-          + [r for r in extra.get("stages.csv", []) if r["line_id"] in restaged] + new_stages,
-          list(pkg["stages.csv"][0].keys()))
+    # the plan's stages, with stop references as the package renumbered them ('#seq' moves past infill stops)
+    pstops = {(r["line_id"], r["stage"]): (r["from_stop"], r["to_stop"]) for r in pkg["stages.csv"]}
+    base_stages = [dict(r, **dict(zip(("from_stop", "to_stop"), pstops.get((r["line_id"], r["stage"]), (r["from_stop"], r["to_stop"])))))
+                   for r in base["stages.csv"]]
+    stages = ([r for r in base_stages if r["line_id"] not in restaged]
+              + [r for r in extra.get("stages.csv", []) if r["line_id"] in restaged] + new_stages)
+    # stages.csv is what `schedule --write` replaces; stages.unscheduled.csv is where every
+    # schedule starts from, so the result doesn't depend on the last one
+    for name in ("stages.csv", "stages.unscheduled.csv"):
+        write(name, stages, list(pkg["stages.csv"][0].keys()))
     print(f"two_million: {len(new_stages)} new stages ({len(drop)} corridors left out); now run python -m dfwt schedule --scenario two_million --write")
 
 

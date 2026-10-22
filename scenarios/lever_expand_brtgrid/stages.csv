@@ -35,7 +35,7 @@ E19,7,extension,Outlet Mall,Center / Main,2059,,,,,optimizer
 E19,8,extension,Parks Mall,Outlet Mall,2059,,,,,optimizer
 E19,9,extension,Berry / Stalcup,Parks Mall,2066,,,,,optimizer
 E20,1,starter,DFW Airport Terminal B,Shiloh Road,2025,,,,,
-E21,1,starter,Main / Galloway,Rowlett,2031,,,,,optimizer
+E21,1,starter,#1,Rowlett,2031,,,,,optimizer
 E21,2,extension,Rowlett,1st Street / Castle,2031,,,,,optimizer
 E21,3,extension,1st Street / Castle,Belt Line / Quorum,2035,,,,,optimizer
 E21,4,extension,Belt Line / Quorum,Downtown Carrollton,2035,,,,,optimizer
@@ -43,7 +43,7 @@ E21,5,extension,Downtown Carrollton,Belt Line / Irving Boulevard,2036,,,,,optimi
 E21,6,extension,Belt Line / Irving Boulevard,Jefferson / Belt Line,2037,,,,,optimizer
 E21,7,extension,Jefferson / Belt Line,FM 1382 / Old Straus,2037,,,,,optimizer
 E21,8,extension,FM 1382 / Old Straus,Wilmer,2054,,,,,optimizer
-E21,9,extension,Wilmer,Bryan-Belt Line / Davis,2055,,,,,optimizer
+E21,9,extension,Wilmer,#66,2055,,,,,optimizer: closes the ring at Main / Galloway
 E22,1,starter,Cockrell Hill Road,Commerce / Fort Worth Avenue,2052,,,,,optimizer
 E22,2,extension,Commerce / Fort Worth Avenue,Garland Road / Buckner Boulevard,2052,,,,,optimizer
 E22,3,extension,Jefferson / Belt Line,Cockrell Hill Road,2060,,,,,optimizer
@@ -97,38 +97,38 @@ F05,1,starter,Lake Worth,TCC Trinity River,2052,,,,,optimizer
 F05,2,extension,TCC Trinity River,Berry / Stalcup,2064,,,,,optimizer
 F06,1,starter,Benbrook,Museum Way,2057,,,,,optimizer
 F07,1,starter,Central Station,Bluebonnet Circle,2039,,,,,optimizer
-XB01,1,starter,X132,XS0011,2075,,,,,expansion lever (hand-staged)
-XB02,1,starter,XS0011,XS0020,2075,,,,,expansion lever (hand-staged)
-XB03,1,starter,XS0021,XS0033,2075,,,,,expansion lever (hand-staged)
-XB03,2,extension,XS0033,XS0039,2075,,,,,expansion lever (hand-staged)
-XB04,1,starter,XS0040,XS0049,2080,,,,,expansion lever (hand-staged)
-XB05,1,starter,XS0050,XS0056,2080,,,,,expansion lever (hand-staged)
-XB06,1,starter,XS0057,XS0064,2085,,,,,expansion lever (hand-staged)
-XB07,1,starter,XS0065,XS0076,2085,,,,,expansion lever (hand-staged)
-XB08,1,starter,XS0077,XS0090,2080,,,,,expansion lever (hand-staged)
-XB09,1,starter,XS0091,XS0102,2080,,,,,expansion lever (hand-staged)
-XB10,1,starter,XS0103,XS0109,2090,,,,,expansion lever (hand-staged)
-XB11,1,starter,XS0110,XS0120,2075,,,,,expansion lever (hand-staged)
-XB12,1,starter,XS0121,XS0136,2075,,,,,expansion lever (hand-staged)
-XB13,1,starter,XS0137,XS0155,2080,,,,,expansion lever (hand-staged)
-XB13,2,extension,XS0155,XS0156,2080,,,,,expansion lever (hand-staged)
-XB14,1,starter,XS0157,XS0169,2085,,,,,expansion lever (hand-staged)
-XB15,1,starter,XS0170,XS0183,2080,,,,,expansion lever (hand-staged)
-XB15,2,extension,XS0183,X500,2080,,,,,expansion lever (hand-staged)
-XB16,1,starter,XS0186,XS0197,2085,,,,,expansion lever (hand-staged)
-XB17,1,starter,XS0198,XS0213,2090,,,,,expansion lever (hand-staged)
-XB17,2,extension,XS0213,XS0215,2090,,,,,expansion lever (hand-staged)
-XB18,1,starter,XS0216,XS0110,2080,,,,,expansion lever (hand-staged)
-XB19,1,starter,XS0226,X092,2085,,,,,expansion lever (hand-staged)
-XB20,1,starter,XS0236,XS0248,2075,,,,,expansion lever (hand-staged)
-XB21,1,starter,XS0249,XS0259,2085,,,,,expansion lever (hand-staged)
-XB22,1,starter,XS0260,XS0268,2090,,,,,expansion lever (hand-staged)
-XB23,1,starter,XS0269,XS0275,2090,,,,,expansion lever (hand-staged)
-XB24,1,starter,XS0276,XS0288,2075,,,,,expansion lever (hand-staged)
-XB25,1,starter,XS0289,XS0300,2075,,,,,expansion lever (hand-staged)
-XB26,1,starter,XS0301,XS0311,2080,,,,,expansion lever (hand-staged)
+XB01,1,starter,X132,XS0079,2075,,,,,expansion lever (hand-staged)
+XB02,1,starter,XS0079,XS0088,2075,,,,,expansion lever (hand-staged)
+XB03,1,starter,XS0089,XS0101,2075,,,,,expansion lever (hand-staged)
+XB03,2,extension,XS0101,XS0107,2075,,,,,expansion lever (hand-staged)
+XB04,1,starter,XS0108,XS0117,2080,,,,,expansion lever (hand-staged)
+XB05,1,starter,XS0118,XS0124,2080,,,,,expansion lever (hand-staged)
+XB06,1,starter,XS0125,XS0132,2085,,,,,expansion lever (hand-staged)
+XB07,1,starter,XS0133,XS0144,2085,,,,,expansion lever (hand-staged)
+XB08,1,starter,XS0145,XS0158,2080,,,,,expansion lever (hand-staged)
+XB09,1,starter,XS0159,XS0170,2080,,,,,expansion lever (hand-staged)
+XB10,1,starter,XS0171,XS0177,2090,,,,,expansion lever (hand-staged)
+XB11,1,starter,XS0178,XS0188,2075,,,,,expansion lever (hand-staged)
+XB12,1,starter,XS0189,XS0204,2075,,,,,expansion lever (hand-staged)
+XB13,1,starter,XS0205,XS0608,2080,,,,,expansion lever (hand-staged)
+XB13,2,extension,XS0608,XS0222,2080,,,,,expansion lever (hand-staged)
+XB14,1,starter,XS0223,XS0235,2085,,,,,expansion lever (hand-staged)
+XB15,1,starter,XS0236,XS0249,2080,,,,,expansion lever (hand-staged)
+XB15,2,extension,XS0249,X500,2080,,,,,expansion lever (hand-staged)
+XB16,1,starter,XS0252,XS0263,2085,,,,,expansion lever (hand-staged)
+XB17,1,starter,XS0616,XS0279,2090,,,,,expansion lever (hand-staged)
+XB17,2,extension,XS0279,XS0281,2090,,,,,expansion lever (hand-staged)
+XB18,1,starter,XS0282,XS0178,2080,,,,,expansion lever (hand-staged)
+XB19,1,starter,XS0292,X092,2085,,,,,expansion lever (hand-staged)
+XB20,1,starter,XS0302,XS0314,2075,,,,,expansion lever (hand-staged)
+XB21,1,starter,XS0315,XS0325,2085,,,,,expansion lever (hand-staged)
+XB22,1,starter,XS0326,XS0334,2090,,,,,expansion lever (hand-staged)
+XB23,1,starter,XS0335,XS0341,2090,,,,,expansion lever (hand-staged)
+XB24,1,starter,XS0342,XS0354,2075,,,,,expansion lever (hand-staged)
+XB25,1,starter,XS0355,XS0366,2075,,,,,expansion lever (hand-staged)
+XB26,1,starter,XS0367,XS0617,2080,,,,,expansion lever (hand-staged)
 XB27,1,starter,S028,X538,2080,,,,,expansion lever (hand-staged)
-XB28,1,starter,XS0320,X065,2085,,,,,expansion lever (hand-staged)
-XB29,1,starter,X547,XS0346,2090,,,,,expansion lever (hand-staged)
-XB30,1,starter,XS0347,XS0351,2085,,,,,expansion lever (hand-staged)
-XB31,1,starter,X592,XS0365,2090,,,,,expansion lever (hand-staged)
+XB28,1,starter,XS0386,X065,2085,,,,,expansion lever (hand-staged)
+XB29,1,starter,X547,XS0412,2090,,,,,expansion lever (hand-staged)
+XB30,1,starter,XS0413,XS0417,2085,,,,,expansion lever (hand-staged)
+XB31,1,starter,X592,XS0431,2090,,,,,expansion lever (hand-staged)

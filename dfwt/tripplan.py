@@ -25,8 +25,9 @@ def constants(cfg):
         "pnrPen": -rc.get("pnr_asc_offset", 0.0) / rc["b_ivt_per_min"],
         "waitW": cfg["wait"].get("weight", 1.0),
         "k": cfg["access"]["max_access_stations"],
-        # demand.Zones.drive_min: km x perKm x congestion + terminal
-        "drive": {"perKm": d["circuity"] / d["speed_kmh"] * 60, "terminal": d["terminal_min"]},
+        # demand.drive_minutes: local streets, then freeway; moving part x congestion + terminal
+        "drive": {"circuity": d["circuity"], "localKm": d["local_km"], "localKmh": d["local_kmh"],
+                  "freewayKmh": d["freeway_kmh"], "terminal": d["terminal_min"]},
         # geo.Projector: the model measures every distance on this plane
         "proj": [pj.lat0, pj.lon0, pj.kx, pj.ky],
     }

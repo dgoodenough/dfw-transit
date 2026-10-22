@@ -35,7 +35,7 @@ body.diagram #map{visibility:hidden}
 .viewtog button+button{border-left:1px solid var(--rule)}
 .viewtog button[aria-pressed="true"]{background:var(--ink);color:var(--panel)}
 /* which modes the diagram shows (each version its own layout): diagram view only */
-.vtog button{padding:5px 11px}
+.vtog button{padding:5px 11px;white-space:nowrap}
 .vtog button[aria-pressed="true"]{background:var(--accent);color:var(--panel)}
 body:not(.diagram) .vtog{display:none}
 #schNote{position:absolute;z-index:930;display:none;align-items:center;gap:8px;left:50%;transform:translateX(-50%);
@@ -79,3 +79,10 @@ body.diagram #schZoom{display:flex}
   #panel.min .viewtog button{flex:1;padding-left:6px;padding-right:6px}
   #schNote{top:auto;left:12px;right:12px;transform:none;max-width:none}     /* just above the bottom sheet (schematic.js sets bottom) */
 }
+#schem .conn-w{stroke:var(--st-ink);stroke-linecap:round;opacity:.85}
+/* a route lit up (hover or tap): the others fade */
+#schem.hl #sch-lines>[data-l]:not(.on),#schem.hl #sch-future>[data-l]:not(.on),#schem.hl #sch-glow>[data-l]:not(.on){opacity:.13}
+#schem .pill rect{stroke:var(--bg)}
+#schem .pill text{font-family:var(--f-ui);font-weight:700;text-anchor:middle}
+@media (max-width:420px){.vtog .vx{display:none}}   /* "Rail + BRT corridors" -> "Rail + BRT" on a narrow phone (full name in the title) */
+#schem .conn-w.lw{opacity:.45}   /* a walk longer than the walk radius (transfers.csv) */

@@ -26,7 +26,7 @@
        "X301", "X302",
        {"name": "Reunion", "lat": 32.7620, "lon": -96.8110, "grade": "tunnel"},
        "X187", "X139", "X142", "X517",
-       {"name": "Greenville Avenue / Richmond", "lat": 32.8170, "lon": -96.7700, "grade": "elevated"},
+       {"name": "Lowest Greenville", "lat": 32.8170, "lon": -96.7700, "grade": "elevated"},
        "X420",
        {"name": "Abrams / Northwest Hwy", "lat": 32.8450, "lon": -96.7400},
        "X180", "X179"

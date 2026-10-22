@@ -101,6 +101,29 @@ class NetworkTests(unittest.TestCase):
         self.assertGreaterEqual(min(ln.stop_years[:3]), ln.stop_years[2])
         with self.assertRaises(ValueError):   # light rail can't borrow commuter track
             net.apply_edits([{"op": "run_over", "target": "E25", "field": "E14", "value": "CityLine/Bush"}])
+        self.assertIn(net.lines["F07"].stop_ids[2], ln.pnr_stops)   # the old terminus keeps its garage
+
+    def test_infill_stops_open_with_their_own_track(self):
+        # TEXRail x FW Berry (infill.csv, no partner): each line stops there from its own opening
+        for sc, lines in ((None, ("E05", "F05")), ("two_million", ("E09", "F05"))):
+            net = Network.load(sc)
+            for lid in lines:
+                ln = net.lines[lid]
+                k = ln.stop_ids.index("XI01")
+                self.assertEqual(ln.stop_years[k], max(s.year for s in ln.segments[max(k - 1, 0):k + 1]), (sc, lid))
+                self.assertLess(ln.stop_years[k], 2100)
+
+    def test_no_new_garages_downtown(self):
+        self.assertTrue(self.net.in_core("X187"))           # Union Station
+        self.assertFalse(self.net.in_core("X328"))           # a Beltline stop out east
+
+    def test_beltline_is_a_ring(self):
+        ln = self.net.lines["E21"]
+        self.assertEqual(ln.stop_ids[0], ln.stop_ids[-1])
+        g = YearGraph(self.net, 2100)
+        a, b = g.sidx[ln.stop_ids[-2]], g.sidx[ln.stop_ids[1]]
+        legs, _ = g.itinerary(a, b)
+        self.assertEqual([k for k, *_ in legs], ["wait", "ride"])   # rides on through Main / Galloway
 
 
 class CostAndRerouteTests(unittest.TestCase):
@@ -442,6 +465,56 @@ class LandUsePolicyTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class ScheduleRuleTests(unittest.TestCase):
+    """The 2M build order (review 2): values that don't depend on opening order, deadlines,
+    fixed works and late-night operating cost."""
+    @classmethod
+    def setUpClass(cls):
+        cls.net = Network.load("two_million")
+
+    def test_shared_cost_does_not_depend_on_opening_order(self):
+        before = {lid: self.net.shared_cost_musd(ln) for lid, ln in self.net.lines.items()}
+        moved = Network.load("two_million")
+        moved.apply_edits([{"op": "shift_line_years", "target": "E26", "field": "", "value": "-12"},
+                           {"op": "shift_line_years", "target": "E17", "field": "", "value": "20"}])
+        for lid, ln in moved.lines.items():
+            self.assertAlmostEqual(moved.shared_cost_musd(ln), before[lid], places=6, msg=lid)
+        self.assertNotAlmostEqual(moved.line_cost_musd(moved.lines["E26"]), self.net.line_cost_musd(self.net.lines["E26"]))
+
+    def test_deadlines_follow_end_stations_not_stage_numbers(self):
+        from dfwt import staging
+        rows = [dict(r) for r in self.net.stage_rows]
+        want = {(rows[i]["line_id"], rows[i]["from_stop"], rows[i]["to_stop"]): y for i, y in staging._deadlines(self.net, rows).items()}
+        self.assertEqual(want[("E22", "Davis Drive", "Jefferson / Belt Line")], 2038)   # Arlington in the 2030s
+        for r in rows:
+            r["stage"] = str(100 - int(r["stage"]))
+        again = {(rows[i]["line_id"], rows[i]["from_stop"], rows[i]["to_stop"]): y for i, y in staging._deadlines(self.net, rows).items()}
+        self.assertEqual(want, again)
+
+    def test_values_use_land_use_with_everything_open(self):
+        from dfwt import evaluate
+        ex = self.net.cfg["existing_year"]
+        a = evaluate._all_open(self.net)
+        self.assertEqual(set(a.lines), set(self.net.lines))
+        self.assertTrue(all(y <= ex + 1 for ln in a.lines.values() for y in ln.stop_years))
+        self.assertTrue(all(s.year <= ex + 1 for ln in a.lines.values() for s in ln.segments))
+        self.assertGreater(max(s.year for s in self.net.lines["E17"].segments), ex + 1)   # the network itself is untouched
+
+    def test_capital_item_is_charged_with_its_line(self):
+        ln = self.net.lines["XP01"]
+        (y, musd, _), = self.net.capital_items(ln)
+        self.assertEqual(musd, 400)
+        self.assertEqual(y, min(s.year for s in ln.segments if s.borrowed))
+
+    def test_late_night_service_costs_more(self):
+        import copy
+        cfg = copy.deepcopy(self.net.cfg)
+        cfg["operating"].pop("late_night")
+        plain = Network.load("two_million", cfg)
+        self.assertGreater(sum(self.net.opex_musd(2050).values()), sum(plain.opex_musd(2050).values()))
+        self.assertEqual(sum(self.net.opex_musd(2028).values()), sum(plain.opex_musd(2028).values()))
 
 
 class StagingTests(unittest.TestCase):

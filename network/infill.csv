@@ -1,0 +1,11 @@
+station_id,lines,partners,year_min,note
+X341,E12;E14,E21,2030,Red/Orange at Main / Sherman Street: opens with the Beltline Line
+X308,E12;E14;E15,E19;E22,2030,Red/Blue/Orange at Central / Hall: opens with the I-20 Crosstown or I-30
+XI01,E05;F05,,2030,TEXRail extension x FW Berry: each line stops there from its own opening
+XI02,E10,E21,2030,TRE at Rock Island / Briery: opens with the Beltline Line at Belt Line / Rock Island
+XI03,E10,F01,2030,TRE at Airport / Beach: opens with FW Green
+XI04,E20,E16,2030,Silver Line at Marsh / Arapaho: opens with DNT West (Belt Line / Marsh)
+XI05,E12,XP01,2035,Orange at John W Carpenter / Freeport: opens with the SH-114 Line (2M; SH-114 / Freeport Parkway is a short walk); 2035 otherwise
+XI06,E12;E14,XB01,2035,Red/Orange at NW Highway / Shady Brook: opens with the Northwest Highway BRT (2M); 2035 otherwise
+XI07,E37,E19,2030,Midlothian Line at I-20 / Oriole: opens with the I-20 Crosstown (I-20 / Camp Wisdom)
+XI08,E15,XB34,2035,Blue at Shiloh / Forest: opens with the Shiloh Road BRT (2M); 2035 otherwise

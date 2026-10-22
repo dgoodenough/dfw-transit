@@ -90,8 +90,17 @@ class Zones:
     cong = 1.0  # peak drive-time multiplier for the year (growth.grown_zones sets it)
 
     def drive_min(self, dist):
-        d = self.cfg["drive"]
-        return dist * (d["circuity"] / d["speed_kmh"] * 60 * self.cong) + d["terminal_min"]
+        return drive_minutes(self.cfg["drive"], dist, self.cong)
+
+
+def drive_minutes(d, dist, cong=1.0):
+    """Peak drive minutes for straight-line km `dist` (config.drive): road km = dist x circuity,
+    the first local_km on local streets at local_kmh, the rest at freeway_kmh (longer trips use
+    freeways), the moving part x congestion, plus terminal minutes (parking, walking in)."""
+    road = dist * d["circuity"]
+    local = np.minimum(road, d["local_km"])
+    moving = local / d["local_kmh"] * 60 + (road - local) / d["freeway_kmh"] * 60
+    return moving * cong + d["terminal_min"]
 
 
 def gravity(zones, cfg, beta=None):
@@ -255,12 +264,14 @@ def garages(zones, net, graph, cfg):
     for run in graph.runs:
         if run.line.mode == "commuter":
             for s in run.stops:
+                if net.in_core(s):          # no new garages downtown
+                    continue
                 is_pnr[idx[s]] = True
                 spaces[idx[s]] = max(spaces[idx[s]], sp["commuter_station"])
         full = net.lines.get(run.line.id, run.line)
         term = sp.get(run.line.mode + "_terminus", sp["terminus"])   # smaller at BRT ends, none for streetcars
         for s in (full.stop_ids[0], full.stop_ids[-1], *full.pnr_stops):
-            if s in idx and term > 0:
+            if s in idx and term > 0 and not net.in_core(s):
                 is_pnr[idx[s]] = True
                 spaces[idx[s]] = max(spaces[idx[s]], term)
     # today's lots at existing suburban stations (DART has parking at most stations
@@ -719,7 +730,7 @@ def assign_loads(graph, flows):
             if ku[0] == "L" and kp[0] == "L" and ku[2] == kp[2]:
                 ri = ku[2]
                 i, j = sorted((stop_pos[ri][ku[1]], stop_pos[ri][kp[1]]))
-                hop_load[ri][i] += v
+                hop_load[ri][i if j - i == 1 else len(hop_load[ri]) - 1] += v   # else a ring's closing hop
             elif ku[0] == "L" and kp[0] == "P":
                 boardings[graph.sidx[kp[1]]] += v
                 run_board[ku[2]] += v

@@ -63,7 +63,7 @@ def cost_factor(cfg, year, mode):
 THROUGH_SNAP_KM = 0.3   # through_route: termini this close count as one station
 csv.field_size_limit(1 << 28)  # long fitted alignments make large WKT cells
 TABLES = ("lines.csv", "stations.csv", "line_stops.csv", "line_segments.csv")
-OPTIONAL = ("service.csv", "transfers.csv", "stages.csv")
+OPTIONAL = ("service.csv", "transfers.csv", "stages.csv", "infill.csv")
 
 
 @dataclass
@@ -80,6 +80,7 @@ class Segment:
     grade: str
     pts: list
     km: float
+    borrowed: bool = False   # another line's track (run_over): never the owner that pays for it
 
 
 @dataclass
@@ -96,6 +97,7 @@ class Line:
     segments: list = field(default_factory=list)
     service: list = field(default_factory=list)   # [(from_year, headway_min)], sorted
     pnr_stops: list = field(default_factory=list)  # former termini (through-routed) that keep a garage
+    cruise_kmh: float = 0.0   # this line's average running speed, if not its mode's (an express bus on a freeway)
 
     def headway_at(self, year):
         hw = self.headway
@@ -197,7 +199,53 @@ class Network:
         net.stage_rows, net.stage_findings = stage_rows, findings
         net.variants = staging.build_variants(net, interims)
         net.apply_edits(edits)
+        net.time_infill(tables.get("infill.csv") or [])
         return net
+
+    def time_infill(self, rows):
+        """Infill stations open when the line they connect to arrives (infill.csv): station_id,
+        lines (;-separated, the lines that get the stop), partners (;-separated, optional), year_min.
+        The stop opens on its lines in the later of their own track there and year_min and, when
+        partners are given, the first year a partner serves the station or one within the
+        transfer walk radius (no partner in this scenario: year_min); without partners, each line
+        stops there from its own track's opening (a station shared by two new lines)."""
+        if not rows:
+            return
+        r_km = self.cfg["transfer"]["walk_radius_m"] / 1000
+        st = self.stations
+
+        def arrival(lid, sid):
+            ln = self.lines.get(lid) or (self.host_line(lid) if lid in self.absorbed else None)
+            if ln is None:
+                return None
+            here = st[sid]
+            years = [y for s, y in zip(ln.stop_ids, ln.stop_years)
+                     if s == sid or geo.hav_km(here.lat, here.lon, st[s].lat, st[s].lon) <= r_km]
+            return min(years) if years else None
+        for r in rows:
+            sid = r["station_id"]
+            if sid not in st:      # a scenario without this station (an older plan)
+                continue
+            lines = [x for x in r["lines"].split(";") if x]
+            partners = [x for x in (r.get("partners") or "").split(";") if x]
+            y = int(r.get("year_min") or 0)
+            if partners:
+                got = [a for a in (arrival(p, sid) for p in partners) if a is not None]
+                y = max(y, min(got)) if got else y
+            for lid in lines:
+                ln = self.lines.get(lid) or (self.host_line(lid) if lid in self.absorbed else None)
+                if ln is None:
+                    continue
+                for k, s in enumerate(ln.stop_ids):
+                    if s == sid:
+                        own = max(seg.year for seg in ln.segments[max(k - 1, 0):k + 1])
+                        ln.stop_years[k] = max(y, own)
+
+    def in_core(self, sid):
+        """Is the station inside a downtown core (config.cores)? No new park & ride there."""
+        s = self.stations[sid]
+        return any(isinstance(c, dict) and geo.hav_km(s.lat, s.lon, c["lat"], c["lon"]) <= c["radius_km"]
+                   for c in self.cfg["cores"].values())
 
     def without(self, line_id):
         """The same network with one line removed (for leave-one-out values)."""
@@ -257,7 +305,7 @@ class Network:
             elif op == "set_headway":
                 ln.service = sorted([x for x in ln.service if x[0] != int(e["field"] or 0)] + [(int(e["field"] or 0), float(e["value"]))])
             elif op == "set_line":
-                setattr(ln, e["field"], float(e["value"]) if e["field"] == "headway" else e["value"])
+                setattr(ln, e["field"], float(e["value"]) if e["field"] in ("headway", "cruise_kmh") else e["value"])
             elif op == "through_route":
                 self._through_route(ln, e["field"], e.get("value") or "")
             elif op == "reroute":
@@ -393,12 +441,15 @@ class Network:
         else:
             stops, years = host.stop_ids[i:j + 1][::-1], host.stop_years[i:j + 1][::-1]
             segs = [Segment(s.year, s.grade, s.pts[::-1], s.km) for s in reversed(host.segments[i:j])]
+        if set(stops[:-1]) & set(ln.stop_ids):
+            raise ValueError(f"run_over {ln.id} on {host_id}: the route would run back over its own stops")
         y0 = ln.stop_years[0]
+        ln.pnr_stops = list(dict.fromkeys(ln.pnr_stops + [ln.stop_ids[0]]))   # the old terminus keeps its garage
         ln.stop_ids = stops[:-1] + ln.stop_ids
         # served from the line's own opening, but never before the host's stop is built (host pays for it)
         ln.stop_years = [max(y0, y) for y in years[:-1]] + ln.stop_years
         # the host's track, open for this line from its own opening (the host keeps paying for it)
-        ln.segments = [Segment(max(s.year, y0), s.grade, list(s.pts), s.km) for s in segs] + ln.segments
+        ln.segments = [Segment(max(s.year, y0), s.grade, list(s.pts), s.km, borrowed=True) for s in segs] + ln.segments
         self.variants.pop(ln.id, None)
 
     def _add_express(self, base, new_id, stops):
@@ -439,7 +490,7 @@ class Network:
                         if ln.stop_years[i] <= year:
                             cur.stops.append(sid)
                             cur.hop_km.append(acc)
-                            cur.hop_min.append(acc / mode["cruise_kmh"] * 60 * slow + mode["stop_penalty_min"])
+                            cur.hop_min.append(acc / (ln.cruise_kmh or mode["cruise_kmh"]) * 60 * slow + mode["stop_penalty_min"])
                             acc, i1 = 0.0, i
                         continue
                     if len(cur.stops) > 1:
@@ -480,9 +531,10 @@ class Network:
         for ln in self.lines.values():
             for i, s in enumerate(ln.segments):
                 key = (ln.mode, frozenset((ln.stop_ids[i], ln.stop_ids[i + 1])))
-                cand = (s.year, ln.id)
+                cand = (s.borrowed, s.year, ln.id)
                 if key not in owner or cand < owner[key]:
                     owner[key] = cand
+        owner = {k: v[1:] for k, v in owner.items()}
         return owner
 
     def line_cost_musd(self, ln, by_year=None, owner=None):
@@ -499,21 +551,61 @@ class Network:
                 track += self.segment_cost(ln, i)
         first_line = self._station_first_line()
         stops = sum(self.stop_cost(ln, i) for i, (sid, y) in enumerate(zip(ln.stop_ids, ln.stop_years))
-                    if ex < y <= by_year and first_line.get((sid, ln.mode)) == ln.id)
-        return track + stops
+                    if ex < y <= by_year and first_line.get((sid, ln.mode)) == ln.id and sid not in ln.stop_ids[:i])
+        items = sum(c * cost_factor(self.cfg, y, ln.mode) for y, c, _ in self.capital_items(ln) if ex < y <= by_year)
+        return track + stops + items
+
+    def capital_items(self, ln):
+        """[(year, $M at 2025 prices, note)]: fixed works charged with a line (config
+        capital_items: e.g. a pocket track where it runs over another line's track), in the year
+        its borrowed track opens (or its first year)."""
+        out = []
+        for it in self.cfg.get("capital_items") or []:
+            if isinstance(it, dict) and it.get("line_id") == ln.id:
+                ys = [s.year for s in ln.segments if s.borrowed] or [ln.first_year]
+                out.append((min(ys), float(it["musd"]), it.get("note", "")))
+        return out
+
+    def shared_cost_musd(self, ln):
+        """A line's share of capital at 2025 prices, for ranking lines (it doesn't depend on
+        which opens first): each new track piece and station platform is split evenly among the
+        lines of its mode that use it, without the program's falling cost factor. Today's track
+        and stations cost nothing."""
+        ex = self.cfg["existing_year"]
+        track, plat = collections.defaultdict(list), collections.defaultdict(list)
+        for other in self.lines.values():
+            for i, s in enumerate(other.segments):
+                track[(other.mode, frozenset((other.stop_ids[i], other.stop_ids[i + 1])))].append((s.year, other.id))
+            for sid, y in zip(other.stop_ids, other.stop_years):
+                plat[(sid, other.mode)].append((y, other.id))
+        cost = 0.0
+        for i, s in enumerate(ln.segments):
+            users = track[(ln.mode, frozenset((ln.stop_ids[i], ln.stop_ids[i + 1])))]
+            if min(users)[0] > ex:
+                cost += self.segment_cost(ln, i) / cost_factor(self.cfg, s.year, ln.mode) / len({u for _, u in users})
+        for i, (sid, y) in enumerate(zip(ln.stop_ids, ln.stop_years)):
+            users = plat[(sid, ln.mode)]
+            if min(users)[0] > ex and sid not in ln.stop_ids[:i]:
+                cost += self.stop_cost(ln, i) / cost_factor(self.cfg, y, ln.mode) / len({u for _, u in users})
+        return cost + sum(c for y, c, _ in self.capital_items(ln) if y > ex)
 
     def opex_musd(self, year):
         """Operating cost ($M/yr) of the service running in `year`, by mode (config.operating):
         revenue vehicle-hours = 2 directions x run minutes / headway x service hours a day
-        x layover/recovery, x cost per revenue hour x weekday-equivalent days."""
+        x layover/recovery, x cost per train (or bus) hour x weekday-equivalent days. Feeder buses
+        are added by evaluate.run_year (they depend on riders)."""
         oc = self.cfg.get("operating")
         if not oc:
             return {}
         out = collections.Counter()
+        late = oc.get("late_night") or {}
+        owl = set(late.get("lines", [])) if year >= late.get("from_year", NEVER) else set()
         for r in self.runs(year):
             hw = r.line.headway_at(year)
             veh_h = 2 * sum(r.hop_min) / hw * oc["span_hours"] * oc["layover"]
-            out[r.line.mode] += veh_h * oc["usd_per_revenue_hour"][r.line.mode] * oc["days_per_year"] / 1e6
+            if r.line.id in owl:   # trunk lines on to about 2 a.m. (config operating.late_night)
+                veh_h += 2 * sum(r.hop_min) / late["headway_min"] * late["hours"] * oc["layover"]
+            out[r.line.mode] += veh_h * oc["usd_per_train_hour"][r.line.mode] * oc["days_per_year"] / 1e6
         return dict(out)
 
     def segment_cost(self, ln, i):
@@ -534,7 +626,7 @@ class Network:
         under = any(ln.segments[k].grade == "tunnel" for k in (i - 1, i) if 0 <= k < len(ln.segments))
         cost = sc.get(ln.mode + "_tunnel", sc[ln.mode]) if under else sc[ln.mode]
         per_space = cfg.get("garage_musd_per_space", 0.0)
-        if per_space:
+        if per_space and not self.in_core(sid):    # no new garages downtown
             sp = cfg["access"]["pnr_spaces"]
             if ln.mode == "commuter":
                 spaces = sp["commuter_station"]

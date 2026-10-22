@@ -30,14 +30,19 @@ class YearGraph:
         for ri, run in enumerate(self.runs):
             wait = min(run.line.headway_at(year) * cfg["wait"]["fraction_of_headway"], wcap)
             wait *= cfg["wait"].get("weight", 1.0)   # perceived wait (sensitivity; 1 = as before)
-            prev = None
+            prev = first = None
+            ring = len(run.stops) > 3 and run.stops[0] == run.stops[-1]   # a loop: ride on through its first stop
             for k, sid in enumerate(run.stops):
-                node = len(self.node_info)
-                self.node_info.append(("L", sid, ri))
-                adj.append([])
-                p = self.sidx[sid]
-                adj[p].append((node, wait + self.board_pen, "board"))
-                adj[node].append((p, 0.0, "alight"))
+                if ring and k == len(run.stops) - 1:
+                    node = first
+                else:
+                    node = len(self.node_info)
+                    self.node_info.append(("L", sid, ri))
+                    adj.append([])
+                    p = self.sidx[sid]
+                    adj[p].append((node, wait + self.board_pen, "board"))
+                    adj[node].append((p, 0.0, "alight"))
+                first = node if k == 0 else first
                 if prev is not None:
                     t = run.hop_min[k - 1]
                     adj[prev].append((node, t, "ride"))

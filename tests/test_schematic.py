@@ -48,6 +48,35 @@ class SchematicLayoutTests(unittest.TestCase):
         self.assertLess(q["zigzags"] / n, 2.0, q)
         self.assertLessEqual(q["crossings"], q["geo_crossings"] + 10, q)
 
+    def test_every_walk_link_is_drawn(self):
+        # every transfer pair the model walks (within the walk radius, or in transfers.csv)
+        # that the layout keeps as two nodes gets a connector, solid or dashed
+        self.assertEqual(sorted(tuple(t[:2]) for t in self.js["transfers"]), sorted(self.lay.transfers))
+        for a, b, far, _ in self.js["transfers"]:
+            d = math.hypot(self.lay.nodes[a]["x"] - self.lay.nodes[b]["x"], self.lay.nodes[a]["y"] - self.lay.nodes[b]["y"])
+            self.assertEqual(far, int(d > schematic.CONNECTOR_MAX))
+
+    def test_walk_linked_stations_are_pulled_together(self):
+        # most pairs within the walk radius end up near the distance they are pulled to
+        q = schematic.quality(self.lay)
+        close = [t for t in self.lay.transfers if schematic._walk_pair(self.lay, *t)]
+        self.assertTrue(close)
+        self.assertLessEqual(q["apart"], len(close) / 2, q)
+
+    def test_area_names_stand_beside_their_core_station(self):
+        X = np.array([[n["x"], n["y"]] for n in self.lay.nodes])
+        names = {t for t, _, _, _ in self.lay.labels}
+        self.assertIn("Fort Worth", names)
+        self.assertIn("Dallas", names)
+        for t, x, y, kind in self.lay.labels:
+            self.assertEqual(kind, "city")
+            self.assertLess(np.linalg.norm(X - (x, y), axis=1).min(), 1e-9, t)
+
+    def test_all_version_is_named_for_what_it_shows(self):
+        label = dict((k, l) for k, l, _ in schematic.VERSIONS)["all"]
+        self.assertNotEqual(label.lower(), "all")
+        self.assertIn("BRT", label)
+
     def node(self, name):
         return next(n for n in self.lay.nodes if n["name"] == name)
 
@@ -216,6 +245,28 @@ class SchematicRuleTests(unittest.TestCase):
         P = np.array([(0, 0), (2, 2), (0, 2), (2, 0), (1, 3)], float)
         self.assertEqual(schematic._n_crossings(P, np.array([0, 2]), np.array([1, 3])), 1)
         self.assertEqual(schematic._n_crossings(P, np.array([0, 0]), np.array([1, 4])), 0)
+
+    def test_kinks_find_a_v_and_turn_it_halfway(self):
+        # south-east, north-east for one edge, south-east again: a V whose middle edge is
+        # turned to east; a 45-degree jog is turned straight back
+        nodes = [(0, 2), (1, 1), (2, 2), (3, 1), (4, 0)]
+        lay = _toy(nodes, [(0, 1), (1, 2), (2, 3), (3, 4)], {"L": [0, 1, 2, 3, 4]})
+        dirs = {0: 7, 1: 1, 2: 7, 3: 7}
+        self.assertEqual(schematic._kinks(lay, dirs), [([(1, 1)], 0)])
+        self.assertLess(schematic._turn_cost(lay, dirs, {}, [1], {1: 0}), schematic._turn_cost(lay, dirs, {}, [1], {}))
+        dirs = {0: 0, 1: 1, 2: 0, 3: 0}
+        self.assertEqual(schematic._kinks(lay, dirs), [([(1, 1)], 0)])
+
+    def test_a_ring_runs_on_through_where_it_closes(self):
+        # a loop 0-1-2-3-0 (its stop list ends where it starts): one node per station, and the
+        # line runs straight through station 0 like any other
+        nodes = [(0, 0), (2, 0), (2, 2), (0, 2)]
+        lay = _toy(nodes, [(0, 1), (1, 2), (2, 3), (3, 0)], {"R": [0, 1, 2, 3, 0]})
+        self.assertEqual(len(lay.nodes), 4)
+        passes = schematic._passes(lay)
+        self.assertIn((lay.eidx[(0, 1)], lay.eidx[(0, 3)]), passes[0])
+        for v in range(1, 4):
+            self.assertEqual(len(passes[v]), 1)
 
     def test_line_turns_counts_bends_and_zigzags(self):
         # east, a 45 degree jog north-east, east again: two bends, one zig-zag
