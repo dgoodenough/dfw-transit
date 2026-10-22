@@ -200,7 +200,7 @@ def _final_job(args):
     return key, lid, r["daily_trips"]
 
 
-def final_values(ctx, net, procs=None, log=print):
+def final_values(ctx, net, procs=None, log=print, only=None):
     """The scheduler's ranking (staging, priority value_per_musd), the same whatever order the
     lines open in: each proposed line's daily trips lost when it is removed from the finished
     network (final year), per $M of its share of capital at 2025 prices (Network.shared_cost_musd).
@@ -222,6 +222,9 @@ def final_values(ctx, net, procs=None, log=print):
             nets[lid] = Network.from_raw(copy.deepcopy(tables), keep, net.cfg, net.name)
     measured = [("", ln.id) for ln in net.lines.values() if ln.status != "existing" and ln.first_year <= final]
     measured += [(lid, lid) for lid in net.absorbed if lid in nets[lid].lines and nets[lid].lines[lid].status != "existing"]
+    if only:   # just these lines (the rest keep their last values)
+        measured = [(k, lid) for k, lid in measured if lid in only]
+        nets = {k: v for k, v in nets.items() if k == "" or k in only}
     jobs = sorted({(k, None) for k, _ in measured}) + measured
     _POOL.update(ctx=ctx, nets=nets, final=final)
     if procs <= 1:

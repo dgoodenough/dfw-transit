@@ -11,6 +11,7 @@
   python -m dfwt ridership [--scenario NAME] [--years 2050,2070,2100]   daily boardings, growth, garages
 """
 import argparse
+import csv
 import os
 import sys
 import time
@@ -117,7 +118,15 @@ def cmd_values(args):
     cfg = config.load(scenario=args.scenario)
     net = Network.load(args.scenario, cfg)
     ctx = evaluate.Context(cfg) if config.has_overlay(args.scenario) else evaluate.Context()
-    rows = evaluate.final_values(ctx, net, procs=args.procs)
+    only = set(args.lines.split(",")) if args.lines else None
+    rows = evaluate.final_values(ctx, net, procs=args.procs, only=only)
+    path = config.path("results", net.name, "line_values.csv")
+    if only and os.path.exists(path):   # merge into the last full set
+        with open(path, encoding="utf-8") as f:
+            rows = [r for r in csv.DictReader(f) if r["line_id"] not in only] + rows
+        for r in rows:
+            r["marginal_final"], r["cost_shared_musd"] = int(r["marginal_final"]), int(r["cost_shared_musd"])
+            r["value_per_musd"] = float(r["value_per_musd"]) if r["value_per_musd"] != "" else ""
     evaluate.write_final_values(config.path("results", net.name), rows)
     for r in sorted(rows, key=lambda r: -(r["value_per_musd"] or 0)):
         print(f"  {r['line_id']:6} {net.host_line(r['line_id']).name if not r['host'] else r['line_id'] + ' (via ' + r['host'] + ')':32}"
@@ -255,6 +264,7 @@ def main(argv=None):
     va = sub.add_parser("values", help="line values for the build order (final-year leave-one-out, ~20-30 min)")
     va.add_argument("--scenario")
     va.add_argument("--procs", type=int, default=3)
+    va.add_argument("--lines", help="comma-separated line_ids to (re)measure; the rest keep their values")
     t = sub.add_parser("trip")
     t.add_argument("origin")
     t.add_argument("dest")

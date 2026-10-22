@@ -55,14 +55,16 @@
   },
   "staging": {
     "priority": "value_per_musd",
-    "_doc_rules": "Review 2 (owner decision D2): the order is riders per $ (results/two_million/line_values.csv: trips lost when a line is removed from the 2100 network, per $M of its share of capital at 2025 prices; the same whatever order lines open in), with three rules: plan lines that serve a downtown core open no later than in the budget plan (core_by_plan); a county's next line goes ahead of the value order once its share of population (x ratio) of the capital committed so far covers it (fair_share); a new line doesn't open as a stub of fewer than min_starter_stops stops ahead of its next stage. Deadlines: lines that must open by a year.",
+    "_doc_rules": "Review 2 (owner decision D2): the order is riders per $ (results/two_million/line_values.csv: trips lost when a line is removed from the 2100 network, per $M of its share of capital at 2025 prices; the same whatever order lines open in), with three rules: the stages of plan lines that reach a downtown core (and the stages they need to connect) open no later than in the budget plan (core_by_plan); a county's next line goes ahead of the value order once its share of population (x ratio) of the capital committed so far covers it (fair_share); a new line doesn't open as a stub of fewer than min_starter_stops stops ahead of its next stage. Deadlines: lines that must open by a year.",
     "core_by_plan": true,
     "fair_share": {"ratio": 1.0},
     "min_starter_stops": 8,
     "deadlines": [
       {"line_id": "E22", "from_stop": "Cockrell Hill Road", "to_stop": "Commerce / Fort Worth Avenue", "by": 2038, "why": "Arlington's first rail in the 2030s (review 2, D2): I-30 Line Dallas - Grand Prairie - Arlington"},
       {"line_id": "E22", "from_stop": "Jefferson / Belt Line", "to_stop": "Cockrell Hill Road", "by": 2038, "why": "Arlington's first rail in the 2030s"},
-      {"line_id": "E22", "from_stop": "Davis Drive", "to_stop": "Jefferson / Belt Line", "by": 2038, "why": "Arlington's first rail in the 2030s: Downtown Arlington, the stadiums, Six Flags"}
+      {"line_id": "E22", "from_stop": "Davis Drive", "to_stop": "Jefferson / Belt Line", "by": 2038, "why": "Arlington's first rail in the 2030s: Downtown Arlington, the stadiums, Six Flags"},
+      {"line_id": "XE02", "from_stop": "X275", "to_stop": "X141", "by": 2032, "why": "every city over 150,000 served by about 2040: Mesquite (its rail comes in the 2050s-70s; the 2100 value can't see an interim bus)"},
+      {"line_id": "XE03", "from_stop": "X500", "to_stop": "X125", "by": 2032, "why": "every city over 150,000 served by about 2040: McKinney (until the Red Line arrives)"}
     ]
   },
   "ridership": {

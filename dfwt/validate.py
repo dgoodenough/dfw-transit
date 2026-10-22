@@ -44,8 +44,8 @@ def run(net):
             if pieces > 1:
                 add("warn", "SPLIT", ln.name, f"opens in {pieces} disconnected pieces in {y}")
                 break
-        # hairpins
-        for i in range(1, len(ln.segments)):
+        # hairpins (an express bus in a freeway leaves it to reach a station and comes back)
+        for i in range(1 if any(s.grade != "freeway" for s in ln.segments) else len(ln.segments), len(ln.segments)):
             p, q = ln.segments[i - 1].pts, ln.segments[i].pts
             if len(p) < 2 or len(q) < 2:
                 continue

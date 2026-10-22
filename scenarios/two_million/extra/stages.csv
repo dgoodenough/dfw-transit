@@ -4,3 +4,5 @@ E41,1,starter,X175,XG05,2095,,,,,"owner: by 2100; scheduled by value and fair sh
 E30,1,starter,Fort Worth T&P,Alvarado,2032,,,,,optimizer
 E30,2,extension,Alvarado,Cleburne,2088,,,,,"owner: by 2100; scheduled by value and fair share (review 2, D4)"
 XE01,1,starter,X588,X187,2030,,,,,review 2 (D3): an early express for Ellis County
+XE02,1,starter,X275,X141,2030,,,,,review 2 (D2/D3): Mesquite served early
+XE03,1,starter,X500,X125,2030,,,,,review 2 (D2/D3): McKinney served early

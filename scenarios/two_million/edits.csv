@@ -61,3 +61,5 @@ set_line,E25,mode,metro,McKinney corridor (DART-owned) built as light rail
 through_route,E14,E25,Red Line,Red Line runs on from Parker Road to McKinney: no transfer
 run_over,XP01,E13,X137,"SH-114 trains run on over the Green Line from Farmers Branch to Victory: one seat to Love Field, Market Center and Victory"
 set_line,XE01,cruise_kmh,60,express bus in managed lanes: about 60 km/h between its five stops
+set_line,XE02,cruise_kmh,60,express bus in managed lanes: about 60 km/h between its stops
+set_line,XE03,cruise_kmh,60,express bus in managed lanes: about 60 km/h between its stops

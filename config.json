@@ -79,6 +79,7 @@
     2100
   ],
   "existing_year": 2025,
+  "_doc_modes": "vehicle_capacity: riders per train or bus at a practical peak load (3-car light rail, articulated BRT, 4-car regional rail); a line's capacity is vehicles an hour x this.",
   "modes": {
     "metro": {
       "cruise_kmh": 63,
@@ -107,8 +108,7 @@
       "default_headway_min": 20,
       "label": "Streetcar",
       "vehicle_capacity": 120
-    },
-    "_doc": "vehicle_capacity: riders per train or bus at a practical peak load (3-car light rail, articulated BRT, 4-car regional rail); a line's capacity is vehicles an hour x this."
+    }
   },
   "wait": {
     "_doc": "Expected wait = headway / 2, capped (riders time arrivals on long headways). Waits count `weight` times in-vehicle minutes, as riders perceive them (planning practice 2-3x), in routing, the logit and the competitive-commute test.",
