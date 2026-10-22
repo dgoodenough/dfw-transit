@@ -12,10 +12,10 @@
 /* Layout: full-bleed map with one docked control panel (bottom sheet on phones). */
 :root{
   --bg:#f4f6f5; --panel:#ffffff; --ink:#18212b; --muted:#566370; --rule:#d5dcdf; --accent:#c96f00;
-  --good:#1d7f4e; --bad:#b3123a; --chip:#eef2f3; --bus:#2f6db5;
+  --good:#1d7f4e; --bad:#b3123a; --chip:#eef2f3; --bus:#2f6db5; --sub:#38434d;
   --f-display:"Barlow Condensed","Arial Narrow",Arial,sans-serif; --f-ui:"Barlow","Helvetica Neue",Arial,sans-serif;
 }
-@media (prefers-color-scheme: dark){:root{--bg:#11171d;--panel:#18212a;--ink:#e7ecef;--muted:#9aa8b3;--rule:#2c3946;--accent:#f29a2e;--good:#4cc488;--bad:#ef6a86;--chip:#22303b;--bus:#6fa8ec;color-scheme:dark}}
+@media (prefers-color-scheme: dark){:root{--bg:#11171d;--panel:#18212a;--ink:#e7ecef;--muted:#9aa8b3;--rule:#2c3946;--accent:#f29a2e;--good:#4cc488;--bad:#ef6a86;--chip:#22303b;--bus:#6fa8ec;--sub:#c5ced5;color-scheme:dark}}
 *{box-sizing:border-box}
 html,body{height:100%;margin:0;background:var(--bg);color:var(--ink);font-family:var(--f-ui);font-size:14px}
 #map{position:absolute;inset:0}
@@ -32,8 +32,8 @@ button{cursor:pointer} button:focus-visible,select:focus-visible,input:focus-vis
 input[type=range]{flex:1;accent-color:var(--accent)}
 .metrics{display:grid;grid-template-columns:1fr 1fr;gap:8px 12px}
 .metric b{display:block;font-family:var(--f-display);font-size:1.45rem;font-variant-numeric:tabular-nums;line-height:1.05}
-.metric span{font-size:.76rem;color:var(--muted);line-height:1.25;display:block}
-.metric em{font-style:normal;font-size:.74rem;font-weight:600}
+.metric span{font-size:.84rem;color:var(--sub);line-height:1.3;display:block}
+.metric em{font-style:normal;font-size:.8rem;font-weight:600;white-space:nowrap}
 .up{color:var(--good)} .down{color:var(--bad)}
 svg.spark{width:100%;height:46px;display:block}
 .spark .ln{fill:none;stroke:var(--ink);stroke-width:2}
@@ -53,6 +53,7 @@ summary{cursor:pointer;font-weight:600;font-size:.9rem}
 .li .nm{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .li .yr{color:var(--muted);font-variant-numeric:tabular-nums;font-size:.76rem}
 .li.future{opacity:.62}
+.foryou{font-size:.84rem;line-height:1.45;margin-top:6px}.foryou p{margin:0 0 6px}.foryou b{font-weight:600}
 .interval{font-size:.82rem;line-height:1.45;border-top:1px solid var(--rule);padding-top:10px}
 .interval b{font-weight:600}
 .interval .op{display:grid;grid-template-columns:10px minmax(0,1fr) auto;gap:6px;align-items:center}
@@ -63,7 +64,7 @@ summary{cursor:pointer;font-weight:600;font-size:.9rem}
 #trip .tot{font-weight:600;font-size:.95rem;margin:4px 0}
 #trip .leg{display:grid;grid-template-columns:8px minmax(0,1fr);gap:8px;margin:3px 0}
 #trip .leg i{border-radius:2px}
-.hint{color:var(--muted);font-size:.8rem}
+.hint{color:var(--sub);font-size:.84rem}
 .od{display:flex;flex-direction:column;gap:6px;margin:6px 0}.od input{width:100%;min-width:0;padding:5px 7px;border:1px solid var(--rule);border-radius:6px;background:var(--panel);color:var(--ink);font:inherit;font-size:.85rem}
 .sugg{list-style:none;margin:2px 0 0;padding:3px;border:1px solid var(--rule);border-radius:6px;background:var(--panel);max-height:230px;overflow-y:auto}
 .sugg[hidden],.opts[hidden]{display:none}
@@ -79,7 +80,9 @@ summary{cursor:pointer;font-weight:600;font-size:.9rem}
 #trip .leg i.drive{background:repeating-linear-gradient(to bottom,var(--accent) 0 6px,transparent 6px 10px)}
 #trip .leg i.bus{background:repeating-linear-gradient(to bottom,var(--bus) 0 5px,transparent 5px 8px)}
 #trip .leg i.bike{background:repeating-linear-gradient(to bottom,var(--good) 0 4px,transparent 4px 8px)}
-#trip .note{margin-top:4px;font-size:.74rem}
+#trip .note{margin-top:4px;font-size:.8rem}
+#trip .drivefirst{margin:4px 0;padding:5px 8px;border-left:3px solid var(--accent);background:var(--chip);border-radius:0 4px 4px 0}
+#trip .near{margin:6px 0}
 svg#tchart{width:100%;height:108px;display:block;margin-top:8px;touch-action:pan-y;cursor:crosshair}
 #tchart .ln{fill:none;stroke:var(--ink);stroke-width:2;stroke-linejoin:round}
 #tchart .ln2{fill:none;stroke:var(--muted);stroke-width:1.5;stroke-dasharray:3 3}
@@ -95,7 +98,7 @@ svg#tchart{width:100%;height:108px;display:block;margin-top:8px;touch-action:pan
 .pin{width:26px;height:26px;border-radius:50% 50% 50% 0;transform:rotate(-45deg);background:var(--accent);border:2px solid var(--panel);box-shadow:0 1px 4px rgba(0,0,0,.35);display:grid;place-items:center}
 .pin b{transform:rotate(45deg);color:var(--panel);font:700 12px var(--f-ui)}
 .ptbtn{gap:6px;margin-top:6px}
-.pop b{font-size:.95rem}.pop .m{color:var(--muted);font-size:.8rem;margin-top:3px;line-height:1.4}
+.pop b{font-size:.95rem}.pop .m{color:var(--sub);font-size:.84rem;margin-top:3px;line-height:1.4}
 .chip{display:inline-block;padding:1px 7px;border-radius:9px;color:#fff;font-size:.72rem;margin:1px 3px 1px 0}
 a{color:var(--accent)}
 .leaflet-popup-content-wrapper,.leaflet-popup-tip,.leaflet-tooltip,.leaflet-bar a,.leaflet-control-layers{background:var(--panel);color:var(--ink);border-color:var(--rule)}
@@ -132,6 +135,10 @@ a{color:var(--accent)}
     <div class="hint" id="sparkKey"></div>
   </div>
   <div id="interval" class="interval" aria-live="polite"></div>
+  <details id="foryou">
+    <summary>What it means for you</summary>
+    <div id="foryouBody" class="foryou"></div>
+  </details>
   <details open>
     <summary>Trip planner</summary>
     <div class="od">
@@ -146,6 +153,7 @@ a{color:var(--accent)}
   <details>
     <summary>Lines</summary>
     <div class="row" style="margin-top:6px"><button type="button" id="allOn">Show all</button><button type="button" id="allOff">Hide all</button></div>
+    <div class="hint" style="margin-top:6px">Year it opens (“today” if it runs now) · daily trips it adds per $1M of its capital cost (the trips lost if it were removed, ÷ cost; higher is better value).</div>
     <div class="lines" id="lines"></div>
   </details>
   <div class="hint">Numbers from the model in <a href="https://github.com/dgoodenough/dfw-transit">the repository</a>; see reports/RESULTS.md for definitions. Demand is a gravity model from census population and LODES jobs.</div>
@@ -187,6 +195,8 @@ const panelPad = () => { const r = $('panel').getBoundingClientRect(), sheet = r
   return sheet ? {autoPanPaddingTopLeft: [12, 12], autoPanPaddingBottomRight: [12, innerHeight - r.top + 12]} : {autoPanPaddingTopLeft: [r.right + 12, 12]}; };
 const $ = id => document.getElementById(id);
 const fmt = n => n >= 10000 ? Math.round(n / 1000) + 'k' : n.toLocaleString();
+// one format for every count on the panel: 1.25M, 77k, 1,752
+const big = n => n >= 1e6 ? (n / 1e6).toFixed(2) + 'M' : fmt(Math.round(n));
 let scenKey = D.order[0], yi = 0, hidden = new Set(), pick = [];
 let S = D.scen[scenKey];
 
@@ -281,7 +291,7 @@ function pieceProj(z) {
 // and newly opened since the last interval (solid on a glow)
 function stateFn() {
   const Y = D.years[yi], prevY = yi ? D.years[yi - 1] : -Infinity;
-  return (ln, yr) => yr <= prevY ? 'open' : yr <= Y ? 'new' : yr - (D.build[ln.mode] || 0) < Y ? 'building' : 'future';
+  return (ln, yr) => yr <= prevY ? 'open' : yr <= Y ? (yi ? 'new' : 'open') : yr - (D.build[ln.mode] || 0) < Y ? 'building' : 'future';
 }
 // piece ends that meet: endpoint -> [[piece, is its start]] (per scenario, built once)
 function pieceEnds() {
@@ -475,7 +485,7 @@ function drawLines() {
 // side-by-side track a capsule across the lines it serves.
 const STOPS_FROM = {metro: 11, commuter: 11, streetcar: 12, brt: 13};
 function drawStations() {
-  stLayer.clearLayers();
+  stLayer.clearLayers(); shownAt.clear();
   const Y = D.years[yi], z = map.getZoom(), yd = S.years[Y], served = new Map();
   for (const [li, stops] of yd.runs) for (const s of stops) {
     if (!served.has(s)) served.set(s, new Set()); served.get(s).add(li);
@@ -510,13 +520,55 @@ function drawStations() {
     if (!m) m = L.circleMarker(ll, big ? {radius: 3.6 * zf() + 1, color: ink, weight: z < 12 ? 1.5 : 2, fillColor: paper, fillOpacity: 1}
       : brt ? {radius: 2.4 * zf(), color: dark ? '#11171d' : '#fff', weight: 1.2, fillColor: lineColor(ln.color, ln.mode), fillOpacity: 1}
       : {radius: 3.3 * zf(), color: lineColor(ln.color, ln.mode), weight: z < 12 ? 1.5 : 2, fillColor: paper, fillOpacity: 1}).addTo(stLayer);
-    m.on('click', () => choose(sid));
-    const chips = [...lis].filter(li => !hidden.has(S.lines[li].id)).map(li => `<span class="chip" style="background:${S.lines[li].color};color:${inkOn(S.lines[li].color)}">${S.lines[li].name}</span>`).join('');
-    const b = S.boardings[sid];
-    m.bindTooltip(st[0]);
-    m.bindPopup(`<div class="pop"><b>${st[0]}</b><div>${chips}</div><div class="m">${fmt(st[3])} residents · ${fmt(st[4])} jobs within 1 km` +
-      (b ? `<br>${fmt(b)} competitive commuters board here by ${D.years[D.years.length - 1]} (end of plan)` : '') + `</div></div>`, panelPad());
+    const at0 = L.latLng(ll.lat, ll.lng);
+    shownAt.set(sid, at0);
+    m.on('click', () => { choose(sid); openStation(sid, at0); });
+    m.bindTooltip(stLabel(sid));
   }
+  // the open station popup stays open (refreshed) while its station is still drawn
+  if (popSid && map.hasLayer(stPop)) {
+    if (!shownAt.has(popSid)) map.closePopup(stPop);
+    else { stPop.options.autoPan = false; stPop.setLatLng(shownAt.get(popSid)).setContent(stationHtml(popSid)); stPop.options.autoPan = true; }
+  }
+}
+// ---- station popup: one shared popup, keyed by station ----
+const MODE_NAME = {metro: 'light rail', commuter: 'regional rail', brt: 'BRT bus', streetcar: 'streetcar'};
+const GRADE_NAME = {tunnel: 'underground', elevated: 'elevated', aerial: 'elevated'};
+let popSid = null, stPop = null;
+const shownAt = new Map();   // station -> where its marker is drawn now
+// the first year each station is served, per mode (this plan)
+function stationOpen() {
+  if (S._open) return S._open;
+  const o = {};
+  for (const Y of D.years) for (const [li, stops] of S.years[Y].runs) {
+    const md = S.lines[li].mode;
+    for (const sid of stops) { o[sid] = o[sid] || {}; if (!(md in o[sid])) o[sid][md] = Y; }
+  }
+  return S._open = o;
+}
+const roundAbout = n => n >= 10000 ? Math.round(n / 1000) * 1000 : n >= 1000 ? Math.round(n / 100) * 100 : Math.max(10, Math.round(n / 10) * 10);
+function stationHtml(sid) {
+  const Y = D.years[yi], st = D.stations[sid], yd = S.years[Y], lis = new Set();
+  for (const [li, stops] of yd.runs) if (stops.includes(sid) && !hidden.has(S.lines[li].id)) lis.add(li);
+  const chips = [...lis].map(li => `<span class="chip" style="background:${S.lines[li].color};color:${inkOn(S.lines[li].color)}">${esc(S.lines[li].name)}</span>`).join('');
+  const op = stationOpen()[sid] || {}, modes = Object.keys(op).sort((a, b) => op[a] - op[b]), one = modes.length === 1;
+  const when = md => op[md] <= D.years[0] ? 'runs today' : (op[md] <= Y ? 'opened ' : 'opens ') + op[md];
+  const gr = (S.grades || {})[sid] || {}, where = md => GRADE_NAME[gr[md]] || 'street-level';
+  const sameGrade = new Set(modes.map(where)).size <= 1;
+  const cap = t => t.charAt(0).toUpperCase() + t.slice(1);
+  const rows = modes.map(md => cap(MODE_NAME[md] || md) + ' ' + when(md) + (sameGrade ? '' : ', ' + where(md)));
+  if (sameGrade && modes.length) rows.push(cap(where(modes[0])) + ' platform' + (one ? '' : 's'));
+  if (modes.some(md => op[md] > D.years[0])) rows.push('New platforms step-free (assumed)');
+  const b = S.boardings[sid], last = D.years[D.years.length - 1];
+  if (b) rows.push(`About ${roundAbout(b).toLocaleString()} daily boardings in ${last} (model: weekday commutes only)`);
+  rows.push(`${fmt(st[3])} residents · ${fmt(st[4])} jobs within 1 km (today)`);
+  return `<div class="pop"><b>${esc(stLabel(sid))}</b><div>${chips}</div><div class="m">${rows.join('<br>')}</div></div>`;
+}
+function openStation(sid, ll) {
+  stPop = stPop || L.popup(panelPad());
+  Object.assign(stPop.options, panelPad());
+  popSid = sid;
+  stPop.setLatLng(ll).setContent(stationHtml(sid)).openOn(map);
 }
 map.on('zoomend', () => { drawLines(); drawStations(); });   // offsets and weights are in screen pixels
 function draw() {
@@ -526,7 +578,7 @@ function draw() {
   drawLines();
   drawStations();
   intervalSummary(Y, prevY, stateFn());
-  metrics(); lineList(); if (ends[0] && ends[1]) replan(false);
+  metrics(); forYou(); lineList(); if (ends[0] && ends[1]) replan(false);
   if (window.Schem) Schem.draw();  // schematic: redraw the diagram view
 }
 function intervalSummary(Y, prevY, state) {
@@ -535,33 +587,35 @@ function intervalSummary(Y, prevY, state) {
     let km = 0, bkm = 0, by = Infinity;
     for (const [yr, k] of ln.segs) {
       const st = state(ln, yr);
-      if (st === 'new') km += k;
+      if (st === 'new' || (!yi && st === 'open')) km += k;   // first year: what runs today
       if (st === 'building') { bkm += k; by = Math.min(by, yr); }
     }
     if (km > 0.05) opened.push([ln, km]);
     if (bkm > 0.05) building.push([ln, bkm, by]);
   }
   const row = ([ln, km, by]) => `<div class="op"><i style="background:${ln.color}"></i><span>${ln.name}</span><span>${km.toFixed(1)} km${by ? ' · ' + by : ''}</span></div>`;
-  const span = !yi ? `by ${Y}` : prevY + 1 === Y ? `in ${Y}` : `${prevY + 1}–${Y}`;
-  $('interval').innerHTML = `<b>Opened ${span}</b>` + (opened.length ? opened.sort((a, b) => b[1] - a[1]).map(row).join('') : '<div class="none">Nothing new</div>') +
+  const span = !yi ? `In service in ${Y}` : 'Opened ' + (prevY + 1 === Y ? `in ${Y}` : `${prevY + 1}–${Y}`);
+  $('interval').innerHTML = `<b>${span}</b>` + (opened.length ? opened.sort((a, b) => b[1] - a[1]).map(row).join('') : '<div class="none">Nothing new</div>') +
     (building.length ? `<b style="display:block;margin-top:6px">Under construction</b>` + building.sort((a, b) => a[2] - b[2]).map(row).join('') : '');
 }
 function metrics() {
   const Y = D.years[yi], m = S.metrics.find(r => r.year === Y);
   // compare with the budget-constrained plan (or, for the plan itself, with v1)
   const refKey = scenKey !== 'plan' && D.scen.plan ? 'plan' : (scenKey !== 'v1_baseline' && D.scen.v1_baseline ? 'v1_baseline' : null);
-  const ref = refKey ? D.scen[refKey] : null, refName = refKey === 'plan' ? 'plan' : 'v1';
+  const ref = refKey ? D.scen[refKey] : null, refName = refKey === 'plan' ? 'budget plan' : 'v1 plan';
   const base = ref ? ref.metrics.find(r => r.year === Y) : null;
-  const d = (k, unit = '') => { if (!base) return ''; const v = m[k] - base[k]; if (Math.abs(v) < 0.05) return ''; const s = v > 0 ? '+' : '−';
-    const a = Math.abs(v), good = unit === '$' ? v < 0 : v > 0; return ` <em class="${good ? 'up' : 'down'}">${s}${unit === '$' ? '$' + a.toFixed(1) + 'B' : unit === '%' ? a.toFixed(1) + ' pts' : fmt(Math.round(a))} vs ${refName}</em>`; };
-  const k = v => v >= 1e6 ? (v / 1e6).toFixed(2) + 'M' : Math.round(v / 1000) + 'k';
-  const modes = [['boardings_metro', 'metro'], ['boardings_commuter', 'regional rail'], ['boardings_brt', 'BRT'], ['boardings_streetcar', 'streetcar'], ['boardings_feeder_bus', 'feeder bus']]
-    .filter(([c]) => m[c]).map(([c, n]) => `${k(m[c])} ${n}`).join(' · ');
+  // a difference under 1% of the larger value is noise: not shown
+  const d = (k, unit = '') => { if (!base) return ''; const v = m[k] - base[k]; if (Math.abs(v) < 0.01 * Math.max(Math.abs(m[k]), Math.abs(base[k])) || Math.abs(v) < 0.05) return '';
+    const s = v > 0 ? '+' : '−', a = Math.abs(v), good = unit === '$' ? v < 0 : v > 0;
+    return ` <em class="${good ? 'up' : 'down'}">${s}${unit === '$' ? '$' + a.toFixed(1) + 'B' : big(a)}&nbsp;vs&nbsp;${refName}</em>`; };
+  const modes = [['boardings_metro', 'light rail'], ['boardings_commuter', 'regional rail'], ['boardings_brt', 'BRT'], ['boardings_streetcar', 'streetcar'], ['boardings_feeder_bus', 'feeder bus']]
+    .filter(([c]) => m[c]).map(([c, n]) => `${big(m[c])} ${n}`).join(' · ');
+  const per = m.daily_trips ? m.all_boardings / m.daily_trips : 0;
   $('metrics').innerHTML = [
-    [(m.daily_trips >= 1e6 ? k(m.daily_trips) : fmt(m.daily_trips)) + d('daily_trips'), 'daily transit trips (each trip counted once)'],
-    [k(m.all_boardings), `boardings a day: ${modes}`],
-    [fmt(m.jobs_45min) + d('jobs_45min'), 'jobs the average resident reaches in 45 min'],
-    ['$' + m.capex_busd + 'B' + d('capex_busd', '$'), 'capital spent since 2025' + (m.opex_busd_per_year != null ? ` · $${m.opex_busd_per_year.toFixed(1)}B a year to run the rail and BRT` : '')],
+    [big(m.daily_trips) + d('daily_trips'), 'daily transit trips (each trip counted once)'],
+    [big(m.all_boardings), `boardings a day${per ? `, ≈${per.toFixed(1)} per trip (each change of vehicle counts, feeder buses too)` : ''}: ${modes}`],
+    [big(m.jobs_45min) + d('jobs_45min'), 'jobs the average resident reaches by transit in 45 min'],
+    ['$' + m.capex_busd.toFixed(1) + 'B' + d('capex_busd', '$'), 'capital spent since 2025' + (m.opex_busd_per_year != null ? ` · $${m.opex_busd_per_year.toFixed(1)}B a year to run the rail and BRT` : '')],
   ].map(([a, b]) => `<div class="metric"><b>${a}</b><span>${b}</span></div>`).join('');
   const series = sc => sc.metrics.map(r => r.daily_trips);
   const all = series(S).concat(ref ? series(ref) : []).concat([2e6]), max = Math.max(...all) * 1.05;
@@ -573,7 +627,27 @@ function metrics() {
   const cv = series(S)[yi];
   svg += `<circle class="now" r="4" cx="${(yi / (D.years.length - 1) * 296 + 2).toFixed(1)}" cy="${yv(cv)}"/>`;
   $('spark').innerHTML = svg;
-  $('sparkKey').textContent = (ref ? `Daily trips. Solid: this plan · dashed: ${refName} · ` : 'Daily trips · ') + `${D.years[0]}–${D.years[D.years.length - 1]}`;
+  $('sparkKey').textContent = (ref ? `Daily trips. Solid: this plan · dashed: the ${refName} · ` : 'Daily trips · ') + `${D.years[0]}–${D.years[D.years.length - 1]}`;
+}
+// "What it means for you": the service and costs this plan models in the selected year, plainly,
+// and what the model leaves out. Frequencies are the lines' headways that year (webmap: runs[4]).
+function forYou() {
+  const Y = D.years[yi], m = S.metrics.find(r => r.year === Y), hw = {};
+  for (const [li, , , , h] of S.years[Y].runs) { const md = S.lines[li].mode; if (h) (hw[md] = hw[md] || []).push(h); }
+  const freq = ['metro', 'commuter', 'brt', 'streetcar'].filter(md => hw[md]).map(md => {
+    const lo = Math.round(Math.min(...hw[md])), hi = Math.round(Math.max(...hw[md]));
+    return `${MODE_NAME[md]} every ${lo === hi ? lo : lo + '–' + hi} min`; });
+  const pop = m.pop_m * 1e6, usd = v => '$' + Math.round(v).toLocaleString(), op = D.operating || {};
+  const cap = S.budget ? `the plan budgets <b>$${S.budget.toFixed(1)}B a year</b> for construction (2025 dollars). Spread over the region's ${m.pop_m.toFixed(1)}M residents in ${Y}, that is about <b>${usd(S.budget * 1e9 / pop)} per resident a year</b>. ` : '';
+  const run = m.opex_busd_per_year != null ? `Running the rail and BRT costs about $${m.opex_busd_per_year.toFixed(1)}B a year in ${Y}, about <b>${usd(m.opex_busd_per_year * 1e9 / pop)} per resident a year</b> (feeder buses not included). ` : '';
+  $('foryouBody').innerHTML =
+    `<p><b>How often (${Y}, as modelled):</b> ${freq.length ? freq.join('; ') : 'no lines run'}. These are rush-hour frequencies; a wait is counted as half the gap between vehicles, at most 12 min.</p>` +
+    `<p><b>Hours:</b> the model counts weekday rush-hour commutes only. Early-morning, late-night and weekend service is not modelled, so nothing here says what runs at 4:30 a.m. or 11 p.m.` +
+    (op.span_hours ? ` The operating cost assumes ${op.span_hours} hours of service a day at these frequencies, ${op.days_per_year} days a year.` : '') + `</p>` +
+    `<p><b>Cost:</b> ${cap}${run}Who pays (sales tax, federal grants, fares) is not decided here.</p>` +
+    `<p><b>Fares:</b> not modelled. The ridership model charges no fare, so read its numbers as if fares stay low enough not to change who rides; no fare level is proposed.</p>` +
+    `<p><b>Access:</b> new stations are assumed step-free (level boarding, ramps or lifts), as US law (the ADA) requires of new stations. Whether a walk to a station is lit, shaded or safe is not modelled.</p>` +
+    `<p class="hint">A hypothetical plan: nothing here is funded, scheduled or promised.</p>`;
 }
 function lineList() {
   // groups: each mode, then within it each region (where most of a line's stops are: Fort Worth,
@@ -594,7 +668,7 @@ function lineList() {
     h += `<label class="grp ${kind}"><input type="checkbox" data-grp="${gi}" ${on === g.length ? 'checked' : ''}>${name} <span class="n">${g.length}</span></label>`;
     if (kind === 'mode') return;
     for (const l of g) {
-      const v = l.value !== '' && l.value != null ? ` · ${l.value}/$M` : '';
+      const v = l.value !== '' && l.value != null ? ` · ${l.value}` : '';
       h += `<label class="li${l.first > Y ? ' future' : ''}" title="${(l.notes || '').replace(/"/g, '&quot;')}"><input type="checkbox" data-id="${l.id}" ${hidden.has(l.id) ? '' : 'checked'}>` +
         `<span class="sw" style="background:${l.color}"></span><span class="nm">${l.name}</span><span class="yr">${l.status === 'existing' ? 'today' : l.first}${v}</span></label>`;
     }
@@ -615,25 +689,41 @@ function lineList() {
 // station at one end): the demand model's access rules, exported per year by dfwt/tripplan.py,
 // pick up to k access and egress stations (walk, drive to a garage, feeder bus, bike, drop-off,
 // each with its minutes), and one Dijkstra runs from all the access stations at once to all the
-// egress stations. The planner shows the fastest trip in clock minutes; tripOpts.model ranks paths
-// by the model's perceived minutes instead (waits x wait.weight, out-of-vehicle time x ovtW, the
-// drive-to-transit constant), as riders in the ridership model choose them (for checks).
+// egress stations. Paths and access options are ranked by the model's perceived minutes (waits x
+// wait.weight, out-of-vehicle time x ovtW, the drive-to-transit constant), as riders in the
+// ridership model choose them, so the trip shown is the one the ridership counts; the minutes
+// shown are clock minutes. tripOpts.model = false ranks by clock minutes instead (for checks).
 let ends = [null, null];   // From, To: {sid} (a station) or {lat, lon, label} (an address or a point)
-const tripOpts = {pnr: true, bike: false, kiss: false, model: false};
+const tripOpts = {pnr: false, bike: false, kiss: false, model: true};
+try { const o = JSON.parse(localStorage.getItem('dfwt.tripOpts') || '{}'); for (const k of ['pnr', 'bike', 'kiss']) if (typeof o[k] === 'boolean') tripOpts[k] = o[k]; } catch (e) { /* no storage */ }
+// the access-station cap: wider than the model's (max_access_stations), since a cut on the nearest
+// stops can prune the station on the right line
+const K_MIN = 16;
+// a garage whose drive takes more than this share of the drive alone isn't offered (drive almost
+// all the way, then ride a stop or two)
+const PNR_MAX_SHARE = .6;
 const MODES = ['walk', 'pnr', 'feeder', 'bike', 'kiss'];
 const GEO_BOX = [-98.1, 32.2, -95.9, 33.6];   // lon/lat box addresses are searched in (the metroplex)
 const inBox = (lat, lon) => lon >= GEO_BOX[0] && lon <= GEO_BOX[2] && lat >= GEO_BOX[1] && lat <= GEO_BOX[3];
 const esc = s => String(s).replace(/[&<>"]/g, c => ({'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;'}[c]));
 const css = v => getComputedStyle(document.documentElement).getPropertyValue(v).trim();
 const hiddenKey = () => [...hidden].sort().join(',');
-const ptOf = e => e.sid ? {lat: D.stations[e.sid][1], lon: D.stations[e.sid][2], label: D.stations[e.sid][0], sid: e.sid} : e;
+// a station's name, with its line(s) where several stations share the name (stationList)
+const stLabel = sid => (S._label && S._label.get(sid)) || D.stations[sid][0];
+const ptOf = e => e.sid ? {lat: D.stations[e.sid][1], lon: D.stations[e.sid][2], label: stLabel(e.sid), sid: e.sid} : e;
 const endLabel = e => e ? ptOf(e).label : '';
 const onAt = (ts, Y) => { let n = 0; for (const t of ts) if (t <= Y) n++; return n % 2 === 1; };   // [on, off, on, ...] years
 const projXY = (T, lat, lon) => [(lon - T.proj[1]) * T.proj[2], (lat - T.proj[0]) * T.proj[3]];   // geo.Projector
-// the model's peak drive (demand.Zones.drive_min): straight-line km x circuity / speed x congestion + terminal minutes
+// the model's peak drive (demand.drive_minutes): road km = straight-line km x circuity; the first
+// localKm on local streets at localKmh, the rest on freeways at freewayKmh; the moving part x the
+// year's congestion, plus terminal minutes. (An older export has one average speed: km x perKm.)
 function driveMin(T, A, B, Y) {
-  const [ax, ay] = projXY(T, A.lat, A.lon), [bx, by] = projXY(T, B.lat, B.lon);
-  return Math.hypot(ax - bx, ay - by) * T.drive.perKm * T.cong[Y] + T.drive.terminal;
+  const [ax, ay] = projXY(T, A.lat, A.lon), [bx, by] = projXY(T, B.lat, B.lon), km = Math.hypot(ax - bx, ay - by), d = T.drive;
+  if (d.localKmh) {
+    const road = km * d.circuity, loc = Math.min(road, d.localKm);
+    return (loc / d.localKmh * 60 + (road - loc) / d.freewayKmh * 60) * T.cong[Y] + d.terminal;
+  }
+  return km * d.perKm * T.cong[Y] + d.terminal;
 }
 // feeder buses serve a zone (census block group) whose activity density reaches the threshold that year
 let zonePts = null;
@@ -708,11 +798,11 @@ function pathLegs(G, R) {
   for (let u = R.end; u >= 0; u = R.prev[u]) nodes.unshift(u);
   const key = n => n < G.nS ? 'P' + G.sids[n] : `L${G.info[n][0]}:${G.info[n][1]}`;
   const legs = [];
-  let min = -D.boardPenalty;
+  let min = 0, boarded = false;   // the first boarding pays no transfer penalty
   for (let i = 1; i < nodes.length; i++) {
     const u = nodes[i - 1], v = nodes[i];
     const e = G.adj[u].filter(x => x[0] === v).sort((a, b) => a[1] - b[1])[0];
-    if (u < G.nS && v >= G.nS) { legs.push({t: 'wait', ri: G.info[v][0], at: key(u), min: e[2]}); min += e[2] + D.boardPenalty; }
+    if (u < G.nS && v >= G.nS) { legs.push({t: 'wait', ri: G.info[v][0], at: key(u), min: e[2]}); min += e[2] + (boarded ? D.boardPenalty : 0); boarded = true; }
     else if (u >= G.nS && v >= G.nS) {
       const l = legs[legs.length - 1], ri = G.info[v][0];
       if (l && l.t === 'ride' && l.ri === ri) { l.to = key(v); l.min += e[1]; } else legs.push({t: 'ride', ri, from: key(u), to: key(v), min: e[1]});
@@ -723,9 +813,11 @@ function pathLegs(G, R) {
   return {legs, min, a: nodes[0], b: st};
 }
 // access (or egress) stations from a point, as demand.Access picks them: each station's best mode
-// by clock minutes (perceived with tripOpts.model; ties to the earlier mode: walk, drive, feeder, bike, drop-off), then the
-// nearest stop of each line run, best first, up to k (demand._diverse_nearest)
-function connectors(G, T, R, Y, p, egress) {
+// by perceived minutes (clock with tripOpts.model false; ties to the earlier mode: walk, drive, feeder, bike, drop-off),
+// then the nearest stop of each line run, best first, up to K_MIN or the model's k, whichever is more.
+// `drive`: the drive alone; a garage the drive mostly reaches anyway is left out (PNR_MAX_SHARE).
+// `every`: every station within reach, unpruned (clockBest: the fastest trip there is).
+function connectors(G, T, R, Y, p, egress, drive, every) {
   const [px, py] = projXY(T, p.lat, p.lon), c = T.cong[Y], feed = R.feeder && feedAt(T, p, Y), best = [];
   for (let i = 0; i < G.nS; i++) {
     const d = Math.hypot(G.xy[i][0] - px, G.xy[i][1] - py);
@@ -733,7 +825,8 @@ function connectors(G, T, R, Y, p, egress) {
     const opt = (m, t, o, x = 0) => { const gen = tripOpts.model ? t + T.ovtW * o + x : t; if (!b || gen < b[0]) b = [gen, t, m, d]; };
     if (d <= R.walkKm) { const t = d * R.walkPerKm; opt(0, t, t); }
     const pr = R.pnr, gar = T.garages[G.sids[i]];
-    if (!egress && tripOpts.pnr && gar && onAt(gar, Y) && d <= pr.maxKm && d >= pr.minKm) opt(1, d * pr.perKm * c + pr.pen, pr.pen, T.pnrPen);
+    if (!egress && tripOpts.pnr && gar && onAt(gar, Y) && d <= pr.maxKm && d >= pr.minKm && !(d * pr.perKm * c > PNR_MAX_SHARE * drive))
+      opt(1, d * pr.perKm * c + pr.pen, pr.pen, T.pnrPen);
     const f = R.feeder;
     if (feed && d <= f.maxKm && (!egress || f.egress)) opt(2, f.ovt + d * f.perKm * c, f.ovt);
     const bk = R.bike;
@@ -742,6 +835,7 @@ function connectors(G, T, R, Y, p, egress) {
     if (!egress && kr && tripOpts.kiss && d <= kr.maxKm) opt(4, d * kr.perKm * c + kr.pen, kr.pen);
     best.push(b);
   }
+  if (every) return best.map((b, i) => b && {i, gen: b[0], t: b[1], mode: MODES[b[2]], km: b[3]}).filter(Boolean);   // no pruning
   const cand = [];
   for (const st of G.runSt) {
     let bi = -1;
@@ -749,14 +843,14 @@ function connectors(G, T, R, Y, p, egress) {
     if (bi >= 0) cand.push(bi);
   }
   cand.sort((a, b) => best[a][0] - best[b][0]);
-  return cand.slice(0, T.k).map(i => ({i, gen: best[i][0], t: best[i][1], mode: MODES[best[i][2]], km: best[i][3]}));
+  return cand.slice(0, Math.max(T.k, K_MIN)).map(i => ({i, gen: best[i][0], t: best[i][1], mode: MODES[best[i][2]], km: best[i][3]}));
 }
 // one year, door to door: {total (clock min) or null, drive, legs, acc, egr, gi}
-function doorYear(Y, A, B) {
+function doorYear(Y, A, B, every = false) {
   const T = S.trip, gi = S.yearGraph[Y], drive = driveMin(T, A, B, Y);
   if (gi === undefined) return {total: null, drive};
   const G = tripGraph(gi), R = T.rules[T.yearRules[Y]];
-  const acc = connectors(G, T, R, Y, A, false), egr = connectors(G, T, R, Y, B, true);
+  const acc = connectors(G, T, R, Y, A, false, drive, every), egr = connectors(G, T, R, Y, B, true, drive, every);
   if (!acc.length || !egr.length) return {total: null, drive, none: !acc.length ? 'from' : 'to'};
   const src = new Map(), tgt = new Map();
   for (const a of acc) if (!(src.get(a.i) <= a.gen)) src.set(a.i, a.gen);
@@ -828,23 +922,117 @@ function replan(fit) {
   const e = a || b;
   endMark(e, a ? 'A' : 'B');
   if (fit && !e.sid) map.panTo([e.lat, e.lon]);
-  $('trip').innerHTML = `<p class="hint">${a ? 'From' : 'To'} <b>${esc(endLabel(e))}</b>. Now ${a ? 'click a destination station or type an address' : 'choose where from'}.${clearBtn}</p>`;
+  if (a && !a.sid) tripOptions();
+  $('trip').innerHTML = `<p class="hint">${a ? 'From' : 'To'} <b>${esc(endLabel(e))}</b>. Now ${a ? 'click a destination station or type an address' : 'choose where from'}.${clearBtn}</p>` +
+    (a && !a.sid ? nearLine(a) : '');
   showTrip();
 }
-// the ride itself: list rows, and the route drawn through the stops it rides
+// a ride drawn along its line's track: hop by hop through the line's open pieces (S.stPiece places
+// each station on a piece; a shortest path joins pieces where a hop spans several). A hop that
+// can't be traced, or whose trace wanders far from the straight hop, is drawn straight.
+const kmXY = p => [p[0] * 111.32 * Math.cos(32.8 * Math.PI / 180), p[1] * 110.57];   // [lon, lat] -> km
+function pieceCum(pi) {
+  S._cum = S._cum || [];
+  if (!S._cum[pi]) { const g = D.geoms[S.pieces[pi][0]], c = [0];
+    for (let i = 1; i < g.length; i++) { const a = kmXY(g[i - 1]), b = kmXY(g[i]); c.push(c[i - 1] + Math.hypot(b[0] - a[0], b[1] - a[1])); }
+    S._cum[pi] = c; }
+  return S._cum[pi];
+}
+// where along piece pi (km from its start) the point q ([lon, lat]) is
+function alongPiece(pi, q) {
+  const g = D.geoms[S.pieces[pi][0]], c = pieceCum(pi), Q = kmXY(q);
+  let best = Infinity, at = 0;
+  for (let i = 1; i < g.length; i++) {
+    const a = kmXY(g[i - 1]), b = kmXY(g[i]), dx = b[0] - a[0], dy = b[1] - a[1], L2 = dx * dx + dy * dy;
+    const t = L2 ? Math.max(0, Math.min(1, ((Q[0] - a[0]) * dx + (Q[1] - a[1]) * dy) / L2)) : 0;
+    const d = Math.hypot(a[0] + t * dx - Q[0], a[1] + t * dy - Q[1]);
+    if (d < best) { best = d; at = c[i - 1] + t * (c[i] - c[i - 1]); }
+  }
+  return at;
+}
+// piece pi from s0 to s1 km (either direction) as [lat, lon] points
+function pieceSlice(pi, s0, s1) {
+  const g = D.geoms[S.pieces[pi][0]], c = pieceCum(pi);
+  const at = s => { let i = 1; while (i < g.length - 1 && c[i] < s) i++; const w = c[i] > c[i - 1] ? Math.max(0, Math.min(1, (s - c[i - 1]) / (c[i] - c[i - 1]))) : 0;
+    return [g[i - 1][1] + w * (g[i][1] - g[i - 1][1]), g[i - 1][0] + w * (g[i][0] - g[i - 1][0])]; };
+  const out = [at(s0)];
+  if (s0 <= s1) { for (let i = 0; i < g.length; i++) if (c[i] > s0 && c[i] < s1) out.push([g[i][1], g[i][0]]); }
+  else { for (let i = g.length - 1; i >= 0; i--) if (c[i] < s0 && c[i] > s1) out.push([g[i][1], g[i][0]]); }
+  out.push(at(s1));
+  return out;
+}
+function trackPts(li, stops, Y) {
+  const mine = new Set();
+  S.pieces.forEach(([, users], pi) => { for (const [l, yr, until] of users) if (l === li && yr <= Y && !(until && Y >= until)) mine.add(pi); });
+  const ll = sid => [D.stations[sid][1], D.stations[sid][2]];
+  const locate = sid => { for (const c of (S.stPiece && S.stPiece[sid]) || []) if (mine.has(c[0])) return {pi: c[0], s: alongPiece(c[0], [c[2], c[3]])}; return null; };
+  const len = pi => { const c = pieceCum(pi); return c[c.length - 1]; };
+  const nodeOf = (pi, e) => { const g = D.geoms[S.pieces[pi][0]], p = e ? g[g.length - 1] : g[0]; return p[0].toFixed(5) + ',' + p[1].toFixed(5); };
+  const hop = (sa, sb) => {
+    const a = locate(sa), b = locate(sb);
+    if (!a || !b) return null;
+    if (a.pi === b.pi) return pieceSlice(a.pi, a.s, b.s);
+    // Dijkstra over piece end nodes (the graph is one line: small)
+    const dist = new Map(), prev = new Map(), q = [];
+    const relax = (n, d, from) => { if (d < (dist.get(n) ?? Infinity)) { dist.set(n, d); prev.set(n, from); q.push([d, n]); } };
+    relax(nodeOf(a.pi, 0), a.s, null); relax(nodeOf(a.pi, 1), len(a.pi) - a.s, null);
+    const adj = new Map();
+    for (const pi of mine) if (pi !== a.pi && pi !== b.pi) for (const e of [0, 1]) {
+      const n = nodeOf(pi, e); if (!adj.has(n)) adj.set(n, []); adj.get(n).push([pi, e]);
+    }
+    while (q.length) {
+      q.sort((x, y) => y[0] - x[0]); const [d, n] = q.pop();
+      if (d > dist.get(n)) continue;
+      for (const [pi, e] of adj.get(n) || []) relax(nodeOf(pi, 1 - e), d + len(pi), [n, pi, e]);
+    }
+    const tA = (dist.get(nodeOf(b.pi, 0)) ?? Infinity) + b.s, tB = (dist.get(nodeOf(b.pi, 1)) ?? Infinity) + len(b.pi) - b.s;
+    if (!isFinite(Math.min(tA, tB))) return null;
+    const viaStart = tA <= tB, entry = nodeOf(b.pi, viaStart ? 0 : 1), chain = [];
+    for (let n = entry; prev.get(n); n = prev.get(n)[0]) chain.unshift(prev.get(n));
+    // leave a's piece by the end the path starts from (a loop piece: the nearer way)
+    const src = chain.length ? chain[0][0] : entry, n0 = nodeOf(a.pi, 0), n1 = nodeOf(a.pi, 1);
+    const toEnd = src === n1 && (src !== n0 || len(a.pi) - a.s < a.s);
+    let pts = pieceSlice(a.pi, a.s, toEnd ? len(a.pi) : 0);
+    for (const [, pi, e] of chain) pts = pts.concat(pieceSlice(pi, e ? len(pi) : 0, e ? 0 : len(pi)));
+    return pts.concat(pieceSlice(b.pi, viaStart ? 0 : len(b.pi), b.s));
+  };
+  let out = [];
+  for (let k = 1; k < stops.length; k++) {
+    const A = ll(stops[k - 1]), B = ll(stops[k]);
+    let P = hop(stops[k - 1], stops[k]);
+    if (P) {   // a trace much longer than the hop has gone the wrong way round: draw it straight
+      let L = 0; for (let i = 1; i < P.length; i++) { const u = kmXY([P[i - 1][1], P[i - 1][0]]), v = kmXY([P[i][1], P[i][0]]); L += Math.hypot(v[0] - u[0], v[1] - u[1]); }
+      const u = kmXY([A[1], A[0]]), v = kmXY([B[1], B[0]]);
+      if (L > 2.5 * Math.hypot(v[0] - u[0], v[1] - u[1]) + 1) P = null;
+    }
+    out = out.concat(P || [A, B]);
+  }
+  return out.length ? out : stops.map(ll);
+}
+// a ride leg names its vehicle and how often it comes (the model's headway that year)
+const rideKind = (ln, hw) => `<span class="hint">(${MODE_NAME[ln.mode] || ln.mode}${hw ? `, every ${Math.round(hw)} min` : ''})</span>`;
+// the ride itself: list rows, and the route drawn along the track it rides
 function transitLegs(legs, yd) {
+  const Y = D.years[yi];
   const sidOf = n => n[0] === 'P' ? n.slice(1) : yd.runs[+n.slice(1).split(':')[0]][1][+n.split(':')[1]];
-  const runPts = (ri, f, t) => { const k0 = +f.split(':')[1], k1 = +t.split(':')[1], st = yd.runs[ri][1];
-    return (k0 <= k1 ? st.slice(k0, k1 + 1) : st.slice(k1, k0 + 1).reverse()).map(s => [D.stations[s][1], D.stations[s][2]]); };
+  const runStops = (ri, f, t) => { const k0 = +f.split(':')[1], k1 = +t.split(':')[1], st = yd.runs[ri][1];
+    return k0 <= k1 ? st.slice(k0, k1 + 1) : st.slice(k1, k0 + 1).reverse(); };
   const tripW = 6 * zf();
   let h = '';
   for (const l of legs) {
-    if (l.t === 'ride') { const ln = S.lines[yd.runs[l.ri][0]], f = sidOf(l.from), t = sidOf(l.to);
-      h += `<div class="leg"><i style="background:${ln.color}"></i><span><b>${ln.name}</b> ${D.stations[f][0]} → ${D.stations[t][0]} · ${Math.round(l.min)} min</span></div>`;
-      const pts = runPts(l.ri, l.from, l.to);
+    if (l.t === 'ride') { const run = yd.runs[l.ri], ln = S.lines[run[0]], f = sidOf(l.from), t = sidOf(l.to);
+      h += `<div class="leg"><i style="background:${ln.color}"></i><span><b>${esc(ln.name)}</b> ${rideKind(ln, run[4])} ${esc(stLabel(f))} → ${esc(stLabel(t))} · ${Math.round(l.min)} min</span></div>`;
+      const pts = trackPts(run[0], runStops(l.ri, l.from, l.to), Y);
       L.polyline(pts, {renderer: tripR, pane: 'trip', color: bgColor, weight: tripW + 4, lineJoin: 'round', interactive: false}).addTo(tripLayer);
       L.polyline(pts, {renderer: tripR, pane: 'trip', color: lineColor(ln.color, ln.mode), weight: tripW, lineJoin: 'round', interactive: false}).addTo(tripLayer); }
-    else if (l.t === 'walk') h += `<div class="leg"><i style="background:var(--rule)"></i><span>Walk ${D.stations[sidOf(l.from)][0]} → ${D.stations[sidOf(l.to)][0]} · ${Math.round(l.min)} min</span></div>`;
+    else if (l.t === 'walk') {
+      const f = sidOf(l.from), t = sidOf(l.to), m = Math.round(l.min);
+      L.polyline([[D.stations[f][1], D.stations[f][2]], [D.stations[t][1], D.stations[t][2]]],   // the walk between platforms
+        {renderer: tripR, pane: 'trip', lineCap: 'round', interactive: false, color: css('--ink'), dashArray: '1 7', weight: 4}).addTo(tripLayer);
+      h += `<div class="leg"><i style="background:var(--rule)"></i><span>` + (D.stations[f][0] === D.stations[t][0]
+        ? `Change at ${esc(D.stations[f][0])} (short walk${m >= 1 ? ', ' + m + ' min' : ''})`
+        : `Walk ${esc(stLabel(f))} → ${esc(stLabel(t))} · ${m} min`) + `</span></div>`;
+    }
     else h += `<div class="leg"><i style="background:var(--rule)"></i><span class="hint">Wait about ${Math.round(l.min)} min</span></div>`;
   }
   return h;
@@ -866,15 +1054,16 @@ function route() {
     for (const [v, w, info] of adj.get(u) || []) { const nd = d + w; if (nd < (dist.get(v) ?? Infinity)) { dist.set(v, nd); prev.set(v, [u, info]); heap.push([nd, v]); } }
   }
   tripLayer.clearLayers(); dimNetwork(false); if (window.Schem) Schem.trip(null, null, pick);  // schematic: clear the diagram route
-  const A = D.stations[a][0], B = D.stations[b][0], clear = clearBtn;
+  const A = esc(stLabel(a)), B = esc(stLabel(b)), clear = clearBtn;
   const served = s => yd.runs.some(([, stops]) => stops.includes(s));
   if (a === b || !dist.has('P' + b)) {
+    const first = s => { const o = stationOpen()[s]; const y = o ? Math.min(...Object.values(o)) : null; return y > Y ? ` It opens in ${y}.` : ''; };
     const why = a === b ? 'That is the same station twice; pick a different destination.'
-      : !served(a) || !served(b) ? `${!served(a) ? A : B} has no service in ${Y} in this plan.`
+      : !served(a) || !served(b) ? `${!served(a) ? A : B} has no service in ${Y} in this plan.` + first(!served(a) ? a : b)
       : `No route from ${A} to ${B} in ${Y}.` + (yi < D.years.length - 1 ? ' Try a later year.' : '');
     if (a !== b) pick.forEach(pickMark);
     $('trip').innerHTML = `<p class="hint">${why}${clear}</p>` + (a !== b ? chartBox() : '');
-    if (a === b) { pick = [a]; ends[1] = null; } else tripChart(tripSeries());
+    if (a === b) { pick = [a]; ends[1] = null; syncInputs(); pick.forEach(pickMark); } else tripChart(tripSeries());
     showTrip(); return;
   }
   const path = []; let u = 'P' + b; while (prev.has(u)) { const [p, info] = prev.get(u); path.unshift([p, u, info]); u = p; }
@@ -885,7 +1074,7 @@ function route() {
     else if (info.t === 'walk') legs.push({t: 'walk', from: p, to: v, min: w});
     else if (info.t === 'board') legs.push({t: 'wait', ri: info.ri, at: p, min: w - D.boardPenalty});
   }
-  const total = dist.get('P' + b) - D.boardPenalty;
+  const total = dist.get('P' + b) - (legs.some(l => l.t === 'wait') ? D.boardPenalty : 0);   // the first boarding is no transfer
   let h = `<div class="tot">${A} → ${B}: ${Math.round(total)} min</div><div class="hint">${Y} network, station to station` +
     (hidden.size ? ', without the hidden lines' : '') + `.${clear}</div>`;
   h += transitLegs(legs, yd);
@@ -900,8 +1089,8 @@ const legStyle = kind => ({walk: {color: css('--ink'), dashArray: '1 7', weight:
   bus: {color: css('--bus'), dashArray: '6 4 1 4', weight: 3.5}, bike: {color: css('--good'), dashArray: '4 5', weight: 3.5}}[kind]);
 function accessRow(c, p, egress, R) {
   if (c.t < 0.5 && c.mode === 'walk') return '';   // the trip starts or ends at the station itself
-  const [verb, kind] = ACCESS[c.mode], st = D.stations[c.sid][0];
-  const what = c.mode === 'pnr' ? `${verb} ${Math.round(c.t)} min to the ${st} garage`
+  const [verb, kind] = ACCESS[c.mode], st = esc(stLabel(c.sid));
+  const what = c.mode === 'pnr' ? `${verb} ${Math.round(c.t)} min to ${/^the\s/i.test(st) ? '' : 'the '}${st} garage`
     : egress ? `${verb} ${Math.round(c.t)} min from ${st}` : `${verb} ${Math.round(c.t)} min to ${st}`;
   const note = c.mode === 'feeder' ? ` <span class="hint">(every ${R.feeder.headway} min; walk to the stop and wait included)</span>`
     : c.mode === 'pnr' ? ' <span class="hint">(park and walk in included)</span>' : '';
@@ -913,7 +1102,8 @@ function doorRoute(fit) {
   const Y = D.years[yi], [ea, eb] = ends, A = ptOf(ea), B = ptOf(eb), ser = tripSeries(), r = ser[yi];
   tripLayer.clearLayers(); dimNetwork(false);
   const head = `<div class="hint">${Y} network, door to door` + (hidden.size ? ', without the hidden lines' : '') + `.${clearBtn}</div>`;
-  const drive = `<div class="hint">Driving alone at rush hour: about <b>${Math.round(r.drive)} min</b>.</div>`;
+  const drive = `<div class="hint">Rush-hour drive (estimate): about <b>${Math.round(r.drive)} min</b> driving alone, parking included.</div>`;
+  const near = ea.sid ? '' : nearLine(A);
   tripOptions();
   if (r.total === null) {
     pick = [ea, eb].filter(e => e.sid).map(e => e.sid);
@@ -923,14 +1113,20 @@ function doorRoute(fit) {
     const R = S.trip.rules[S.trip.yearRules[Y]];
     const why = r.none ? `No station of this plan's ${Y} network is within reach of ${esc(r.none === 'from' ? A.label : B.label)} ` +
       `(the model walks up to ${R.walkKm} km` + (r.none === 'from' && tripOpts.pnr ? `, drives up to ${R.pnr.maxKm} km to a garage` : '') +
-      (R.feeder ? `, takes a feeder bus up to ${R.feeder.maxKm} km where it's dense enough` : '') + ').'
+      (R.feeder ? `, takes a feeder bus up to ${R.feeder.maxKm} km where it's dense enough` : '') + ').' +
+      (r.none === 'from' && !tripOpts.pnr ? ' If you can drive to a station, tick “I can drive to a station”.' : '')
       : `No transit route from ${esc(A.label)} to ${esc(B.label)} in ${Y}.`;
-    $('trip').innerHTML = `<p class="hint">${why}${first > 0 ? ` The first comes in ${D.years[first]}.` : ''}${clearBtn}</p>` + drive + chartBox();
+    $('trip').innerHTML = `<p class="hint">${why}${first > 0 ? ` The first comes in ${D.years[first]}.` : ''}${clearBtn}</p>` + near + drive + chartBox();
   } else {
     const yd = S.graphs[r.gi];
     let h = `<div class="tot">${esc(A.label)} → ${esc(B.label)}: ${Math.round(r.total)} min</div>` + head;
+    // the trip shown is the one the model's riders pick; is any transit trip faster than the car?
+    const fast = tripOpts.model ? clockBest(Y, A, B) : r, best = Math.min(r.total, fast.total ?? Infinity);
+    const slower = best > r.drive;
+    if (slower) h += `<div class="drivefirst">Driving alone is faster this year: about <b>${Math.round(r.drive)} min</b> (rush-hour drive, estimate), against ${Math.round(best)} min by the fastest transit trip.</div>`;
     h += accessRow(r.acc, A, false, r.rule) + transitLegs(r.legs, yd) + accessRow(r.egr, B, true, r.rule);
-    h += drive + '<div class="hint note">Getting to and from stations is estimated as the model does it: straight-line distance, average speeds, feeder buses standing in for local routes.</div>';
+    if (fast.total !== null && Math.round(fast.total) <= Math.round(r.total) - 3) h += `<div class="hint note">A trip of ${Math.round(fast.total)} min exists too, with more waiting, walking or driving, which riders weigh more heavily than time on board; this is the trip the ridership model counts.</div>`;
+    h += near + (slower ? '' : drive) + selfPowered(A, B, r.rule) + '<div class="hint note">Getting to and from stations is estimated as the model does it: straight-line distance, average speeds, feeder buses standing in for local routes. Waits and frequencies are for the weekday rush; late-night and weekend service is not modelled.</div>';
     pick = [r.acc.sid, r.egr.sid];
     endMark(ea, 'A'); endMark(eb, 'B');
     dimNetwork(true);
@@ -946,14 +1142,57 @@ function doorRoute(fit) {
   }
   showTrip();
 }
+// short trips: walking (or biking, if ticked) the whole way, at the model's access speeds
+function selfPowered(A, B, R) {
+  const T = S.trip, [ax, ay] = projXY(T, A.lat, A.lon), [bx, by] = projXY(T, B.lat, B.lon), d = Math.hypot(ax - bx, ay - by), out = [];
+  if (d <= 2.5) out.push(`walking the whole way about ${Math.round(d * R.walkPerKm)} min`);
+  if (R.bike && tripOpts.bike && d <= R.bike.maxKm) out.push(`biking the whole way about ${Math.round(d * R.bike.perKm)} min`);
+  return out.length ? `<div class="hint">Or: ${out.join('; ')}.</div>` : '';
+}
+// the fastest trip in clock minutes, from every station within reach (the model ranks by perceived minutes)
+function clockBest(Y, A, B) { const m = tripOpts.model; tripOpts.model = false; try { return doorYear(Y, A, B, true); } finally { tripOpts.model = m; } }
+// "Nearest: Lovers Lane (Red, Orange) 0.6 km · runs today": the nearest stations the model's access rules
+// reach from p in the selected year (walk, feeder bus, garage if driving is ticked, bike / drop-off if
+// ticked), or the first year one comes within reach
+function nearLine(p) {
+  const T = S.trip, Y = D.years[yi], [px, py] = projXY(T, p.lat, p.lon), op = stationOpen();
+  const reach = Y2 => {
+    const R = T.rules[T.yearRules[Y2]], feed = R.feeder && feedAt(T, p, Y2), out = [], seen = new Map();
+    for (const [li, stops] of S.years[Y2].runs) if (!hidden.has(S.lines[li].id)) for (const sid of stops) {
+      if (!seen.has(sid)) seen.set(sid, new Set()); seen.get(sid).add(li);
+    }
+    for (const [sid, lis] of seen) {
+      const [x, y] = projXY(T, D.stations[sid][1], D.stations[sid][2]), d = Math.hypot(x - px, y - py), gar = T.garages[sid];
+      const how = d <= R.walkKm ? 'on foot' : feed && d <= R.feeder.maxKm ? 'feeder bus'
+        : tripOpts.pnr && gar && onAt(gar, Y2) && d <= R.pnr.maxKm && d >= R.pnr.minKm ? 'car (garage)'
+        : tripOpts.bike && R.bike && d <= R.bike.maxKm ? 'bike' : tripOpts.kiss && R.kiss && d <= R.kiss.maxKm ? 'getting dropped off' : null;
+      if (how) out.push({sid, d, how, lis});
+    }
+    return out.sort((a, b) => a.d - b.d);
+  };
+  const lines = lis => [...lis].map(li => S.lines[li].name.replace(/ Line$/, '')).filter((v, i, a) => a.indexOf(v) === i);
+  const say = c => { const o = op[c.sid] || {}, y0 = Math.min(...Object.values(o)), ls = lines(c.lis);
+    return `<b>${esc(stLabel(c.sid))}</b> (${esc(ls.slice(0, 3).join(', '))}${ls.length > 3 ? ', …' : ''}) ${c.d.toFixed(1)} km${c.how === 'on foot' ? '' : ' by ' + c.how} · ` +
+      (y0 <= D.years[0] ? 'runs today' : `open since ${y0}`); };
+  const now = reach(Y);
+  if (now.length) return `<div class="hint near">Nearest: ${now.slice(0, 2).map(say).join('; ')}.</div>`;
+  for (let i = yi + 1; i < D.years.length; i++) {
+    const later = reach(D.years[i]);
+    if (later.length) { const c = later[0], ls = lines(c.lis);
+      return `<div class="hint near">No station within reach in ${Y}. The first within reach opens in <b>${D.years[i]}</b>: ${esc(stLabel(c.sid))} (${esc(ls.slice(0, 3).join(', '))}), ${c.d.toFixed(1)} km${c.how === 'on foot' ? '' : ' by ' + c.how}.</div>`; }
+  }
+  return `<div class="hint near">No station of this plan comes within reach by ${D.years[D.years.length - 1]}` + (tripOpts.pnr ? '.' : ' (without driving to one).') + '</div>';
+}
 // which ways of reaching a station the traveller has: driving to a garage, and the levers this plan
 // enables in some year (bike or scooter, getting dropped off)
 function tripOptions() {
   const T = S.trip, any = k => T.rules.some(r => r[k]);
   const box = (k, label) => `<label><input type="checkbox" data-o="${k}" ${tripOpts[k] ? 'checked' : ''}> ${label}</label>`;
-  $('tripOpts').innerHTML = '<span>Reach stations by:</span>' + box('pnr', 'driving to a garage') + (any('bike') ? box('bike', 'bike or scooter') : '') + (any('kiss') ? box('kiss', 'drop-off') : '');
+  $('tripOpts').innerHTML = box('pnr', 'I can drive to a station') + (any('bike') ? box('bike', 'bike or scooter') : '') + (any('kiss') ? box('kiss', 'I can get dropped off') : '');
   $('tripOpts').hidden = false;
-  $('tripOpts').querySelectorAll('input').forEach(i => i.onchange = () => { tripOpts[i.dataset.o] = i.checked; replan(false); });
+  $('tripOpts').querySelectorAll('input').forEach(i => i.onchange = () => { tripOpts[i.dataset.o] = i.checked;
+    try { localStorage.setItem('dfwt.tripOpts', JSON.stringify({pnr: tripOpts.pnr, bike: tripOpts.bike, kiss: tripOpts.kiss})); } catch (e) { /* no storage */ }
+    replan(false); });
 }
 
 // ---- the trip, year by year: transit door to door (solid) and driving alone (dashed) ----
@@ -981,8 +1220,8 @@ function tripChart(ser) {
   svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
   svg.innerHTML = g;
   const say = i => { const s = ser[i];
-    return `<b>${D.years[i]}</b>: ` + (s.total !== null ? `transit ${Math.round(s.total)} min` : 'no transit route') + ` · driving ${Math.round(s.drive)} min`; };
-  const keyText = say(yi) + '. Solid: transit · dashed: driving alone. Tap or click a year to go there.';
+    return `<b>${D.years[i]}</b>: ` + (s.total !== null ? `transit ${Math.round(s.total)} min` : 'no transit route') + ` · rush-hour drive ${Math.round(s.drive)} min`; };
+  const keyText = say(yi) + '. Solid: transit · dashed: rush-hour drive (estimate). Tap or click a year to go there.';
   $('tchartKey').innerHTML = keyText;
   const at = e => { const rc = svg.getBoundingClientRect(), x = (e.clientX - rc.left) / rc.width * W; return Math.max(0, Math.min(n - 1, Math.round((x - l) / (W - l - r) * (n - 1)))); };
   svg.onpointermove = svg.onpointerdown = e => {
@@ -1042,6 +1281,7 @@ function combo(i) {
     items = q ? stations(q) : []; msg = ''; act = -1;
     const ll = q.match(/^(-?\d{1,3}\.\d+)\s*[, ]\s*(-?\d{1,3}\.\d+)$/);   // "32.78, -96.80"
     if (ll && inBox(+ll[1], +ll[2])) items.unshift({lat: +ll[1], lon: +ll[2], label: `${(+ll[1]).toFixed(5)}, ${(+ll[2]).toFixed(5)}`, coords: true});
+    else if (ll) msg = `That point is outside the area this plan covers (the Dallas–Fort Worth region, latitude ${GEO_BOX[1]}–${GEO_BOX[3]}, longitude ${GEO_BOX[0]} to ${GEO_BOX[2]}).`;
     else if (q.length >= 3) { msg = 'Searching addresses…'; timer = setTimeout(() => search(q), 350); }
     render();
   });
@@ -1052,7 +1292,7 @@ function combo(i) {
     } else if (e.key === 'Enter') {
       const q = inp.value.trim(), exact = S._byName.get(q);
       if (act >= 0) take(items[act]); else if (exact) take({sid: exact}); else if (items.length) take(items[0]);
-      else if (q.length >= 3) { clearTimeout(timer); search(q).then(() => { if (items.length && inp.value.trim() === q) take(items[0]); }); }
+      else if (q.length >= 3 && !msg.startsWith('That point')) { clearTimeout(timer); search(q).then(() => { if (items.length && inp.value.trim() === q) take(items[0]); }); }
       e.preventDefault();
     } else if (e.key === 'Escape') close();
   });
@@ -1089,12 +1329,36 @@ map.on('contextmenu', e => {
     ends[i] = p; syncInputs(); replan(false); nameOf(p);
   };
 });
-// station names for the From / To search (stations this plan ever serves)
+// station names for the From / To search (stations this plan ever serves). Where several
+// stations share a name, each gets its line(s) in brackets ("Pearl (I-20 Crosstown)"): the lines
+// only it serves among them, or else all of its lines; as a last resort a compass direction.
 function stationList() {
-  const ids = new Set(Object.values(S.years).flatMap(g => g.runs.flatMap(r => r[1])));
-  const byName = new Map();
-  for (const s of ids) if (!byName.has(D.stations[s][0])) byName.set(D.stations[s][0], s);
-  S._byName = byName;
+  const lines = new Map();
+  for (const g of S.graphs) for (const [li, stops] of g.runs) for (const s of stops) {
+    if (!lines.has(s)) lines.set(s, new Set()); lines.get(s).add(S.lines[li].name);
+  }
+  const groups = new Map();
+  for (const s of lines.keys()) { const nm = D.stations[s][0]; if (!groups.has(nm)) groups.set(nm, []); groups.get(nm).push(s); }
+  const byName = new Map(), label = new Map();
+  for (const [nm, ss] of groups) {
+    if (ss.length === 1) { byName.set(nm, ss[0]); continue; }
+    const all = s => [...lines.get(s)].sort(), common = all(ss[0]).filter(x => ss.every(s => lines.get(s).has(x)));
+    const tag = s => { const own = all(s).filter(x => !common.includes(x)), ls = own.length ? own : all(s);
+      return ls.slice(0, 2).join(', ') + (ls.length > 2 ? ', …' : ''); };
+    const tags = ss.map(tag);
+    ss.forEach((s, k) => {
+      let t = tags[k];
+      if (tags.filter(x => x === t).length > 1) {   // same lines: say where it is relative to the group's middle
+        const la = ss.reduce((a, x) => a + D.stations[x][1], 0) / ss.length, lo = ss.reduce((a, x) => a + D.stations[x][2], 0) / ss.length;
+        const dy = D.stations[s][1] - la, dx = (D.stations[s][2] - lo) * Math.cos(la * Math.PI / 180);
+        t += (t ? ', ' : '') + (Math.abs(dy) > Math.abs(dx) ? (dy > 0 ? 'north' : 'south') : (dx > 0 ? 'east' : 'west'));
+      }
+      let lb = `${nm} (${t})`;
+      if (byName.has(lb)) lb = `${nm} (${t}, ${s})`;
+      label.set(s, lb); byName.set(lb, s);
+    });
+  }
+  S._byName = byName; S._label = label;
 }
 stationList();
 $('slider').oninput = e => { yi = +e.target.value; draw(); };

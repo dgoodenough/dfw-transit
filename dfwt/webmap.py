@@ -61,6 +61,20 @@ def line_extras(net, ln):
     return out
 
 
+def station_grades(net):
+    """Where each station's platform is, per mode, when it isn't at street level: station_id ->
+    {mode: grade} from the grade of the segments on either side of it (a stop next to a tunnel
+    segment is underground, as network.stop_cost prices it; likewise elevated)."""
+    out = {}
+    for ln in net.lines.values():
+        for i, sid in enumerate(ln.stop_ids):
+            near = {ln.segments[k].grade for k in (i - 1, i) if 0 <= k < len(ln.segments)}
+            g = "tunnel" if "tunnel" in near else next((x for x in sorted(near) if x != "surface"), None)
+            if g:
+                out.setdefault(sid, {})[ln.mode] = g
+    return out
+
+
 def drawn(net):
     """The map's shared-track pieces (bundle.pieces) and where each station sits on them
     (bundle.station_pieces). A rerouted line draws its old track too, until the new one opens."""
@@ -123,7 +137,8 @@ def write(nets, evals, out_path):
             wcap = cfg["wait"]["max_wait_min"]
             for run in g.runs:
                 wait = min(run.line.headway_at(y) * cfg["wait"]["fraction_of_headway"], wcap)
-                runs.append([lix[run.line.id], run.stops, [round(t, 2) for t in run.hop_min], round(wait, 1)])
+                runs.append([lix[run.line.id], run.stops, [round(t, 2) for t in run.hop_min], round(wait, 1),
+                             round(run.line.headway_at(y), 1)])
             walks = []
             for i in range(g.n_st):
                 for j, w, kind in g.adj[i]:
@@ -138,12 +153,16 @@ def write(nets, evals, out_path):
         scen[key] = {"label": LABELS.get(key, key), "lines": lines, "pieces": pieces, "stPiece": st_piece, "graphs": graphs, "yearGraph": years,
                      "metrics": ev["years"],
                      "boardings": {r["station_id"]: r["boardings_final"] for r in ev["stations"]},
+                     "grades": station_grades(net),
+                     # "What it means for you": the plan's capital budget ($B a year, 2025 dollars)
+                     "budget": net.cfg["budget"]["musd_per_year"] / 1000,
                      # door-to-door trips: the model's access rules, garages and feeder zones by year
                      "trip": tripplan.export(zones, net, ygraphs)}
         feeds = feeds or scen[key]["trip"]["feed"] is not None
     data = {"years": cfg["years"], "boardPenalty": cfg["transfer"]["penalty_min"],
             "build": cfg["staging"]["construction_years"],
             "modes": {m: v["label"] for m, v in cfg["modes"].items()}, "regions": REGIONS,
+            "operating": {k: cfg["operating"][k] for k in ("span_hours", "days_per_year")},
             "geoms": geoms, "stations": stations, "scen": scen,
             "zones": tripplan.zone_points(zones) if feeds else [],
             "order": [k for k in (cfg.get("default_scenario"), "plan", "v1_baseline", "right_sized") if k in scen] +
