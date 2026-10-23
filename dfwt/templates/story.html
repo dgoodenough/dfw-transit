@@ -12,7 +12,7 @@
 <style>
 :root{
   color-scheme:light;
-  --bg:#f4f6f5; --panel:#ffffff; --ink:#18212b; --muted:#566370; --rule:#d5dcdf; --accent:#c96f00; --chip:#eef2f3;
+  --bg:#f4f6f5; --panel:#ffffff; --ink:#18212b; --muted:#566370; --rule:#d5dcdf; --accent:#a35700; --chip:#eef2f3; --pr-ink:#c2441a; --ct-ink:#1f63b8;
   --ct:#2a78d6; --pr:#eb6834;                 /* current track / proposal (categorical slots 1-2, validated) */
   --dot0:#e4ebf2; --dot-empty:#c9d1d8;
   --f-display:"Barlow Condensed","Arial Narrow",Arial,sans-serif; --f-ui:"Barlow","Helvetica Neue",Arial,sans-serif;
@@ -20,16 +20,16 @@
 @media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
   color-scheme:dark;
   --bg:#11171d; --panel:#18212a; --ink:#e7ecef; --muted:#9aa8b3; --rule:#2c3946; --accent:#f29a2e; --chip:#22303b;
-  --ct:#3987e5; --pr:#d95926; --dot0:#1d2731; --dot-empty:#2a3540;
+  --ct:#3987e5; --pr:#d95926; --dot0:#1d2731; --dot-empty:#2a3540; --pr-ink:#f08257; --ct-ink:#7fb2f0;
 }}
 :root[data-theme="dark"]{
   color-scheme:dark;
   --bg:#11171d; --panel:#18212a; --ink:#e7ecef; --muted:#9aa8b3; --rule:#2c3946; --accent:#f29a2e; --chip:#22303b;
-  --ct:#3987e5; --pr:#d95926; --dot0:#1d2731; --dot-empty:#2a3540;
+  --ct:#3987e5; --pr:#d95926; --dot0:#1d2731; --dot-empty:#2a3540; --pr-ink:#f08257; --ct-ink:#7fb2f0;
 }
 *{box-sizing:border-box}
 html{scroll-behavior:smooth}
-@media (prefers-reduced-motion: reduce){html{scroll-behavior:auto}}
+@media (prefers-reduced-motion: reduce){html{scroll-behavior:auto}.step .card,.people i{transition:none}}
 body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--f-ui);font-size:18px;line-height:1.55;-webkit-text-size-adjust:100%}
 a{color:var(--accent)}
 .skiplink{position:absolute;left:-999px;top:8px;background:var(--panel);padding:8px 12px;z-index:100}
@@ -83,14 +83,15 @@ sup a{text-decoration:none;font-size:.7em;padding:0 1px}
 .step.on .card{opacity:1}
 .step .card p{margin:0 0 .7em}.step .card p:last-child{margin:0}
 .big{font-family:var(--f-display);font-size:2.6rem;line-height:1;display:block;margin:.1em 0 .15em;font-variant-numeric:tabular-nums}
-.big.ct{color:var(--ct)} .big.pr{color:var(--pr)}
+.big.ct{color:var(--ct-ink)} .big.pr{color:var(--pr-ink)}
 @media (max-width:860px){
   body{font-size:17px}
   .scrolly{display:block;padding:0 12px}
-  .scrolly .fig{top:52px;height:58svh;z-index:1}
+  .scrolly .fig{top:52px;height:52svh;z-index:3;background:var(--bg);padding-bottom:6px}
   .figbox{max-height:none}
-  .steps{position:relative;z-index:2;padding:6vh 4px 30vh}
-  .step{min-height:80svh;align-items:flex-end}
+  .steps{position:relative;z-index:1;padding:4vh 4px 30vh}
+  .step{min-height:70svh;align-items:flex-end}
+  .step .card{max-height:40svh;overflow:auto}
   .step .card{opacity:.97}
   .step.on .card{opacity:1}
   header.bar nav{display:none}
@@ -103,6 +104,9 @@ sup a{text-decoration:none;font-size:.7em;padding:0 1px}
 .ramp{display:flex;align-items:center;gap:6px;font-size:.75rem;color:var(--muted)}
 .ramp span.bar{display:flex;height:10px;border-radius:2px;overflow:hidden}
 .ramp span.bar i{width:22px;height:10px}
+.ramp .steps7{display:flex;flex-wrap:wrap;gap:2px}
+.ramp .steps7 span{display:flex;flex-direction:column;align-items:center;font-size:.68rem;min-width:30px}
+.ramp .steps7 i{width:30px;height:10px;border-radius:2px}
 
 /* tooltip */
 .tip{position:fixed;z-index:80;pointer-events:none;background:var(--panel);border:1px solid var(--rule);border-radius:6px;padding:6px 9px;font-size:.8rem;
@@ -170,7 +174,7 @@ table.cmp{width:100%;max-width:1100px;margin:22px auto 0;border-collapse:collaps
 table.cmp th,table.cmp td{padding:9px 10px;border-bottom:1px solid var(--rule);text-align:right;font-variant-numeric:tabular-nums}
 table.cmp th:first-child,table.cmp td:first-child{text-align:left}
 table.cmp thead th{font-size:.78rem;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);font-weight:600}
-table.cmp td.ct{color:var(--ct);font-weight:600} table.cmp td.pr{color:var(--pr);font-weight:600}
+table.cmp td.ct{color:var(--ct-ink);font-weight:600} table.cmp td.pr{color:var(--pr-ink);font-weight:600}
 
 /* ending */
 .end{text-align:center;padding:90px 20px 60px}
@@ -270,7 +274,7 @@ footer{max-width:900px;margin:0 auto;padding:20px 20px 60px;font-size:.8rem;colo
 
 <!-- 4. CONNECTIONS -->
 <section class="ch" id="connect" aria-labelledby="h-connect">
-  <div class="chead"><div class="num">4 &middot; Connections</div><h2 id="h-connect">Six links and what they unlock</h2></div>
+  <div class="chead"><div class="num">4 &middot; Connections</div><h2 id="h-connect">Links and what they unlock</h2></div>
   <div class="prose"><p id="conn-intro"></p></div>
   <div class="conns" id="conns"></div>
 </section>
@@ -374,6 +378,9 @@ const dark = () => css('color-scheme') === 'dark' || getComputedStyle(document.b
 const ramp = () => matchMedia('(prefers-color-scheme: dark)').matches && document.documentElement.dataset.theme !== 'light' ? RAMP_D : RAMP_L;
 const binOf = v => { let k = 0; while (k < JOB_BINS.length && v >= JOB_BINS[k]) k++; return k; };
 
+const CITIES = [['Dallas', 32.7767, -96.797], ['Fort Worth', 32.7555, -97.3308], ['Arlington', 32.7357, -97.1081], ['Plano', 33.0198, -96.6989],
+  ['Frisco', 33.1507, -96.8236], ['Denton', 33.2148, -97.1331], ['McKinney', 33.1972, -96.6398], ['Irving', 32.814, -96.9489],
+  ['Garland', 32.9126, -96.6389], ['Mesquite', 32.7668, -96.5992]];
 class RegionMap {
   constructor(canvas, opt = {}) {
     this.c = canvas; this.opt = opt; this.state = {};
@@ -423,12 +430,23 @@ class RegionMap {
         ctx.setLineDash(ln.mode === 'brt' ? [lw * 2, lw * 1.2] : []);
         for (const [y, pts] of ln.segs) {
           if (y > st.year) continue;
+          ctx.globalAlpha = (dim ? 0.15 : st.fadeBefore && y <= st.fadeBefore ? 0.35 : 1) * (st.lineAlpha ?? 1);
           ctx.beginPath();
           pts.forEach(([lon, lat], k) => { const [x, yy] = this.P(lat, lon); k ? ctx.lineTo(x, yy) : ctx.moveTo(x, yy); });
           ctx.stroke();
         }
       }
       ctx.setLineDash([]); ctx.globalAlpha = 1;
+    }
+    // a few city names for orientation
+    if (st.cities !== false && !st.bbox) {
+      ctx.font = '600 11px Barlow, Arial, sans-serif'; ctx.textAlign = 'center'; ctx.lineJoin = 'round';
+      for (const [nm, la, lo] of CITIES) {
+        const [x, y] = this.P(la, lo);
+        if (x < 20 || x > this.w - 20 || y < 12 || y > this.h - 6) continue;
+        ctx.strokeStyle = css('--panel'); ctx.lineWidth = 3; ctx.strokeText(nm, x, y - 6);
+        ctx.fillStyle = css('--ink'); ctx.fillText(nm, x, y - 6);
+      }
     }
     // markers
     for (const m of st.marks || []) {
@@ -459,9 +477,8 @@ class RegionMap {
 function showTip(x, y, html) { const t = $('tip'); t.innerHTML = html; t.style.display = 'block'; t.style.left = Math.min(innerWidth - 270, x + 14) + 'px'; t.style.top = (y + 14) + 'px'; }
 function hideTip() { $('tip').style.display = 'none'; }
 function rampLegend(el, title) {
-  const R = ramp(), lab = ['<50k', '', '300k', '', '1M', '', '1.6M+'];
-  el.innerHTML = `<span class="ramp">${title} <span class="bar">${R.map(c => `<i style="background:${c}"></i>`).join('')}</span></span>
-    <span class="ramp" style="gap:2px">${['under 50k', '1.6M+'].join(' &rarr; ')}</span>`;
+  const R = ramp(), lab = ['<50k', '50k', '150k', '300k', '600k', '1M', '1.6M+'];
+  el.innerHTML = `<span class="ramp">${title} <span class="steps7">${R.map((c, k) => `<span><i style="background:${c}"></i>${lab[k]}</span>`).join('')}</span></span>`;
 }
 
 // ---------- small SVG charts ----------
@@ -641,8 +658,9 @@ function rangeNote() {
 $('s-appetite').innerHTML = stepHtml('appetite');
 ['_budget_compare', '_peers', '_appetite'].forEach(k => ((F[k] || {}).cites || []).forEach(cite));
 function invYear(y) {
-  figText('inv', `The network in ${y}`, 'Lines open by that year; dashed lines are BRT', '');
-  invMapOn().set({dots: null, year: y, scen: 'p', marks: []});
+  const before = {2035: 2025, 2050: 2035, 2100: 2050}[y] || 0;
+  figText('inv', `The network in ${y}`, `Lines open by then${before ? `; what opened by ${before} is faded` : ''}; dashed lines are BRT`, '');
+  invMapOn().set({dots: null, year: y, scen: 'p', marks: [], fadeBefore: before});
   $('inv-cap').innerHTML = `<span class="legend"><span><i class="ln" style="background:var(--muted)"></i>rail</span><span><i class="ln" style="background:repeating-linear-gradient(90deg,var(--muted) 0 6px,transparent 6px 9px)"></i>BRT and express bus</span></span>`;
 }
 scrolly('invest', {
@@ -712,7 +730,7 @@ function showStation(s) {
   $('st-legend').innerHTML = s.lines.map(([n, c, m]) => `<span><i class="ln" style="background:${c}"></i>${n}</span>`).join('') + '<span>Other lines faded</span>';
   document.querySelectorAll('#st-chips .chip').forEach(c => c.setAttribute('aria-pressed', c.dataset.name === s.name));
 }
-const EX = (F._examples && F._examples.stations) || ['Downtown Arlington', 'Akard', 'Frisco Main St', 'Waxahachie', 'Stockyards Main', 'Downtown Denton Transit Center'];
+const EX = (F._examples && F._examples.stations) || ['Downtown Arlington', 'Deep Ellum', 'Magnolia / 8th Avenue', 'Frisco Main St', 'Waxahachie', 'Stockyards Main', 'Downtown Denton Transit Center'];
 $('st-chips').innerHTML = EX.filter(n => stByName.has(n.toLowerCase())).map(n => `<button type="button" class="chip" data-name="${n}" aria-pressed="false">${n}</button>`).join('');
 $('st-chips').addEventListener('click', e => { const b = e.target.closest('.chip'); if (b) showStation(stByName.get(b.dataset.name.toLowerCase())); });
 (function () {
@@ -748,12 +766,15 @@ $('assume').innerHTML = [
   ['Changing vehicles', `${A.transfer_min} min`, 'is what each change of bus or train costs riders, on top of the wait: riders avoid transfers, and the model counts that.'],
   ['Growth near stations', `+${Math.round(((tod.pop_uplift || {}).urban || 0.5) * 100)}%`, `more residents within walking distance of a new in-town station over about ${tod.ramp_mid_years || 10} years (${Math.round(((tod.pop_uplift || {}).downtown || 0.75) * 100)}% downtown, ${Math.round(((tod.pop_uplift || {}).suburban || 0.25) * 100)}% suburban), and ${Math.round(((A.capture || {}).pop_share || 0.2) * 100)}% of the region's growth steered to station areas.`],
   ['Parking', `${fmtN(A.pnr_spaces.terminus)} spaces`, `in a garage at the end of each rail line and ${fmtN(A.pnr_spaces.commuter_station)} at regional rail stations; no new garages downtown.`],
+  ['Service', 'Every 5-10 min', 'Trains and BRT every 5 to 10 minutes at rush hour, streetcars every 10, and late-night trains and buses to about 2 a.m. on the busiest lines.'],
   ['Who rides', 'Weekday trips', 'The model counts weekday commutes and scales them to all trips the way today\'s riders split, about half commutes. Evening and weekend service isn\'t modelled separately.'],
 ].map(([h, b, p]) => `<div class="panel"><h4>${h}</h4><b>${b}</b><p>${p}</p></div>`).join('');
 
 // ---------- chapter 4: connections ----------
-$('conn-intro').innerHTML = `A network is worth more than its lines. These are some of the links the plan builds, with the rush-hour ride on the plan
-  against the drive, and how many jobs someone at the start can reach within 45 minutes by rail and BRT (local buses count only as a way to reach them).
+$('conn-intro').innerHTML = `A network is worth more than its lines. These are some of the links the plan builds. Be clear about what they are: most of them
+  still don't beat a car on a clear road. What the network adds is reach: trips that have no transit at all today become ones people who can't or
+  would rather not drive can make, and many more jobs come within a 45-minute ride.
+  Each card shows the ride today and in 2100 against the rush-hour drive, and how many jobs someone at the start can reach within 45 minutes by rail and BRT (local buses count only as a way to reach them).
   Ride times are clock minutes from platform to platform, waits included.`;
 $('conns').innerHTML = D.connections.map((c, i) => {
   const ride = c.ride['two_million_2100'], drive = c.drive[2100], now = c.ride['current_track_2025'];

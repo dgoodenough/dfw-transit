@@ -673,7 +673,10 @@ def _fair_order(net, rows, idx, value, oc, deadline, per_year):
     falls behind (staging.fair_share): once a county's population share (x ratio) of the capital
     committed so far covers its best remaining line, that line goes next (the county furthest
     behind first). Stages with a deadline count from about the year they open (the cumulative
-    budget reaching it)."""
+    budget reaching it). With fair_share.band_years, a county whose share of the capital committed
+    over the last band_years of budget falls below band_low x its population share goes next
+    with its best line, whatever that line costs (review 3, R3: deadline stages fill the early
+    decades, and Collin had nothing until 2040)."""
     fs = net.cfg["staging"].get("fair_share") or {}
     by_line = collections.defaultdict(list)
     for i in idx:
@@ -707,25 +710,45 @@ def _fair_order(net, rows, idx, value, oc, deadline, per_year):
     home = {lid: max(w, key=w.get) for lid, w in line_w.items()}
     dl = sorted(((y, cost[i], weights(i)) for i, y in deadline.items()), key=lambda d: d[:2])
     cum, total, k, order = collections.Counter(), 0.0, 0, []
+    events = []   # (total committed before, county -> $M): for the decade bands
+    band = fs.get("band_years") and per_year * fs["band_years"]
+
+    def commit(w, c_musd):
+        nonlocal total
+        events.append((total, {c: v * c_musd for c, v in w.items()}))
+        for c, v in w.items():
+            cum[c] += v * c_musd
+        total += c_musd
+
+    def window():
+        got = collections.Counter()
+        for t0, ws in events:
+            if t0 >= total - band:
+                for c, v in ws.items():
+                    got[c] += v
+        return got, min(total, band)
     left = list(lines)
     while left:
         while k < len(dl) and dl[k][0] <= ex + total / per_year:   # deadline stages, about when they're funded
-            for c, v in dl[k][2].items():
-                cum[c] += v * dl[k][1]
-            total += dl[k][1]
+            commit(dl[k][2], dl[k][1])
             k += 1
         best = {}
         for l in left:   # each county's best remaining line (left is in value order)
             best.setdefault(home[l], l)
-        due = sorted((cum[c] / (share[c] * total), c) for c, l in best.items()
-                     if total and cum[c] + sum(cost[i] for i in by_line[l]) * line_w[l].get(c, 0) <= fs["ratio"] * share[c] * total)
-        pick = best[due[0][1]] if due else left[0]
+        pick = None
+        if band and total >= band / 2:   # a county far behind over the last decade or so goes first
+            got, wt = window()
+            low = sorted((got[c] / (share[c] * wt), c) for c in best if got[c] < fs.get("band_low", 0.5) * share[c] * wt)
+            if low:
+                pick = best[low[0][1]]
+        if pick is None:
+            due = sorted((cum[c] / (share[c] * total), c) for c, l in best.items()
+                         if total and cum[c] + sum(cost[i] for i in by_line[l]) * line_w[l].get(c, 0) <= fs["ratio"] * share[c] * total)
+            pick = best[due[0][1]] if due else left[0]
         left.remove(pick)
         order += by_line[pick]
         for i in by_line[pick]:
-            for c, v in line_w[pick].items():
-                cum[c] += v * cost[i]
-            total += cost[i]
+            commit(line_w[pick], cost[i])
     return order
 
 
@@ -795,6 +818,18 @@ def _exact_years(net, rows, log=print, scale=1.0, floor=None):
     # in the last schedule)
     pieces = _stage_pieces(net, rows) if by_value else {}
     charged, agg = {}, collections.Counter()
+    # no more than staging.max_km_per_interval of a line opens in one year (a stage bigger than
+    # that opens alone): the work is spread, and riders get the first part sooner
+    km_cap = cfg["staging"]["max_km_per_interval"] if by_value and cfg["staging"].get("enforce_interval") else None
+    skm = _stage_km(net, rows) if km_cap else {}
+    opened_km = collections.Counter()
+
+    def fits(i, t):
+        if not km_cap:
+            return True
+        host = net.host_line(rows[i]["line_id"])
+        key = (host.id if host else rows[i]["line_id"], t)
+        return opened_km[key] == 0 or opened_km[key] + skm.get(i, 0.0) <= km_cap[oc[i][1]]
 
     def with_stage(i, t, commit=False):
         trial = agg if commit else collections.Counter(agg)
@@ -833,9 +868,9 @@ def _exact_years(net, rows, log=print, scale=1.0, floor=None):
         fund = (lambda t: with_stage(i, t)) if by_value else (lambda t: placed + [(t, cost, n)])
         if i in deadline:     # by its deadline, as late as that allows (the money goes to value first)
             d = max(deadline[i], lo)
-            y = next((t for t in [*range(d, lo - 1, -1), *range(d + 1, hi + 1)] if ok(fund(t))), None)
+            y = next((t for t in [*range(d, lo - 1, -1), *range(d + 1, hi + 1)] if fits(i, t) and ok(fund(t))), None)
         else:
-            y = next((t for t in range(lo, hi + 1) if ok(fund(t))), None)
+            y = next((t for t in range(lo, hi + 1) if fits(i, t) and ok(fund(t))), None)
         if y is None:
             y = max(y0, lo)   # keep it where it was (or after its line's previous stage)
         if y > end:
@@ -843,6 +878,9 @@ def _exact_years(net, rows, log=print, scale=1.0, floor=None):
         elif (r.get("note") or "").startswith(("after the", "deferred by the optimizer")):
             r["note"] = "value per $" if by_value else "optimizer"
         r["year_opens"] = str(y)
+        if km_cap:
+            host = net.host_line(r["line_id"])
+            opened_km[(host.id if host else r["line_id"], y)] += skm.get(i, 0.0)
         if by_value:
             with_stage(i, y, commit=True)
         else:
@@ -854,6 +892,22 @@ def _exact_years(net, rows, log=print, scale=1.0, floor=None):
     if log:
         log(f"{moved} of {len(rows)} stages moved to their earliest affordable year")
     return renumber(keep_attached(net, rows))
+
+
+def _stage_km(net, rows):
+    """Row index -> km of track the stage spans on its line."""
+    names = {k: v.name for k, v in net.stations.items()}
+    out = {}
+    for i, r in enumerate(rows):
+        ln = net.host_line(r["line_id"])
+        if ln is None or r["kind"] == "via":
+            continue
+        try:
+            a, b = sorted(resolve_on(net, ln, r[c], names) for c in ("from_stop", "to_stop"))
+        except KeyError:
+            continue
+        out[i] = sum(s.km for s in ln.segments[a:b])
+    return out
 
 
 def _stage_pieces(net, rows):

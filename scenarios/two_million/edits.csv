@@ -31,7 +31,7 @@ set_headway,E33,2030,30,every 30 min: a rural line (review 2: 15 min cost ~$60M 
 set_headway,E35,2030,30,every 30 min: a rural line (review 2: 15 min cost ~$60M a year for 0.6% of trips)
 set_headway,E36,2030,30,every 30 min: a rural line (review 2: 15 min cost ~$60M a year for 0.6% of trips)
 set_headway,E01,2030,6,BRT every 6 min (plan default 8)
-set_headway,E02,2030,6,BRT every 6 min (plan default 8)
+set_headway,E02,2030,12,"every 12 min: its riders fill a bus every 12 (review 3 trims, about $90M a year with the others)"
 set_headway,E04,2030,6,BRT every 6 min (plan default 8)
 set_headway,E21,2030,6,BRT every 6 min (plan default 8)
 set_headway,E24,2030,6,BRT every 6 min (plan default 8)
@@ -44,12 +44,12 @@ set_headway,F02,2050,5,metro every 5 min from 2050
 set_headway,F05,2050,5,metro every 5 min from 2050
 set_headway,F06,2050,5,metro every 5 min from 2050
 set_headway,E16,2050,5,metro every 5 min from 2050
-set_headway,E17,2050,10,each branch every 10 min from 2050; 5 min on the shared trunk Legacy West - Pearl
+set_headway,E17,2050,7.5,"each branch every 7.5 min from 2050, 3.75 min on the shared trunk Legacy West - Pearl (review 3, R6: +27k trips for about $50M a year)"
 set_headway,E18,2050,5,metro every 5 min from 2050
 set_headway,E19,2050,5,metro every 5 min from 2050
 set_headway,E22,2050,5,metro every 5 min from 2050
 set_headway,E23,2050,5,metro every 5 min from 2050
-set_headway,E26,2050,10,each branch every 10 min from 2050; 5 min on the shared trunk Legacy West - Pearl
+set_headway,E26,2050,7.5,"each branch every 7.5 min from 2050, 3.75 min on the shared trunk Legacy West - Pearl (review 3, R6: +27k trips for about $50M a year)"
 reroute,E13,2035,"tunnel|X137;@32.7850,-96.8110;@32.7800,-96.8085;@32.7791,-96.8028;XD01;@32.7802,-96.7977;XD02;@32.7813,-96.7923;@32.7822,-96.7885;@32.7838,-96.7878;X142",Green Line through the D2 subway from 2035 (Victory - Metro Center - Commerce/Harwood - Deep Ellum)
 reroute,E12,2035,"tunnel|X137;@32.7850,-96.8110;@32.7800,-96.8085;@32.7791,-96.8028;XD01;@32.7802,-96.7977;XD02;@32.7835,-96.7945;X141","Orange Line through the D2 subway from 2035, rejoining at Pearl"
 through_route,E10,E30,TRE,TRE runs through FW T&P to Alvarado
@@ -65,3 +65,10 @@ set_line,XE02,cruise_kmh,51.4,"express bus: 83% of the route in freeway lanes at
 retire_with,XE02,E18,,runs until E18 opens (tools/express_buses.py)
 set_line,XE03,cruise_kmh,44.1,"express bus: 64% of the route in freeway lanes at 60 km/h, the rest at BRT speed"
 retire_with,XE03,E25,,runs until E25 opens (tools/express_buses.py)
+through_route,E22,F02,I-30 / FW Blue Line,"review 3 (R6): I-30 trains run on as FW Blue at Handley: downtown Dallas, Arlington and west Fort Worth in one seat (+7.9k trips in 2060, no capital)"
+set_headway,F03,2030,10,"FW Orange every 10 min: its riders fill a train every 10 (review 3 trims)"
+set_line,E31,span_hours,6,"Bowie Line: rush hours only, about 6 hours a day (review 3 trims)"
+set_line,E32,span_hours,6,"Gainesville Line: rush hours only, about 6 hours a day (review 3 trims)"
+set_line,E19,capacity_factor,1.333,"4-car trains on the I-20 / I-30 trunk, 88% full at 24 trains an hour with 3 cars (review 3, R6)"
+set_line,E22,capacity_factor,1.333,"4-car trains on the I-20 / I-30 trunk, 88% full at 24 trains an hour with 3 cars (review 3, R6)"
+drop_line,E36,,,"Waxahachie Line left out: about 436 trips a day for about $1.5B (review 3, R6); the I-35E Express serves Waxahachie"

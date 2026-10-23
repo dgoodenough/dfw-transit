@@ -10,3 +10,4 @@ XB23  # Grand Prairie Carrier BRT
 XB30  # Seminary-Wichita BRT
 XB36  # Southwest Arlington BRT
 XB43  # West Dallas-Irving BRT
+E36   # Waxahachie Line (a plan line: drop_line in edits.csv; review 3, R6)

@@ -1,7 +1,21 @@
 {
   "_doc": "The 2 million riders scenario: 2M daily transit trips (each trip counted once, all modes) by 2100. The plan plus the expansion package (arterial BRT grid, SH-114 metro, job-campus BRT, infill stations), the D2 subway, the Red Line on to McKinney, regional rail to Weatherford, Greenville and Cleburne by the 2090s (scenarios/two_million/extra/), the frequent-service package (edits.csv), better access (15-min feeder buses, bike/scooter to stations, walkable station areas, drop-off) and moderate land use (upzoning around stations, 20% of growth steered to station areas). Parking prices double in real terms by 2050 in today's paid districts and $5/day parking spreads to the densest job centers (15,000+ jobs/km2; cash-out is left out). The D2 subway takes the Green and Orange lines off the downtown mall from 2035, and regional rail runs through Fort Worth and Dallas. Stages are scheduled by riders per dollar (staging.priority), so cheap high-value BRT comes early under the same $2.3B/yr budget. Merged over config.json for this scenario only.",
   "capital_items": [
-    {"line_id": "XP01", "musd": 400, "note": "Victory pocket track and the junctions where SH-114 trains join and leave the Green Line (review 2: about 30 trains an hour on Victory-Bachman; $0.3-0.5B)"}
+    {
+      "line_id": "XP01",
+      "musd": 400,
+      "note": "Victory pocket track and the junctions where SH-114 trains join and leave the Green Line (review 2: about 30 trains an hour on Victory-Bachman; $0.3-0.5B)"
+    },
+    {
+      "line_id": "E19",
+      "musd": 300,
+      "note": "4-car platforms on the I-20 Crosstown (review 3, R6: the I-20 / I-30 trunk is 88% full at 24 trains an hour with 3-car trains): about $6M a surface platform, $25M underground"
+    },
+    {
+      "line_id": "E22",
+      "musd": 275,
+      "note": "4-car platforms on the I-30 / FW Blue Line (review 3, R6), as on the I-20 Crosstown"
+    }
   ],
   "growth": {
     "tod": {
@@ -57,18 +71,151 @@
     "priority": "value_per_musd",
     "_doc_rules": "Review 2 (owner decision D2): the order is riders per $ (results/two_million/line_values.csv: trips lost when a line is removed from the 2100 network, per $M of its share of capital at 2025 prices; the same whatever order lines open in), with three rules: the stages of plan lines that reach a downtown core (and the stages they need to connect) open no later than in the budget plan (core_by_plan); a county's next line goes ahead of the value order once its share of population (x ratio) of the capital committed so far covers it (fair_share); a new line doesn't open as a stub of fewer than min_starter_stops stops ahead of its next stage. Deadlines: lines that must open by a year.",
     "core_by_plan": true,
-    "fair_share": {"ratio": 1.0},
+    "fair_share": {
+      "ratio": 1.0,
+      "band_years": 10,
+      "band_low": 0.5
+    },
     "min_starter_stops": 8,
     "deadlines": [
-      {"line_id": "E22", "from_stop": "Cockrell Hill Road", "to_stop": "Commerce / Fort Worth Avenue", "by": 2038, "why": "Arlington's first rail in the 2030s (review 2, D2): I-30 Line Dallas - Grand Prairie - Arlington"},
-      {"line_id": "E22", "from_stop": "Jefferson / Belt Line", "to_stop": "Cockrell Hill Road", "by": 2038, "why": "Arlington's first rail in the 2030s"},
-      {"line_id": "E22", "from_stop": "Davis Drive", "to_stop": "Jefferson / Belt Line", "by": 2038, "why": "Arlington's first rail in the 2030s: Downtown Arlington, the stadiums, Six Flags"},
-      {"line_id": "E22", "from_stop": "Handley", "to_stop": "Davis Drive", "by": 2042, "why": "Arlington - Fort Worth with FW Blue (residents review 2): tested, +9k daily trips in 2050 and +31k in 2060 against the value order (-4k in 2040)"},
-      {"line_id": "F02", "from_stop": "Handley", "to_stop": "Central Station", "by": 2042, "why": "FW Blue to Handley with the I-30 Line: one ride Dallas - Arlington - downtown Fort Worth"},
-      {"line_id": "F02", "from_stop": "Central Station", "to_stop": "7th Street / Carroll", "by": 2042, "why": "FW Blue's first stage, which the Handley stage attaches to"},
-      {"line_id": "XE02", "from_stop": "X275", "to_stop": "X141", "by": 2032, "why": "every city over 150,000 served by about 2040: Mesquite (its rail comes in the 2050s-70s; the 2100 value can't see an interim bus)"},
-      {"line_id": "XE03", "from_stop": "X500", "to_stop": "X125", "by": 2032, "why": "every city over 150,000 served by about 2040: McKinney (until the Red Line arrives)"}
-    ]
+      {
+        "line_id": "E22",
+        "from_stop": "Cockrell Hill Road",
+        "to_stop": "Commerce / Fort Worth Avenue",
+        "by": 2038,
+        "why": "Arlington's first rail in the 2030s (review 2, D2): I-30 Line Dallas - Grand Prairie - Arlington"
+      },
+      {
+        "line_id": "E22",
+        "from_stop": "Jefferson / Belt Line",
+        "to_stop": "Cockrell Hill Road",
+        "by": 2038,
+        "why": "Arlington's first rail in the 2030s"
+      },
+      {
+        "line_id": "E22",
+        "from_stop": "Davis Drive",
+        "to_stop": "Jefferson / Belt Line",
+        "by": 2038,
+        "why": "Arlington's first rail in the 2030s: Downtown Arlington, the stadiums, Six Flags"
+      },
+      {
+        "line_id": "E22",
+        "from_stop": "Handley",
+        "to_stop": "Davis Drive",
+        "by": 2042,
+        "why": "Arlington - Fort Worth with FW Blue (residents review 2): tested, +9k daily trips in 2050 and +31k in 2060 against the value order (-4k in 2040)"
+      },
+      {
+        "line_id": "F02",
+        "from_stop": "Handley",
+        "to_stop": "Fort Worth Central",
+        "by": 2042,
+        "why": "FW Blue to Handley with the I-30 Line: one ride Dallas - Arlington - downtown Fort Worth"
+      },
+      {
+        "line_id": "F02",
+        "from_stop": "Fort Worth Central",
+        "to_stop": "7th Street / Carroll",
+        "by": 2042,
+        "why": "FW Blue's first stage, which the Handley stage attaches to"
+      },
+      {
+        "line_id": "XE02",
+        "from_stop": "X275",
+        "to_stop": "X141",
+        "by": 2032,
+        "why": "every city over 150,000 served by about 2040: Mesquite (its rail comes in the 2050s-70s; the 2100 value can't see an interim bus)"
+      },
+      {
+        "line_id": "XE03",
+        "from_stop": "X500",
+        "to_stop": "X125",
+        "by": 2032,
+        "why": "every city over 150,000 served by about 2040: McKinney (until the Red Line arrives)"
+      },
+      {
+        "line_id": "E16",
+        "from_stop": "Frankford / Vail",
+        "to_stop": "Forest and Marsh",
+        "by": 2047,
+        "why": "inner ring (review 3, R7): DNT West north to Frankford when the budget plan opens it"
+      },
+      {
+        "line_id": "E19",
+        "from_stop": "Zang / 12th Street",
+        "to_stop": "Commerce / Fort Worth Avenue",
+        "by": 2046,
+        "why": "inner ring (review 3, R7): the I-20 Crosstown to Oak Cliff when the budget plan opens it"
+      },
+      {
+        "line_id": "E24",
+        "from_stop": "Berry / McCart",
+        "to_stop": "Ridglea Hills",
+        "by": 2031,
+        "why": "inner ring (review 3, R7): the FW Crosstown Loop when the budget plan opens it"
+      },
+      {
+        "line_id": "E24",
+        "from_stop": "Ridglea Hills",
+        "to_stop": "#31",
+        "by": 2031,
+        "why": "inner ring (review 3, R7): the FW Crosstown Loop when the budget plan opens it"
+      },
+      {
+        "line_id": "E24",
+        "from_stop": "Berry / Riverside",
+        "to_stop": "Berry / McCart",
+        "by": 2031,
+        "why": "inner ring (review 3, R7): the FW Crosstown Loop when the budget plan opens it"
+      },
+      {
+        "line_id": "E24",
+        "from_stop": "Berry / Miller",
+        "to_stop": "Berry / Riverside",
+        "by": 2031,
+        "why": "inner ring (review 3, R7): the FW Crosstown Loop when the budget plan opens it"
+      },
+      {
+        "line_id": "E24",
+        "from_stop": "Marine Park",
+        "to_stop": "Berry / Miller",
+        "by": 2053,
+        "why": "inner ring (review 3, R7): the FW Crosstown Loop when the budget plan opens it"
+      },
+      {
+        "line_id": "E24",
+        "from_stop": "#1",
+        "to_stop": "Marine Park",
+        "by": 2054,
+        "why": "inner ring (review 3, R7): the FW Crosstown Loop when the budget plan opens it"
+      },
+      {
+        "line_id": "F01",
+        "from_stop": "7th Street / Carroll",
+        "to_stop": "Ridglea Hills",
+        "by": 2047,
+        "why": "inner ring (review 3, R7): FW Green west of 7th Street when the budget plan opens it"
+      },
+      {
+        "line_id": "F01",
+        "from_stop": "Ridglea Hills",
+        "to_stop": "Ridgmar Mall / BRT Transfer",
+        "by": 2048,
+        "why": "inner ring (review 3, R7): FW Green west of 7th Street when the budget plan opens it"
+      },
+      {
+        "line_id": "F02",
+        "from_stop": "7th Street / Carroll",
+        "to_stop": "Ridgmar Mall / BRT Transfer",
+        "by": 2054,
+        "why": "inner ring (review 3, R7): FW Blue west of 7th Street when the budget plan opens it"
+      }
+    ],
+    "ride_open_track": true,
+    "_doc_ride": "ride_open_track: a line runs over track another line has already opened as soon as it is open and joins the line's own open track (review 3: I-30 on the I-20 Crosstown's downtown track from 2043, +12.9k trips in 2045). Nothing is built, so nothing is charged.",
+    "enforce_interval": true,
+    "_doc_r3": "Review 3 (R3): fair_share.band_years / band_low: a county that got less than half its population share of the capital committed over the last ten years of budget (deadline stages included) goes next with its best line. enforce_interval: no more than max_km_per_interval of a line opens in one year."
   },
   "ridership": {
     "parking_policy": {
@@ -77,6 +224,24 @@
         "min_jobs_per_km2": 15000,
         "usd_per_day": 5
       }
+    }
+  },
+  "operating": {
+    "late_night": {
+      "_doc": "2M (review 3, R7): late-night service also on FW Blue (with I-30), FW Purple, Jefferson BRT and the Dallas streetcars. Each line's late service starts when the line opens.",
+      "lines": [
+        "E12",
+        "E13",
+        "E14",
+        "E15",
+        "F03",
+        "E10",
+        "E22",
+        "F07",
+        "E29",
+        "E50",
+        "E51"
+      ]
     }
   }
 }

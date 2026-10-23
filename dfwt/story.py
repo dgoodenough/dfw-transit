@@ -6,6 +6,7 @@ docs/map.html.
 
 Everything on the page comes from here, from the model, or from cited facts in
 dfwt/templates/story_facts.json; the template (dfwt/templates/story.html) only draws it."""
+import collections
 import copy
 import csv
 import json
@@ -27,14 +28,18 @@ CONNECTIONS = [
      "An express bus in I-35E's managed lanes from 2027: Ellis County's first frequent link, decades before rail."),
     ("Downtown Arlington", "Union Station", "Arlington to downtown Dallas",
      "The largest US city without regular public transit gets the I-30 Line by 2038, on to Fort Worth with FW Blue by about 2043."),
-    ("Downtown Arlington", "Central Station", "Arlington to downtown Fort Worth",
+    ("Downtown Arlington", "Fort Worth Central", "Arlington to downtown Fort Worth",
      "One line between the two downtowns from {year}: I-30 trains run on as FW Blue at Handley, through Arlington's stadiums and UTA."),
     ("Irving Convention Center", "DFW Airport North", "Las Colinas to DFW Airport north",
      "The SH-114 Line ties the region's second job center to the airport and Grapevine."),
     ("Frisco Main St", "Pearl/Arts District", "Frisco to downtown Dallas",
      "BRT on Dallas Parkway and Preston Road comes first; DNT East rail reaches Frisco Main St in {year}."),
-    ("Stockyards Main", "Central Station", "The Stockyards to downtown Fort Worth",
-     "FW Orange, the first of Fort Worth's own metro lines (2035)."),
+    ("Stockyards Main", "Magnolia / 8th Avenue", "The Stockyards to Magnolia Avenue",
+     "FW Orange, the first of Fort Worth's own metro lines ({year}), from the Stockyards through downtown to the Near Southside."),
+    ("Bishop Arts District", "Deep Ellum", "Bishop Arts to Deep Ellum",
+     "Jefferson Boulevard BRT from 2030 and the Green Line: two of Dallas's night-out districts, with late-night service to about 2 a.m."),
+    ("Union Station", "Fort Worth Central", "Downtown Dallas to downtown Fort Worth",
+     "No high-speed link is planned between the two downtowns: TRE trains, faster and more often, and the I-30 / FW Blue Line through Arlington."),
 ]
 
 
@@ -72,12 +77,12 @@ def _simplify(pts, tol):
 
 
 def _station_index(net):
-    """station name -> station id, among stations some line serves (first one wins)."""
-    served = {s for ln in net.lines.values() for s in ln.stop_ids}
+    """station name -> station id, among stations some line serves (where platforms of several
+    modes share a name, the one most lines serve)."""
+    n_lines = collections.Counter(s for ln in net.lines.values() for s in set(ln.stop_ids))
     out = {}
-    for sid, s in net.stations.items():
-        if sid in served:
-            out.setdefault(s.name, sid)
+    for sid in sorted(n_lines, key=lambda s: (-n_lines[s], s)):
+        out.setdefault(net.stations[sid].name, sid)
     return out
 
 

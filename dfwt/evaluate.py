@@ -379,7 +379,7 @@ def evaluate(ctx, net, line_values=True, log=print, procs=None):
             "km": round(ln.km, 1), "stops": len(set(ln.stop_ids)), "avg_spacing_km": round(spacing, 2),
             "headway_min": ln.headway_at(final), "cost_musd": round(net.line_cost_musd(ln)),
             "daily_commuters_peak_link": round(peak), "peak_hour_load": round(peak_hour),
-            "capacity_used_pct": round(peak_hour / (60 / ln.headway_at(final) * vcap[ln.mode]) * 100, 1),
+            "capacity_used_pct": round(peak_hour / (60 / ln.headway_at(final) * vcap[ln.mode] * ln.capacity_factor) * 100, 1),
             "passenger_km": round(pkm),
         })
     ev_values = None

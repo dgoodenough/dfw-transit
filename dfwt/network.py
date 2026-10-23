@@ -99,6 +99,8 @@ class Line:
     pnr_stops: list = field(default_factory=list)  # former termini (through-routed) that keep a garage
     cruise_kmh: float = 0.0   # this line's average running speed, if not its mode's (an express bus on a freeway)
     retire: int = NEVER       # first year it no longer runs (retire_with: an interim bus replaced by rail)
+    span_hours: float = 0.0   # hours of service a day, if not config operating.span_hours (peak-only regional rail)
+    capacity_factor: float = 1.0   # longer trains than the mode's (4-car instead of 3-car light rail: 4/3)
 
     def headway_at(self, year):
         hw = self.headway
@@ -200,8 +202,37 @@ class Network:
         net.stage_rows, net.stage_findings = stage_rows, findings
         net.variants = staging.build_variants(net, interims)
         net.apply_edits(edits)
+        if cfg.get("staging", {}).get("ride_open_track"):
+            net.ride_open_track()
         net.time_infill(tables.get("infill.csv") or [])
         return net
+
+    def ride_open_track(self):
+        """staging.ride_open_track: a line runs over track another line of its mode has already
+        opened as soon as that track is open and joins the line's own open track (I-30 trains on
+        the I-20 Crosstown's downtown track from 2043, not when I-30's own stage there comes up).
+        Its stops there open with it. Nothing is built, so nothing is charged."""
+        ex = self.cfg["existing_year"]
+        first = {}
+        for ln in self.lines.values():
+            for i, s in enumerate(ln.segments):
+                key = (ln.mode, frozenset((ln.stop_ids[i], ln.stop_ids[i + 1])))
+                first[key] = min(first.get(key, NEVER), s.year)
+        for ln in self.lines.values():
+            changed = True
+            while changed:
+                changed = False
+                for i, s in enumerate(ln.segments):
+                    f = first[(ln.mode, frozenset((ln.stop_ids[i], ln.stop_ids[i + 1])))]
+                    if f >= s.year or s.year <= ex:
+                        continue
+                    nb = [ln.segments[j].year for j in (i - 1, i + 1) if 0 <= j < len(ln.segments)]
+                    y = max(f, min(nb)) if nb else f
+                    if y < s.year:
+                        s.year = y
+                        for k in (i, i + 1):
+                            ln.stop_years[k] = min(ln.stop_years[k], y)
+                        changed = True
 
     def time_infill(self, rows):
         """Infill stations open when the line they connect to arrives (infill.csv): station_id,
@@ -311,7 +342,7 @@ class Network:
             elif op == "set_headway":
                 ln.service = sorted([x for x in ln.service if x[0] != int(e["field"] or 0)] + [(int(e["field"] or 0), float(e["value"]))])
             elif op == "set_line":
-                setattr(ln, e["field"], float(e["value"]) if e["field"] in ("headway", "cruise_kmh") else e["value"])
+                setattr(ln, e["field"], float(e["value"]) if e["field"] in ("headway", "cruise_kmh", "span_hours", "capacity_factor") else e["value"])
             elif op == "retire_with":   # runs until the named line's stages have all opened
                 ys = [int(r["year_opens"]) for r in self.stage_rows if r["line_id"] == e["field"] and r["kind"] != "via"]
                 ln.retire = max(ys) if ys else NEVER
@@ -606,7 +637,8 @@ class Network:
 
     def opex_musd(self, year):
         """Operating cost ($M/yr) of the service running in `year`, by mode (config.operating):
-        revenue vehicle-hours = 2 directions x run minutes / headway x service hours a day
+        revenue vehicle-hours = 2 directions x run minutes / headway x service hours a day (the
+        line's span_hours if set)
         x layover/recovery, x cost per train (or bus) hour x weekday-equivalent days. Feeder buses
         are added by evaluate.run_year (they depend on riders)."""
         oc = self.cfg.get("operating")
@@ -617,10 +649,12 @@ class Network:
         owl = set(late.get("lines", [])) if year >= late.get("from_year", NEVER) else set()
         for r in self.runs(year):
             hw = r.line.headway_at(year)
-            veh_h = 2 * sum(r.hop_min) / hw * oc["span_hours"] * oc["layover"]
+            veh_h = 2 * sum(r.hop_min) / hw * (r.line.span_hours or oc["span_hours"]) * oc["layover"]
             if r.line.id in owl:   # trunk lines on to about 2 a.m. (config operating.late_night)
                 veh_h += 2 * sum(r.hop_min) / late["headway_min"] * late["hours"] * oc["layover"]
-            out[r.line.mode] += veh_h * oc["usd_per_train_hour"][r.line.mode] * oc["days_per_year"] / 1e6
+            # longer trains: the crew is the same, the rest of a train-hour's cost grows with its cars
+            per_h = oc["usd_per_train_hour"][r.line.mode] * (1 + oc.get("car_share", 0.75) * (r.line.capacity_factor - 1))
+            out[r.line.mode] += veh_h * per_h * oc["days_per_year"] / 1e6
         return dict(out)
 
     def segment_cost(self, ln, i):

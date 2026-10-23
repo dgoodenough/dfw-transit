@@ -82,6 +82,7 @@ def main():
               + [r for r in extra.get("stages.csv", []) if r["line_id"] in restaged] + new_stages)
     # stages.csv is what `schedule --write` replaces; stages.unscheduled.csv is where every
     # schedule starts from, so the result doesn't depend on the last one
+    stages = [r for r in stages if r["line_id"] not in drop]   # a plan line left out (drop_line in edits.csv)
     for name in ("stages.csv", "stages.unscheduled.csv"):
         write(name, stages, list(pkg["stages.csv"][0].keys()))
     print(f"two_million: {len(new_stages)} new stages ({len(drop)} corridors left out); now run python -m dfwt schedule --scenario two_million --write")
