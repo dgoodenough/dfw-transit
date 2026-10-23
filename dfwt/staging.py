@@ -123,11 +123,13 @@ def compile_stages(tables, stage_rows):
         years = [int(r["year_opens"]) for r in rows if r["kind"] != "via"]
         if years != sorted(years):
             add("warn", "STAGE_ORDER", lid, "stage numbers and opening years disagree")
-        # A stop is served once track reaches it; a stop that was an infill station
-        # (opened later than its own track) keeps that delay.
+        # A stop is served once track reaches it. An infill stop on today's track keeps its
+        # stored delay; on new track the stop opens with it (infill.csv times the exceptions).
+        ex = config.load()["existing_year"]
         for i, r in enumerate(stops[lid]):
             adj = [j for j in (i - 1, i) if 0 <= j < len(orig_seg)]
-            delay = max(0, orig_stop[i] - min(orig_seg[j] for j in adj))
+            own = min(orig_seg[j] for j in adj)
+            delay = max(0, orig_stop[i] - own) if own <= ex else 0
             r["year_opens"] = str(min(new_seg[j] for j in adj) + delay)
         drift = sum(1 for y, o in zip(new_seg, orig_seg) if y != o)
         if drift:
@@ -282,6 +284,16 @@ def check(net):
             if max(s.year for s in own) > y1:
                 add("error", "INTERIM_GAP", base.name, f"via routing ends {y1} but its own track opens {max(s.year for s in own)}")
 
+    # deadlines (staging.deadlines, core_by_plan): a stage that opens after its year
+    if rules.get("deadlines") or rules.get("core_by_plan"):
+        for i, d in sorted(_deadlines(net, net.stage_rows).items()):
+            r = net.stage_rows[i]
+            if int(r["year_opens"]) > d:
+                ln = net.host_line(r["line_id"])
+                add("warn", "DEADLINE_MISSED", ln.name if ln else r["line_id"],
+                    f"stage {r['stage']} ({names.get(r['from_stop'], r['from_stop'])} - {names.get(r['to_stop'], r['to_stop'])}) "
+                    f"opens {r['year_opens']}, after its deadline {d}")
+
     # budget: spend spread over construction, against a flat annual budget with carryover
     per_year = cfg["budget"]["musd_per_year"]
     worst = over_budget(net, max(years))
@@ -292,6 +304,15 @@ def check(net):
 
 
 # ---------------------------------------------------------------- money
+BUDGET_SLACK_MUSD = 0.01   # float noise at the limit: the scheduler and the check use the same rule
+
+
+def within_budget(cum_musd, cfg, years, scale=1.0):
+    """Is cumulative spending of cum_musd over `years` years within the money accrued (config.budget,
+    with its tolerance)? The one rule both the scheduler and the budget check use."""
+    return cum_musd <= cfg["budget"]["musd_per_year"] * scale * (1 + cfg["budget"]["tolerance"]) * years + BUDGET_SLACK_MUSD
+
+
 def allocate_spending(items, cfg, horizon=2200):
     """Spend each (opening_year, cost, construction_years) item in the years before it
     opens, earliest years first and no year more than 1.5x an even share, without
@@ -352,13 +373,14 @@ def over_budget(net, last_year):
     cfg = net.cfg
     spend = spend_by_year(net)
     per_year = cfg["budget"]["musd_per_year"]
-    cum_s = cum_b = 0.0
+    ex = cfg["existing_year"]
+    cum_s = 0.0
     worst = None
-    for y in range(cfg["existing_year"] + 1, last_year + 1):
+    for y in range(ex + 1, last_year + 1):
         cum_s += spend.get(y, 0.0)
-        cum_b += per_year
-        if cum_s > cum_b * (1 + cfg["budget"]["tolerance"]) + 1e-6 and (worst is None or cum_s - cum_b > worst[1]):   # (rounding at the limit)
-            worst = (y, cum_s - cum_b)
+        over = cum_s - per_year * (y - ex)
+        if not within_budget(cum_s, cfg, y - ex) and (worst is None or over > worst[1]):
+            worst = (y, over)
     return worst
 
 
@@ -454,6 +476,9 @@ def schedule(scenario=None, log=print):
             if log:
                 log(f"{moved} of {len(rows)} stages moved to their earliest affordable year "
                     f"(scheduled against {scale:.0%} of the budget)")
+                for f in check(test):
+                    if f[1] == "DEADLINE_MISSED":
+                        log(f"warning: {f[2]}: {f[3]}")
             return rows
     raise RuntimeError("could not fit the stages in the budget")
 
@@ -761,7 +786,7 @@ def _exact_years(net, rows, log=print, scale=1.0, floor=None):
         cum = 0.0
         for t in range(ex + 1, horizon):
             cum += sp.get(t, 0.0)
-            if cum > per_year * (t - ex) + 1e-6:
+            if not within_budget(cum, cfg, t - ex, scale):
                 return False
         return True
 

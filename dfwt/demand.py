@@ -281,10 +281,12 @@ def garages(zones, net, graph, cfg):
         from . import growth
         base = getattr(zones, "base", zones)
         cache = _SETTING.setdefault(id(base), {})
+        today = cfg["existing_year"]
+        open_today = {s for ln in net.lines.values() for s, y in zip(ln.stop_ids, ln.stop_years) if y <= today}
         for run in graph.runs:
-            if run.line.status != "existing":
-                continue
             for s in run.stops:
+                if s not in open_today:   # today's lots: stations open today (a through-routed line's old part too)
+                    continue
                 i = idx[s]
                 if sids[i] not in cache:
                     st = net.stations[sids[i]]
@@ -431,7 +433,8 @@ class Access:
 
 def _diverse_nearest(arr, run_cols, k):
     """Pick up to k connector stations per zone: the nearest stop of each line run
-    first, so a nearby stop on a minor line can't crowd out the trunk line."""
+    first, so a nearby stop on a minor line can't crowd out the trunk line, and each
+    station once (several runs often share the nearest station)."""
     m = arr.shape[0]
     cand_st = np.zeros((m, len(run_cols)), dtype=np.int32)
     cand_t = np.full((m, len(run_cols)), np.inf, dtype=np.float32)
@@ -440,6 +443,11 @@ def _diverse_nearest(arr, run_cols, k):
         best = np.argmin(sub, axis=1)
         cand_st[:, j] = cols[best]
         cand_t[:, j] = sub[np.arange(m), best]
+    # a station several runs share takes one slot, not one per run
+    o = np.lexsort((cand_t, cand_st), axis=-1)
+    s_sorted, t_sorted = np.take_along_axis(cand_st, o, axis=1), np.take_along_axis(cand_t, o, axis=1)
+    t_sorted[:, 1:][s_sorted[:, 1:] == s_sorted[:, :-1]] = np.inf
+    np.put_along_axis(cand_t, o, t_sorted, axis=1)
     order = np.argsort(cand_t, axis=1)[:, :k]
     return np.take_along_axis(cand_st, order, axis=1), np.take_along_axis(cand_t, order, axis=1)
 

@@ -25,6 +25,10 @@ The zones (2020 block groups) are the base. For a given network and year:
 
 `growth.case` picks the regional trajectory: "mid" (default), or "low"/"high"
 from growth.alt (jobs follow population in proportion unless alt has a jobs table).
+`growth.spatial` picks where it lands: "even" (default: every zone by the regional
+multiplier) or "county" (growth.alt.county_weights: each zone's growth scaled by its
+county's weight, the fringe counties faster, as NCTCOG's county forecasts have it; the
+regional totals don't change).
 `growth.tod.upzone_existing_year`, if set, gives stations that already exist the
 same TOD uplift as new ones, as if they opened (were upzoned) that year.
 
@@ -63,6 +67,68 @@ def congestion(cfg, year):
         return 1.0
     decades = max(0.0, (year - c["base_year"]) / 10)
     return 1.0 + min(c["cap"], c["per_decade"] * decades)
+
+
+class Walksheds:
+    """Block groups apportioned by area: the region on a CELL_KM grid, each cell given to the
+    nearest block-group centroid (a Voronoi estimate of each group's land, no farther than
+    MAX_KM from it), so a station's walkshed counts the share of each group's land within
+    walking distance rather than whole groups by their centre point."""
+    CELL_KM, BUCKET_KM, MAX_KM = 0.2, 4.0, 8.0
+
+    def __init__(self, zx, zy):
+        c, b = self.CELL_KM, self.BUCKET_KM
+        self.x0, self.y0 = zx.min() - 2, zy.min() - 2
+        nx, ny = int((zx.max() + 2 - self.x0) / c) + 1, int((zy.max() + 2 - self.y0) / c) + 1
+        self.nx, self.ny = nx, ny
+        owner = np.full(nx * ny, -1)
+        bx, by = ((zx - self.x0) // b).astype(int), ((zy - self.y0) // b).astype(int)
+        buckets = {}
+        for i, k in enumerate(zip(bx, by)):
+            buckets.setdefault(k, []).append(i)
+        per = int(b / c)
+        ring = int(np.ceil(self.MAX_KM / b))
+        for gx in range(int(nx / per) + 1):
+            for gy in range(int(ny / per) + 1):
+                cand = [i for dx in range(-ring, ring + 1) for dy in range(-ring, ring + 1)
+                        for i in buckets.get((gx + dx, gy + dy), ())]
+                ix = np.arange(gx * per, min(nx, (gx + 1) * per))
+                iy = np.arange(gy * per, min(ny, (gy + 1) * per))
+                if not cand or not len(ix) or not len(iy):
+                    continue
+                cx, cy = np.meshgrid(self.x0 + (ix + 0.5) * c, self.y0 + (iy + 0.5) * c, indexing="ij")
+                cand = np.array(cand)
+                d2 = (cx.ravel()[:, None] - zx[cand][None, :]) ** 2 + (cy.ravel()[:, None] - zy[cand][None, :]) ** 2
+                k = np.argmin(d2, axis=1)
+                ok = d2[np.arange(len(k)), k] <= self.MAX_KM ** 2
+                II, JJ = np.meshgrid(ix, iy, indexing="ij")
+                flat = (II.ravel() * ny + JJ.ravel())[ok]
+                owner[flat] = cand[k[ok]]
+        self.owner = owner
+        self.cells = np.bincount(owner[owner >= 0], minlength=len(zx)).astype(float)
+
+    def cells_near(self, x, y, r=0.8):
+        c = self.CELL_KM
+        i0, i1 = max(0, int((x - r - self.x0) / c)), min(self.nx - 1, int((x + r - self.x0) / c))
+        j0, j1 = max(0, int((y - r - self.y0) / c)), min(self.ny - 1, int((y + r - self.y0) / c))
+        I, J = np.meshgrid(np.arange(i0, i1 + 1), np.arange(j0, j1 + 1), indexing="ij")
+        d2 = (self.x0 + (I + 0.5) * c - x) ** 2 + (self.y0 + (J + 0.5) * c - y) ** 2
+        return (I * self.ny + J)[d2 <= r * r]
+
+    def share(self, flat):
+        """Each block group's share of its land inside the given cells."""
+        o = self.owner[np.unique(flat)]
+        o = o[o >= 0]
+        return np.bincount(o, minlength=len(self.cells)) / np.maximum(self.cells, 1)
+
+
+
+def walksheds(zones):
+    """Walksheds for the base zones (built once)."""
+    base = getattr(zones, "base", zones)
+    if "_walksheds" not in base.__dict__:
+        base._walksheds = Walksheds(base.x, base.y)
+    return base._walksheds
 
 
 def setting(zones, lat, lon, cfg):
@@ -271,6 +337,22 @@ def near_stations(zones, net, year, radius_m=800):
     return m
 
 
+def _spatial(zones, cfg, kind, mult):
+    """Base values to grow by the regional multiplier `mult` so that growth lands as growth.spatial
+    says: "county" scales each zone's growth (mult - 1) by its county's weight (jobs by
+    jobs_factor of the deviation), normalized so the regional total is unchanged."""
+    base = zones.pop if kind == "pop" else zones.jobs
+    g = cfg["growth"]
+    if g.get("spatial", "even") != "county" or mult == 1.0:
+        return base
+    cw = g["alt"]["county_weights"]
+    raw = np.array([float(cw["weights"].get(i[:5], cw["other"])) for i in zones.ids])
+    if kind == "jobs":
+        raw = 1 + (raw - 1) * cw.get("jobs_factor", 1.0)
+    w = raw * base.sum() / (raw * base).sum()
+    return base * (1 + (mult - 1) * w) / mult
+
+
 def grown_zones(zones, net, year, cfg):
     """A shallow copy of `zones` with this year's population, jobs and congestion."""
     g = cfg["growth"]
@@ -278,8 +360,9 @@ def grown_zones(zones, net, year, cfg):
     z = copy.copy(zones)
     z.base = getattr(zones, "base", zones)   # base-year data (e.g. for a station's setting)
     nn = g["tod"]["net_new_share"]
-    z.pop = _grow(zones.pop, regional(cfg, "pop", year), up_p, nn)
-    z.jobs = _grow(zones.jobs, regional(cfg, "jobs", year), up_j, nn)
+    mp, mj = regional(cfg, "pop", year), regional(cfg, "jobs", year)
+    z.pop = _grow(_spatial(zones, cfg, "pop", mp), mp, up_p, nn)
+    z.jobs = _grow(_spatial(zones, cfg, "jobs", mj), mj, up_j, nn)
     z.pop, z.jobs, z.capture = capture(zones, net, year, cfg, z.pop, z.jobs)
     z.cong = congestion(cfg, year)
     z.year = year

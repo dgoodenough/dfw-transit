@@ -152,6 +152,7 @@ sup a{text-decoration:none;font-size:.7em;padding:0 1px}
 .conn .mini{height:190px;position:relative;border-radius:8px;overflow:hidden;background:var(--bg)}
 .conn .mini canvas{position:absolute;inset:0;width:100%;height:100%}
 .conn .nums{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;font-size:.78rem;color:var(--muted)}
+.conn .nums div:last-child{grid-column:1/-1}
 .conn .nums b{display:block;font-family:var(--f-display);font-size:1.45rem;color:var(--ink);line-height:1.05;font-variant-numeric:tabular-nums}
 
 /* 2100 comparison */
@@ -197,7 +198,7 @@ footer{max-width:900px;margin:0 auto;padding:20px 20px 60px;font-size:.8rem;colo
   <canvas id="hero-map" aria-hidden="true"></canvas>
   <div class="in">
     <div class="kicker">A hypothetical plan, tested with a ridership model</div>
-    <h1 id="h-hero">By 2100, <span data-v="pop2100"></span> people will live in Dallas&ndash;Fort Worth.</h1>
+    <h1 id="h-hero">By 2100, <span data-v="pop2100"></span> people could live in Dallas&ndash;Fort Worth.<span id="hero-cite"></span></h1>
     <p class="dek">Today almost all of them would have to drive to get anywhere. This is the case for a regional transit network built at a steady
       <span data-v="budgetB"></span> a year, what it would change, and what it wouldn't.</p>
     <div class="ctas"><a class="btn" href="#roads">Read the story &darr;</a><a class="btn ghost" href="map.html">Skip to the map&nbsp;&rarr;</a></div>
@@ -318,7 +319,8 @@ const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 // ---------- facts and footnotes ----------
 const FF = D.facts || {}, F = Object.assign({}, FF.charts || {}), SRC = FF.sources || {}, cited = [];
-const stepHtml = name => ((FF.steps || {})[name] || []).map(([t, ids]) => `<p>${t}${(ids || []).map(cite).join('')}</p>`).join('');
+const TOK = {};   // model numbers the cited text refers to ({per_res} etc.), filled in before use
+const stepHtml = name => ((FF.steps || {})[name] || []).map(([t, ids]) => `<p>${t.replace(/\{(\w+)\}/g, (m, k) => TOK[k] ?? m)}${(ids || []).map(cite).join('')}</p>`).join('');
 function cite(id) {
   const f = SRC[id];
   if (!f) return '';
@@ -348,6 +350,7 @@ const M = {
   car45_2100: popW(Z.drive45_2100, Z.pop_2100),
   ct45_2100: popW(Z.jobs45_current_track_2100, Z.pop_ct_2100), pr45_2100: popW(Z.jobs45_two_million_2100, Z.pop_2100),
 };
+$('hero-cite').innerHTML = cite('pop2100');
 document.querySelectorAll('[data-v]').forEach(el => {
   const v = el.dataset.v;
   el.textContent = v === 'pop2100' ? (M.pop2100 / 1e6).toFixed(0) + ' million' : v === 'budgetB' ? '$' + (M.budget / 1000).toFixed(1) + ' billion' : '';
@@ -409,18 +412,17 @@ class RegionMap {
       const rr = Math.max(1, Math.min(2.4, this.s * 0.009));
       for (let i = 0; i < NZ; i++) if (Z.pop[i] > 0) { const [x, y] = this.P(Z.lat[i], Z.lon[i]); ctx.fillRect(x - rr / 2, y - rr / 2, rr, rr); }
     }
-    // lines open by st.year (current track: existing lines only)
+    // lines open by st.year (today's system, and the current track, from today's lines)
     if (st.year) {
       const lw = st.lineWidth || Math.max(1.2, Math.min(3, this.s * 0.012));
-      for (const ln of D.lines) {
-        if (st.scen === 'ct' && !ln.existing) continue;
+      const today = st.scen === 'ct' || st.year <= 2025;
+      for (const ln of today ? D.lines_today : D.lines) {
         const dim = st.only && !st.only.includes(ln.id);
         ctx.strokeStyle = ln.color; ctx.globalAlpha = (dim ? 0.15 : 1) * (st.lineAlpha ?? 1);
         ctx.lineWidth = ln.mode === 'brt' ? lw * 0.7 : ln.mode === 'streetcar' ? lw * 0.6 : lw;
         ctx.setLineDash(ln.mode === 'brt' ? [lw * 2, lw * 1.2] : []);
         for (const [y, pts] of ln.segs) {
           if (y > st.year) continue;
-          if (st.scen === 'ct' && y > 2025) continue;
           ctx.beginPath();
           pts.forEach(([lon, lat], k) => { const [x, yy] = this.P(lat, lon); k ? ctx.lineTo(x, yy) : ctx.moveTo(x, yy); });
           ctx.stroke();
@@ -468,14 +470,26 @@ function hbars(stage, rows, opt = {}) {
   // rows: [{label, value, color, note}] - one measure, one axis
   stage.innerHTML = '';
   const W = stage.clientWidth, H = stage.clientHeight, svg = svgEl('svg', {class: 'full', viewBox: `0 0 ${W} ${H}`, role: 'img', 'aria-label': opt.aria || ''}, stage);
-  const lw = Math.min(210, W * 0.42), vw = 70, bh = Math.min(30, (H - 20) / rows.length - 12), max = Math.max(...rows.map(r => r.value)) || 1;
+  const narrow = W < 460;   // phones: each label on its own line above its bar, never cut
+  const lw = narrow ? 0 : Math.min(230, W * 0.42), vw = 64, gap = narrow ? 30 : 12;
+  const bh = Math.min(narrow ? 18 : 30, (H - 20) / rows.length - gap), max = opt.max || Math.max(...rows.map(r => r.value)) || 1;
+  const top = i => 10 + i * (bh + gap) + (H - 20 - rows.length * (bh + gap)) / 2 + (narrow ? gap - 10 : 0);
   rows.forEach((r, i) => {
-    const y = 10 + i * (bh + 12) + (H - 20 - rows.length * (bh + 12)) / 2;
-    svgEl('text', {x: 0, y: y + bh / 2 + 4, fill: css('--ink'), 'font-size': 13}, svg).textContent = r.label;
+    const y = top(i);
+    svgEl('text', narrow ? {x: 0, y: y - 6, fill: css('--ink'), 'font-size': 13} : {x: 0, y: y + bh / 2 + 4, fill: css('--ink'), 'font-size': 13}, svg).textContent = r.label;
     const w = Math.max(3, (W - lw - vw - 8) * r.value / max);
     svgEl('path', {d: `M${lw},${y} h${w - 4} q4,0 4,4 v${bh - 8} q0,4 -4,4 h${-(w - 4)} z`, fill: r.color || css('--pr')}, svg);
     svgEl('text', {x: lw + w + 6, y: y + bh / 2 + 4, fill: css('--ink'), 'font-size': 13, 'font-weight': 600}, svg).textContent = r.text || fmt(r.value);
   });
+  if (opt.mark != null) {   // a reference line, e.g. 50% of the vote
+    const x = lw + (W - lw - vw - 8) * opt.mark / max;
+    svgEl('line', {x1: x, x2: x, y1: 4, y2: H - 4, stroke: css('--ink'), 'stroke-dasharray': '3 3', 'stroke-width': 1}, svg);
+    svgEl('text', {x: x + 4, y: H - 6, fill: css('--muted'), 'font-size': 11}, svg).textContent = opt.markLabel || '';
+  }
+  // the same numbers as text, for screen readers
+  const ul = document.createElement('ul'); ul.className = 'sr';
+  ul.innerHTML = rows.map(r => `<li>${r.label}: ${r.text || fmt(r.value)}</li>`).join('');
+  stage.appendChild(ul);
 }
 function lineChart(stage, series, opt = {}) {
   // series: [{name, color, pts: [[year, value]]}], one y axis
@@ -594,8 +608,12 @@ const invStage = $('inv-stage');
 let invMap = null;
 function invMapOn() { if (!invMap) { invStage.innerHTML = '<canvas></canvas>'; invMap = new RegionMap(invStage.firstChild); } return invMap; }
 const perRes = y => M.budget * 1e6 / (at('two_million', y, 'pop_m') * 1e6);
+TOK.per_res = '$' + Math.round(perRes(2025));
+TOK.budget_b = '$' + (M.budget / 1000).toFixed(1) + 'B';
+TOK.opex_2050 = '$' + at('two_million', 2050, 'opex_busd_per_year').toFixed(1) + 'B';
+TOK.opex_per_res = '$' + Math.round(at('two_million', 2050, 'opex_busd_per_year') * 1e9 / (at('two_million', 2050, 'pop_m') * 1e6));
 $('s-budget').innerHTML = `<p>The plan assumes one thing: a steady <span class="big pr">$${(M.budget / 1000).toFixed(1)}B a year</span>
-  for new lines, stations and garages, every year until 2100, at today's prices. That is about $${Math.round(perRes(2025))} per resident a year today,
+  for new lines, stations and garages, every year until 2100, at today's prices. That is about ${TOK.per_res} per resident a year today,
   falling to $${Math.round(perRes(2100))} as the region grows.</p>${stepHtml('budget')}`;
 $('s-peers').innerHTML = stepHtml('peers');
 const tr = sc => (D.years[sc] || []).map(r => [r.year, r.daily_trips]);
@@ -607,7 +625,19 @@ $('s-y2100').innerHTML = yearCard(2100, 'A regional network: metro, regional rai
 $('s-riders').innerHTML = `<p>The ridership model, calibrated to today's riders, puts the plan at about
   <span class="big pr">${fmt(at('two_million', 2100, 'daily_trips'))}</span>daily trips in 2100. On today's network, a much bigger region still takes only
   <b style="color:var(--ct)">${fmt(at('current_track', 2100, 'daily_trips'))}</b>.</p>
-  <p class="note">If the region grows more slowly than the official forecast, the plan carries about ${fmt((F._low || {}).trips2100 || 1.17e6)}. Either way, it is ten times the current track.</p>`;
+  <p class="note">${rangeNote()}</p>`;
+function rangeNote() {
+  // R1/R4: what the network does, what policy does, and how growth changes it
+  const R = D.range || {}, mid = R.mid || {}, cases = Object.values(R).filter(r => r.pr && r.ct && r.ct_policy);
+  if (!mid.ct_policy) return '';
+  const net = cases.map(r => r.pr / r.ct_policy), all = cases.map(r => r.pr / r.ct);
+  const lo = Math.min(...net), hi = Math.max(...all);
+  return `How much of that is the network? Run today's network with the plan's parking and access policies and it carries about
+    ${fmt(mid.ct_policy)}: the network itself multiplies ridership about ${(mid.pr / mid.ct_policy).toFixed(1)} times, and with the policies about
+    ${(mid.pr / mid.ct).toFixed(0)} times. If growth follows the county forecasts out to Collin and Denton, the plan carries about
+    ${fmt((R.county || {}).pr)}; if the region grows more slowly, about ${fmt((R.low || {}).pr)}. Across these cases the plan carries
+    about ${Math.floor(lo)}&ndash;${Math.round(hi)} times what the current track would.`;
+}
 $('s-appetite').innerHTML = stepHtml('appetite');
 ['_budget_compare', '_peers', '_appetite'].forEach(k => ((F[k] || {}).cites || []).forEach(cite));
 function invYear(y) {
@@ -627,7 +657,8 @@ scrolly('invest', {
     invMap = null;
     const rows = (F._peers && F._peers.rows) || [];
     figText('inv', (F._peers || {}).title || 'Transit capital per resident per year', (F._peers || {}).sub || '', capOf(F._peers));
-    if (rows.length) hbars(invStage, rows.map(r => ({label: r.label, value: r.value, text: r.text, color: r.plan ? css('--pr') : css('--muted')})), {aria: 'Peer regions compared'});
+    if (rows.length) hbars(invStage, rows.map(r => r.plan ? {label: r.label, value: perRes(2025), text: TOK.per_res, color: css('--pr')}
+      : {label: r.label, value: r.value, text: r.text, color: css('--muted')}), {aria: 'Transit capital per resident per year, peer regions compared'});
     else invStage.innerHTML = '';
   },
   y2035() { invYear(2035); }, y2050() { invYear(2050); }, y2100() { invYear(2100); },
@@ -641,7 +672,7 @@ scrolly('invest', {
     invMap = null;
     const rows = (F._appetite && F._appetite.rows) || [];
     figText('inv', (F._appetite || {}).title || 'Recent transit votes and polls', (F._appetite || {}).sub || '', capOf(F._appetite));
-    if (rows.length) hbars(invStage, rows.map(r => ({label: r.label, value: r.value, text: r.text, color: css('--pr')})), {aria: 'Support for transit in votes and polls'});
+    if (rows.length) hbars(invStage, rows.map(r => ({label: r.label, value: r.value, text: r.text, color: css('--pr')})), {aria: 'Recent votes on transit in Texas', max: 100, mark: 50, markLabel: '50%'});
     else invStage.innerHTML = '';
   },
 });
@@ -654,21 +685,26 @@ $('near-intro').innerHTML = `A station changes the few blocks around it. The pla
   how often it runs, and how many people would live within a 10-minute walk.`;
 const ST = D.stations, stByName = new Map(ST.map(s => [s.name.toLowerCase(), s]));
 const gradeWord = g => g === 'tunnel' ? 'underground' : g === 'elevated' ? 'elevated' : 'street level';
+const settingLabel = {downtown: 'Downtown', urban: 'Dense neighborhood', suburban: 'Lower-density area'};
+// [[year, grade], ...] -> "street level today, underground from 2035"
+const gradeText = tl => tl.map(([y, g], k) => gradeWord(g) + (tl.length > 1 ? (k === 0 ? (y <= 2025 ? ' today' : ' from ' + y) : ' from ' + y) : '')).join(', ');
 const modeWord = {metro: 'light rail / metro', brt: 'BRT bus', commuter: 'regional rail', streetcar: 'streetcar'};
 const stMap = new RegionMap($('st-map'), {pad: 16});
 function showStation(s) {
   const yrs = Object.entries(s.years).sort((a, b) => a[1] - b[1]);
   const opens = yrs.map(([m, y]) => `${modeWord[m] || m} ${y <= 2025 ? 'today' : y}`).join(', ');
-  const grade = Object.entries(s.grade).map(([m, g]) => `${modeWord[m] || m}: ${gradeWord(g)}`).join('; ') || 'street level';
+  const gr = Object.entries(s.grade).filter(([m, tl]) => tl.some(([, g]) => g !== 'surface'));
+  const grade = gr.map(([m, tl]) => (Object.keys(s.grade).length > 1 ? `${modeWord[m] || m}: ` : '') + gradeText(tl)).join('; ') || 'street level';
   const [p25, pct2100, pp2100] = s.pop, d = pp2100 - pct2100;
   const maxp = Math.max(p25, pct2100, pp2100, 1);
-  $('st-card').innerHTML = `<h3>${s.name}</h3><div class="meta">${s.setting === 'downtown' ? 'Downtown' : s.setting === 'urban' ? 'In town' : 'Suburban'} station &middot; ${s.existing ? 'open today' : 'new'}</div>
+  $('st-card').innerHTML = `<h3>${s.name}</h3><div class="meta">${settingLabel[s.setting] || ''} &middot; ${s.existing ? 'open today' : 'new'}</div>
     <div style="margin-top:8px">${s.lines.map(([n, c]) => `<span class="lpill"><i style="background:${c}"></i>${n}</span>`).join('')}</div>
-    <dl class="facts"><dt>Opens</dt><dd>${opens}</dd><dt>Platform</dt><dd>${grade}</dd><dt>Every</dt><dd>${s.headway} min at rush hour (2050)</dd>
-      <dt>Parking</dt><dd>${s.garage ? fmtN(s.garage) + ' spaces in a garage' : 'none: people walk, bike, ride a feeder bus or get dropped off'}</dd></dl>
+    <dl class="facts"><dt>Opens</dt><dd>${opens}</dd><dt>Platform</dt><dd>${grade}</dd><dt>Every</dt><dd>${s.headway[1]} min at rush hour (${s.headway[0]})</dd>
+      <dt>Parking</dt><dd>${s.garage ? fmtN(s.garage) + (s.garage_today >= s.garage ? ' spaces (today\'s lot)' : ' spaces in a garage') : 'none: people walk, bike, ride a feeder bus or get dropped off'}</dd></dl>
     <div class="note">People living within a 10-minute walk (${A.walk_km * 1000} m)</div>
     <div class="bars3">${[['Today', p25, 'var(--muted)'], ['2100, current track', pct2100, 'var(--ct)'], ['2100, with the plan', pp2100, 'var(--pr)']].map(([l, v, c]) =>
       `<div class="r"><span>${l}</span><span class="t"><i style="width:${(v / maxp * 100).toFixed(1)}%;background:${c}"></i></span><b>${fmtN(v)}</b></div>`).join('')}</div>
+    <p style="margin:8px 0 0"><a href="map.html#year=${Math.max(2025, ...Object.values(s.years))}&amp;station=${encodeURIComponent(s.id)}">See it on the map&nbsp;&rarr;</a></p>
     <p class="note" style="margin-top:10px">${d > 50 ? `About ${fmtN(d)} more neighbors than the region's growth alone would bring (${pct(d / Math.max(1, pct2100))}), from homes built near the station.` : 'About the same as without the plan: little new building is assumed here.'}</p>`;
   const ll = [s.lat, s.lon], dz = 0.12;
   stMap.set({bbox: {x0: (s.lon - dz * 1.6) * KX, x1: (s.lon + dz * 1.6) * KX, y0: s.lat - dz, y1: s.lat + dz}, year: 2100, scen: 'p',
@@ -700,10 +736,11 @@ $('st-chips').addEventListener('click', e => { const b = e.target.closest('.chip
   list.addEventListener('click', e => { const li = e.target.closest('li'); if (li) { showStation(hits[+li.id.slice(4)]); hits = []; render(); q.value = ''; } });
 })();
 showStation(stByName.get((EX.find(n => stByName.has(n.toLowerCase())) || ST[0].name).toLowerCase()));
-const farShare = CH.pop_far_2100 / CH.pop_2100;
-$('near-region').innerHTML = `Most of the region doesn't change at all. In 2100, <b>${pct(farShare)}</b> of residents live more than a 10-minute walk from any
-  station in the plan; their neighborhoods grow exactly as they would on the current track. Near stations, the plan adds about
-  <b>${fmt(CH.pop_near_2100 - CH.pop_near_2100_ct)}</b> residents by 2100, homes the region would otherwise build further out.`;
+const farShare = CH.pop_far_2100 / CH.pop_2100, farLess = 1 - CH.pop_far_2100 / CH.pop_far_2100_ct;
+$('near-region').innerHTML = `Most of the region changes little. In 2100, <b>${pct(farShare)}</b> of residents live more than a 10-minute walk from any
+  station in the plan. Their neighborhoods still grow, but about ${pct(farLess)} less than on the current track, because some of the new homes
+  are built near stations instead: the plan adds about <b>${fmt(CH.pop_near_2100 - CH.pop_near_2100_ct)}</b> residents within a walk of a station by 2100.
+  More neighbors near stations also means rents rise there unless the region builds enough homes; that takes housing policy, not just trains.`;
 const tod = A.tod || {};
 $('assume').innerHTML = [
   ['Building costs', `$${A.cost_per_km.metro.surface}M`, `per km of light rail at street level ($${A.cost_per_km.metro.tunnel}M in a tunnel), $${A.cost_per_km.brt.surface}M per km of BRT: today's US costs, falling about 25% by 2055 as a steady program learns.`],
@@ -711,19 +748,21 @@ $('assume').innerHTML = [
   ['Changing vehicles', `${A.transfer_min} min`, 'is what each change of bus or train costs riders, on top of the wait: riders avoid transfers, and the model counts that.'],
   ['Growth near stations', `+${Math.round(((tod.pop_uplift || {}).urban || 0.5) * 100)}%`, `more residents within walking distance of a new in-town station over about ${tod.ramp_mid_years || 10} years (${Math.round(((tod.pop_uplift || {}).downtown || 0.75) * 100)}% downtown, ${Math.round(((tod.pop_uplift || {}).suburban || 0.25) * 100)}% suburban), and ${Math.round(((A.capture || {}).pop_share || 0.2) * 100)}% of the region's growth steered to station areas.`],
   ['Parking', `${fmtN(A.pnr_spaces.terminus)} spaces`, `in a garage at the end of each rail line and ${fmtN(A.pnr_spaces.commuter_station)} at regional rail stations; no new garages downtown.`],
-  ['Who rides', 'Commuters', 'The model counts weekday commutes and the trips that go with them, not evenings, weekends or visitors, so the totals are, if anything, low.'],
+  ['Who rides', 'Weekday trips', 'The model counts weekday commutes and scales them to all trips the way today\'s riders split, about half commutes. Evening and weekend service isn\'t modelled separately.'],
 ].map(([h, b, p]) => `<div class="panel"><h4>${h}</h4><b>${b}</b><p>${p}</p></div>`).join('');
 
 // ---------- chapter 4: connections ----------
 $('conn-intro').innerHTML = `A network is worth more than its lines. These are some of the links the plan builds, with the rush-hour ride on the plan
-  against the drive, and how many jobs someone at the start can reach within 45 minutes by transit.`;
+  against the drive, and how many jobs someone at the start can reach within 45 minutes by rail and BRT (local buses count only as a way to reach them).
+  Ride times are clock minutes from platform to platform, waits included.`;
 $('conns').innerHTML = D.connections.map((c, i) => {
-  const ride = c.ride['two_million_2100'], drive = c.drive[2100];
+  const ride = c.ride['two_million_2100'], drive = c.drive[2100], now = c.ride['current_track_2025'];
   const j0 = c.jobs45['current_track_2025'], j1 = c.jobs45['current_track_2100'], j2 = c.jobs45['two_million_2100'];
   return `<article class="panel conn"><h3>${c.title}</h3><p class="why">${c.why}</p>
     <div class="mini"><canvas id="cm-${i}" role="img" aria-label="Map: ${c.from} to ${c.to}"></canvas></div>
-    <div class="nums"><div><b style="color:var(--pr)">${ride != null ? ride + ' min' : '–'}</b>by transit, 2100</div><div><b>${drive} min</b>rush-hour drive, 2100</div>
-      <div><b style="color:var(--pr)">${fmt(j2)}</b>jobs in 45 min from ${c.from}, 2100 (${fmt(j1)} on the current track; ${fmt(j0)} today)</div></div></article>`;
+    <div class="nums"><div><b style="color:var(--ct)">${now != null ? now + ' min' : 'no trip'}</b>by transit today</div><div><b style="color:var(--pr)">${ride != null ? ride + ' min' : '–'}</b>by transit, 2100</div><div><b>${drive} min</b>rush-hour drive, 2100</div>
+      <div><b style="color:var(--pr)">${fmt(j2)}</b>jobs in 45 min from ${c.from}, 2100 (${fmt(j1)} on the current track; ${fmt(j0)} today)</div></div>
+    <p style="margin:6px 0 0"><a href="map.html#year=2100&amp;trip=${encodeURIComponent(c.from_id)}|${encodeURIComponent(c.to_id)}">Plan this trip&nbsp;&rarr;</a></p></article>`;
 }).join('');
 D.connections.forEach((c, i) => {
   const lat = [c.from_ll[0], c.to_ll[0]], lon = [c.from_ll[1], c.to_ll[1]], pad = 0.05;
@@ -748,10 +787,10 @@ function twin(mode) {
 }
 $('tw-lines').onclick = () => twin('lines'); $('tw-jobs').onclick = () => twin('jobs');
 twin('lines');
-const near800 = (sc, y) => at(sc, y, 'pop_covered_pct') / 100;
+
 const rowsCmp = [
   ['Daily transit trips', fmt(at('current_track', 2100, 'daily_trips')), fmt(at('two_million', 2100, 'daily_trips'))],
-  ['Residents within a 10-minute walk of a station', pct(near800('current_track', 2100)), pct(near800('two_million', 2100))],
+  ['Residents within a 10-minute walk of a station', pct(CH.near_today_2100_ct / CH.pop_2100_ct), pct(1 - farShare)],
   ['Jobs the average resident reaches in 45 min by transit', fmt(M.ct45_2100), fmt(M.pr45_2100)],
   ['Jobs the average resident reaches in 45 min by car', fmt(M.car45_2100), fmt(M.car45_2100)],
   ['New capital, 2025-2100 (today\'s dollars)', '$0', '$' + at('two_million', 2100, 'capex_busd').toFixed(0) + 'B'],

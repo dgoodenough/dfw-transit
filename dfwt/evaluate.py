@@ -194,11 +194,24 @@ def _without_job(args):
 
 
 def _final_job(args):
-    key, lid = args
-    net = _POOL["nets"][key]
-    r = run_year(_POOL["ctx"], net.without(lid) if lid else net, _POOL["final"], want_loads=False,
-                 inputs=_POOL["inputs"][key])
-    return key, lid, r["daily_trips"]
+    """One final-year run of the scenario with some lines' stages deferred past the horizon."""
+    lid, mode = args
+    from .network import Network
+    rows = _defer(_POOL["rows"], _POOL["cands"], lid, mode)
+    net = Network.load(_POOL["scenario"], _POOL["ctx"].cfg, stage_rows=rows)
+    r = run_year(_POOL["ctx"], net, _POOL["final"], want_loads=False, inputs=_POOL["inputs"])
+    return lid, mode, r["daily_trips"], sum(net.opex_musd(_POOL["final"]).values())
+
+
+def _defer(rows, cands, lid, mode):
+    """Stage rows with lines deferred past the horizon: mode "full" none, "without" `lid`,
+    "alone" every proposed line but `lid`, "none" every proposed line."""
+    out = []
+    for r in rows:
+        off = (mode == "none" or (mode == "without" and r["line_id"] == lid)
+               or (mode == "alone" and r["line_id"] != lid)) and r["line_id"] in cands
+        out.append(dict(r, year_opens="9999") if off else r)
+    return out
 
 
 def _all_open(net):
@@ -221,52 +234,60 @@ def _all_open(net):
 
 def final_values(ctx, net, procs=None, log=print, only=None):
     """The scheduler's ranking (staging, priority value_per_musd), the same whatever order the
-    lines open in: each proposed line's daily trips lost when it is removed from the finished
-    network (final year, on the land use of the network with everything open, _all_open), per $M
-    of its share of capital at 2025 prices (Network.shared_cost_musd).
-    A line through-routed into another (edits through_route) is measured on the network
-    without that join. Returns rows: line_id, host, marginal_final, cost_shared_musd, value_per_musd."""
-    from .network import Network
+    lines open in. Two measures of each proposed line's daily trips in the final year, both on one
+    land use (the network with everything open, _all_open):
+      marginal_final  trips lost when its stages are deferred out of the finished network
+      marginal_alone  trips gained when it alone is added to today's network (every other
+                      proposed line deferred)
+    A line through-routed into another (edits through_route) is measured by deferring its own
+    stages, so its riders ride on through as they do in the plan. value_per_musd is their mean
+    per $M of the line's cost: its share of capital at 2025 prices (Network.shared_cost_musd)
+    plus staging.value_opex_years of its operating cost (the mean of the two measures' change).
+    Returns rows: line_id, host, marginal_final, marginal_alone, cost_shared_musd, opex_musd,
+    value_per_musd."""
+    from . import staging
     final = max(ctx.cfg["years"])
     procs = procs or max(1, min(3, (os.cpu_count() or 2) - 1))
-    nets = {"": net}
-    tables, edits = Network.read_tables(None if net.name == "plan" else net.name)
-    for lid in net.absorbed:
-        # without its join; if a later join onto the same host needed it (a chain), without that too
-        cut = next(i for i, e in enumerate(edits) if e["op"] == "through_route" and e["field"] == lid)
-        try:
-            nets[lid] = Network.from_raw(copy.deepcopy(tables), edits[:cut] + edits[cut + 1:], net.cfg, net.name)
-        except ValueError:
-            keep = [e for i, e in enumerate(edits) if not (e["op"] == "through_route" and i >= cut
-                                                           and e["target"] == edits[cut]["target"])]
-            nets[lid] = Network.from_raw(copy.deepcopy(tables), keep, net.cfg, net.name)
-    measured = [("", ln.id) for ln in net.lines.values() if ln.status != "existing" and ln.first_year <= final]
-    measured += [(lid, lid) for lid in net.absorbed if lid in nets[lid].lines and nets[lid].lines[lid].status != "existing"]
-    if only:   # just these lines (the rest keep their last values)
-        measured = [(k, lid) for k, lid in measured if lid in only]
-        nets = {k: v for k, v in nets.items() if k == "" or k in only}
-    jobs = sorted({(k, None) for k, _ in measured}) + measured
-    # one land use per network, from it with everything open (the run with the line and the one
-    # without it share it: the value is what the line does for travel)
-    inputs = {k: ctx.year_inputs(_all_open(n), final) for k, n in nets.items()}
-    _POOL.update(ctx=ctx, nets=nets, final=final, inputs=inputs)
+    ex = ctx.cfg["existing_year"]
+    rows = net.stage_rows
+    cands = sorted({r["line_id"] for r in rows if r["kind"] != "via" and int(r["year_opens"]) > ex
+                    and int(r["year_opens"]) <= final and net.host_line(r["line_id"]) is not None})
+    measured = [l for l in cands if not only or l in only]
+    jobs = [(None, "full"), (None, "none")] + [(l, m) for l in measured for m in ("without", "alone")]
+    inputs = ctx.year_inputs(_all_open(net), final)
+    _POOL.update(ctx=ctx, rows=rows, cands=set(cands), final=final, inputs=inputs,
+                 scenario=None if net.name == "plan" else net.name)
     if procs <= 1:
         res = [_final_job(j) for j in jobs]
     else:
         import multiprocessing as mp
         with mp.get_context("fork").Pool(procs) as pool:
             res = pool.map(_final_job, jobs, chunksize=1)
-    trips = {(k, lid): v for k, lid, v in res}
-    rows = []
-    for key, lid in measured:
-        n = nets[key]
-        m = trips[(key, None)] - trips[(key, lid)]
-        c = n.shared_cost_musd(n.lines[lid])
-        rows.append({"line_id": lid, "host": net.absorbed.get(lid, "") if key else "", "marginal_final": round(m),
-                     "cost_shared_musd": round(c), "value_per_musd": round(m / c, 2) if c else ""})
+    out = {(lid, mode): (t, o) for lid, mode, t, o in res}
+    (full, op_full), (none, op_none) = out[(None, "full")], out[(None, "none")]
+    years = ctx.cfg["staging"].get("value_opex_years", 20)
+    names = {k: v.name for k, v in net.stations.items()}
+    table = []
+    for lid in measured:
+        (tw, ow), (ta, oa) = out[(lid, "without")], out[(lid, "alone")]
+        m1, m2 = full - tw, ta - none
+        opex = max(0.0, ((op_full - ow) + (oa - op_none)) / 2)
+        host = net.host_line(lid)
+        idx = None
+        if host.id != lid:   # through-routed: its part of the joined line
+            idx = set()
+            for r in rows:
+                if r["line_id"] == lid and r["kind"] != "via":
+                    a, b = sorted(staging.resolve_on(net, host, r[c], names) for c in ("from_stop", "to_stop"))
+                    idx |= set(range(a, b + 1))
+        cap = net.shared_cost_musd(host, idx)
+        cost = cap + years * opex
+        table.append({"line_id": lid, "host": host.id if host.id != lid else "", "marginal_final": round(m1),
+                      "marginal_alone": round(m2), "cost_shared_musd": round(cap), "opex_musd": round(opex, 1),
+                      "value_per_musd": round((m1 + m2) / 2 / cost, 2) if cost else ""})
     if log:
-        log(f"  {net.name}: final-year values for {len(rows)} lines ({len(nets) - 1} through-routed)")
-    return rows
+        log(f"  {net.name}: final-year values for {len(table)} lines")
+    return table
 
 
 def write_final_values(out_dir, rows):
@@ -386,10 +407,10 @@ def evaluate(ctx, net, line_values=True, log=print, procs=None):
             y0 = row.pop("_y0", None)
             if y0 is None:
                 continue
-            v = by_line[row["line_id"]]
+            v = by_line.get(row["line_id"], {})   # a host whose own stages are today's has none
             row["marginal_at_opening"] = round(base[y0] - without[(row["line_id"], y0)])
-            row["marginal_final"] = v["marginal_final"]
-            row["value_per_musd"] = v["value_per_musd"]   # order-independent (final_values), what the scheduler ranks by
+            row["marginal_final"] = v.get("marginal_final", "")
+            row["value_per_musd"] = v.get("value_per_musd", "")   # order-independent (final_values), what the scheduler ranks by
         ev_values = fv
         log(f"  {net.name}: line values for {sum(1 for r in line_rows if r['status'] != 'existing')} proposed lines")
 

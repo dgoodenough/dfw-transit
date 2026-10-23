@@ -98,6 +98,7 @@ class Line:
     service: list = field(default_factory=list)   # [(from_year, headway_min)], sorted
     pnr_stops: list = field(default_factory=list)  # former termini (through-routed) that keep a garage
     cruise_kmh: float = 0.0   # this line's average running speed, if not its mode's (an express bus on a freeway)
+    retire: int = NEVER       # first year it no longer runs (retire_with: an interim bus replaced by rail)
 
     def headway_at(self, year):
         hw = self.headway
@@ -214,13 +215,18 @@ class Network:
         r_km = self.cfg["transfer"]["walk_radius_m"] / 1000
         st = self.stations
 
+        linked = collections.defaultdict(set)   # explicit walk links (transfers.csv) count as "there"
+        for a, b, *_ in self.transfers:
+            linked[a].add(b)
+            linked[b].add(a)
+
         def arrival(lid, sid):
             ln = self.lines.get(lid) or (self.host_line(lid) if lid in self.absorbed else None)
             if ln is None:
                 return None
             here = st[sid]
             years = [y for s, y in zip(ln.stop_ids, ln.stop_years)
-                     if s == sid or geo.hav_km(here.lat, here.lon, st[s].lat, st[s].lon) <= r_km]
+                     if s == sid or s in linked[sid] or geo.hav_km(here.lat, here.lon, st[s].lat, st[s].lon) <= r_km]
             return min(years) if years else None
         for r in rows:
             sid = r["station_id"]
@@ -306,6 +312,9 @@ class Network:
                 ln.service = sorted([x for x in ln.service if x[0] != int(e["field"] or 0)] + [(int(e["field"] or 0), float(e["value"]))])
             elif op == "set_line":
                 setattr(ln, e["field"], float(e["value"]) if e["field"] in ("headway", "cruise_kmh") else e["value"])
+            elif op == "retire_with":   # runs until the named line's stages have all opened
+                ys = [int(r["year_opens"]) for r in self.stage_rows if r["line_id"] == e["field"] and r["kind"] != "via"]
+                ln.retire = max(ys) if ys else NEVER
             elif op == "through_route":
                 self._through_route(ln, e["field"], e.get("value") or "")
             elif op == "reroute":
@@ -479,6 +488,8 @@ class Network:
         cg = self.cfg["drive"].get("congestion")
         brt_slow = 1.0 + (growth.congestion(self.cfg, year) - 1.0) * cg["brt_share"] if cg else 1.0
         for ln in (self.line_at(k, year) for k in self.lines):
+            if year >= ln.retire:
+                continue
             mode = self.cfg["modes"][ln.mode]
             slow = brt_slow if ln.mode == "brt" else 1.0
             cur, acc, i0, i1 = None, 0.0, 0, 0
@@ -566,7 +577,7 @@ class Network:
                 out.append((min(ys), float(it["musd"]), it.get("note", "")))
         return out
 
-    def shared_cost_musd(self, ln):
+    def shared_cost_musd(self, ln, idx=None):
         """A line's share of capital at 2025 prices, for ranking lines (it doesn't depend on
         which opens first): each new track piece and station platform is split evenly among the
         lines of its mode that use it, without the program's falling cost factor. Today's track
@@ -580,14 +591,18 @@ class Network:
                 plat[(sid, other.mode)].append((y, other.id))
         cost = 0.0
         for i, s in enumerate(ln.segments):
+            if idx is not None and not (i in idx and i + 1 in idx):   # only these stops and the track between them
+                continue
             users = track[(ln.mode, frozenset((ln.stop_ids[i], ln.stop_ids[i + 1])))]
             if min(users)[0] > ex:
                 cost += self.segment_cost(ln, i) / cost_factor(self.cfg, s.year, ln.mode) / len({u for _, u in users})
         for i, (sid, y) in enumerate(zip(ln.stop_ids, ln.stop_years)):
+            if idx is not None and i not in idx:
+                continue
             users = plat[(sid, ln.mode)]
             if min(users)[0] > ex and sid not in ln.stop_ids[:i]:
                 cost += self.stop_cost(ln, i) / cost_factor(self.cfg, y, ln.mode) / len({u for _, u in users})
-        return cost + sum(c for y, c, _ in self.capital_items(ln) if y > ex)
+        return cost + (sum(c for y, c, _ in self.capital_items(ln) if y > ex) if idx is None else 0.0)
 
     def opex_musd(self, year):
         """Operating cost ($M/yr) of the service running in `year`, by mode (config.operating):
