@@ -1,0 +1,9 @@
+line_id,stage,kind,from_stop,to_stop,year_opens,until_year,via_line,headway_min,locked,note
+E09,1,starter,Fort Worth T&P,DFW Airport Terminal B,2025,,,,,
+E10,1,starter,Union Station,Fort Worth T&P,2025,,,,,
+E11,1,starter,Trinity Mills,Downtown Denton Transit Center,2025,,,,,
+E12,1,starter,DFW Airport Terminal B,Parker Road,2025,,,,,
+E13,1,starter,North Carrollton/Frankford,Buckner,2025,,,,,
+E14,1,starter,Parker Road,Westmoreland,2025,,,,,
+E15,1,starter,Downtown Rowlett,UNT Dallas,2025,,,,,
+E20,1,starter,DFW Airport Terminal B,Shiloh Road,2025,,,,,

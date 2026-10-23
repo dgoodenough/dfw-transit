@@ -13,6 +13,7 @@ Definitions: *daily boardings* = weekday boardings on the modeled rail and BRT n
 | Scenario | 2025 | 2030 | 2035 | 2040 | 2050 | 2070 |
 |---|---|---|---|---|---|---|
 | `plan` | 75k | 143k | 178k | 213k | 370k | 661k |
+| `current_track` | 75k | 85k | 95k | 105k | 125k | 160k |
 | `right_sized` | 75k | 143k | 178k | 213k | 366k | 587k |
 | `two_million` | 75k | 199k | 329k | 436k | 866k | 1500k |
 | `v1_baseline` | 75k | 85k | 112k | 167k | 319k | 553k |
@@ -23,6 +24,7 @@ Definitions: *daily boardings* = weekday boardings on the modeled rail and BRT n
 | Scenario | 2025 | 2030 | 2035 | 2040 | 2050 | 2070 |
 |---|---|---|---|---|---|---|
 | `plan` | 102k | 216k | 272k | 331k | 587k | 1076k |
+| `current_track` | 102k | 116k | 131k | 146k | 176k | 227k |
 | `right_sized` | 102k | 216k | 272k | 331k | 577k | 930k |
 | `two_million` | 102k | 338k | 583k | 771k | 1568k | 2720k |
 | `v1_baseline` | 102k | 117k | 157k | 240k | 485k | 889k |
@@ -33,6 +35,7 @@ Definitions: *daily boardings* = weekday boardings on the modeled rail and BRT n
 | Scenario | 2025 | 2030 | 2035 | 2040 | 2050 | 2070 |
 |---|---|---|---|---|---|---|
 | `plan` | 78k | 164k | 209k | 257k | 472k | 873k |
+| `current_track` | 78k | 88k | 98k | 109k | 130k | 166k |
 | `right_sized` | 78k | 164k | 209k | 257k | 463k | 754k |
 | `two_million` | 78k | 230k | 417k | 556k | 1205k | 2167k |
 | `v1_baseline` | 77k | 88k | 117k | 182k | 377k | 712k |
@@ -43,6 +46,7 @@ Definitions: *daily boardings* = weekday boardings on the modeled rail and BRT n
 | Scenario | 2025 | 2030 | 2035 | 2040 | 2050 | 2070 |
 |---|---|---|---|---|---|---|
 | `plan` | 0k | 1k | 1k | 2k | 7k | 19k |
+| `current_track` | 0k | 0k | 0k | 0k | 0k | 0k |
 | `right_sized` | 0k | 1k | 1k | 2k | 7k | 17k |
 | `two_million` | 0k | 1k | 5k | 9k | 24k | 52k |
 | `v1_baseline` | 0k | 0k | 1k | 1k | 6k | 15k |
@@ -53,6 +57,7 @@ Definitions: *daily boardings* = weekday boardings on the modeled rail and BRT n
 | Scenario | 2025 | 2030 | 2035 | 2040 | 2050 | 2070 |
 |---|---|---|---|---|---|---|
 | `plan` | 20.9k | 41.0k | 50.9k | 57.4k | 76.2k | 97.8k |
+| `current_track` | 20.9k | 22.3k | 23.8k | 25.2k | 27.7k | 30.8k |
 | `right_sized` | 20.9k | 41.0k | 50.9k | 57.4k | 75.5k | 93.4k |
 | `two_million` | 20.9k | 40.8k | 60.9k | 73.2k | 113.2k | 151.5k |
 | `v1_baseline` | 20.5k | 21.8k | 27.4k | 41.8k | 63.1k | 82.5k |
@@ -63,6 +68,7 @@ Definitions: *daily boardings* = weekday boardings on the modeled rail and BRT n
 | Scenario | 2025 | 2030 | 2035 | 2040 | 2050 | 2070 |
 |---|---|---|---|---|---|---|
 | `plan` | 5.1% | 8.6% | 12.4% | 14.6% | 17.4% | 21.8% |
+| `current_track` | 5.1% | 5.1% | 5.1% | 5.1% | 5.1% | 5.1% |
 | `right_sized` | 5.1% | 8.6% | 12.4% | 14.6% | 17.4% | 21.7% |
 | `two_million` | 5.1% | 8.1% | 9.7% | 11.5% | 18.4% | 30.2% |
 | `v1_baseline` | 5.1% | 5.1% | 6.7% | 9.5% | 15.1% | 22.3% |
@@ -73,6 +79,7 @@ Definitions: *daily boardings* = weekday boardings on the modeled rail and BRT n
 | Scenario | 2025 | 2030 | 2035 | 2040 | 2050 | 2070 |
 |---|---|---|---|---|---|---|
 | `plan` | $0.0B | $6.8B | $19.1B | $26.8B | $52.5B | $100.9B |
+| `current_track` | $0.0B | $0.0B | $0.0B | $0.0B | $0.0B | $0.0B |
 | `right_sized` | $0.0B | $6.8B | $19.1B | $26.8B | $50.6B | $81.9B |
 | `two_million` | $0.0B | $5.4B | $15.9B | $21.6B | $53.6B | $101.1B |
 | `v1_baseline` | $0.0B | $0.0B | $10.5B | $25.7B | $58.4B | $112.2B |

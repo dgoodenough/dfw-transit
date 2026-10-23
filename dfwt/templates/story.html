@@ -1,0 +1,777 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>DFW Transit 2100</title>
+<meta name="description" content="Why a regional transit network for Dallas-Fort Worth is affordable, and what it would change by 2100. A hypothetical plan, told with a ridership model.">
+<script>if (/^#(map|diagram)/.test(location.hash)) location.replace('map.html' + location.hash);</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=Barlow:wght@400;500;600&display=swap">
+<style>
+:root{
+  color-scheme:light;
+  --bg:#f4f6f5; --panel:#ffffff; --ink:#18212b; --muted:#566370; --rule:#d5dcdf; --accent:#c96f00; --chip:#eef2f3;
+  --ct:#2a78d6; --pr:#eb6834;                 /* current track / proposal (categorical slots 1-2, validated) */
+  --dot0:#e4ebf2; --dot-empty:#c9d1d8;
+  --f-display:"Barlow Condensed","Arial Narrow",Arial,sans-serif; --f-ui:"Barlow","Helvetica Neue",Arial,sans-serif;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  color-scheme:dark;
+  --bg:#11171d; --panel:#18212a; --ink:#e7ecef; --muted:#9aa8b3; --rule:#2c3946; --accent:#f29a2e; --chip:#22303b;
+  --ct:#3987e5; --pr:#d95926; --dot0:#1d2731; --dot-empty:#2a3540;
+}}
+:root[data-theme="dark"]{
+  color-scheme:dark;
+  --bg:#11171d; --panel:#18212a; --ink:#e7ecef; --muted:#9aa8b3; --rule:#2c3946; --accent:#f29a2e; --chip:#22303b;
+  --ct:#3987e5; --pr:#d95926; --dot0:#1d2731; --dot-empty:#2a3540;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+@media (prefers-reduced-motion: reduce){html{scroll-behavior:auto}}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--f-ui);font-size:18px;line-height:1.55;-webkit-text-size-adjust:100%}
+a{color:var(--accent)}
+.skiplink{position:absolute;left:-999px;top:8px;background:var(--panel);padding:8px 12px;z-index:100}
+.skiplink:focus{left:8px}
+
+/* top bar: always a way to the map */
+header.bar{position:fixed;inset:0 0 auto 0;z-index:50;display:flex;align-items:center;gap:12px;padding:8px max(16px,env(safe-area-inset-left));
+  background:color-mix(in srgb,var(--bg) 88%,transparent);backdrop-filter:blur(6px);border-bottom:1px solid var(--rule)}
+header.bar .brand{font-family:var(--f-display);font-size:1.25rem;font-weight:700;letter-spacing:.01em;white-space:nowrap}
+header.bar nav{display:flex;gap:4px;overflow-x:auto;scrollbar-width:none;flex:1;min-width:0}
+header.bar nav a{font-size:.78rem;color:var(--muted);text-decoration:none;padding:4px 8px;border-radius:999px;white-space:nowrap}
+header.bar nav a.on{background:var(--chip);color:var(--ink)}
+.btn{display:inline-flex;align-items:center;gap:6px;font:600 .9rem var(--f-ui);color:#fff;background:var(--accent);border:0;border-radius:999px;padding:8px 14px;
+  text-decoration:none;white-space:nowrap;cursor:pointer}
+.btn.ghost{background:transparent;color:var(--ink);border:1px solid var(--rule)}
+.btn:focus-visible,button:focus-visible,input:focus-visible,a:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.progress{position:fixed;left:0;top:0;height:3px;background:var(--accent);z-index:60;width:0}
+
+/* hero */
+.hero{min-height:100svh;display:grid;place-items:center;padding:96px 20px 40px;position:relative;overflow:hidden}
+.hero canvas{position:absolute;inset:0;width:100%;height:100%;opacity:.32}
+.hero .in{position:relative;max-width:820px}
+.kicker{font-size:.8rem;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--accent)}
+h1{font-family:var(--f-display);font-size:clamp(2.6rem,7vw,5rem);line-height:.95;margin:.2em 0 .3em}
+.dek{font-size:clamp(1.1rem,2.2vw,1.35rem);color:var(--muted);max-width:640px}
+.hero .ctas{display:flex;gap:10px;flex-wrap:wrap;margin-top:22px}
+.scrollcue{margin-top:36px;font-size:.85rem;color:var(--muted)}
+
+/* chapters */
+section.ch{padding:72px 0 24px}
+.chead{max-width:680px;margin:0 auto;padding:0 20px}
+.chead .num{font-family:var(--f-display);font-size:1rem;color:var(--accent);letter-spacing:.1em;text-transform:uppercase}
+h2{font-family:var(--f-display);font-size:clamp(2rem,4.5vw,3rem);line-height:1;margin:.15em 0 .4em}
+.prose{max-width:680px;margin:0 auto;padding:0 20px}
+.prose p{margin:0 0 1em}
+sup a{text-decoration:none;font-size:.7em;padding:0 1px}
+
+/* scrollytelling: sticky figure + steps */
+.scrolly{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(300px,.9fr);gap:28px;max-width:1240px;margin:0 auto;padding:0 20px}
+.scrolly .fig{position:sticky;top:64px;height:calc(100svh - 84px);display:flex;flex-direction:column;justify-content:center}
+.figbox{background:var(--panel);border:1px solid var(--rule);border-radius:10px;padding:16px;height:100%;max-height:720px;display:flex;flex-direction:column;gap:10px;position:relative}
+.figbox .ftitle{font-weight:600;font-size:.95rem}
+.figbox .fsub{font-size:.8rem;color:var(--muted);margin-top:-6px}
+.figbox .stage{flex:1;min-height:0;position:relative}
+.figbox canvas,.figbox svg.full{position:absolute;inset:0;width:100%;height:100%}
+.figbox .cap{font-size:.78rem;color:var(--muted)}
+.figbox .cap sup a{font-size:.85rem}
+.steps{padding:30vh 0 40vh}
+.step{min-height:70vh;display:flex;align-items:center}
+.step .card{background:var(--panel);border:1px solid var(--rule);border-radius:10px;padding:18px 20px;box-shadow:0 2px 10px rgba(0,0,0,.06);opacity:.45;transition:opacity .3s}
+.step.on .card{opacity:1}
+.step .card p{margin:0 0 .7em}.step .card p:last-child{margin:0}
+.big{font-family:var(--f-display);font-size:2.6rem;line-height:1;display:block;margin:.1em 0 .15em;font-variant-numeric:tabular-nums}
+.big.ct{color:var(--ct)} .big.pr{color:var(--pr)}
+@media (max-width:860px){
+  body{font-size:17px}
+  .scrolly{display:block;padding:0 12px}
+  .scrolly .fig{top:52px;height:58svh;z-index:1}
+  .figbox{max-height:none}
+  .steps{position:relative;z-index:2;padding:6vh 4px 30vh}
+  .step{min-height:80svh;align-items:flex-end}
+  .step .card{opacity:.97}
+  .step.on .card{opacity:1}
+  header.bar nav{display:none}
+}
+
+/* legends, keys */
+.legend{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:.78rem;color:var(--muted);align-items:center}
+.legend i{display:inline-block;width:14px;height:10px;border-radius:2px;margin-right:5px;vertical-align:-1px}
+.legend i.ln{height:4px;width:18px;border-radius:2px;vertical-align:2px}
+.ramp{display:flex;align-items:center;gap:6px;font-size:.75rem;color:var(--muted)}
+.ramp span.bar{display:flex;height:10px;border-radius:2px;overflow:hidden}
+.ramp span.bar i{width:22px;height:10px}
+
+/* tooltip */
+.tip{position:fixed;z-index:80;pointer-events:none;background:var(--panel);border:1px solid var(--rule);border-radius:6px;padding:6px 9px;font-size:.8rem;
+  box-shadow:0 2px 10px rgba(0,0,0,.15);max-width:260px;line-height:1.35;display:none}
+.tip b{font-weight:600}
+
+/* people grid */
+.people{display:grid;grid-template-columns:repeat(20,1fr);gap:3px;align-content:center;height:100%}
+.people i{aspect-ratio:1;border-radius:50%;background:var(--dot-empty);transition:background .5s}
+
+/* station explorer */
+.explorer{max-width:1100px;margin:0 auto;padding:0 20px;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:20px}
+@media (max-width:860px){.explorer{grid-template-columns:1fr}}
+.panel{background:var(--panel);border:1px solid var(--rule);border-radius:10px;padding:16px 18px}
+.search{display:flex;gap:8px}
+.search input{flex:1;min-width:0;font:inherit;font-size:1rem;color:var(--ink);background:var(--bg);border:1px solid var(--rule);border-radius:8px;padding:9px 12px}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin:10px 0 0}
+.chip{font:500 .82rem var(--f-ui);color:var(--ink);background:var(--chip);border:1px solid var(--rule);border-radius:999px;padding:5px 11px;cursor:pointer}
+.chip[aria-pressed="true"]{border-color:var(--accent);box-shadow:inset 0 0 0 1px var(--accent)}
+.sugg{list-style:none;margin:6px 0 0;padding:0;border:1px solid var(--rule);border-radius:8px;max-height:220px;overflow:auto;background:var(--panel)}
+.sugg li{padding:7px 12px;cursor:pointer;font-size:.9rem}
+.sugg li[aria-selected="true"],.sugg li:hover{background:var(--chip)}
+.stcard h3{font-family:var(--f-display);font-size:1.9rem;line-height:1;margin:.2em 0 .1em}
+.stcard .meta{font-size:.85rem;color:var(--muted)}
+.facts{display:grid;grid-template-columns:auto 1fr;gap:6px 14px;margin:14px 0;font-size:.92rem}
+.facts dt{color:var(--muted)} .facts dd{margin:0;font-weight:500}
+.lpill{display:inline-flex;align-items:center;gap:5px;font-size:.8rem;border:1px solid var(--rule);border-radius:999px;padding:1px 8px;margin:2px 4px 2px 0}
+.lpill i{width:10px;height:10px;border-radius:50%}
+.bars3{display:flex;flex-direction:column;gap:6px;margin-top:6px}
+.bars3 .r{display:grid;grid-template-columns:150px minmax(0,1fr) 70px;gap:8px;align-items:center;font-size:.85rem}
+.bars3 .r b{font-weight:500;font-variant-numeric:tabular-nums;text-align:right}
+.bars3 .t{height:12px;background:var(--chip);border-radius:0 4px 4px 0;overflow:hidden}
+.bars3 .t i{display:block;height:100%;border-radius:0 4px 4px 0}
+.note{font-size:.82rem;color:var(--muted)}
+
+/* assumptions */
+.assume{max-width:1100px;margin:28px auto 0;padding:0 20px;display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px}
+.assume .panel h4{margin:0 0 4px;font-size:.95rem}
+.assume .panel p{margin:0;font-size:.88rem;color:var(--muted);line-height:1.45}
+.assume .panel b{color:var(--ink);font-family:var(--f-display);font-size:1.5rem;display:block;line-height:1.1}
+
+/* connections */
+.conns{max-width:1100px;margin:0 auto;padding:0 20px;display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:16px}
+.conn{display:flex;flex-direction:column;gap:8px}
+.conn h3{margin:0;font-family:var(--f-display);font-size:1.5rem;line-height:1.05}
+.conn .why{font-size:.88rem;color:var(--muted);margin:0}
+.conn .mini{height:190px;position:relative;border-radius:8px;overflow:hidden;background:var(--bg)}
+.conn .mini canvas{position:absolute;inset:0;width:100%;height:100%}
+.conn .nums{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;font-size:.78rem;color:var(--muted)}
+.conn .nums b{display:block;font-family:var(--f-display);font-size:1.45rem;color:var(--ink);line-height:1.05;font-variant-numeric:tabular-nums}
+
+/* 2100 comparison */
+.twin{max-width:1240px;margin:0 auto;padding:0 20px;display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media (max-width:860px){.twin{grid-template-columns:1fr}}
+.twin .panel{display:flex;flex-direction:column;gap:8px}
+.twin .mapbox{position:relative;height:min(62vh,560px);min-height:320px}
+.twin .mapbox canvas{position:absolute;inset:0;width:100%;height:100%}
+.twin h3{margin:0;font-family:var(--f-display);font-size:1.6rem}
+.toggle{display:inline-flex;border:1px solid var(--rule);border-radius:999px;overflow:hidden}
+.toggle button{font:500 .85rem var(--f-ui);color:var(--ink);background:transparent;border:0;padding:6px 12px;cursor:pointer}
+.toggle button[aria-pressed="true"]{background:var(--chip);font-weight:600}
+table.cmp{width:100%;max-width:1100px;margin:22px auto 0;border-collapse:collapse;font-size:.95rem}
+.cmpwrap{max-width:1100px;margin:0 auto;padding:0 20px;overflow-x:auto}
+table.cmp th,table.cmp td{padding:9px 10px;border-bottom:1px solid var(--rule);text-align:right;font-variant-numeric:tabular-nums}
+table.cmp th:first-child,table.cmp td:first-child{text-align:left}
+table.cmp thead th{font-size:.78rem;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);font-weight:600}
+table.cmp td.ct{color:var(--ct);font-weight:600} table.cmp td.pr{color:var(--pr);font-weight:600}
+
+/* ending */
+.end{text-align:center;padding:90px 20px 60px}
+.end h2{margin-bottom:.2em}
+.sources{max-width:900px;margin:0 auto;padding:20px;font-size:.82rem;color:var(--muted)}
+.sources ol{padding-left:1.4em}
+.sources li{margin:0 0 6px}
+footer{max-width:900px;margin:0 auto;padding:20px 20px 60px;font-size:.8rem;color:var(--muted);border-top:1px solid var(--rule)}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+</style>
+</head>
+<body>
+<a class="skiplink" href="map.html">Skip to the map</a>
+<div class="progress" id="progress" aria-hidden="true"></div>
+<header class="bar">
+  <span class="brand">DFW Transit 2100</span>
+  <nav aria-label="Chapters">
+    <a href="#roads">Roads</a><a href="#invest">Investing</a><a href="#near">Near you</a><a href="#connect">Connections</a><a href="#y2100">2100</a><a href="#sources">Sources</a>
+  </nav>
+  <a class="btn" href="map.html">Skip to the map&nbsp;&rarr;</a>
+</header>
+
+<main id="main">
+<section class="hero" aria-labelledby="h-hero">
+  <canvas id="hero-map" aria-hidden="true"></canvas>
+  <div class="in">
+    <div class="kicker">A hypothetical plan, tested with a ridership model</div>
+    <h1 id="h-hero">By 2100, <span data-v="pop2100"></span> people will live in Dallas&ndash;Fort Worth.</h1>
+    <p class="dek">Today almost all of them would have to drive to get anywhere. This is the case for a regional transit network built at a steady
+      <span data-v="budgetB"></span> a year, what it would change, and what it wouldn't.</p>
+    <div class="ctas"><a class="btn" href="#roads">Read the story &darr;</a><a class="btn ghost" href="map.html">Skip to the map&nbsp;&rarr;</a></div>
+    <div class="scrollcue">About 8 minutes &middot; every number links to its source or to the model</div>
+  </div>
+</section>
+
+<!-- 1. ROADS -->
+<section class="ch" id="roads" aria-labelledby="h-roads">
+  <div class="chead"><div class="num">1 &middot; The roads we already pay for</div><h2 id="h-roads">One way to get around, and a steep price for it</h2></div>
+  <div class="scrolly" data-scrolly="roads">
+    <div class="fig"><div class="figbox">
+      <div class="ftitle" id="roads-title"></div><div class="fsub" id="roads-sub"></div>
+      <div class="stage" id="roads-stage"></div>
+      <div class="cap" id="roads-cap"></div>
+    </div></div>
+    <div class="steps">
+      <div class="step" data-scene="cost"><div class="card" id="s-cost"></div></div>
+      <div class="step" data-scene="household"><div class="card" id="s-household"></div></div>
+      <div class="step" data-scene="people"><div class="card" id="s-people"></div></div>
+      <div class="step" data-scene="reach-car"><div class="card" id="s-reach-car"></div></div>
+      <div class="step" data-scene="reach-transit"><div class="card" id="s-reach-transit"></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- 2. INVEST -->
+<section class="ch" id="invest" aria-labelledby="h-invest">
+  <div class="chead"><div class="num">2 &middot; Investing for real</div><h2 id="h-invest">What a steady budget builds in 75 years</h2></div>
+  <div class="scrolly" data-scrolly="invest">
+    <div class="fig"><div class="figbox">
+      <div class="ftitle" id="inv-title"></div><div class="fsub" id="inv-sub"></div>
+      <div class="stage" id="inv-stage"></div>
+      <div class="cap" id="inv-cap"></div>
+    </div></div>
+    <div class="steps">
+      <div class="step" data-scene="budget"><div class="card" id="s-budget"></div></div>
+      <div class="step" data-scene="peers"><div class="card" id="s-peers"></div></div>
+      <div class="step" data-scene="y2035"><div class="card" id="s-y2035"></div></div>
+      <div class="step" data-scene="y2050"><div class="card" id="s-y2050"></div></div>
+      <div class="step" data-scene="y2100"><div class="card" id="s-y2100"></div></div>
+      <div class="step" data-scene="riders"><div class="card" id="s-riders"></div></div>
+      <div class="step" data-scene="appetite"><div class="card" id="s-appetite"></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- 3. NEAR YOU -->
+<section class="ch" id="near" aria-labelledby="h-near">
+  <div class="chead"><div class="num">3 &middot; What it means near you</div><h2 id="h-near">Your station, and how much your neighborhood changes</h2></div>
+  <div class="prose"><p id="near-intro"></p></div>
+  <div class="explorer">
+    <div class="panel">
+      <label for="st-q" class="note">Find a station (or start from an example)</label>
+      <div class="search"><input id="st-q" type="search" autocomplete="off" placeholder="e.g. Downtown Arlington, Frisco Main St, Deep Ellum" role="combobox" aria-expanded="false" aria-controls="st-list" aria-autocomplete="list"></div>
+      <ul class="sugg" id="st-list" role="listbox" hidden></ul>
+      <div class="chips" id="st-chips" role="group" aria-label="Example stations"></div>
+      <div class="stcard" id="st-card" aria-live="polite"></div>
+    </div>
+    <div class="panel" style="display:flex;flex-direction:column;gap:8px">
+      <div class="ftitle" style="font-weight:600">Where it is</div>
+      <div style="position:relative;flex:1;min-height:300px"><canvas id="st-map" style="position:absolute;inset:0;width:100%;height:100%" role="img" aria-label="Map of the selected station and the lines that serve it"></canvas></div>
+      <div class="legend" id="st-legend"></div>
+    </div>
+  </div>
+  <div class="prose" style="margin-top:28px"><p id="near-region"></p></div>
+  <div class="assume" id="assume"></div>
+</section>
+
+<!-- 4. CONNECTIONS -->
+<section class="ch" id="connect" aria-labelledby="h-connect">
+  <div class="chead"><div class="num">4 &middot; Connections</div><h2 id="h-connect">Six links and what they unlock</h2></div>
+  <div class="prose"><p id="conn-intro"></p></div>
+  <div class="conns" id="conns"></div>
+</section>
+
+<!-- 5. 2100 -->
+<section class="ch" id="y2100" aria-labelledby="h-2100">
+  <div class="chead"><div class="num">5 &middot; 2100</div><h2 id="h-2100">Two futures for the same region</h2></div>
+  <div class="prose"><p id="y-intro"></p>
+    <p><span class="toggle" role="group" aria-label="What the maps show">
+      <button type="button" id="tw-lines" aria-pressed="true">The network</button>
+      <button type="button" id="tw-jobs" aria-pressed="false">Jobs within 45 min by transit</button></span></p></div>
+  <div class="twin">
+    <div class="panel"><h3 style="color:var(--ct)">Current track</h3><div class="note">Today's lines and service, the region grown to 2100 around them</div>
+      <div class="mapbox"><canvas id="tw-ct" role="img" aria-label="2100 on the current track"></canvas></div></div>
+    <div class="panel"><h3 style="color:var(--pr)">The proposal</h3><div class="note">The 2 million riders network, built at a flat budget</div>
+      <div class="mapbox"><canvas id="tw-pr" role="img" aria-label="2100 with the proposal"></canvas></div></div>
+  </div>
+  <div class="prose" style="margin-top:10px"><div class="legend" id="tw-legend"></div></div>
+  <div class="cmpwrap"><table class="cmp" id="cmp"></table></div>
+</section>
+
+<section class="end" aria-labelledby="h-end">
+  <h2 id="h-end">See it for yourself</h2>
+  <p class="dek" style="margin:0 auto 20px">Every line, station and opening year, a trip planner from any address, and the build-out year by year.</p>
+  <a class="btn" href="map.html" style="font-size:1.05rem;padding:12px 22px">Open the map&nbsp;&rarr;</a>
+</section>
+
+<section class="sources" id="sources" aria-labelledby="h-sources">
+  <h2 id="h-sources" style="font-size:1.6rem">Sources and notes</h2>
+  <p>Model numbers come from this project's ridership model (block groups, census and LODES jobs data, calibrated to today's ~80,000 daily rail boardings; <a href="https://github.com/dgoodenough/dfw-transit">code and method</a>). Long-range numbers are estimates: read them as orders of magnitude, and the comparisons more than the totals.
+    Outside figures were gathered in October 2026 from the published summaries of the pages cited below; check the originals before quoting them.</p>
+  <ol id="srclist"></ol>
+</section>
+</main>
+<footer>DFW Transit 2100 is a speculative, independent proposal. It is not affiliated with DART, Trinity Metro, DCTA, NCTCOG or TxDOT.</footer>
+<div class="tip" id="tip" role="tooltip"></div>
+
+<script>
+const D = /*__DATA__*/null;
+const $ = id => document.getElementById(id);
+const css = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+const fmt = n => n == null ? '–' : n >= 1e6 ? (n / 1e6).toFixed(n >= 1e7 ? 0 : 2).replace(/\.?0+$/, '') + 'M' : n >= 1e4 ? Math.round(n / 1e3) + 'k' : Math.round(n).toLocaleString();
+const fmtN = n => Math.round(n).toLocaleString();
+const pct = x => Math.round(x * 100) + '%';
+const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+// ---------- facts and footnotes ----------
+const FF = D.facts || {}, F = Object.assign({}, FF.charts || {}), SRC = FF.sources || {}, cited = [];
+const stepHtml = name => ((FF.steps || {})[name] || []).map(([t, ids]) => `<p>${t}${(ids || []).map(cite).join('')}</p>`).join('');
+function cite(id) {
+  const f = SRC[id];
+  if (!f) return '';
+  let k = cited.indexOf(id);
+  if (k < 0) { cited.push(id); k = cited.length - 1; }
+  return `<sup><a href="#src-${id}" aria-label="source ${k + 1}">${k + 1}</a></sup>`;
+}
+const fv = (id, key = 'display') => (F[id] || {})[key];
+function sources() {
+  $('srclist').innerHTML = cited.map(id => {
+    const f = SRC[id];
+    return `<li id="src-${id}">${f.source}${f.year ? ', ' + f.year : ''}${f.url ? ` &mdash; <a href="${f.url}" rel="noopener">${new URL(f.url).hostname.replace(/^www\./, '')}</a>` : ''}${f.note ? `. <span>${f.note}</span>` : ''}</li>`;
+  }).join('');
+}
+
+// ---------- model numbers ----------
+const Y = {}; for (const k in D.years) Y[k] = Object.fromEntries(D.years[k].map(r => [r.year, r]));
+const at = (sc, y, k) => (Y[sc] && Y[sc][y]) ? Y[sc][y][k] : null;
+const Z = D.zones, NZ = Z.lat.length;
+const popW = (arr, pop) => { let s = 0, p = 0; for (let i = 0; i < NZ; i++) { s += arr[i] * pop[i]; p += pop[i]; } return s / p; };
+const M = {
+  pop2025: at('two_million', 2025, 'pop_m') * 1e6, pop2100: at('two_million', 2100, 'pop_m') * 1e6,
+  tripsNow: at('current_track', 2025, 'daily_trips'),
+  trips: sc => y => at(sc, y, 'daily_trips'),
+  budget: D.assumptions.budget_musd,
+  car45_2025: popW(Z.drive45_2025, Z.pop), tr45_2025: popW(Z.jobs45_current_track_2025, Z.pop),
+  car45_2100: popW(Z.drive45_2100, Z.pop_2100),
+  ct45_2100: popW(Z.jobs45_current_track_2100, Z.pop_ct_2100), pr45_2100: popW(Z.jobs45_two_million_2100, Z.pop_2100),
+};
+document.querySelectorAll('[data-v]').forEach(el => {
+  const v = el.dataset.v;
+  el.textContent = v === 'pop2100' ? (M.pop2100 / 1e6).toFixed(0) + ' million' : v === 'budgetB' ? '$' + (M.budget / 1000).toFixed(1) + ' billion' : '';
+});
+
+// ---------- region map on a canvas ----------
+const LAT0 = 32.85, KX = Math.cos(LAT0 * Math.PI / 180);
+let BB = null;
+(function () {   // the populated region, trimmed of far outliers (1st-99th percentile)
+  const xs = [], ys = [];
+  for (let i = 0; i < NZ; i++) if (Z.pop[i] > 0) { xs.push(Z.lon[i] * KX); ys.push(Z.lat[i]); }
+  xs.sort((a, b) => a - b); ys.sort((a, b) => a - b);
+  const q = (a, f) => a[Math.floor(f * (a.length - 1))];
+  BB = {x0: q(xs, .01), x1: q(xs, .99), y0: q(ys, .01), y1: q(ys, .99)};
+})();
+// sequential blue ramp (reference palette), light -> dark; dark mode reverses toward the surface
+const RAMP_L = ['#cde2fb', '#9ec5f4', '#6da7ec', '#3987e5', '#256abf', '#184f95', '#0d366b'];
+const RAMP_D = ['#1b2f47', '#184f95', '#1c5cab', '#2a78d6', '#5598e7', '#86b6ef', '#cde2fb'];
+const JOB_BINS = [50e3, 150e3, 300e3, 600e3, 1e6, 1.6e6];
+const dark = () => css('color-scheme') === 'dark' || getComputedStyle(document.body).colorScheme === 'dark';
+const ramp = () => matchMedia('(prefers-color-scheme: dark)').matches && document.documentElement.dataset.theme !== 'light' ? RAMP_D : RAMP_L;
+const binOf = v => { let k = 0; while (k < JOB_BINS.length && v >= JOB_BINS[k]) k++; return k; };
+
+class RegionMap {
+  constructor(canvas, opt = {}) {
+    this.c = canvas; this.opt = opt; this.state = {};
+    this.c.addEventListener('mousemove', e => this.hover(e));
+    this.c.addEventListener('mouseleave', () => hideTip());
+    new ResizeObserver(() => this.draw()).observe(canvas.parentElement);
+  }
+  fit() {
+    const r = this.c.parentElement.getBoundingClientRect(), dpr = Math.min(2, devicePixelRatio || 1);
+    this.w = r.width; this.h = r.height;
+    this.c.width = Math.max(1, r.width * dpr); this.c.height = Math.max(1, r.height * dpr);
+    const ctx = this.c.getContext('2d'); ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    const bb = this.state.bbox || BB, pad = this.opt.pad ?? 10;
+    const s = Math.min((this.w - 2 * pad) / (bb.x1 - bb.x0), (this.h - 2 * pad) / (bb.y1 - bb.y0));
+    this.s = s; this.ox = (this.w - s * (bb.x1 - bb.x0)) / 2 - s * bb.x0; this.oy = (this.h + s * (bb.y1 - bb.y0)) / 2 + s * bb.y0;
+    return ctx;
+  }
+  P(lat, lon) { return [this.ox + this.s * lon * KX, this.oy - this.s * lat]; }
+  set(st) { this.state = Object.assign({}, this.state, st); this.draw(); }
+  draw() {
+    if (!this.c.isConnected) return;
+    const ctx = this.fit(), st = this.state;
+    ctx.clearRect(0, 0, this.w, this.h);
+    // dots: block groups
+    if (st.dots) {
+      const R = ramp(), vals = st.dots.vals, pop = st.dots.pop || Z.pop;
+      const rr = Math.max(1.6, Math.min(4.5, this.s * 0.018));
+      for (let i = 0; i < NZ; i++) {
+        if (pop[i] <= 0) continue;
+        const [x, y] = this.P(Z.lat[i], Z.lon[i]);
+        ctx.fillStyle = st.dots.color ? st.dots.color(i) : R[binOf(vals[i])];
+        ctx.fillRect(x - rr / 2, y - rr / 2, rr, rr);
+      }
+    } else if (st.base !== false) {
+      ctx.fillStyle = css('--dot-empty');
+      const rr = Math.max(1, Math.min(2.4, this.s * 0.009));
+      for (let i = 0; i < NZ; i++) if (Z.pop[i] > 0) { const [x, y] = this.P(Z.lat[i], Z.lon[i]); ctx.fillRect(x - rr / 2, y - rr / 2, rr, rr); }
+    }
+    // lines open by st.year (current track: existing lines only)
+    if (st.year) {
+      const lw = st.lineWidth || Math.max(1.2, Math.min(3, this.s * 0.012));
+      for (const ln of D.lines) {
+        if (st.scen === 'ct' && !ln.existing) continue;
+        const dim = st.only && !st.only.includes(ln.id);
+        ctx.strokeStyle = ln.color; ctx.globalAlpha = (dim ? 0.15 : 1) * (st.lineAlpha ?? 1);
+        ctx.lineWidth = ln.mode === 'brt' ? lw * 0.7 : ln.mode === 'streetcar' ? lw * 0.6 : lw;
+        ctx.setLineDash(ln.mode === 'brt' ? [lw * 2, lw * 1.2] : []);
+        for (const [y, pts] of ln.segs) {
+          if (y > st.year) continue;
+          if (st.scen === 'ct' && y > 2025) continue;
+          ctx.beginPath();
+          pts.forEach(([lon, lat], k) => { const [x, yy] = this.P(lat, lon); k ? ctx.lineTo(x, yy) : ctx.moveTo(x, yy); });
+          ctx.stroke();
+        }
+      }
+      ctx.setLineDash([]); ctx.globalAlpha = 1;
+    }
+    // markers
+    for (const m of st.marks || []) {
+      const [x, y] = this.P(m.ll[0], m.ll[1]);
+      ctx.fillStyle = css('--panel'); ctx.strokeStyle = css('--ink'); ctx.lineWidth = 2;
+      ctx.beginPath(); ctx.arc(x, y, m.r || 5, 0, 7); ctx.fill(); ctx.stroke();
+      if (m.label) {
+        ctx.font = '600 12px Barlow, Arial, sans-serif'; ctx.fillStyle = css('--ink');
+        ctx.textAlign = x > this.w * 0.7 ? 'right' : 'left';
+        ctx.fillText(m.label, x + (ctx.textAlign === 'right' ? -9 : 9), y + 4);
+      }
+    }
+  }
+  hover(e) {
+    const st = this.state;
+    if (!st.dots || !st.dots.tip) return hideTip();
+    const r = this.c.getBoundingClientRect(), mx = e.clientX - r.left, my = e.clientY - r.top;
+    let best = -1, bd = 64;
+    for (let i = 0; i < NZ; i++) {
+      if (Z.pop[i] <= 0) continue;
+      const [x, y] = this.P(Z.lat[i], Z.lon[i]), d = (x - mx) ** 2 + (y - my) ** 2;
+      if (d < bd) { bd = d; best = i; }
+    }
+    if (best < 0) return hideTip();
+    showTip(e.clientX, e.clientY, st.dots.tip(best));
+  }
+}
+function showTip(x, y, html) { const t = $('tip'); t.innerHTML = html; t.style.display = 'block'; t.style.left = Math.min(innerWidth - 270, x + 14) + 'px'; t.style.top = (y + 14) + 'px'; }
+function hideTip() { $('tip').style.display = 'none'; }
+function rampLegend(el, title) {
+  const R = ramp(), lab = ['<50k', '', '300k', '', '1M', '', '1.6M+'];
+  el.innerHTML = `<span class="ramp">${title} <span class="bar">${R.map(c => `<i style="background:${c}"></i>`).join('')}</span></span>
+    <span class="ramp" style="gap:2px">${['under 50k', '1.6M+'].join(' &rarr; ')}</span>`;
+}
+
+// ---------- small SVG charts ----------
+function svgEl(tag, attrs, parent) { const e = document.createElementNS('http://www.w3.org/2000/svg', tag); for (const k in attrs) e.setAttribute(k, attrs[k]); if (parent) parent.appendChild(e); return e; }
+function hbars(stage, rows, opt = {}) {
+  // rows: [{label, value, color, note}] - one measure, one axis
+  stage.innerHTML = '';
+  const W = stage.clientWidth, H = stage.clientHeight, svg = svgEl('svg', {class: 'full', viewBox: `0 0 ${W} ${H}`, role: 'img', 'aria-label': opt.aria || ''}, stage);
+  const lw = Math.min(210, W * 0.42), vw = 70, bh = Math.min(30, (H - 20) / rows.length - 12), max = Math.max(...rows.map(r => r.value)) || 1;
+  rows.forEach((r, i) => {
+    const y = 10 + i * (bh + 12) + (H - 20 - rows.length * (bh + 12)) / 2;
+    svgEl('text', {x: 0, y: y + bh / 2 + 4, fill: css('--ink'), 'font-size': 13}, svg).textContent = r.label;
+    const w = Math.max(3, (W - lw - vw - 8) * r.value / max);
+    svgEl('path', {d: `M${lw},${y} h${w - 4} q4,0 4,4 v${bh - 8} q0,4 -4,4 h${-(w - 4)} z`, fill: r.color || css('--pr')}, svg);
+    svgEl('text', {x: lw + w + 6, y: y + bh / 2 + 4, fill: css('--ink'), 'font-size': 13, 'font-weight': 600}, svg).textContent = r.text || fmt(r.value);
+  });
+}
+function lineChart(stage, series, opt = {}) {
+  // series: [{name, color, pts: [[year, value]]}], one y axis
+  stage.innerHTML = '';
+  const W = stage.clientWidth, H = stage.clientHeight, m = {l: 44, r: 16, t: 12, b: 26};
+  const svg = svgEl('svg', {class: 'full', viewBox: `0 0 ${W} ${H}`, role: 'img', 'aria-label': opt.aria || ''}, stage);
+  const xs = series[0].pts.map(p => p[0]), x0 = Math.min(...xs), x1 = opt.xmax || Math.max(...xs);
+  const raw = opt.ymax || Math.max(...series.flatMap(s => s.pts.map(p => p[1])));
+  const mag = Math.pow(10, Math.floor(Math.log10(raw / 4))), stepv = [1, 2, 2.5, 5, 10].map(k => k * mag).find(v => raw / v <= 4), ymax = Math.ceil(raw / stepv) * stepv;
+  const X = x => m.l + (W - m.l - m.r) * (x - x0) / (x1 - x0), Yp = v => H - m.b - (H - m.t - m.b) * v / ymax;
+  for (let k = 0; k <= Math.round(ymax / stepv); k++) {
+    const v = stepv * k, y = Yp(v);
+    svgEl('line', {x1: m.l, x2: W - m.r, y1: y, y2: y, stroke: css('--rule'), 'stroke-width': 1}, svg);
+    svgEl('text', {x: m.l - 6, y: y + 4, 'text-anchor': 'end', fill: css('--muted'), 'font-size': 11}, svg).textContent = fmt(v);
+  }
+  for (const yr of [2025, 2050, 2075, 2100]) if (yr <= x1) svgEl('text', {x: X(yr), y: H - 8, 'text-anchor': 'middle', fill: css('--muted'), 'font-size': 11}, svg).textContent = yr;
+  for (const s of series) {
+    const pts = s.pts.filter(p => p[0] <= (opt.until || 9999));
+    if (!pts.length) continue;
+    svgEl('path', {d: pts.map((p, i) => (i ? 'L' : 'M') + X(p[0]).toFixed(1) + ',' + Yp(p[1]).toFixed(1)).join(''), fill: 'none', stroke: s.color, 'stroke-width': 2.5, 'stroke-linejoin': 'round'}, svg);
+    const last = pts[pts.length - 1];
+    svgEl('circle', {cx: X(last[0]), cy: Yp(last[1]), r: 4.5, fill: s.color, stroke: css('--panel'), 'stroke-width': 2}, svg);
+    svgEl('text', {x: X(last[0]) - 8, y: Yp(last[1]) - 10, 'text-anchor': 'end', fill: css('--ink'), 'font-size': 12, 'font-weight': 600}, svg).textContent = s.name + ' ' + fmt(last[1]);
+  }
+  // hover crosshair
+  const hl = svgEl('line', {y1: m.t, y2: H - m.b, stroke: css('--muted'), 'stroke-width': 1, opacity: 0}, svg);
+  svg.addEventListener('mousemove', e => {
+    const r = svg.getBoundingClientRect(), mx = (e.clientX - r.left) * W / r.width;
+    const yr = Math.round(x0 + (mx - m.l) / (W - m.l - m.r) * (x1 - x0));
+    if (yr < x0 || yr > Math.min(x1, opt.until || 9999)) { hl.setAttribute('opacity', 0); return hideTip(); }
+    hl.setAttribute('x1', X(yr)); hl.setAttribute('x2', X(yr)); hl.setAttribute('opacity', .6);
+    showTip(e.clientX, e.clientY, `<b>${yr}</b><br>` + series.map(s => { const p = s.pts.find(q => q[0] === yr); return `<span style="color:${s.color}">&#9632;</span> ${s.name}: ${p ? fmtN(p[1]) : '–'}`; }).join('<br>'));
+  });
+  svg.addEventListener('mouseleave', () => { hl.setAttribute('opacity', 0); hideTip(); });
+}
+function people(stage, groups) {
+  // 100 people; groups: [{n, color, label}]
+  stage.innerHTML = '<div class="people" role="img"></div>';
+  const g = stage.firstChild; let k = 0;
+  g.setAttribute('aria-label', groups.map(x => `${x.n} in 100 ${x.label}`).join('; '));
+  for (let i = 0; i < 100; i++) g.appendChild(document.createElement('i'));
+  requestAnimationFrame(() => {
+    for (const x of groups) for (let j = 0; j < x.n && k < 100; j++, k++) g.children[k].style.background = x.color;
+  });
+}
+
+// ---------- scrollytelling ----------
+function scrolly(name, scenes) {
+  const root = document.querySelector(`[data-scrolly="${name}"]`), steps = [...root.querySelectorAll('.step')];
+  let cur = null;
+  const io = new IntersectionObserver(es => {
+    for (const e of es) if (e.isIntersecting) {
+      steps.forEach(s => s.classList.toggle('on', s === e.target));
+      const sc = e.target.dataset.scene;
+      if (sc !== cur) { cur = sc; scenes[sc] && scenes[sc](); }
+    }
+  }, {rootMargin: '-45% 0px -45% 0px'});
+  steps.forEach(s => io.observe(s));
+  scenes[steps[0].dataset.scene]();
+  new ResizeObserver(() => cur && scenes[cur] && scenes[cur]()).observe(root.querySelector('.stage'));
+  cur = steps[0].dataset.scene;
+}
+const capOf = o => (o && o.cap ? o.cap + ' ' : '') + (o && o.cites ? 'Sources: ' + o.cites.map(id => cite(id).replace(/<\/?sup>/g, '')).join(', ') : '');
+function figText(prefix, title, sub, cap) { $(prefix + '-title').textContent = title; $(prefix + '-sub').innerHTML = sub || ''; $(prefix + '-cap').innerHTML = cap || ''; }
+
+// ---------- chapter 1: roads ----------
+const ROADS = (F._roads_projects && F._roads_projects.rows) || [];
+$('s-cost').innerHTML = stepHtml('cost');
+$('s-household').innerHTML = stepHtml('household');
+$('s-people').innerHTML = stepHtml('people');
+$('s-reach-car').innerHTML = `<p>Driving works for those who can. At rush hour, the average resident can reach about
+  <span class="big">${fmt(M.car45_2025)} jobs</span> within 45 minutes by car.</p><p class="note">Each dot is a census block group, shaded by the jobs reachable from it (model).</p>`;
+$('s-reach-transit').innerHTML = `<p>By transit, the same resident reaches about <span class="big ct">${fmt(M.tr45_2025)} jobs</span>
+  in 45 minutes: ${Math.round(M.car45_2025 / Math.max(1, M.tr45_2025))} times fewer. For most of the region, the bus or train isn't a real option at all.</p>`;
+['_roads_projects', '_household', '_people'].forEach(k => ((F[k] || {}).cites || []).forEach(cite));   // footnotes in reading order
+const roadsStage = $('roads-stage');
+let roadsMap = null;
+function roadsMapOn() { if (!roadsMap) { roadsStage.innerHTML = '<canvas></canvas>'; roadsMap = new RegionMap(roadsStage.firstChild); } return roadsMap; }
+const tipJobs = (arr, label) => i => `<b>${label}</b><br>${fmtN(arr[i])} jobs within 45 min`;
+scrolly('roads', {
+  cost() {
+    roadsMap = null;
+    figText('roads', (F._roads_projects || {}).title || 'What recent freeway projects cost', (F._roads_projects || {}).sub || '', capOf(F._roads_projects));
+    if (ROADS.length) hbars(roadsStage, ROADS.map(r => ({label: r.label, value: r.value, text: r.text, color: css('--muted')})), {aria: 'Costs of recent freeway projects'});
+    else roadsStage.innerHTML = '';
+  },
+  household() {
+    roadsMap = null;
+    const rows = (F._household && F._household.rows) || [];
+    figText('roads', (F._household || {}).title || 'What a car costs a household each year', (F._household || {}).sub || '', capOf(F._household));
+    if (rows.length) hbars(roadsStage, rows.map(r => ({label: r.label, value: r.value, text: r.text, color: css('--ct')})), {aria: 'Household transport costs'});
+    else roadsStage.innerHTML = '';
+  },
+  people() {
+    roadsMap = null;
+    const g = (F._people && F._people.groups) || [];
+    figText('roads', (F._people || {}).title || 'Of every 100 people in the region…', (F._people || {}).sub || '', '');
+    const cols = [css('--pr'), css('--ct'), '#1baf7a', '#6250d6'];
+    people(roadsStage, g.map((x, i) => ({n: x.n, color: cols[i], label: x.label})));
+    $('roads-cap').innerHTML = `<span class="legend">${g.map((x, i) => `<span><i style="background:${cols[i]}"></i>${x.label}</span>`).join('')}</span> ${capOf(F._people)}`;
+  },
+  'reach-car'() {
+    figText('roads', 'Jobs within 45 minutes by car, at rush hour, today', 'Each dot is a census block group', '');
+    roadsMapOn().set({dots: {vals: Z.drive45_2025, tip: tipJobs(Z.drive45_2025, 'By car, 2025')}, year: 0, marks: []});
+    rampLegend($('roads-cap'), 'Jobs reachable');
+  },
+  'reach-transit'() {
+    figText('roads', 'Jobs within 45 minutes by transit, today', 'Walking, waiting and riding included', '');
+    roadsMapOn().set({dots: {vals: Z.jobs45_current_track_2025, tip: tipJobs(Z.jobs45_current_track_2025, 'By transit, 2025')}, year: 2025, scen: 'ct', marks: []});
+    rampLegend($('roads-cap'), 'Jobs reachable');
+  },
+});
+
+// ---------- chapter 2: invest ----------
+const invStage = $('inv-stage');
+let invMap = null;
+function invMapOn() { if (!invMap) { invStage.innerHTML = '<canvas></canvas>'; invMap = new RegionMap(invStage.firstChild); } return invMap; }
+const perRes = y => M.budget * 1e6 / (at('two_million', y, 'pop_m') * 1e6);
+$('s-budget').innerHTML = `<p>The plan assumes one thing: a steady <span class="big pr">$${(M.budget / 1000).toFixed(1)}B a year</span>
+  for new lines, stations and garages, every year until 2100, at today's prices. That is about $${Math.round(perRes(2025))} per resident a year today,
+  falling to $${Math.round(perRes(2100))} as the region grows.</p>${stepHtml('budget')}`;
+$('s-peers').innerHTML = stepHtml('peers');
+const tr = sc => (D.years[sc] || []).map(r => [r.year, r.daily_trips]);
+const yearCard = (y, extra) => `<p><b>${y}.</b> ${extra}</p><p><span class="big pr">${fmt(at('two_million', y, 'daily_trips'))}</span>daily transit trips with the plan, against
+  <b style="color:var(--ct)">${fmt(at('current_track', y, 'daily_trips'))}</b> on the current track.</p>`;
+$('s-y2035').innerHTML = yearCard(2035, 'Cheap, fast wins come first: frequent BRT on the busiest arterials, express buses on the freeways, and the SH-114 line toward DFW Airport.');
+$('s-y2050').innerHTML = yearCard(2050, 'Downtown subways and metro lines in Dallas and Fort Worth, Arlington on the I-30 Line, and every city over 150,000 served.');
+$('s-y2100').innerHTML = yearCard(2100, 'A regional network: metro, regional rail and a grid of BRT, built one affordable piece at a time.');
+$('s-riders').innerHTML = `<p>The ridership model, calibrated to today's riders, puts the plan at about
+  <span class="big pr">${fmt(at('two_million', 2100, 'daily_trips'))}</span>daily trips in 2100. On today's network, a much bigger region still takes only
+  <b style="color:var(--ct)">${fmt(at('current_track', 2100, 'daily_trips'))}</b>.</p>
+  <p class="note">If the region grows more slowly than the official forecast, the plan carries about ${fmt((F._low || {}).trips2100 || 1.17e6)}. Either way, it is ten times the current track.</p>`;
+$('s-appetite').innerHTML = stepHtml('appetite');
+['_budget_compare', '_peers', '_appetite'].forEach(k => ((F[k] || {}).cites || []).forEach(cite));
+function invYear(y) {
+  figText('inv', `The network in ${y}`, 'Lines open by that year; dashed lines are BRT', '');
+  invMapOn().set({dots: null, year: y, scen: 'p', marks: []});
+  $('inv-cap').innerHTML = `<span class="legend"><span><i class="ln" style="background:var(--muted)"></i>rail</span><span><i class="ln" style="background:repeating-linear-gradient(90deg,var(--muted) 0 6px,transparent 6px 9px)"></i>BRT and express bus</span></span>`;
+}
+scrolly('invest', {
+  budget() {
+    invMap = null;
+    const rows = (F._budget_compare && F._budget_compare.rows) || [];
+    figText('inv', (F._budget_compare || {}).title || 'Capital spending a year', (F._budget_compare || {}).sub || '', capOf(F._budget_compare));
+    if (rows.length) hbars(invStage, rows.map(r => ({label: r.label, value: r.value, text: r.text, color: r.plan ? css('--pr') : css('--muted')})), {aria: 'Yearly capital spending compared'});
+    else invStage.innerHTML = '';
+  },
+  peers() {
+    invMap = null;
+    const rows = (F._peers && F._peers.rows) || [];
+    figText('inv', (F._peers || {}).title || 'Transit capital per resident per year', (F._peers || {}).sub || '', capOf(F._peers));
+    if (rows.length) hbars(invStage, rows.map(r => ({label: r.label, value: r.value, text: r.text, color: r.plan ? css('--pr') : css('--muted')})), {aria: 'Peer regions compared'});
+    else invStage.innerHTML = '';
+  },
+  y2035() { invYear(2035); }, y2050() { invYear(2050); }, y2100() { invYear(2100); },
+  riders() {
+    invMap = null;
+    figText('inv', 'Daily transit trips, 2025-2100', 'Each trip counted once, all modes (model)', '');
+    lineChart(invStage, [{name: 'Current track', color: css('--ct'), pts: tr('current_track')}, {name: 'Proposal', color: css('--pr'), pts: tr('two_million')}],
+      {aria: 'Daily transit trips by year: current track against the proposal'});
+  },
+  appetite() {
+    invMap = null;
+    const rows = (F._appetite && F._appetite.rows) || [];
+    figText('inv', (F._appetite || {}).title || 'Recent transit votes and polls', (F._appetite || {}).sub || '', capOf(F._appetite));
+    if (rows.length) hbars(invStage, rows.map(r => ({label: r.label, value: r.value, text: r.text, color: css('--pr')})), {aria: 'Support for transit in votes and polls'});
+    else invStage.innerHTML = '';
+  },
+});
+
+// ---------- chapter 3: near you ----------
+const A = D.assumptions, CH = D.change;
+const settingWord = {downtown: 'downtown', urban: 'in town', suburban: 'suburban'};
+$('near-intro').innerHTML = `A station changes the few blocks around it. The plan assumes more homes and offices get built within a short walk of a new station,
+  the way they have around DART's best stations, and that the rest of the region grows as it would anyway. Pick a station to see what gets built there,
+  how often it runs, and how many people would live within a 10-minute walk.`;
+const ST = D.stations, stByName = new Map(ST.map(s => [s.name.toLowerCase(), s]));
+const gradeWord = g => g === 'tunnel' ? 'underground' : g === 'elevated' ? 'elevated' : 'street level';
+const modeWord = {metro: 'light rail / metro', brt: 'BRT bus', commuter: 'regional rail', streetcar: 'streetcar'};
+const stMap = new RegionMap($('st-map'), {pad: 16});
+function showStation(s) {
+  const yrs = Object.entries(s.years).sort((a, b) => a[1] - b[1]);
+  const opens = yrs.map(([m, y]) => `${modeWord[m] || m} ${y <= 2025 ? 'today' : y}`).join(', ');
+  const grade = Object.entries(s.grade).map(([m, g]) => `${modeWord[m] || m}: ${gradeWord(g)}`).join('; ') || 'street level';
+  const [p25, pct2100, pp2100] = s.pop, d = pp2100 - pct2100;
+  const maxp = Math.max(p25, pct2100, pp2100, 1);
+  $('st-card').innerHTML = `<h3>${s.name}</h3><div class="meta">${s.setting === 'downtown' ? 'Downtown' : s.setting === 'urban' ? 'In town' : 'Suburban'} station &middot; ${s.existing ? 'open today' : 'new'}</div>
+    <div style="margin-top:8px">${s.lines.map(([n, c]) => `<span class="lpill"><i style="background:${c}"></i>${n}</span>`).join('')}</div>
+    <dl class="facts"><dt>Opens</dt><dd>${opens}</dd><dt>Platform</dt><dd>${grade}</dd><dt>Every</dt><dd>${s.headway} min at rush hour (2050)</dd>
+      <dt>Parking</dt><dd>${s.garage ? fmtN(s.garage) + ' spaces in a garage' : 'none: people walk, bike, ride a feeder bus or get dropped off'}</dd></dl>
+    <div class="note">People living within a 10-minute walk (${A.walk_km * 1000} m)</div>
+    <div class="bars3">${[['Today', p25, 'var(--muted)'], ['2100, current track', pct2100, 'var(--ct)'], ['2100, with the plan', pp2100, 'var(--pr)']].map(([l, v, c]) =>
+      `<div class="r"><span>${l}</span><span class="t"><i style="width:${(v / maxp * 100).toFixed(1)}%;background:${c}"></i></span><b>${fmtN(v)}</b></div>`).join('')}</div>
+    <p class="note" style="margin-top:10px">${d > 50 ? `About ${fmtN(d)} more neighbors than the region's growth alone would bring (${pct(d / Math.max(1, pct2100))}), from homes built near the station.` : 'About the same as without the plan: little new building is assumed here.'}</p>`;
+  const ll = [s.lat, s.lon], dz = 0.12;
+  stMap.set({bbox: {x0: (s.lon - dz * 1.6) * KX, x1: (s.lon + dz * 1.6) * KX, y0: s.lat - dz, y1: s.lat + dz}, year: 2100, scen: 'p',
+    only: D.lines.filter(l => s.lines.some(([n]) => n === l.name)).map(l => l.id), marks: [{ll, label: s.name, r: 6}], lineWidth: 3});
+  $('st-legend').innerHTML = s.lines.map(([n, c, m]) => `<span><i class="ln" style="background:${c}"></i>${n}</span>`).join('') + '<span>Other lines faded</span>';
+  document.querySelectorAll('#st-chips .chip').forEach(c => c.setAttribute('aria-pressed', c.dataset.name === s.name));
+}
+const EX = (F._examples && F._examples.stations) || ['Downtown Arlington', 'Akard', 'Frisco Main St', 'Waxahachie', 'Stockyards Main', 'Downtown Denton Transit Center'];
+$('st-chips').innerHTML = EX.filter(n => stByName.has(n.toLowerCase())).map(n => `<button type="button" class="chip" data-name="${n}" aria-pressed="false">${n}</button>`).join('');
+$('st-chips').addEventListener('click', e => { const b = e.target.closest('.chip'); if (b) showStation(stByName.get(b.dataset.name.toLowerCase())); });
+(function () {
+  const q = $('st-q'), list = $('st-list'); let hits = [], sel = -1;
+  const render = () => {
+    list.innerHTML = hits.map((s, i) => `<li role="option" id="opt-${i}" aria-selected="${i === sel}">${s.name} <span class="note">${s.lines.map(l => l[0]).slice(0, 2).join(', ')}</span></li>`).join('');
+    list.hidden = !hits.length; q.setAttribute('aria-expanded', String(!!hits.length));
+    if (sel >= 0) q.setAttribute('aria-activedescendant', 'opt-' + sel); else q.removeAttribute('aria-activedescendant');
+  };
+  q.addEventListener('input', () => {
+    const t = q.value.trim().toLowerCase();
+    hits = t.length < 2 ? [] : ST.filter(s => s.name.toLowerCase().includes(t)).sort((a, b) => a.name.toLowerCase().indexOf(t) - b.name.toLowerCase().indexOf(t)).slice(0, 8);
+    sel = -1; render();
+  });
+  q.addEventListener('keydown', e => {
+    if (e.key === 'ArrowDown') { sel = Math.min(hits.length - 1, sel + 1); render(); e.preventDefault(); }
+    else if (e.key === 'ArrowUp') { sel = Math.max(0, sel - 1); render(); e.preventDefault(); }
+    else if (e.key === 'Enter' && hits.length) { showStation(hits[Math.max(0, sel)]); hits = []; render(); q.value = ''; }
+    else if (e.key === 'Escape') { hits = []; render(); }
+  });
+  list.addEventListener('click', e => { const li = e.target.closest('li'); if (li) { showStation(hits[+li.id.slice(4)]); hits = []; render(); q.value = ''; } });
+})();
+showStation(stByName.get((EX.find(n => stByName.has(n.toLowerCase())) || ST[0].name).toLowerCase()));
+const farShare = CH.pop_far_2100 / CH.pop_2100;
+$('near-region').innerHTML = `Most of the region doesn't change at all. In 2100, <b>${pct(farShare)}</b> of residents live more than a 10-minute walk from any
+  station in the plan; their neighborhoods grow exactly as they would on the current track. Near stations, the plan adds about
+  <b>${fmt(CH.pop_near_2100 - CH.pop_near_2100_ct)}</b> residents by 2100, homes the region would otherwise build further out.`;
+const tod = A.tod || {};
+$('assume').innerHTML = [
+  ['Building costs', `$${A.cost_per_km.metro.surface}M`, `per km of light rail at street level ($${A.cost_per_km.metro.tunnel}M in a tunnel), $${A.cost_per_km.brt.surface}M per km of BRT: today's US costs, falling about 25% by 2055 as a steady program learns.`],
+  ['A steady budget', `$${(A.budget_musd / 1000).toFixed(1)}B a year`, 'for lines, stations and garages, every year to 2100. Nothing opens before the money for it has been raised.'],
+  ['Changing vehicles', `${A.transfer_min} min`, 'is what each change of bus or train costs riders, on top of the wait: riders avoid transfers, and the model counts that.'],
+  ['Growth near stations', `+${Math.round(((tod.pop_uplift || {}).urban || 0.5) * 100)}%`, `more residents within walking distance of a new in-town station over about ${tod.ramp_mid_years || 10} years (${Math.round(((tod.pop_uplift || {}).downtown || 0.75) * 100)}% downtown, ${Math.round(((tod.pop_uplift || {}).suburban || 0.25) * 100)}% suburban), and ${Math.round(((A.capture || {}).pop_share || 0.2) * 100)}% of the region's growth steered to station areas.`],
+  ['Parking', `${fmtN(A.pnr_spaces.terminus)} spaces`, `in a garage at the end of each rail line and ${fmtN(A.pnr_spaces.commuter_station)} at regional rail stations; no new garages downtown.`],
+  ['Who rides', 'Commuters', 'The model counts weekday commutes and the trips that go with them, not evenings, weekends or visitors, so the totals are, if anything, low.'],
+].map(([h, b, p]) => `<div class="panel"><h4>${h}</h4><b>${b}</b><p>${p}</p></div>`).join('');
+
+// ---------- chapter 4: connections ----------
+$('conn-intro').innerHTML = `A network is worth more than its lines. These are some of the links the plan builds, with the rush-hour ride on the plan
+  against the drive, and how many jobs someone at the start can reach within 45 minutes by transit.`;
+$('conns').innerHTML = D.connections.map((c, i) => {
+  const ride = c.ride['two_million_2100'], drive = c.drive[2100];
+  const j0 = c.jobs45['current_track_2025'], j1 = c.jobs45['current_track_2100'], j2 = c.jobs45['two_million_2100'];
+  return `<article class="panel conn"><h3>${c.title}</h3><p class="why">${c.why}</p>
+    <div class="mini"><canvas id="cm-${i}" role="img" aria-label="Map: ${c.from} to ${c.to}"></canvas></div>
+    <div class="nums"><div><b style="color:var(--pr)">${ride != null ? ride + ' min' : '–'}</b>by transit, 2100</div><div><b>${drive} min</b>rush-hour drive, 2100</div>
+      <div><b style="color:var(--pr)">${fmt(j2)}</b>jobs in 45 min from ${c.from}, 2100 (${fmt(j1)} on the current track; ${fmt(j0)} today)</div></div></article>`;
+}).join('');
+D.connections.forEach((c, i) => {
+  const lat = [c.from_ll[0], c.to_ll[0]], lon = [c.from_ll[1], c.to_ll[1]], pad = 0.05;
+  new RegionMap($('cm-' + i), {pad: 26}).set({bbox: {x0: (Math.min(...lon) - pad) * KX, x1: (Math.max(...lon) + pad) * KX, y0: Math.min(...lat) - pad, y1: Math.max(...lat) + pad},
+    year: 2100, scen: 'p', lineWidth: 3, only: c.lines || null, marks: [{ll: c.from_ll, label: c.from}, {ll: c.to_ll, label: c.to}]});
+});
+
+// ---------- chapter 5: 2100 ----------
+$('y-intro').innerHTML = `Both futures have the same ${(M.pop2100 / 1e6).toFixed(0)} million people and the same roads. One keeps today's ten lines; the other builds the network,
+  piece by piece, within the same yearly budget.`;
+const twCt = new RegionMap($('tw-ct')), twPr = new RegionMap($('tw-pr'));
+function twin(mode) {
+  $('tw-lines').setAttribute('aria-pressed', mode === 'lines'); $('tw-jobs').setAttribute('aria-pressed', mode === 'jobs');
+  if (mode === 'lines') {
+    twCt.set({dots: null, year: 2100, scen: 'ct', lineAlpha: 1, lineWidth: 0}); twPr.set({dots: null, year: 2100, scen: 'p', lineAlpha: 1, lineWidth: 0});
+    $('tw-legend').innerHTML = '<span><i class="ln" style="background:var(--muted)"></i>rail</span><span><i class="ln" style="background:repeating-linear-gradient(90deg,var(--muted) 0 6px,transparent 6px 9px)"></i>BRT and express bus</span>';
+  } else {
+    twCt.set({dots: {vals: Z.jobs45_current_track_2100, pop: Z.pop_ct_2100, tip: tipJobs(Z.jobs45_current_track_2100, 'Current track, 2100')}, year: 2100, scen: 'ct', lineAlpha: 0.35, lineWidth: 1});
+    twPr.set({dots: {vals: Z.jobs45_two_million_2100, pop: Z.pop_2100, tip: tipJobs(Z.jobs45_two_million_2100, 'With the plan, 2100')}, year: 2100, scen: 'p', lineAlpha: 0.35, lineWidth: 1});
+    rampLegend($('tw-legend'), 'Jobs within 45 min by transit');
+  }
+}
+$('tw-lines').onclick = () => twin('lines'); $('tw-jobs').onclick = () => twin('jobs');
+twin('lines');
+const near800 = (sc, y) => at(sc, y, 'pop_covered_pct') / 100;
+const rowsCmp = [
+  ['Daily transit trips', fmt(at('current_track', 2100, 'daily_trips')), fmt(at('two_million', 2100, 'daily_trips'))],
+  ['Residents within a 10-minute walk of a station', pct(near800('current_track', 2100)), pct(near800('two_million', 2100))],
+  ['Jobs the average resident reaches in 45 min by transit', fmt(M.ct45_2100), fmt(M.pr45_2100)],
+  ['Jobs the average resident reaches in 45 min by car', fmt(M.car45_2100), fmt(M.car45_2100)],
+  ['New capital, 2025-2100 (today\'s dollars)', '$0', '$' + at('two_million', 2100, 'capex_busd').toFixed(0) + 'B'],
+  ['Operating cost in 2100, per year', '$' + at('current_track', 2100, 'opex_busd_per_year').toFixed(1) + 'B', '$' + at('two_million', 2100, 'opex_busd_per_year').toFixed(1) + 'B'],
+];
+$('cmp').innerHTML = `<caption class="sr">2100: current track against the proposal</caption><thead><tr><th scope="col">2100</th><th scope="col">Current track</th><th scope="col">The proposal</th></tr></thead>
+  <tbody>${rowsCmp.map(([a, b, c]) => `<tr><th scope="row" style="font-weight:500">${a}</th><td class="ct">${b}</td><td class="pr">${c}</td></tr>`).join('')}</tbody>`;
+
+// ---------- hero, nav, progress ----------
+const hero = new RegionMap($('hero-map'), {pad: 0});
+hero.set({dots: null, base: true, year: 2100, scen: 'p', lineWidth: 1.6});
+const navLinks = [...document.querySelectorAll('header.bar nav a')];
+const secs = navLinks.map(a => document.querySelector(a.getAttribute('href')));
+addEventListener('scroll', () => {
+  const h = document.documentElement, p = h.scrollTop / Math.max(1, h.scrollHeight - h.clientHeight);
+  $('progress').style.width = (p * 100).toFixed(1) + '%';
+  let k = -1; secs.forEach((s, i) => { if (s && s.getBoundingClientRect().top < innerHeight * 0.4) k = i; });
+  navLinks.forEach((a, i) => a.classList.toggle('on', i === k));
+}, {passive: true});
+sources();
+</script>
+</body>
+</html>

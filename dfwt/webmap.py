@@ -1,4 +1,4 @@
-"""Builds docs/index.html: the interactive map, from evaluated scenarios.
+"""Builds docs/map.html: the interactive map, from evaluated scenarios.
 
 Everything the page needs is embedded as one JSON blob. The routing graph for
 each year is exported from the same Python model the reports use (runs, ride

@@ -67,8 +67,10 @@ def cmd_build(args):
             evaluate.stamp_line_values(out, evals[key])
         evaluate.write(out, evals[key])
     report.write_all(ctx, nets, evals, findings)
-    webmap.write(nets, evals, config.path("docs", "index.html"))
-    print(f"done in {time.time() - t0:.0f}s: results/, reports/RESULTS.md, reports/VALIDATION.md, docs/index.html")
+    webmap.write(nets, evals, config.path("docs", "map.html"))
+    from . import story
+    story.write(config.path("docs", "index.html"))
+    print(f"done in {time.time() - t0:.0f}s: results/, reports/RESULTS.md, reports/VALIDATION.md, docs/map.html, docs/index.html (story)")
     return 0
 
 
@@ -132,6 +134,12 @@ def cmd_values(args):
         print(f"  {r['line_id']:6} {net.host_line(r['line_id']).name if not r['host'] else r['line_id'] + ' (via ' + r['host'] + ')':32}"
               f" {r['marginal_final']:>8,} trips  ${r['cost_shared_musd']:>7,}M  {r['value_per_musd']}")
     print(f"wrote {config.path('results', net.name, 'line_values.csv')}")
+    return 0
+
+
+def cmd_story(args):
+    from . import story
+    print("wrote", story.write(config.path("docs", "index.html")))
     return 0
 
 
@@ -265,6 +273,7 @@ def main(argv=None):
     va.add_argument("--scenario")
     va.add_argument("--procs", type=int, default=3)
     va.add_argument("--lines", help="comma-separated line_ids to (re)measure; the rest keep their values")
+    sub.add_parser("story", help="the story page (docs/index.html) from the last build's results (~10 min)")
     t = sub.add_parser("trip")
     t.add_argument("origin")
     t.add_argument("dest")
@@ -288,7 +297,7 @@ def main(argv=None):
     args = p.parse_args(argv)
     return {"validate": cmd_validate, "build": cmd_build, "trip": cmd_trip, "stage": cmd_stage,
             "optimize": cmd_optimize, "align": cmd_align,
-            "ridership": cmd_ridership, "schedule": cmd_schedule, "values": cmd_values}[args.cmd](args)
+            "ridership": cmd_ridership, "schedule": cmd_schedule, "values": cmd_values, "story": cmd_story}[args.cmd](args)
 
 
 if __name__ == "__main__":

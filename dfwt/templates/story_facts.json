@@ -1,0 +1,509 @@
+{
+ "sources": {
+  "lbj": {
+   "source": "FHWA Center for Innovative Finance Support, Project Profile: LBJ Express/IH 635 Managed Lanes",
+   "url": "https://www.fhwa.dot.gov/ipd/project_profiles/tx_lbj_express.aspx",
+   "year": 2015,
+   "note": null
+  },
+  "seconn": {
+   "source": "TxDOT, Southeast Connector project page",
+   "url": "https://www.txdot.gov/projects/projects-studies/fort-worth/southeast-connector.html",
+   "year": 2026,
+   "note": null
+  },
+  "i635e": {
+   "source": "TxDOT, I-635 East project page",
+   "url": "https://www.txdot.gov/635east",
+   "year": 2026,
+   "note": null
+  },
+  "i345": {
+   "source": "Candy's Dirt, 'TxDOT Says $1.6 Billion Interstate 345 Project Could Take a Decade to Complete'",
+   "url": "https://candysdirt.com/?p=370489",
+   "year": 2024,
+   "note": "Cost estimate; not yet built"
+  },
+  "x35": {
+   "source": "TxDOT news release 029-2016 (TIFIA loan for 35Express)",
+   "url": "https://www.txdot.gov/about/newsroom/statewide/2016/029-2016.html",
+   "year": 2017,
+   "note": "Phase 1, Dallas to Denton"
+  },
+  "sgw": {
+   "source": "TxDOT, The Southern Gateway project page",
+   "url": "https://www.txdot.gov/the-southern-gateway.html",
+   "year": 2022,
+   "note": null
+  },
+  "m2050": {
+   "source": "NCTCOG news release, 'DFW Transportation-AQ Balance Approved by Federal Government'",
+   "url": "https://nctcog.org/trans/about/news/dfw-transportation-aq-balance-approved-by-federal-government",
+   "year": 2025,
+   "note": "Year-of-expenditure dollars, 2025-2050"
+  },
+  "m2050need": {
+   "source": "NCTCOG Mobility 2050, Chapter 8 Conclusion",
+   "url": "https://nctcog.org/getmedia/e81521a0-7f5f-431e-8a14-d994193304a5/8-0-Conclusion.pdf",
+   "year": 2025,
+   "note": null
+  },
+  "utp": {
+   "source": "TxDOT, Inside Scoop: Texas Transportation Commission August 2026",
+   "url": "https://www.txdot.gov/about/newsroom/statewide/inside-scoop-texas-transportation-commission-august-2026.html",
+   "year": 2026,
+   "note": "Statewide, construction projects over 10 years"
+  },
+  "aaa": {
+   "source": "AAA Your Driving Costs 2026 (reported by Finger Lakes 1 / Autobody News / CarPro)",
+   "url": "https://www.fingerlakes1.com/2026/09/15/aaa-estimates-new-vehicle-ownership-costs-at-12863-a-year/",
+   "year": 2026,
+   "note": "Reported coverage of AAA's 2026 figure"
+  },
+  "bls": {
+   "source": "BLS Southwest Information Office, Consumer Expenditures for the Dallas Metropolitan Area 2023-2024",
+   "url": "https://www.bls.gov/regions/southwest/news-release/consumerexpenditures_dallasfortworth.htm",
+   "year": 2024,
+   "note": "2023-24 average"
+  },
+  "tti": {
+   "source": "Axios Dallas, 'You're not crazy; traffic in Dallas-Fort Worth is worse' (citing TTI 2025 Urban Mobility Report)",
+   "url": "https://www.axios.com/local/dallas/2025/11/03/you-re-not-crazy-traffic-in-dallas-fort-worth-is-worse",
+   "year": 2024,
+   "note": "Citing TTI's 2025 Urban Mobility Report (2024 data)"
+  },
+  "deaths": {
+   "source": "NCTCOG Crash Facts, Calendar Year 2024 (Final)",
+   "url": "https://nctcog.org/getmedia/0fa88941-1c1f-4250-a452-9de4804f5a1e/NCTCOG-Crash-Facts-Calendar-Year-2024-Final.pdf",
+   "year": 2024,
+   "note": "12-county region"
+  },
+  "agekids": {
+   "source": "Social Explorer profile (ACS)",
+   "url": "https://www.socialexplorer.com/profiles/essential-report/dallas-fort-worth-arlington-tx-metro-area.html",
+   "year": 2024,
+   "note": "ACS, DFW metro"
+  },
+  "license85": {
+   "source": "NHTSA, Countermeasures That Work - Older Drivers",
+   "url": "https://www.nhtsa.gov/book/countermeasures-that-work/older-drivers",
+   "year": 2020,
+   "note": null
+  },
+  "pew": {
+   "source": "Pew Research Center, '1 in 10 Americans rarely or never drive a car'",
+   "url": "https://www.pewresearch.org/short-reads/2024/11/14/1-in-10-americans-rarely-or-never-drive-a-car/",
+   "year": 2024,
+   "note": "US adults"
+  },
+  "zerocar_co": {
+   "source": "Axios Dallas, 'What other cities can learn from car-dependent Dallas' (Aug 2023)",
+   "url": "https://www.axios.com/local/dallas/2023/08/07/dallas-car-dependency",
+   "year": 2021,
+   "note": null
+  },
+  "zerocar_city": {
+   "source": "CultureMap Dallas, review of ACS 2011-2015 estimates",
+   "url": "https://dallas.culturemap.com/news/city-life/05-16-17-car-free-city-report-us-census-bureau-dallas",
+   "year": 2015,
+   "note": "ACS 2011-2015; newer city figures weren't found"
+  },
+  "st3": {
+   "source": "Wikipedia, Sound Transit 3 / Bellevue Reporter",
+   "url": "https://en.wikipedia.org/wiki/Sound_Transit_3",
+   "year": 2016,
+   "note": null
+  },
+  "measurem": {
+   "source": "CBS Los Angeles / Beverly Press (Metro estimate)",
+   "url": "https://www.cbsnews.com/losangeles/news/how-soon-will-commuters-see-traffic-improvements-now-that-measure-m-has-been-passed",
+   "year": 2016,
+   "note": null
+  },
+  "fastracks": {
+   "source": "Progressive Railroading",
+   "url": "https://www.progressiverailroading.com/passenger_rail/article/Rising-Material-Costs-Falling-Sales-Tax-Revenue-put-Denver-RTDs-FasTracks-Program-in-Flux--19323",
+   "year": 2004,
+   "note": "Original budget; later about $7.8B"
+  },
+  "metronext": {
+   "source": "Planetizen / Mass Transit / Community Impact",
+   "url": "https://planetizen.com/node/102623",
+   "year": 2019,
+   "note": null
+  },
+  "metro2025": {
+   "source": "US Census Bureau Vintage 2025 estimates via FRED series DFWPOP",
+   "url": "https://fred.stlouisfed.org/series/DFWPOP",
+   "year": 2025,
+   "note": null
+  },
+  "houston": {
+   "source": "Community Impact Newspaper, election results Nov 6, 2019",
+   "url": "https://communityimpact.com/houston/cy-fair/vote/2019/11/05/with-early-voting-results-in-metro-bond-on-track-to-pass",
+   "year": 2019,
+   "note": "Election-night result"
+  },
+  "sanantonio": {
+   "source": "VIA Metropolitan Transit press release via Mass Transit",
+   "url": "https://www.masstransitmag.com/management/press-release/21161362/via-metropolitan-transit-san-antonio-voters-say-yes-to-atd-proposition-a-yes-to-vias-keep-sa-moving-plan",
+   "year": 2020,
+   "note": null
+  },
+  "austin": {
+   "source": "KUT / Fox 7 Austin election coverage",
+   "url": "https://www.fox7austin.com/news/prop-a-passes-allowing-capmetro-to-move-forward-with-project-connect",
+   "year": 2020,
+   "note": "Election-night result"
+  },
+  "addison": {
+   "source": "Dallas Express, 'Votes are in on Dallas ISD's $6.2B bond, DART membership questions'",
+   "url": "https://dallasexpress.com/city/votes-are-in-on-dallas-isds-6-2b-bond-dart-membership-questions/",
+   "year": 2026,
+   "note": null
+  },
+  "upark": {
+   "source": "KERA News / Dallas Express",
+   "url": "https://www.keranews.org/transportation/2026-05-02/highland-university-park-cities-addison-dart-election",
+   "year": 2026,
+   "note": null
+  },
+  "hpark": {
+   "source": "Texas Tribune, DART elections in Addison, Highland Park, University Park (May 3, 2026)",
+   "url": "https://www.texastribune.org/2026/05/03/texas-dallas-dart-election-addison-highland-university-park/",
+   "year": 2026,
+   "note": null
+  },
+  "nctcogsurvey": {
+   "source": "Mass Transit (via Dallas Morning News), 'As cities look to pull back funding, North Texas residents say they want more transit'",
+   "url": "https://masstransitmag.com/management/news/55242059/tx-as-cities-look-to-pull-back-funding-north-texas-residents-say-they-want-more-transit",
+   "year": 2024,
+   "note": "Opt-in survey, not a random poll"
+  },
+  "dartrail": {
+   "source": "Wikipedia, DART rail (citing APTA)",
+   "url": "https://en.wikipedia.org/wiki/DART_rail",
+   "year": 2026,
+   "note": "Citing APTA"
+  },
+  "silver": {
+   "source": "DART news release, 'Silver Line launches Oct. 25'",
+   "url": "https://www.dart.org/about/news-and-events/newsreleases/newsrelease-detail/silver-line-launches-oct.-25--connecting-seven-cities-and-dfw-airport-with-modern--reliable-transit",
+   "year": 2025,
+   "note": null
+  }
+ },
+ "steps": {
+  "cost": [
+   [
+    "A new freeway now costs well over a billion dollars. The LBJ Express cost $2.6 billion for 13 miles of I-635, about $200 million a mile.",
+    [
+     "lbj"
+    ]
+   ],
+   [
+    "The region's long-range plan, Mobility 2050, puts $97.5 billion into roads and $57.9 billion into rail and bus through 2050. Its authors say that eliminating the worst congestion would take road spending four to five times the size of the entire plan.",
+    [
+     "m2050",
+     "m2050need"
+    ]
+   ]
+  ],
+  "household": [
+   [
+    "Households pay too. Owning and running a new car costs about $12,900 a year, and DFW households spend 18.6% of their budget on getting around, more than the national average.",
+    [
+     "aaa",
+     "bls"
+    ]
+   ],
+   [
+    "The average DFW commuter lost 69 hours to traffic delay in 2024, and 849 people died on the region's roads.",
+    [
+     "tti",
+     "deaths"
+    ]
+   ]
+  ],
+  "people": [
+   [
+    "And roads only serve people who can drive. A quarter of the region's residents are under 18. One in eight is 65 or older, and by 85 four in ten have given up their license. One in ten adults rarely or never drive.",
+    [
+     "agekids",
+     "license85",
+     "pew"
+    ]
+   ],
+   [
+    "One in fifteen Dallas County households has no car at all; in the City of Dallas it was one in ten.",
+    [
+     "zerocar_co",
+     "zerocar_city"
+    ]
+   ]
+  ],
+  "budget": [
+   [
+    "That is not a radical number. Mobility 2050 already plans about $57.9 billion for transit over 25 years, a little over $2 billion a year, beside $97.5 billion for roads. The difference is that this plan keeps going, every year, on a network designed around where people live and work.",
+    [
+     "m2050"
+    ]
+   ]
+  ],
+  "peers": [
+   [
+    "Other American regions already spend this much. Seattle's Sound Transit 3 spends about $630 per resident a year and LA's Measure M about $310. This plan is about $270 per resident today.",
+    [
+     "st3",
+     "measurem",
+     "metro2025"
+    ]
+   ],
+   [
+    "Texas cities are building too: Houston's METRONext and Austin's Project Connect were approved by voters.",
+    [
+     "metronext",
+     "austin"
+    ]
+   ]
+  ],
+  "appetite": [
+   [
+    "When Texans vote on transit, they mostly say yes: Houston (68% in 2019), San Antonio (68% in 2020) and Austin (58% in 2020).",
+    [
+     "houston",
+     "sanantonio",
+     "austin"
+    ]
+   ],
+   [
+    "The support isn't unanimous. In May 2026 three DART member cities voted on leaving: Addison (70%) and University Park (54%) stayed, Highland Park left. In NCTCOG's 2024 survey for Mobility 2050, 48% of respondents named expanding transit the region's biggest challenge.",
+    [
+     "addison",
+     "upark",
+     "hpark",
+     "nctcogsurvey"
+    ]
+   ],
+   [
+    "People already ride where service is good: DART's light rail carries about 65,000 trips on an average weekday, and the Silver Line opened in October 2025.",
+    [
+     "dartrail",
+     "silver"
+    ]
+   ]
+  ]
+ },
+ "charts": {
+  "_roads_projects": {
+   "title": "Recent DFW freeway projects",
+   "sub": "Total cost, billions of dollars (the year each was reported)",
+   "rows": [
+    {
+     "label": "LBJ Express (I-635, 13 mi)",
+     "value": 2.645,
+     "text": "$2.6B"
+    },
+    {
+     "label": "Southeast Connector (16 mi)",
+     "value": 2.3,
+     "text": "$2.3B"
+    },
+    {
+     "label": "I-635 East (about 11 mi)",
+     "value": 1.74,
+     "text": "$1.7B"
+    },
+    {
+     "label": "I-345 trench (1.4 mi, estimate)",
+     "value": 1.6,
+     "text": "$1.6B"
+    },
+    {
+     "label": "35Express, phase 1",
+     "value": 1.4,
+     "text": "$1.4B"
+    },
+    {
+     "label": "Southern Gateway (11 mi)",
+     "value": 0.666,
+     "text": "$0.7B"
+    }
+   ],
+   "cites": [
+    "lbj",
+    "seconn",
+    "i635e",
+    "i345",
+    "x35",
+    "sgw"
+   ]
+  },
+  "_household": {
+   "title": "What getting around costs, per year",
+   "sub": "Dollars a year",
+   "rows": [
+    {
+     "label": "DFW household, all transportation",
+     "value": 15248,
+     "text": "$15,248"
+    },
+    {
+     "label": "Own and run a new car (AAA)",
+     "value": 12863,
+     "text": "$12,863"
+    },
+    {
+     "label": "Time lost in traffic, per commuter",
+     "value": 1618,
+     "text": "$1,618"
+    }
+   ],
+   "cites": [
+    "bls",
+    "aaa",
+    "tti"
+   ]
+  },
+  "_people": {
+   "title": "Of every 100 people in the region",
+   "sub": "Who can't count on driving",
+   "groups": [
+    {
+     "n": 24,
+     "label": "under 18"
+    },
+    {
+     "n": 13,
+     "label": "65 or older"
+    },
+    {
+     "n": 6,
+     "label": "adults 18-64 who rarely or never drive (estimate)"
+    }
+   ],
+   "cap": "The last group applies the US share of adults who rarely or never drive (10%) to the region's working-age adults.",
+   "cites": [
+    "agekids",
+    "pew"
+   ]
+  },
+  "_budget_compare": {
+   "title": "Capital for getting around, per year",
+   "sub": "Billions of dollars a year",
+   "rows": [
+    {
+     "label": "TxDOT construction, all of Texas",
+     "value": 9.5,
+     "text": "$9.5B"
+    },
+    {
+     "label": "Mobility 2050: roads",
+     "value": 3.9,
+     "text": "$3.9B"
+    },
+    {
+     "label": "Mobility 2050: rail and bus",
+     "value": 2.3,
+     "text": "$2.3B"
+    },
+    {
+     "label": "This plan (2025 dollars)",
+     "value": 2.3,
+     "text": "$2.3B",
+     "plan": true
+    }
+   ],
+   "cap": "TxDOT: $95B over 10 years. Mobility 2050: totals over 2025-2050 divided by 25, in year-of-expenditure dollars.",
+   "cites": [
+    "utp",
+    "m2050"
+   ]
+  },
+  "_peers": {
+   "title": "Transit capital per resident per year",
+   "sub": "Dollars, each program's own years and dollars",
+   "rows": [
+    {
+     "label": "Seattle, Sound Transit 3",
+     "value": 630,
+     "text": "$630"
+    },
+    {
+     "label": "Los Angeles, Measure M",
+     "value": 310,
+     "text": "$310"
+    },
+    {
+     "label": "This plan, today",
+     "value": 271,
+     "text": "$271",
+     "plan": true
+    },
+    {
+     "label": "Denver, FasTracks",
+     "value": 126,
+     "text": "$126"
+    },
+    {
+     "label": "Houston, METRONext",
+     "value": 100,
+     "text": "$100"
+    }
+   ],
+   "cites": [
+    "st3",
+    "measurem",
+    "fastracks",
+    "metronext"
+   ]
+  },
+  "_appetite": {
+   "title": "Share voting for transit",
+   "sub": "Percent of votes, recent Texas elections",
+   "rows": [
+    {
+     "label": "San Antonio, VIA (2020)",
+     "value": 68,
+     "text": "68%"
+    },
+    {
+     "label": "Houston, METRONext (2019)",
+     "value": 67.9,
+     "text": "68%"
+    },
+    {
+     "label": "Addison: stay in DART (2026)",
+     "value": 70,
+     "text": "70%"
+    },
+    {
+     "label": "Austin, Project Connect (2020)",
+     "value": 58,
+     "text": "58%"
+    },
+    {
+     "label": "University Park: stay (2026)",
+     "value": 53.6,
+     "text": "54%"
+    },
+    {
+     "label": "Highland Park: stay (2026)",
+     "value": 30,
+     "text": "30%"
+    }
+   ],
+   "cites": [
+    "sanantonio",
+    "houston",
+    "addison",
+    "austin",
+    "upark",
+    "hpark"
+   ]
+  },
+  "_low": {
+   "trips2100": 1167018
+  }
+ }
+}

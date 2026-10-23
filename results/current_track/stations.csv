@@ -1,0 +1,105 @@
+station_id,name,lat,lon,year_opens,lines,modes,pop_1km,jobs_1km,boardings_final
+X131,Walnut Hill/Denton,32.881529,-96.883758,2025,Green Line,metro,1916,4953,249
+X130,Royal Lane,32.895513,-96.888157,2025,Green Line,metro,3114,6627,734
+X129,Farmers Branch,32.921314,-96.896078,2025,Green Line,metro,4408,10011,327
+X134,Inwood/Love Field,32.821756,-96.833261,2025,Orange Line;Green Line,metro,12370,8509,537
+X133,Burbank,32.842702,-96.861651,2025,Orange Line;Green Line,metro,1952,21576,546
+X132,Bachman,32.853236,-96.877236,2025,Orange Line;Green Line,metro,5458,752,1165
+X125,Parker Road,33.03432,-96.700657,2025,Orange Line;Red Line,metro,3707,1323,1766
+X124,Downtown Plano,33.021203,-96.700862,2025,Orange Line;Red Line,metro,5261,20929,174
+X123,12th Street,33.014509,-96.700996,2025,Orange Line;Red Line,metro,3468,16209,152
+X128,Downtown Carrollton,32.95404,-96.908049,2025,Green Line;Silver Line,metro,4789,5828,595
+X127,Trinity Mills,32.980393,-96.926177,2025,A-train;Green Line,commuter;metro,0,0,1020
+X126,North Carrollton/Frankford,32.992155,-96.937439,2025,Green Line,metro,0,0,881
+X143,Baylor University Medical Center,32.786689,-96.781325,2025,Green Line,metro,5085,26397,185
+X142,Deep Ellum,32.785505,-96.78815,2025,Green Line,metro,9903,58669,55
+X141,Pearl/Arts District,32.786763,-96.79409,2025,Orange Line;Green Line;Red Line;Blue Line,metro,8998,62271,666
+X146,Hatcher,32.766281,-96.74187,2025,Green Line,metro,9413,1402,391
+X145,MLK Jr.,32.773475,-96.764245,2025,Green Line,metro,3342,1788,182
+X144,Fair Park,32.781353,-96.76621,2025,Green Line,metro,4770,4396,357
+X137,Victory,32.788989,-96.812452,2025,TRE;Orange Line;Green Line,commuter;metro,10003,23854,783
+X136,Market Center,32.804496,-96.82307,2025,Orange Line;Green Line,metro,6351,5482,396
+X135,Southwestern Medical District/Parkland,32.813304,-96.833266,2025,Orange Line;Green Line,metro,7405,41665,473
+X140,Saint Paul,32.784576,-96.796695,2025,Orange Line;Green Line;Red Line;Blue Line,metro,7131,90802,88
+X139,Akard,32.782015,-96.800167,2025,Orange Line;Green Line;Red Line;Blue Line,metro,6514,89389,370
+X138,West End,32.781003,-96.80499,2025,Orange Line;Green Line;Red Line;Blue Line,metro,7797,90007,400
+X101,University of Dallas,32.848753,-96.914543,2025,Orange Line,metro,0,0,538
+X100,Las Colinas Urban Center,32.868224,-96.933252,2025,Orange Line,metro,9409,28389,440
+X099,Irving Convention Center,32.876663,-96.938094,2025,Orange Line,metro,6190,19519,341
+X119,Spring Valley,32.941299,-96.737057,2025,Orange Line;Red Line,metro,2862,12090,769
+X118,LBJ/Central,32.918689,-96.751792,2025,Orange Line;Red Line,metro,5281,2881,771
+X117,Forest Lane,32.908824,-96.761325,2025,Orange Line;Red Line,metro,5236,11366,933
+X122,CityLine/Bush,33.00249,-96.702941,2025,Orange Line;Red Line;Silver Line,metro,4580,10824,523
+X121,Galatyn Park,32.985465,-96.71077,2025,Orange Line;Red Line,metro,3238,20000,312
+X120,Arapaho Center,32.963965,-96.722586,2025,Orange Line;Red Line,metro,2447,15949,381
+X113,SMU/Mockingbird,32.838193,-96.774435,2025,Orange Line;Red Line;Blue Line,metro,11847,10784,1135
+X112,CityPlace/Uptown,32.806758,-96.793225,2025,Orange Line;Red Line;Blue Line;M-Line Trolley,metro;streetcar,18537,15921,2215
+X116,Walnut Hill,32.883191,-96.764865,2025,Orange Line;Red Line,metro,9734,25927,521
+X115,Park Lane,32.873176,-96.765729,2025,Orange Line;Red Line,metro,12843,14728,1213
+X114,Lovers Lane,32.849026,-96.771595,2025,Orange Line;Red Line,metro,13126,15292,956
+X147,Lawnview,32.765571,-96.719953,2025,Green Line,metro,2734,22,952
+X180,White Rock,32.855521,-96.732718,2025,Blue Line,metro,3394,1092,864
+X179,Lake Highlands,32.878976,-96.730623,2025,Blue Line,metro,10962,935,793
+X178,LBJ/Skillman,32.897934,-96.71223,2025,Blue Line,metro,10340,30830,841
+X174,Westmoreland,32.719612,-96.872258,2025,Red Line,metro,8204,1625,1602
+X173,Hampton,32.726201,-96.855802,2025,Red Line,metro,9553,986,550
+X172,Tyler/Vernon,32.733033,-96.838999,2025,Red Line,metro,8883,2224,596
+X177,Forest/Jupiter,32.90795,-96.68003,2025,Blue Line,metro,4936,1126,1014
+X176,Downtown Garland,32.916252,-96.635921,2025,Blue Line,metro,3255,3079,1198
+X175,Downtown Rowlett,32.904231,-96.563086,2025,Blue Line,metro,1727,999,1204
+X192,Kiest,32.706776,-96.800927,2025,Blue Line,metro,9108,920,721
+X191,Illinois,32.722783,-96.805293,2025,Blue Line,metro,4093,151,317
+X190,Morrell,32.739735,-96.802666,2025,Blue Line,metro,6582,636,250
+X196,UNT Dallas,32.65388,-96.801574,2025,Blue Line,metro,1209,46,1117
+X195,Camp Wisdom,32.666083,-96.787899,2025,Blue Line,metro,2439,17,348
+X193,VA Medical Center,32.69331,-96.792811,2025,Blue Line,metro,2677,5542,254
+X189,8th & Corinth,32.748008,-96.798735,2025,Red Line;Blue Line,metro,2531,908,381
+X188,Cedars,32.76855,-96.79325,2025,Red Line;Blue Line,metro,2458,3686,132
+X187,Union Station,32.775477,-96.808115,2025,TRE;Red Line;Blue Line;Dallas Streetcar,commuter;metro;streetcar,5460,29680,427
+X149,Buckner,32.718265,-96.684696,2025,Green Line,metro,2966,1425,2098
+X148,Lake June,32.732028,-96.709088,2025,Green Line,metro,5849,283,656
+X171,Dallas Zoo,32.740418,-96.813372,2025,Red Line,metro,5623,1596,174
+X098,North Lake College,32.875156,-96.966591,2025,Orange Line,metro,6906,4946,828
+X072,Fort Worth T&P,32.745306,-97.329001,2025,TEXRail;TRE,commuter,2758,6103,87
+X073,Fort Worth Central,32.75202,-97.325515,2025,TEXRail;TRE,commuter,6345,36322,69
+X318,DFW Airport North,32.934261,-97.054329,2025,Silver Line,metro,0,0,89
+X317,DFW Airport Terminal B,32.906918,-97.041221,2025,TEXRail;Orange Line;Silver Line,commuter;metro,0,0,551
+X074,North Side,32.795759,-97.33813,2025,TEXRail,commuter,5087,4991,366
+X077,North Richland Hills/Smithfield,32.864882,-97.211686,2025,TEXRail,commuter,2404,256,423
+X078,Grapevine-Main Street,32.933708,-97.077642,2025,TEXRail,commuter,5003,17453,71
+X075,Mercantile Center,32.819569,-97.292877,2025,TEXRail,commuter,2098,247,247
+X076,North Richland Hills/Iron Horse,32.844595,-97.249724,2025,TEXRail,commuter,3871,4452,410
+X325,12th Street,33.015498,-96.698026,2025,Silver Line,metro,3468,16209,92
+X194,Ledbetter,32.682824,-96.788722,2025,Blue Line,metro,868,5500,210
+X326,Shiloh Road,33.0125,-96.66537,2025,Silver Line,metro,7934,7500,475
+X323,UT Dallas,32.996497,-96.749607,2025,Silver Line,metro,5232,8864,188
+X319,Cypress Waters,32.950817,-96.982823,2025,Silver Line,metro,1586,995,324
+X322,Knoll Trail,32.962958,-96.817204,2025,Silver Line,metro,13078,40604,234
+X321,Addison,32.959128,-96.827719,2025,Silver Line,metro,4257,31987,134
+X091,Hebron,33.010593,-96.958731,2025,A-train,commuter,3859,1163,52
+X087,Trinity Lakes,32.805216,-97.21005,2025,TRE,commuter,0,0,599
+X092,Old Town,33.047791,-96.986572,2025,A-train,commuter,0,0,49
+X097,Belt Line,32.887681,-96.986145,2025,Orange Line,metro,0,0,388
+X095,Downtown Denton Transit Center,33.21385,-97.126216,2025,A-train,commuter,5816,5049,72
+X093,Highland Village/Lewisville Lake,33.083903,-97.026097,2025,A-train,commuter,2595,521,116
+X094,MedPark,33.182633,-97.091034,2025,A-train,commuter,0,208,96
+X084,West Irving,32.816138,-97.00777,2025,TRE,commuter,1824,401,607
+X082,Medical/Market Center,32.809647,-96.841013,2025,TRE,commuter,2675,41018,108
+X085,CentrePort/DFW Airport,32.817043,-97.053542,2025,TRE,commuter,4348,6761,654
+X086,Bell,32.804628,-97.155799,2025,TRE,commuter,3502,4090,604
+X083,Downtown Irving/Heritage Crossing,32.814967,-96.948368,2025,TRE,commuter,2771,3015,752
+X341,Main / Sherman Street,32.949068,-96.731669,9999,Orange Line;Red Line,metro,4566,13768,0
+X308,Central / Hall,32.798838,-96.792879,9999,Orange Line;Red Line;Blue Line,metro,17995,61933,0
+XT01,Methodist Medical Center,32.760867,-96.817525,2025,Dallas Streetcar,streetcar,5199,964,51
+XT02,Zang / 7th,32.756132,-96.823008,2025,Dallas Streetcar,streetcar,10627,8063,11
+XT03,Zang / Davis,32.748695,-96.824588,2025,Dallas Streetcar,streetcar,9129,6453,25
+XM01,Olive / Ross,32.789189,-96.803913,2025,M-Line Trolley,streetcar,16597,84686,48
+XM02,McKinney / Pearl,32.793407,-96.802679,2025,M-Line Trolley,streetcar,20785,58930,39
+XM03,McKinney / Allen,32.799088,-96.801012,2025,M-Line Trolley,streetcar,20535,48453,43
+XM04,McKinney / Blackburn,32.8038,-96.799687,2025,M-Line Trolley,streetcar,20205,34270,53
+XI02,Rock Island / Briery,32.815875,-96.994001,9999,TRE,commuter,4104,2121,0
+XI03,Airport / Beach,32.773304,-97.283704,9999,TRE,commuter,0,0,0
+XI04,Marsh / Arapaho,32.957675,-96.854707,9999,Silver Line,metro,3410,6134,0
+XI05,John W Carpenter / Freeport,32.922227,-97.024198,9999,Orange Line,metro,0,0,0
+XI06,NW Highway / Shady Brook,32.865394,-96.767451,9999,Orange Line;Red Line,metro,11225,8191,0
+XI08,Shiloh / Forest,32.912515,-96.664836,9999,Blue Line,metro,6290,5103,0
