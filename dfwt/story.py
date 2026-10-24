@@ -27,7 +27,7 @@ CONNECTIONS = [
     ("Waxahachie", "Union Station", "Waxahachie to downtown Dallas",
      "An express bus in I-35E's managed lanes from 2027: Ellis County's first frequent link, decades before rail."),
     ("Downtown Arlington", "Union Station", "Arlington to downtown Dallas",
-     "The largest US city without regular public transit gets the I-30 Line by 2038, on to Fort Worth with FW Blue by about 2043."),
+     "The largest US city without regular public transit gets rail in {opens}: the I-30 / FW Blue Line to downtown Dallas, and to Fort Worth from 2042."),
     ("Downtown Arlington", "Fort Worth Central", "Arlington to downtown Fort Worth",
      "One line between the two downtowns from {year}: I-30 trains run on as FW Blue at Handley, through Arlington's stadiums and UTA."),
     ("Irving Convention Center", "DFW Airport North", "Las Colinas to DFW Airport north",
@@ -137,6 +137,17 @@ def _existing_lots(net, base):
                 st = net.stations[sid]
                 if growth.setting(base, st.lat, st.lon, net.cfg) in ex["settings"]:
                     out[sid] = ex["spaces"]
+    return out
+
+
+def _one_seat_year(net, a, b):
+    """The first year one line serves both places (a station name, any of its platforms), else 9999."""
+    out = 9999
+    for ln in net.lines.values():
+        ya = [y for s, y in zip(ln.stop_ids, ln.stop_years) if net.stations[s].name == a]
+        yb = [y for s, y in zip(ln.stop_ids, ln.stop_years) if net.stations[s].name == b]
+        if ya and yb:
+            out = min(out, max(min(ya), min(yb)))
     return out
 
 
@@ -304,8 +315,7 @@ def compute(log=print):
                 row["ride"][f"{sc}_{y}"] = t
                 row["jobs45"][f"{sc}_{y}"] = int(round(float(runs[(sc, y)]["jobs45"][oz]), -2))
         row["opens"] = min(net.station_mode_years()[names[o]].values())
-        rail = [min((y for m, y in my[names[x]].items() if m in ("metro", "commuter")), default=9999) for x in (o, d)]
-        row["why"] = why.replace("{year}", str(max(rail)))   # when rail serves both ends
+        row["why"] = why.replace("{year}", str(_one_seat_year(net, o, d))).replace("{opens}", str(row["opens"]))
         conns.append(row)
 
     # network lines, simplified, with the years each piece opens. Today's system (and the current

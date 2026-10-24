@@ -632,8 +632,9 @@ def _deadlines(net, rows):
             return None
     want = {}
     for d in sc.get("deadlines") or []:
-        if isinstance(d, dict):
-            want[ends(net, d, names)] = int(d["by"])
+        k = ends(net, d, names) if isinstance(d, dict) else None
+        if k:   # (a deadline for a line this network doesn't have is skipped)
+            want[k] = int(d["by"])
     if sc.get("core_by_plan") and net.name != "plan":
         if "net" not in _PLAN:
             _PLAN["net"] = Network.load()
@@ -647,13 +648,13 @@ def _deadlines(net, rows):
                 a, b = sorted(resolve_on(plan, ln, r[c], pnames) for c in ("from_stop", "to_stop"))
             except KeyError:
                 continue
-            if any(plan.in_core(s) for s in ln.stop_ids[a:b + 1]):
+            if any(plan.in_core(s) for s in ln.stop_ids[a:b + 1]) and ends(plan, r, pnames):
                 want.setdefault(ends(plan, r, pnames), int(r["year_opens"]))
     out = {}
     key = {}
     for i, r in enumerate(rows):
         key[i] = ends(net, r, names) if r["kind"] != "via" else None
-        y = want.get(key[i])
+        y = want.get(key[i]) if key[i] else None
         if y is not None:
             out[i] = y
     # an extension can't open before a stage it attaches to (keep_attached): the earliest
@@ -793,7 +794,8 @@ def _exact_years(net, rows, log=print, scale=1.0, floor=None):
         # value per $ with no county left behind (_fair_order)
         fixed = [i for i, r in enumerate(rows) if r.get("locked") == "1" or int(r["year_opens"]) <= ex]
         deadline = {i: y for i, y in _deadlines(net, rows).items() if i not in fixed}
-        rest = sorted((i for i in range(len(rows)) if i not in deadline and i not in fixed),
+        rest = sorted((i for i in range(len(rows)) if i not in deadline and i not in fixed
+                       and net.host_line(rows[i]["line_id"]) is not None),   # (a dropped line's stages stay put)
                       key=lambda i: (rows[i]["line_id"], int(rows[i]["stage"])))
         order = (fixed + sorted(deadline, key=lambda i: (deadline[i], rows[i]["line_id"], int(rows[i]["stage"])))
                  + _fair_order(net, rows, rest, value, oc, deadline, per_year))

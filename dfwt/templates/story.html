@@ -636,8 +636,8 @@ $('s-peers').innerHTML = stepHtml('peers');
 const tr = sc => (D.years[sc] || []).map(r => [r.year, r.daily_trips]);
 const yearCard = (y, extra) => `<p><b>${y}.</b> ${extra}</p><p><span class="big pr">${fmt(at('two_million', y, 'daily_trips'))}</span>daily transit trips with the plan, against
   <b style="color:var(--ct)">${fmt(at('current_track', y, 'daily_trips'))}</b> on the current track.</p>`;
-$('s-y2035').innerHTML = yearCard(2035, 'Cheap, fast wins come first: frequent BRT on the busiest arterials, express buses on the freeways, and the SH-114 line toward DFW Airport.');
-$('s-y2050').innerHTML = yearCard(2050, 'Downtown subways and metro lines in Dallas and Fort Worth, Arlington on the I-30 Line, and every city over 150,000 served.');
+$('s-y2035').innerHTML = yearCard(2035, 'Cheap, fast wins come first: frequent BRT on the busiest arterials, express buses on the freeways, and Fort Worth\'s first metro line.');
+$('s-y2050').innerHTML = yearCard(2050, 'Downtown subways and metro lines in Dallas and Fort Worth, Arlington on the I-30 / FW Blue Line, and every city over 150,000 served.');
 $('s-y2100').innerHTML = yearCard(2100, 'A regional network: metro, regional rail and a grid of BRT, built one affordable piece at a time.');
 $('s-riders').innerHTML = `<p>The ridership model, calibrated to today's riders, puts the plan at about
   <span class="big pr">${fmt(at('two_million', 2100, 'daily_trips'))}</span>daily trips in 2100. On today's network, a much bigger region still takes only

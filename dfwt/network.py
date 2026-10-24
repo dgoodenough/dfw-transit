@@ -202,6 +202,8 @@ class Network:
         net.stage_rows, net.stage_findings = stage_rows, findings
         net.variants = staging.build_variants(net, interims)
         net.apply_edits(edits)
+        for lid in [k for k, ln in net.lines.items() if ln.retire <= ln.first_year]:
+            net.lines.pop(lid)   # an interim bus whose rail opens before it would: never runs, never built
         if cfg.get("staging", {}).get("ride_open_track"):
             net.ride_open_track()
         net.time_infill(tables.get("infill.csv") or [])

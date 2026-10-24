@@ -110,7 +110,8 @@ class NetworkTests(unittest.TestCase):
             for lid in lines:
                 ln = net.lines[lid]
                 k = ln.stop_ids.index("XI01")
-                self.assertEqual(ln.stop_years[k], max(s.year for s in ln.segments[max(k - 1, 0):k + 1]), (sc, lid))
+                own = max(s.year for s in ln.segments[max(k - 1, 0):k + 1])
+                self.assertEqual(ln.stop_years[k], max(own, 2030), (sc, lid))   # infill.csv year_min 2030
                 self.assertLess(ln.stop_years[k], 2100)
 
     def test_no_new_garages_downtown(self):
@@ -473,14 +474,15 @@ class Review3Tests(unittest.TestCase):
         cls.net = Network.load("two_million")
 
     def test_interim_express_retires_when_its_rail_opens(self):
-        ln = self.net.lines["XE03"]
+        ln = self.net.lines["XE02"]
+        self.assertNotIn("XE03", self.net.lines)   # the Red Line reaches McKinney (2030) before the express would start
         self.assertLess(ln.retire, 9999)
-        runs = lambda y: any(r.line.id == "XE03" for r in self.net.runs(y))
+        runs = lambda y: any(r.line.id == "XE02" for r in self.net.runs(y))
         self.assertTrue(runs(ln.retire - 1))
         self.assertFalse(runs(ln.retire))
 
     def test_express_speed_is_slower_than_the_freeway(self):
-        for lid in ("XE01", "XE02", "XE03"):
+        for lid in ("XE01", "XE02"):
             self.assertLess(self.net.lines[lid].cruise_kmh, 60)
 
     def test_a_line_rides_track_another_line_opened(self):
