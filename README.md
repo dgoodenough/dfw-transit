@@ -152,13 +152,17 @@ Live numbers are in [`reports/RESULTS.md`](reports/RESULTS.md).
   as overlays: the untouched v1 plan, the v2 plan's hand-set phasing from before
   the optimizer, and a "right-sized" version with suburban metro as BRT. Every build compares them side by side.
 - **Phasing follows demand, and doesn't flip between builds.** In the 2 million
-  scenario each line is valued by the trips lost if it's removed from the 2100 network
-  (on one land use, the network's with everything open), per $M of its share of
-  capital (shared track and stations split among their lines, 2025 prices), so the value
-  doesn't depend on which line opens first (`python -m dfwt values`). The schedule starts
-  from the generated stages every time, takes lines by value with a few rules (downtown
-  cores no later than in the budget plan, every county's fair share of the money, every
-  city over 150,000 served by about 2040, no short stubs), and a second run moves nothing.
+  scenario each line is valued two ways in 2100, on one land use (the network's with
+  everything open): the trips lost when its stages are held back from the full network,
+  and the trips it adds on its own to the network without the new lines. The average is
+  divided by its share of capital (shared track and stations split among their lines,
+  2025 prices) plus 20 years of its operating cost, so the value doesn't depend on which
+  line opens first; a line that runs through onto another is valued by its own stages
+  (`python -m dfwt values`). The schedule starts from the generated stages every time,
+  takes lines by value with a few rules (downtown cores and the inner ring no later than
+  in the budget plan, every county's fair share of the money over each ten years, every
+  city over 150,000 served by about 2040, no short stubs, no more than a stage's worth of
+  a line opening in one year), warns about any missed deadline, and a second run moves nothing.
 - **Geometry stays buildable.** Commuter rail follows existing rail, metro follows
   existing right-of-way, BRT follows ROW only, and river tunnels are minimized.
 - **Portable stack.** Python 3 + numpy, and Leaflet. It runs anywhere, with tests
