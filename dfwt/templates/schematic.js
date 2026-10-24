@@ -17,7 +17,6 @@ let SD = null, setKey = null;      // the version showing and its layout
 const NS = 'http://www.w3.org/2000/svg';
 const W = {metro: 0.24, commuter: 0.2, streetcar: 0.14, brt: 0.12};     // stroke widths, layout units (1 = min station spacing); BRT: solid, half weight
 const R_ST = 0.17;
-const CONN_GAP = 0.9;      // markers further apart than this (layout units, edge to edge) are linked by a dashed walk
 const el = (tag, attrs, parent) => {
   const e = document.createElementNS(NS, tag);
   for (const k in attrs) if (attrs[k] !== null) e.setAttribute(k, attrs[k]);
@@ -61,7 +60,7 @@ $('map').after(host);
 const svg = el('svg', {'aria-hidden': 'true'}, host);
 const vp = el('g', {}, svg);
 const G = {};
-for (const k of ['water', 'city', 'future', 'glow', 'lines', 'trip', 'conn', 'st', 'ring', 'lbl']) G[k] = el('g', {id: 'sch-' + k}, vp);
+for (const k of ['water', 'city', 'future', 'glow', 'lines', 'trip', 'walk', 'conn', 'st', 'ring', 'lbl']) G[k] = el('g', {id: 'sch-' + k}, vp);
 const pop = document.createElement('div'); pop.id = 'schPop'; host.appendChild(pop);
 const tip = document.createElement('div'); tip.id = 'schTip'; host.appendChild(tip);
 const zoomBox = document.createElement('div'); zoomBox.id = 'schZoom';
@@ -288,23 +287,20 @@ function draw() {
     R.set(v, shape);
     drawnNodes.push({v, open, st, shape});
   }
-  // every walk link the model uses (SD.transfers: stations within the walk radius, or linked
-  // in transfers.csv): a solid link when the two markers sit side by side, a dashed walk when
-  // the layout keeps them further apart
-  const byNode = new Map(drawnNodes.map(n => [n.v, n]));
-  for (const [a, b, , longWalk] of SD.transfers) {
+  // walk links the model uses (SD.transfers: stations within the walk radius, or linked in
+  // transfers.csv) that the layout keeps as two markers: a short one (the two side by side,
+  // flag 0) is one solid connector, straight across when the markers overlap along an axis;
+  // a longer one is not drawn (it would only cross the core), except faintly around the
+  // station that is selected or hovered (walks)
+  byNode = new Map(drawnNodes.map(n => [n.v, n]));
+  for (const [a, b, far] of SD.transfers) {
     const A = byNode.get(a), B = byNode.get(b);
-    if (!A || !B) continue;
-    const cls = A.open && B.open ? '' : ' fut', xy = [A.shape.x, A.shape.y, B.shape.x, B.shape.y];
-    const ba = A.shape.box, bb = B.shape.box;
-    const gap = Math.hypot(Math.max(0, ba[0] - bb[2], bb[0] - ba[2]), Math.max(0, ba[1] - bb[3], bb[1] - ba[3]));
-    if (gap > CONN_GAP) {
-      el('line', {class: 'conn-w' + cls + (longWalk ? ' lw' : ''), x1: xy[0], y1: xy[1], x2: xy[2], y2: xy[3], 'stroke-width': 0.09, 'stroke-dasharray': '0.01 0.2'}, G.conn);
-      continue;
-    }
+    if (!A || !B || far) continue;
+    const cls = A.open && B.open ? '' : ' fut', xy = connector(A.shape, B.shape);
     el('line', {class: 'conn-o' + cls, x1: xy[0], y1: xy[1], x2: xy[2], y2: xy[3], 'stroke-width': 0.24}, G.conn);
     el('line', {class: 'conn-i' + cls, x1: xy[0], y1: xy[1], x2: xy[2], y2: xy[3], 'stroke-width': 0.12}, G.conn);
   }
+  walks();
   for (const n of drawnNodes) drawMarker(n, G.st, anim && n.open && !lastOpen.has(n.v));
   lastY = Y;
   lastOpen = new Set(drawnNodes.filter(n => n.open).map(n => n.v));
@@ -371,6 +367,38 @@ function drawMarker(n, g, fadeIn) {
   const r = n.open ? R_ST : R_ST * 0.62;
   el('path', {d, fill: 'var(--st-ink)', stroke: 'var(--st-ink)', style: `stroke-width:calc(var(--f) * ${2 * r} + ${2 * ow})`, 'stroke-linejoin': 'round', 'stroke-linecap': 'round'}, grp);
   el('path', {d, fill: 'var(--st-fill)', stroke: 'var(--st-fill)', style: sw(2 * r), 'stroke-linejoin': 'round', 'stroke-linecap': 'round'}, grp);
+}
+
+// a connector between two markers: vertical or horizontal where their boxes overlap across
+// (at the middle of the overlap), else from centre to centre
+function connector(A, B) {
+  const a = A.box, b = B.box, ox0 = Math.max(a[0], b[0]), ox1 = Math.min(a[2], b[2]), oy0 = Math.max(a[1], b[1]), oy1 = Math.min(a[3], b[3]);
+  if (ox1 - ox0 > 0.05) { const x = (ox0 + ox1) / 2; return [x, A.y, x, B.y]; }
+  if (oy1 - oy0 > 0.05) { const y = (oy0 + oy1) / 2; return [A.x, y, B.x, y]; }
+  return [A.x, A.y, B.x, B.y];
+}
+// the longer walk links of one station (the one selected, or hovered with a mouse), drawn
+// faintly while it is: where else one can walk to from here
+let byNode = new Map(), hoverNode = null;
+function walks() {
+  G.walk.textContent = '';
+  const v = hoverNode !== null ? hoverNode : popNode;
+  if (v === null || !byNode.has(v)) return;
+  for (const [a, b, far, longWalk] of SD.transfers) {
+    if (!far || (a !== v && b !== v)) continue;
+    const A = byNode.get(a), B = byNode.get(b);
+    if (!A || !B) continue;
+    el('line', {class: 'conn-w' + (longWalk ? ' lw' : ''), x1: A.shape.x, y1: A.shape.y, x2: B.shape.x, y2: B.shape.y,
+      'stroke-width': 0.08, 'stroke-dasharray': '0.01 0.2'}, G.walk);
+  }
+}
+// the name shown for a node: the stations it stands for that this plan serves this year (a
+// merged interchange, "Akard · Metro Center"), or its own name
+function nodeName(v) {
+  const sids = SD.nodes[v][2];
+  if (sids.length < 2) return SD.nodes[v][3];
+  const names = [...new Set(sids.filter(s => sidLines.has(s)).map(s => D.stations[s] ? D.stations[s][0] : null).filter(Boolean))];
+  return names.length ? names.join(' · ') : SD.nodes[v][3];
 }
 
 // ---------------------------------------------------------------- labels (greedy, 8 positions, redone per zoom)
@@ -453,12 +481,13 @@ function placeLabels() {
   const nMajor = cand.filter(n => lines(n) > 1 || n.st.term).length;
   // a repeated name is skipped within 190 px; a variant ("Irving W3" near "Irving")
   // only while zoomed out, so every distinct name shows when zoomed well in
-  const gap = 3 / k, padX = fs * 0.45, padY = fs * 0.12, near = 190 / k, nearVariant = near * Math.max(0, Math.min(1, (4 - kf) / 3));
+  // air kept around a placed name: a word space across, a third of a line above and below
+  const gap = 3 / k, padX = fs * 0.6, padY = fs * 0.32, near = 190 / k, nearVariant = near * Math.max(0, Math.min(1, (4 - kf) / 3));
   const lm = fs * 0.12;          // a label just touching a line counts as on it
   const placed = new Map();       // group lead -> [[x, y, name]] of its placed labels
   cand.forEach((n, ci) => {
     if (ci === nMajor) placePills(pills);
-    const s = n.shape, g = lead(n.v), name = SD.nodes[n.v][3];
+    const s = n.shape, g = lead(n.v), name = nodeName(n.v);
     if ((placed.get(g) || []).some(([x, y, nm]) => Math.hypot(x - s.x, y - s.y) < (nm === name ? near : nearVariant))) return;
     const bx = s.box, ex = (bx[2] - bx[0]) / 2, ey = (bx[3] - bx[1]) / 2;
     const dx = ex + gap, dy = ey + gap, dd = Math.min(ex, ey) * 0.72 + gap, f = fs * 0.9;
@@ -668,13 +697,13 @@ function popupHtml(v) {
   const lis = [...new Set(sids.flatMap(s => sidLines.get(s) || []))].filter(li => !hidden.has(S.lines[li].id));
   const chips = lis.map(li => `<span class="chip" style="background:${S.lines[li].color};color:${inkOn(S.lines[li].color)}">${S.lines[li].name}</span>`).join('');
   const b = sids.reduce((a, s) => a + (S.boardings[s] || 0), 0);
-  return `<div class="pop"><b>${SD.nodes[v][3]}</b><div>${chips}</div><div class="m">${fmt(st[3])} residents · ${fmt(st[4])} jobs within 1 km` +
+  return `<div class="pop"><b>${nodeName(v)}</b><div>${chips}</div><div class="m">${fmt(st[3])} residents · ${fmt(st[4])} jobs within 1 km` +
     (b ? `<br>${fmt(b)} competitive commuters board here by ${D.years[D.years.length - 1]} (end of plan)` : '') + `</div></div>`;
 }
 function lineHtml(id) {
   const ln = lineOf(id), lp = cache.get(id);
   if (!ln || !lp) return '';
-  const ends = [lp.path[0], lp.path[lp.path.length - 1]].map(v => SD.nodes[v][3]);
+  const ends = [lp.path[0], lp.path[lp.path.length - 1]].map(nodeName);
   const Y = D.years[yi], open = openLines.has(id);
   return `<div class="pop"><span class="chip" style="background:${colorOf(ln)};color:${inkOn(colorOf(ln))}">${ln.name}</span>` +
     `<div class="m">${D.modes[ln.mode] || ln.mode} · ${ends[0]} – ${ends[1]}` +
@@ -682,6 +711,7 @@ function lineHtml(id) {
 }
 function showLinePop(id, x, y) {
   popNode = null; popLine = {id, x, y};
+  walks();
   pop.innerHTML = '<button type="button" class="x" aria-label="Close">×</button>' + lineHtml(id);
   pop.querySelector('.x').onclick = e => { e.stopPropagation(); hidePop(); highlight(null); };
   pop.style.display = 'block';
@@ -689,12 +719,13 @@ function showLinePop(id, x, y) {
 }
 function showPop(v) {
   popNode = v; popLine = null;
+  walks();
   pop.innerHTML = '<button type="button" class="x" aria-label="Close">×</button>' + popupHtml(v);
   pop.querySelector('.x').onclick = e => { e.stopPropagation(); hidePop(); };
   pop.style.display = 'block';
   posPop();
 }
-function hidePop() { popNode = null; popLine = null; pop.style.display = 'none'; }
+function hidePop() { popNode = null; popLine = null; pop.style.display = 'none'; walks(); }
 function posPop() {
   if (popLine) { pop.style.left = (popLine.x * view.k + view.tx) + 'px'; pop.style.top = (popLine.y * view.k + view.ty) + 'px'; return; }
   if (popNode === null) return;
@@ -797,7 +828,8 @@ host.addEventListener('pointermove', e => {
     const px = e.clientX - r.left, py = e.clientY - r.top, n = nearest(px, py, 10, false);
     const id = n ? null : nearestLine(px, py, 7);
     setHover(id);
-    if (n) { tip.textContent = SD.nodes[n.v][3]; tip.style.left = (n.shape.x * view.k + view.tx) + 'px'; tip.style.top = (n.shape.y * view.k + view.ty) + 'px'; tip.style.display = 'block'; }
+    if ((n ? n.v : null) !== hoverNode) { hoverNode = n ? n.v : null; walks(); }
+    if (n) { tip.textContent = nodeName(n.v); tip.style.left = (n.shape.x * view.k + view.tx) + 'px'; tip.style.top = (n.shape.y * view.k + view.ty) + 'px'; tip.style.display = 'block'; }
     else if (id) { tip.textContent = lineOf(id).name; tip.style.left = px + 'px'; tip.style.top = py + 'px'; tip.style.display = 'block'; }
     else tip.style.display = 'none';
     return;
@@ -828,7 +860,7 @@ const up = e => {
 };
 host.addEventListener('pointerup', up);
 host.addEventListener('pointercancel', up);
-host.addEventListener('pointerleave', () => { tip.style.display = 'none'; setHover(null); });
+host.addEventListener('pointerleave', () => { tip.style.display = 'none'; setHover(null); if (hoverNode !== null) { hoverNode = null; walks(); } });
 host.addEventListener('dblclick', e => { const r = host.getBoundingClientRect(); zoomAt(e.clientX - r.left, e.clientY - r.top, 2); });
 host.addEventListener('keydown', e => {
   const c = [host.clientWidth / 2, host.clientHeight / 2], step = 60;

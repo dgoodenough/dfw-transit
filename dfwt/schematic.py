@@ -106,7 +106,9 @@ MIN_SP = 1.0          # minimum distance between station centres
 PITCH = 0.30          # offset between parallel lines in a corridor
 MERGE_KM = 0.04       # always merge stations closer than this
 MERGE_NAME_KM = 0.40  # merge same-named stations closer than this
-MERGE_LINKED_KM = 0.15  # merge transfer-linked stations closer than this
+MERGE_LINKED_KM = 0.15  # merge transfer-linked stations closer than this,
+MERGE_WALK_KM = 0.30  # and walk-linked ones (within the walk radius) this close: one interchange, not two
+                      # markers and a connector (a group so merged spans no more than this)
 CONNECTOR_MAX = 1.6   # a transfer connector longer than this is drawn dashed (a walk), not as a solid link
 W_XFER_S = 25.0       # walk-linked stations (transfers) are pulled this hard to sit side by side in _smooth,
 W_XFER = 4.0          # ... and in the least-squares relaxation (a stop-to-stop edge's length weighs W_LEN)
@@ -142,7 +144,7 @@ SP_AIM = 1.2          # the relaxation aims this much above MIN_SP (the final sc
 SHRINK = 0.45         # a straight edge shrunk below this fraction of its target gets a bend
 SEG_GAP = 0.45        # clear space between the outer strokes of two corridors
 # straightness rules (_strokes, _smooth, _ports, _chain_dirs)
-STROKE_TURN = 100.0   # two edge ends join into one stroke only if they turn less than this (degrees)
+STROKE_TURN = 70.0    # two edge ends join into one stroke only if they turn less than this (degrees)
 DEFAULT_W = 4.0       # a line of the default plan counts this many times in a stroke
 SMOOTH = 40.0         # how hard stations are pulled into line along their stroke (_smooth)
 AXIS_TOL = 0.12       # a stroke that strays less than this from an axis (RMS offset / length)
@@ -154,6 +156,8 @@ AXIS_JOG, AXIS_JOG_KM = 65.0, 0.8   # (a hop shorter than AXIS_JOG_KM: AXIS_JOG 
 AXIS_MISS = 0.2       # unless that misses by more than this fraction of the edge's length
 AXIS_HOP_KM = 1.5     # strokes are laid heaviest first: lines squared x hop length (capped at this)
 AXIS_CROSS = True     # ... and an edge whose laying pushes one line across another stays free
+AXIS_FIRM, AXIS_FIRM_N = 0.08, 12   # ... except a long, very straight stroke: the others give way to it,
+AXIS_FIRM_DP = 40.0   # and its edges keep to the axis this many times as hard (AXIS_DP), and are never bent
 AXIS_KEEP = 0.6      # a stroke that can lay less than this share of its edges is left free
 AXIS_DP = 1.0         # directions of axis edges pay this per 45 degrees off the axis (VARIANTS)
 SMOOTH_W = 4.0        # a chain's course: its direction over +-this much (layout units)
@@ -163,6 +167,8 @@ Z_ZIG = 2.5           # extra for a turn back within ZZ_HOPS edges of the last t
 ZZ_HOPS = 3
 ZZ_LEN = 4.0          # quality(): two opposite turns this close (layout units) make a zig-zag
 T_THROUGH = 0.5       # per line running straight through a junction, per 45 degrees its ports turn
+T_SHARP = 4.0         # per line turning back on itself (135 degrees or more) at a junction's ports
+UNSHARP_LEG, UNSHARP_GAP = 0.25, 0.45   # _unsharp: shortest leg of a redrawn edge; clearance it keeps
 DIRS = np.array([(math.cos(k * math.pi / 4), math.sin(k * math.pi / 4)) for k in range(8)])
 CITY_KM = 1.2         # an area name stands beside the busiest station this close to its centre
 CITIES = [("Fort Worth", 32.7555, -97.3308), ("Dallas", 32.7810, -96.7990), ("Denton", 33.2148, -97.1331),
@@ -244,6 +250,7 @@ class Layout:
         self.scale = 1.0       # the uniform rescale the minimum spacing needed
         self.w_xfer = (W_XFER_S, W_XFER)
         self.xfer_t = None     # _xfer_pairs, set by _place
+        self.firm = set()      # edges of firm axis strokes, set by _smooth
 
 
 # ---------------------------------------------------------------- graph
@@ -278,10 +285,12 @@ def _union(nets):
     used = sorted({s for _, _, ss, _ in seqs for s in ss})
     xy = {s: np.array(proj.xy(stations[s].lat, stations[s].lon)) for s in used}
     line_sets = collections.defaultdict(set)
+    seq_sets = collections.defaultdict(set)       # the stop sequences (scenario routings) through each station
     nbrs = collections.defaultdict(set)
-    for _, lid, ss, _ in seqs:
+    for q, (_, lid, ss, _) in enumerate(seqs):
         for s in ss:
             line_sets[s].add(lid)
+            seq_sets[s].add(q)
         for a, b in zip(ss, ss[1:]):
             nbrs[a].add(b)
             nbrs[b].add(a)
@@ -291,7 +300,7 @@ def _union(nets):
         for a, b, _, _ in net.transfers:
             if a in xy and b in xy:
                 transfers.add(frozenset((a, b)))
-    # merge co-located stations (union-find), never two stops of one line, max degree 8
+    # merge co-located stations (union-find), never two stops of one routing, max degree 8
     parent = {s: s for s in used}
 
     def find(s):
@@ -308,13 +317,19 @@ def _union(nets):
             transfers.add(frozenset((a, b)))
         same = _norm_name(stations[a].name) == _norm_name(stations[b].name)
         linked = D[i, j] < MERGE_LINKED_KM and frozenset((a, b)) in transfers
-        if not (D[i, j] < MERGE_KM or same or linked) or b in nbrs[a]:
+        walk = D[i, j] < min(MERGE_WALK_KM, radius) and frozenset((a, b)) in transfers
+        if not (D[i, j] < MERGE_KM or same or linked or walk) or b in nbrs[a]:
             continue
         ra, rb = find(a), find(b)
         if ra == rb:
             continue
         members = [s for s in used if find(s) in (ra, rb)]
-        if any(x & y for x, y in itertools.combinations([line_sets[s] for s in members], 2)):
+        # never two stops of one routing (a line may stop at one in one plan and at the other
+        # in another: a stop moved down the street is still the same interchange)
+        if any(x & y for x, y in itertools.combinations([seq_sets[s] for s in members], 2)):
+            continue
+        idx = [used.index(s) for s in members]
+        if walk and not (D[i, j] < MERGE_KM or same or linked) and D[np.ix_(idx, idx)].max() > MERGE_WALK_KM:
             continue
         ext = {find(t) for s in members for t in nbrs[s]} - {ra, rb}
         if len(ext) > 8:
@@ -650,6 +665,8 @@ def _strokes(lay, inc, X):
             n = passes[v].get((e1, e2), 0)
             if (ang < 180 - STROKE_TURN or n == 0) and len(inc[v]) > 2:
                 continue
+            if n == 0 and v in lay.termini:     # every line there ends there: nothing runs straight on
+                continue
             cand.append((-((e1 in lay.prime) + (e2 in lay.prime)), -n, -ang, e1, e2))
         for _, n, _, e1, e2 in sorted(cand):
             if (v, e1) not in mate and (v, e2) not in mate:
@@ -690,8 +707,9 @@ def stroke_axis(P):
 def _axis_strokes(lay, G, strokes, hop_km=AXIS_HOP_KM):
     """Strokes that run roughly along one of the four axes in the real geography G
     (stroke_axis strays less than AXIS_TOL; at least AXIS_MIN edges), heaviest first (lines
-    x length): [(axis 0..3, [edges])], leaving out stretches that cross the axis (more than
-    AXIS_EDGE degrees off it) and edges the default plan doesn't use."""
+    x length): [(axis 0..3, [edges], firm)], leaving out stretches that cross the axis (more
+    than AXIS_EDGE degrees off it) and edges the default plan doesn't use. firm: a long and
+    very straight stroke (AXIS_FIRM_N edges, straying less than AXIS_FIRM)."""
     out = []
     for nodes, es in strokes:
         if len(es) >= AXIS_MIN and len(set(nodes)) == len(nodes):
@@ -706,8 +724,8 @@ def _axis_strokes(lay, G, strokes, hop_km=AXIS_HOP_KM):
                         keep.append(e)
                 wt = sum(len(lay.edges[e]["lines"]) ** 2 * min(np.linalg.norm(G[lay.edges[e]["a"]] - G[lay.edges[e]["b"]]), hop_km) for e in es)
                 if keep:
-                    out.append((-wt, es[0], k, keep))
-    return [(k, keep) for _, _, k, keep in sorted(out)]
+                    out.append((-wt, es[0], k, keep, stray < AXIS_FIRM and len(es) >= AXIS_FIRM_N))
+    return [(k, keep, firm) for _, _, k, keep, firm in sorted(out)]
 
 
 def _axis_off(d, k):
@@ -762,7 +780,7 @@ def _smooth(lay, A, G, strokes, hop_km=AXIS_HOP_KM, unique=True):
             rhs[ia] -= w * g[d]
     Minv = np.linalg.inv(M)
     st = {"M": M, "rhs": rhs, "Minv": Minv, "x": Minv @ rhs, "acc": np.zeros((0, 6)),   # acc: a, b, u, length, scale
-          "axes": {}, "taken": set()}              # taken: (station, direction) of the laid edges
+          "axes": {}, "taken": set(), "firm": set()}     # taken: (station, direction) of the laid edges
     ea = np.array([ed["a"] for ed in lay.edges], int)
     eb = np.array([ed["b"] for ed in lay.edges], int)
 
@@ -805,11 +823,11 @@ def _smooth(lay, A, G, strokes, hop_km=AXIS_HOP_KM, unique=True):
 
     def snapshot():
         return {k: (v.copy() if hasattr(v, "copy") else v) for k, v in st.items()}
-    for k, es in _axis_strokes(lay, G, strokes, hop_km):
+    for k, es, firm in _axis_strokes(lay, G, strokes, hop_km):
         es = [e for e in es if e not in st["axes"]]
         before, n0 = snapshot(), _n_crossings(st["x"].reshape(n, 2), ea, eb)
         laid = sum(lay_edge(e, k, False) for e in es)
-        if AXIS_CROSS and _n_crossings(st["x"].reshape(n, 2), ea, eb) > n0:
+        if AXIS_CROSS and not firm and _n_crossings(st["x"].reshape(n, 2), ea, eb) > n0:
             # the stroke pushed lines across others: lay it again edge by edge, leaving
             # out the edges that do
             st.update(before)
@@ -817,7 +835,10 @@ def _smooth(lay, A, G, strokes, hop_km=AXIS_HOP_KM, unique=True):
             laid = sum(lay_edge(e, k, True) for e in es)
         if laid < AXIS_KEEP * len(es):     # only bits of it: that would make a staircase
             st.update(before)
+        elif firm:
+            st["firm"] |= {e for e in es if e in st["axes"]}
     M, rhs, axes = st["M"], st["rhs"], st["axes"]
+    lay.firm = st["firm"]
     return np.linalg.solve(M, rhs).reshape(n, 2), axes
 
 
@@ -837,13 +858,16 @@ def _n_crossings(P, ea, eb):
     return int(((d1 * d2 < -1e-12) & (d3 * d4 < -1e-12)).sum())
 
 
-def _ports(X, chains, through=None, axes=None, axis_dp=AXIS_DP):
+def _ports(X, chains, through=None, axes=None, axis_dp=AXIS_DP, firm=(), turning=None):
     """Port (direction index 0..7) for each chain end at a junction: ends[(chain, 0|1)].
     Each end aims along its chain's general direction (its first few stations, nearest
     weighted most); a terminus gets no port, so its chain is free to run straight.
     `through` {(chain end), (chain end): lines} pairs ends at one junction that lines run
     straight through: their ports should be opposite (T_THROUGH per line and 45 degrees off);
-    an end on an axis stroke (`axes` {edge: axis}) pays axis_dp per 45 degrees off the axis."""
+    an end on an axis stroke (`axes` {edge: axis}) pays axis_dp per 45 degrees off the axis
+    (AXIS_FIRM_DP times that on a firm stroke's edge, `firm`). `turning` {(chain end), (chain
+    end): lines} pairs the ends that any line runs between: a port pair that would turn those
+    lines back on themselves (by 135 degrees or more) pays T_SHARP per line."""
     at = collections.defaultdict(list)       # node -> [(chain idx, end)]
     for ci, (nodes, _) in enumerate(chains):
         at[nodes[0]].append((ci, 0))
@@ -872,7 +896,10 @@ def _ports(X, chains, through=None, axes=None, axis_dp=AXIS_DP):
         k = len(ends)
         pairs = [(i, j, through[(ends[i], ends[j])]) for i in range(k) for j in range(i + 1, k)
                  if (ends[i], ends[j]) in through]
+        turns = [(i, j, (turning or {})[(ends[i], ends[j])]) for i in range(k) for j in range(i + 1, k)
+                 if (ends[i], ends[j]) in (turning or {})]
         ax = [(axes or {}).get(chains[ci][1][0 if end == 0 else -1]) for ci, end in ends]
+        aw = [axis_dp * (AXIS_FIRM_DP if chains[ci][1][0 if end == 0 else -1] in firm else 1.0) for ci, end in ends]
         idx = sorted(range(k), key=lambda i: angs[i])
         best, bestc = None, 1e18
         for combo in itertools.combinations(range(8), min(k, 8)):
@@ -883,12 +910,15 @@ def _ports(X, chains, through=None, axes=None, axis_dp=AXIS_DP):
                     dk = pk[i] = combo[(r + s) % len(combo)] if r < len(combo) else combo[0]
                     cost += _angdiff(angs[i], dk * math.pi / 4) ** 2
                     if ax[i] is not None:
-                        cost += axis_dp * _axis_off(dk, ax[i])
+                        cost += aw[i] * _axis_off(dk, ax[i])
                     if pref[i] is not None and pref[i] != dk:
                         cost += 0.6
                 for i, j, nl in pairs:
                     off = abs(4 - (pk[i] - pk[j]) % 8)
                     cost += T_THROUGH * min(nl / 2, 3) * off
+                for i, j, nl in turns:
+                    if abs(4 - (pk[i] - pk[j]) % 8) >= 3:
+                        cost += T_SHARP * min(nl, 3)
                 if cost < bestc - 1e-12:
                     bestc, best = cost, (combo, s)
         combo, s = best
@@ -960,11 +990,11 @@ def _turn_dp(un):
     return out[::-1]
 
 
-def _chain_dirs(X, nodes, p0, p1, axes=None, axis_dp=AXIS_DP):
+def _chain_dirs(X, nodes, p0, p1, axes=None, axis_dp=AXIS_DP, aw=None):
     """One direction per edge of the chain (in chain orientation): each edge pays its squared
     angular deviation from its own course and from the chain's course over +-SMOOTH_W,
     weighted by its length, and axis_dp per 45 degrees off its stroke's axis (axes[k], or
-    None); turns and zig-zags pay as in _turn_dp; ports are kept."""
+    None; times aw[k] if given); turns and zig-zags pay as in _turn_dp; ports are kept."""
     m = len(nodes) - 1
     P = X[nodes]
     raw, sm = _smooth_dirs(P, 0.0), _smooth_dirs(P, SMOOTH_W)
@@ -976,7 +1006,7 @@ def _chain_dirs(X, nodes, p0, p1, axes=None, axis_dp=AXIS_DP):
             th = d * math.pi / 4
             un[k, d] = w * (W_RAW * _angdiff(raw[k], th) ** 2 + (1 - W_RAW) * _angdiff(sm[k], th) ** 2)
             if axes and axes[k] is not None:
-                un[k, d] += axis_dp * _axis_off(d, axes[k])
+                un[k, d] += axis_dp * (aw[k] if aw else 1.0) * _axis_off(d, axes[k])
     if p0 is not None:
         un[0] += [0 if d == p0 else 50 for d in range(8)]
     if p1 is not None:
@@ -998,13 +1028,32 @@ def _through(lay, chains, mate):
     return out
 
 
+def _turning(lay, chains):
+    """{(end, end): lines} for every pair of chain ends at a junction that some line runs
+    between (_passes; both orders)."""
+    endof = {}
+    for ci, (nodes, es) in enumerate(chains):
+        endof[(nodes[0], es[0])] = (ci, 0)
+        endof[(nodes[-1], es[-1])] = (ci, 1)
+    out = {}
+    for v, pp in _passes(lay).items():
+        for (e1, e2), n in pp.items():
+            if (v, e1) in endof and (v, e2) in endof:
+                a, b = endof[(v, e1)], endof[(v, e2)]
+                out[(a, b)] = out[(b, a)] = n
+    return out
+
+
 def _assign(lay, X, chains, key, L, through=None, axes=None, axis_dp=AXIS_DP):
-    """Edge directions (canonical a->b) and bent edges {e: (d1 from a, d2 into b)}."""
+    """Edge directions (canonical a->b) and bent edges {e: (d1 from a, d2 into b)}. The edges
+    of firm axis strokes (lay.firm) keep to their axis AXIS_FIRM_DP times as hard."""
     axes = axes or {}
-    ports = _ports(X, chains, through, axes, axis_dp)
+    firm = getattr(lay, "firm", set())
+    ports = _ports(X, chains, through, axes, axis_dp, firm, getattr(lay, "turning", None))
     dirs, bent = {}, {}
     for ci, (nodes, es) in enumerate(chains):
-        cd = _chain_dirs(X, nodes, ports.get((ci, 0)), ports.get((ci, 1)), [axes.get(e) for e in es], axis_dp)
+        cd = _chain_dirs(X, nodes, ports.get((ci, 0)), ports.get((ci, 1)), [axes.get(e) for e in es], axis_dp,
+                         [AXIS_FIRM_DP if e in firm else 1.0 for e in es])
         if len(es) == 1 and (ci, 0) in ports and (ci, 1) in ports:
             # a single edge between two junctions: the ports may disagree -> one bend
             d0, d1 = ports[(ci, 0)], (ports[(ci, 1)] + 4) % 8
@@ -1552,6 +1601,7 @@ def _place(lay, G, A, warped, water, log=None, w_anc=W_ANC, hop_km=AXIS_HOP_KM, 
     inc, key, chains = _chains(lay)
     strokes, mate = _strokes(lay, inc, A)
     through = _through(lay, chains, mate)
+    lay.turning = _turning(lay, chains)
     AS, axes = _smooth(lay, A, G, strokes, hop_km, unique)       # the anchors: pre-warped, then smoothed along strokes
     L = _targets(lay, AS, chains)
     rad = _radius(lay)
@@ -1579,6 +1629,8 @@ def _place(lay, G, A, warped, water, log=None, w_anc=W_ANC, hop_km=AXIS_HOP_KM, 
     for it in range(N_RELAX):
         conv = []
         for e, d in list(dirs.items()):
+            if e in lay.firm:
+                continue          # a firm axis stroke stays straight: the others give way
             ed = lay.edges[e]
             v = X[ed["b"]] - X[ed["a"]]
             ln = np.linalg.norm(v)
@@ -1596,7 +1648,7 @@ def _place(lay, G, A, warped, water, log=None, w_anc=W_ANC, hop_km=AXIS_HOP_KM, 
                 conv.append(e)
         if it >= 4:      # stations still well under the minimum spacing: free one straight edge
             for pair in close:
-                es = [e for v in pair for e in inc[v] if e in dirs]
+                es = [e for v in pair for e in inc[v] if e in dirs and e not in lay.firm]
                 if es:
                     e = max(es, key=lambda e: (L[e], -e))
                     d = dirs.pop(e)
@@ -1816,6 +1868,7 @@ def _place(lay, G, A, warped, water, log=None, w_anc=W_ANC, hop_km=AXIS_HOP_KM, 
             else:
                 (i, al), (j, be) = _decompose(v)
                 ed["bend"] = tuple(X[a] + DIRS[i] * al) if al > 1e-6 and be > 1e-6 else None
+    _unsharp(lay, X, log)
     _order_lines(lay, X, chains, key)
     _water(lay, A, X, water, warped)
     for name, v in _city_cores(lay):
@@ -1823,6 +1876,123 @@ def _place(lay, G, A, warped, water, log=None, w_anc=W_ANC, hop_km=AXIS_HOP_KM, 
     lay.X = X
     lay.chains = chains
     return lay
+
+
+def _edge_shapes(v):
+    """The octilinear ways to draw vector v: straight if it is octilinear, and every two-leg
+    shape (d1 then d2, 45 or 90 degrees apart, both legs at least UNSHARP_LEG long), as
+    [(directions, bend point offset or None)]."""
+    out = []
+    L = float(np.linalg.norm(v))
+    if L < 1e-9:
+        return out
+    th = math.atan2(v[1], v[0]) / (math.pi / 4)
+    if abs(th - round(th)) < 1e-3:
+        out.append(((round(th) % 8,), None))
+    for d1 in range(8):
+        for step in (1, 2, -1, -2):
+            d2 = (d1 + step) % 8
+            M = np.array([DIRS[d1], DIRS[d2]]).T
+            al, be = np.linalg.solve(M, v)
+            if al > UNSHARP_LEG and be > UNSHARP_LEG:
+                out.append(((d1, d2), DIRS[d1] * al))
+    return out
+
+
+def _unsharp(lay, X, log=None):
+    """Last touch, stations fixed: a line that turns back on itself at a station (135 degrees
+    or more) is eased by drawing one of the two edges there another octilinear way (straight,
+    or two legs either way round), the way that costs the lines through that edge least in
+    turns (TURN_COST, over every plan's routing) and passes no closer to other edges and
+    stations than the old drawing or UNSHARP_GAP. So a short edge the relaxation left at an odd
+    angle doesn't make the line double back."""
+    def pieces(e, frm):
+        ed = lay.edges[e]
+        pts = [X[ed["a"]]] + ([np.array(ed["bend"])] if ed["bend"] is not None else []) + [X[ed["b"]]]
+        if frm != ed["a"]:
+            pts = pts[::-1]
+        return [round(math.atan2(q[1] - p[1], q[0] - p[0]) / (math.pi / 4)) % 8 for p, q in zip(pts, pts[1:])]
+    uses = collections.defaultdict(list)          # edge -> [(path, i)]: path[i] -> path[i + 1] runs on it
+    for key, _, path in lay.seqs:
+        for i, (u, w) in enumerate(zip(path, path[1:])):
+            uses[lay.eidx[(min(u, w), max(u, w))]].append((path, i))
+
+    def tc(d0, d1):
+        t = (d1 - d0) % 8
+        return TURN_COST[min(t, 8 - t)]
+
+    def cost(e):
+        c = 0.0
+        for path, i in uses[e]:
+            ds = pieces(e, path[i])
+            c += sum(tc(a, b) for a, b in zip(ds, ds[1:]))
+            if i > 0:
+                c += tc(pieces(lay.eidx[(min(path[i - 1], path[i]), max(path[i - 1], path[i]))], path[i - 1])[-1], ds[0])
+            if i + 2 < len(path):
+                c += tc(ds[-1], pieces(lay.eidx[(min(path[i + 1], path[i + 2]), max(path[i + 1], path[i + 2]))], path[i + 1])[0])
+        return c
+
+    def clearance(e, pts):
+        ed = lay.edges[e]
+        ends = {ed["a"], ed["b"]}
+        segs = list(zip(pts, pts[1:]))
+        lo = np.min(pts, axis=0) - 2.0
+        hi = np.max(pts, axis=0) + 2.0
+        dmin, nx = 1e9, 0
+        for f, fd in enumerate(lay.edges):
+            if f == e or {fd["a"], fd["b"]} & ends:
+                continue
+            q = [X[fd["a"]]] + ([np.array(fd["bend"])] if fd["bend"] is not None else []) + [X[fd["b"]]]
+            if (np.max(q, axis=0) < lo).any() or (np.min(q, axis=0) > hi).any():
+                continue
+            for p1, q1 in segs:
+                for p2, q2 in zip(q, q[1:]):
+                    if _intersect(p1, q1, p2, q2):
+                        nx += 1
+                    else:
+                        dmin = min(dmin, _seg_seg(p1, q1, p2, q2)[0])
+        for v in range(len(lay.nodes)):
+            if v not in ends and (X[v] >= lo).all() and (X[v] <= hi).all():
+                for p1, q1 in segs:
+                    dmin = min(dmin, _seg_dist(X[v], p1, q1)[0])
+        return nx, dmin
+    fixed = 0
+    for _ in range(3):
+        sharp = set()
+        for key, _, path in lay.seqs:
+            if lay.default is not None and key not in (lay.default, "plan"):
+                continue
+            for i in range(1, len(path) - 1):
+                e1 = lay.eidx[(min(path[i - 1], path[i]), max(path[i - 1], path[i]))]
+                e2 = lay.eidx[(min(path[i], path[i + 1]), max(path[i], path[i + 1]))]
+                if e1 != e2 and tc(pieces(e1, path[i - 1])[-1], pieces(e2, path[i])[0]) >= TURN_COST[3]:
+                    sharp |= {e1, e2}
+        if not sharp:
+            break
+        changed = False
+        for e in sorted(sharp):
+            ed = lay.edges[e]
+            a, b = ed["a"], ed["b"]
+            old = ed["bend"]
+            pts_old = [X[a]] + ([np.array(old)] if old is not None else []) + [X[b]]
+            c_old, (x_old, g_old) = cost(e), clearance(e, pts_old)
+            best = None
+            for ds, off in _edge_shapes(X[b] - X[a]):
+                ed["bend"] = None if off is None else tuple(X[a] + off)
+                c = cost(e)
+                if c < c_old - 1e-9 and (best is None or c < best[0] - 1e-9):
+                    pts = [X[a]] + ([X[a] + off] if off is not None else []) + [X[b]]
+                    nx, g = clearance(e, pts)
+                    if nx <= x_old and g >= min(g_old, UNSHARP_GAP):
+                        best = (c, ed["bend"])
+            ed["bend"] = old if best is None else best[1]
+            if best is not None:
+                fixed += 1
+                changed = True
+        if not changed:
+            break
+    if log:
+        log(f"unsharp: {fixed} edges redrawn")
 
 
 def _city_cores(lay):
