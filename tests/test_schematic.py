@@ -46,22 +46,91 @@ class SchematicLayoutTests(unittest.TestCase):
         n = sum(1 for (k, _) in self.lay.paths if k in (self.lay.default, "plan"))
         self.assertLess(q["bends"] / n, 6.0, q)
         self.assertLess(q["zigzags"] / n, 2.0, q)
-        self.assertLessEqual(q["crossings"], q["geo_crossings"] + 10, q)
+        # (edge against edge: a crossing that moves one station along in the drawing counts as a
+        # new one; merged interchanges took a dozen of the geography's own away)
+        self.assertLessEqual(q["crossings"], q["geo_crossings"] + 12, q)
 
-    def test_every_walk_link_is_drawn(self):
+    def test_every_walk_link_is_in_the_page_and_only_short_ones_are_drawn(self):
         # every transfer pair the model walks (within the walk radius, or in transfers.csv)
-        # that the layout keeps as two nodes gets a connector, solid or dashed
+        # that the layout keeps as two nodes is in the page's data; one longer than
+        # CONNECTOR_MAX on the diagram is flagged far, and the page draws only the others (a
+        # far one just faintly around the station selected or hovered)
         self.assertEqual(sorted(tuple(t[:2]) for t in self.js["transfers"]), sorted(self.lay.transfers))
         for a, b, far, _ in self.js["transfers"]:
             d = math.hypot(self.lay.nodes[a]["x"] - self.lay.nodes[b]["x"], self.lay.nodes[a]["y"] - self.lay.nodes[b]["y"])
             self.assertEqual(far, int(d > schematic.CONNECTOR_MAX))
+        with open(os.path.join(os.path.dirname(schematic.__file__), "templates", "schematic.js"), encoding="utf-8") as f:
+            js = f.read()
+        self.assertIn("if (!A || !B || far) continue;", js)                # draw(): connectors for short links only
+        self.assertIn("if (!far || (a !== v && b !== v)) continue;", js)   # walks(): the far ones of one station
+
+    def stations(self):
+        st = {}
+        for net in self.nets.values():
+            st.update(net.stations)
+        return st
+
+    def test_same_place_interchanges_are_one_node(self):
+        # walk transfers a short way apart are one interchange: Akard and Metro Center (the
+        # Orange Line's stop moved a block in the 2-million plan) are one node, and a merged
+        # group of different names spans no more than MERGE_WALK_KM
+        from dfwt import geo
+        st, proj = self.stations(), geo.Projector()
+        sid = {s.name: k for k, s in st.items()}
+        self.assertEqual(self.lay.node_of[sid["Akard"]], self.lay.node_of[sid["Metro Center"]])
+        for nd in self.lay.nodes:
+            if len({schematic._norm_name(st[s].name) for s in nd["sids"]}) > 1:
+                pts = [np.array(proj.xy(st[s].lat, st[s].lon)) for s in nd["sids"]]
+                self.assertLessEqual(max(np.linalg.norm(p - q) for p in pts for q in pts), schematic.MERGE_WALK_KM + 1e-9, nd["name"])
+        # never two stops of one routing in one node
+        for (key, lid), (path, stop_at) in self.lay.paths.items():
+            stops = [path[i] for i in stop_at]
+            self.assertTrue(all(u != w for u, w in zip(stops, stops[1:])), (key, lid))
+
+    def test_fort_worth_main_terminal_to_la_gran_plaza_runs_straight_south(self):
+        # the owner: "the line to La Gran Plaza should go straight north/south and not
+        # deviate". FW Pink (F04) runs Main / Terminal (by Meacham airport) - downtown - La
+        # Gran Plaza, almost due south in the real geography: every drawn piece points south,
+        # all on one vertical
+        path, stop_at = self.lay.paths[(self.lay.default, "F04")]
+        names = [self.lay.nodes[path[i]]["name"] for i in stop_at]
+        i, j = stop_at[names.index("Main / Terminal")], stop_at[names.index("La Gran Plaza")]
+        ds = schematic.drawn_dirs(self.lay, path[i:j + 1])
+        self.assertEqual({d for d, _ in ds}, {6}, ds)
+        self.assertLess(np.ptp([self.lay.nodes[v]["x"] for v in path[i:j + 1]]), 1e-6)
+
+    def test_no_line_doubles_back_at_a_station(self):
+        # no line of the default plan or the plan is drawn turning straight back (180
+        # degrees) at a station, hardly any by 135, and the SH-114 Line not at all (it used
+        # to at John W Carpenter / Freeport and Parkridge)
+        turns = schematic.sharp_turns(self.lay, {self.lay.default, "plan"})
+        self.assertEqual([t for t in turns if t[3] == 180], [], turns)
+        self.assertLessEqual(len(turns), 3, turns)
+        self.assertEqual([t for t in turns if t[1] == "XP01"], [], turns)
+
+    def test_airport_lines_keep_their_real_order(self):
+        # DFW Airport North is drawn north of Terminal B (the Silver Line and TEXRail run up
+        # from one to the other), and the SH-114 Line's stops from John W Carpenter / Freeport
+        # through DFW Airport North to Grapevine run east to west as they really do
+        self.assertGreater(self.node("DFW Airport North")["y"], self.node("DFW Airport Terminal B")["y"])
+        path, stop_at = self.lay.paths[(self.lay.default, "XP01")]
+        names = [self.lay.nodes[path[i]]["name"] for i in stop_at]
+        xs = [self.lay.nodes[path[i]]["x"] for i in stop_at]
+        a, b = names.index("John W Carpenter / Freeport"), names.index("Grapevine-Main Street")
+        self.assertTrue(all(x0 > x1 for x0, x1 in zip(xs[a:b + 1], xs[a + 1:b + 1])), list(zip(names[a:b + 1], xs[a:b + 1])))
 
     def test_walk_linked_stations_are_pulled_together(self):
-        # most pairs within the walk radius end up near the distance they are pulled to
+        # most walk transfers end up together: one interchange node (stations a short walk
+        # apart are merged), or, for pairs within the walk radius kept as two nodes, near the
+        # distance they are pulled to
         q = schematic.quality(self.lay)
         close = [t for t in self.lay.transfers if schematic._walk_pair(self.lay, *t)]
-        self.assertTrue(close)
-        self.assertLessEqual(q["apart"], len(close) / 2, q)
+        st = {}
+        for net in self.nets.values():
+            st.update(net.stations)
+        merged = [nd for nd in self.lay.nodes if len({schematic._norm_name(st[s].name) for s in nd["sids"]}) > 1]
+        self.assertTrue(close and merged)
+        self.assertLessEqual(q["apart"], (len(close) + len(merged)) / 4, q)
 
     def test_area_names_stand_beside_their_core_station(self):
         X = np.array([[n["x"], n["y"]] for n in self.lay.nodes])

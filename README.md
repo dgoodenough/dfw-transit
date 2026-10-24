@@ -45,12 +45,14 @@ line, the 2-million plan's arterial grid included, tinted by area) and **Rail + 
 corridors** (rail and the plan's main BRT corridors: all 47 routes on top of the rail
 network would not stay legible, so the full BRT network has its own version).
 Geography gives way to straight lines: a line that runs along one
-axis overall (the Fort Worth north-south trunk, the east-west lines out to Ridgmar)
-is drawn on that axis through its junctions, turns cost more than a little
-geographic fidelity, and a turn straight back (a zig-zag) costs more still. Every
-walk transfer the model uses (stations within the walk radius, or linked in
-`transfers.csv`) is drawn: the layout pulls such stations side by side, and a pair
-it can't bring together gets a dotted walk link. Hover or tap a line to light up
+axis overall (the Fort Worth Main / Terminal - La Gran Plaza trunk, the east-west lines
+out to Ridgmar) is drawn on that axis through its junctions, turns cost more than a little
+geographic fidelity, a turn straight back (a zig-zag) costs more still, and no line is
+drawn doubling back on itself at a station. Stations a short walk apart (within 300 m)
+are one interchange ("Akard · Metro Center"); other walk transfers the model uses
+(stations within the walk radius, or linked in `transfers.csv`) are pulled side by side
+and joined by a short connector, and a longer walk is not drawn across the core but shown
+faintly when its station is selected. Hover or tap a line to light up
 its route; BRT routes are named at their ends. A trip that rides a mode the version
 leaves out says so and offers the version that shows it.
 

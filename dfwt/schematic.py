@@ -14,8 +14,11 @@ takes ~15-40 s per variant (layout_json caches it in the temp folder).
 Method
 ------
 1. **Union graph.** Nodes are stations; stations at the same place (within
-   40 m, the same name within 400 m, or transfer-linked within 150 m) merge into
-   one interchange node, never two stops of one line and never above degree 8.
+   40 m, the same name within 400 m, transfer-linked within 150 m, or a walk
+   transfer within MERGE_WALK_KM, 300 m, as long as the group spans no more)
+   merge into one interchange node ("Akard · Metro Center"), never two stops of
+   one routing (a line may stop at one in one plan and the other in another)
+   and never above degree 8.
    A line whose track (segment geometry) passes within 120 m of another station
    is drawn *through* that node when that joins an existing corridor, so
    express hops bundle with the local line instead of fanning out separately.
@@ -26,19 +29,25 @@ Method
    long commuter-rail reaches. The scale is set so the median hop is EDGE_MED.
 3. **Straightness rules** (looser geography, before any direction is chosen).
    *Strokes*: at every station the two edge ends that the most lines run
-   straight through are joined (the default plan's routings first), so a trunk
+   straight through are joined (the default plan's routings first; not across
+   a turn sharper than STROKE_TURN, and not where every line ends), so a trunk
    is one stroke through its junctions (_strokes). Stations are pulled into
    line along their strokes, and every stroke that runs along one of the four
    axes in the real geography (a north-south trunk, an east-west line) is laid
    exactly along it, heaviest first, edge by edge, as long as that agrees with
-   those laid already; the lighter branch takes the bend (_smooth). These
-   positions anchor everything after.
+   those laid already; the lighter branch takes the bend (_smooth). A *firm*
+   stroke, very straight over many stations (AXIS_FIRM, AXIS_FIRM_N: the Fort
+   Worth Main / Terminal - La Gran Plaza trunk), is laid even where the warp
+   left other lines in its way (they give way), keeps its axis AXIS_FIRM_DP
+   times as hard below and never gets a bend. These positions anchor
+   everything after.
 4. **Octilinear directions.** Chains of degree-2 stations between junctions or
    termini are the units of the drawing. At each junction the incident chains
    get distinct ports (8 directions) by exhaustive search over assignments that
    keep the cyclic order of neighbours, each aimed along its chain's general
    direction (its next few stations), ends that lines run straight through kept
-   opposite (T_THROUGH) and axis edges on their axis (AXIS_DP); termini get no
+   opposite (T_THROUGH), no line turned back on itself (T_SHARP) and axis edges
+   on their axis (AXIS_DP); termini get no
    port, so a line's last stretch is free to run straight on. Along each chain
    a dynamic program (_turn_dp) picks one direction per edge, trading squared
    angular deviation (from the edge and from the chain's course) against a
@@ -65,6 +74,9 @@ Method
    tried straight; those the relaxation can't hold, that crowd a station or
    that turn an edge round (two stations swapping places), keep their kink
    (kinks near trouble are put off and retried a few at a time).
+   Last, with the stations fixed, an edge where a line turns back on itself at
+   a station (135 degrees or more) is redrawn another octilinear way if that
+   eases it without crowding anything (_unsharp).
    Steps 4-5 are chaotic (a small change can tip a junction elsewhere), so they
    run once per VARIANT (in parallel processes) and the drawing with the best
    quality() is kept: fewest bends, zig-zags, sharp turns, crossings beyond
@@ -109,7 +121,8 @@ MERGE_NAME_KM = 0.40  # merge same-named stations closer than this
 MERGE_LINKED_KM = 0.15  # merge transfer-linked stations closer than this,
 MERGE_WALK_KM = 0.30  # and walk-linked ones (within the walk radius) this close: one interchange, not two
                       # markers and a connector (a group so merged spans no more than this)
-CONNECTOR_MAX = 1.6   # a transfer connector longer than this is drawn dashed (a walk), not as a solid link
+CONNECTOR_MAX = 1.6   # a walk link this short (centre to centre) is drawn as a connector; a longer one only
+                      # faintly, around the station selected (it would cross the core: the page)
 W_XFER_S = 25.0       # walk-linked stations (transfers) are pulled this hard to sit side by side in _smooth,
 W_XFER = 4.0          # ... and in the least-squares relaxation (a stop-to-stop edge's length weighs W_LEN)
 LABEL_GROUP = 8.0     # same-named stations (ignoring a compass suffix) this close share one label when zoomed out
@@ -156,7 +169,7 @@ AXIS_JOG, AXIS_JOG_KM = 65.0, 0.8   # (a hop shorter than AXIS_JOG_KM: AXIS_JOG 
 AXIS_MISS = 0.2       # unless that misses by more than this fraction of the edge's length
 AXIS_HOP_KM = 1.5     # strokes are laid heaviest first: lines squared x hop length (capped at this)
 AXIS_CROSS = True     # ... and an edge whose laying pushes one line across another stays free
-AXIS_FIRM, AXIS_FIRM_N = 0.08, 12   # ... except a long, very straight stroke: the others give way to it,
+AXIS_FIRM, AXIS_FIRM_N = 0.08, 12   # ... except a firm stroke, a very straight one of many stations: the others give way to it,
 AXIS_FIRM_DP = 40.0   # and its edges keep to the axis this many times as hard (AXIS_DP), and are never bent
 AXIS_KEEP = 0.6      # a stroke that can lay less than this share of its edges is left free
 AXIS_DP = 1.0         # directions of axis edges pay this per 45 degrees off the axis (VARIANTS)
@@ -708,8 +721,8 @@ def _axis_strokes(lay, G, strokes, hop_km=AXIS_HOP_KM):
     """Strokes that run roughly along one of the four axes in the real geography G
     (stroke_axis strays less than AXIS_TOL; at least AXIS_MIN edges), heaviest first (lines
     x length): [(axis 0..3, [edges], firm)], leaving out stretches that cross the axis (more
-    than AXIS_EDGE degrees off it) and edges the default plan doesn't use. firm: a long and
-    very straight stroke (AXIS_FIRM_N edges, straying less than AXIS_FIRM)."""
+    than AXIS_EDGE degrees off it) and edges the default plan doesn't use. firm: a very
+    straight stroke of many stations (AXIS_FIRM_N edges, straying less than AXIS_FIRM)."""
     out = []
     for nodes, es in strokes:
         if len(es) >= AXIS_MIN and len(set(nodes)) == len(nodes):
@@ -1960,8 +1973,6 @@ def _unsharp(lay, X, log=None):
     for _ in range(3):
         sharp = set()
         for key, _, path in lay.seqs:
-            if lay.default is not None and key not in (lay.default, "plan"):
-                continue
             for i in range(1, len(path) - 1):
                 e1 = lay.eidx[(min(path[i - 1], path[i]), max(path[i - 1], path[i]))]
                 e2 = lay.eidx[(min(path[i], path[i + 1]), max(path[i], path[i + 1]))]
@@ -2056,6 +2067,28 @@ def _crossings(segs):
     return len(out)
 
 
+def sharp_turns(lay, keys=None):
+    """Where lines turn back on themselves at a station: [(scenario, line, station node, turn in
+    degrees)] for every turn of 135 degrees or more between the piece a line arrives on and the
+    piece it leaves on (the routings of `keys`, default: every scenario's)."""
+    out = []
+    for (key, lid), (path, _) in sorted(lay.paths.items()):
+        if keys is not None and key not in keys:
+            continue
+        for i in range(1, len(path) - 1):
+            ds = []
+            for u, w in ((path[i - 1], path[i]), (path[i], path[i + 1])):
+                pts = edge_polyline(lay, lay.eidx[(min(u, w), max(u, w))])
+                if lay.edges[lay.eidx[(min(u, w), max(u, w))]]["a"] != u:
+                    pts = pts[::-1]
+                (x0, y0), (x1, y1) = (pts[-2], pts[-1]) if u == path[i - 1] else (pts[0], pts[1])
+                ds.append(round(math.atan2(y1 - y0, x1 - x0) / (math.pi / 4)) % 8)
+            t = (ds[1] - ds[0]) % 8
+            if min(t, 8 - t) >= 3:
+                out.append((key, lid, path[i], 45 * min(t, 8 - t)))
+    return out
+
+
 def quality(lay):
     """How clean the drawing is, over the lines of the default plan and of the plan: bends,
     zig-zags and sharp turns along the lines, edge crossings drawn against those in the real
@@ -2116,8 +2149,9 @@ def to_json(lay):
     paths = collections.defaultdict(dict)
     for (key, lid), (path, stop_at) in sorted(lay.paths.items()):
         paths[key][lid] = [path, stop_at]
-    # every walk link the model uses is drawn: [a, b, 1 if it is long on the diagram (a dashed
-    # walk), 1 if it is a longer walk than the walk radius (a transfers.csv link)]
+    # every walk link the model uses that the layout keeps as two nodes: [a, b, 1 if it is long
+    # on the diagram (not drawn but around the station selected), 1 if it is a longer walk than
+    # the walk radius (a transfers.csv link)]
     conn = [[a, b, int(math.hypot(lay.nodes[a]["x"] - lay.nodes[b]["x"], lay.nodes[a]["y"] - lay.nodes[b]["y"]) > CONNECTOR_MAX),
              int(not _walk_pair(lay, a, b))] for a, b in lay.transfers]
     return {"nodes": nodes, "edges": edges, "paths": paths, "transfers": conn,
