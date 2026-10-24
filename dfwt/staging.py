@@ -123,11 +123,13 @@ def compile_stages(tables, stage_rows):
         years = [int(r["year_opens"]) for r in rows if r["kind"] != "via"]
         if years != sorted(years):
             add("warn", "STAGE_ORDER", lid, "stage numbers and opening years disagree")
-        # A stop is served once track reaches it; a stop that was an infill station
-        # (opened later than its own track) keeps that delay.
+        # A stop is served once track reaches it. An infill stop on today's track keeps its
+        # stored delay; on new track the stop opens with it (infill.csv times the exceptions).
+        ex = config.load()["existing_year"]
         for i, r in enumerate(stops[lid]):
             adj = [j for j in (i - 1, i) if 0 <= j < len(orig_seg)]
-            delay = max(0, orig_stop[i] - min(orig_seg[j] for j in adj))
+            own = min(orig_seg[j] for j in adj)
+            delay = max(0, orig_stop[i] - own) if own <= ex else 0
             r["year_opens"] = str(min(new_seg[j] for j in adj) + delay)
         drift = sum(1 for y, o in zip(new_seg, orig_seg) if y != o)
         if drift:
@@ -282,6 +284,16 @@ def check(net):
             if max(s.year for s in own) > y1:
                 add("error", "INTERIM_GAP", base.name, f"via routing ends {y1} but its own track opens {max(s.year for s in own)}")
 
+    # deadlines (staging.deadlines, core_by_plan): a stage that opens after its year
+    if rules.get("deadlines") or rules.get("core_by_plan"):
+        for i, d in sorted(_deadlines(net, net.stage_rows).items()):
+            r = net.stage_rows[i]
+            if int(r["year_opens"]) > d:
+                ln = net.host_line(r["line_id"])
+                add("warn", "DEADLINE_MISSED", ln.name if ln else r["line_id"],
+                    f"stage {r['stage']} ({names.get(r['from_stop'], r['from_stop'])} - {names.get(r['to_stop'], r['to_stop'])}) "
+                    f"opens {r['year_opens']}, after its deadline {d}")
+
     # budget: spend spread over construction, against a flat annual budget with carryover
     per_year = cfg["budget"]["musd_per_year"]
     worst = over_budget(net, max(years))
@@ -292,6 +304,15 @@ def check(net):
 
 
 # ---------------------------------------------------------------- money
+BUDGET_SLACK_MUSD = 0.01   # float noise at the limit: the scheduler and the check use the same rule
+
+
+def within_budget(cum_musd, cfg, years, scale=1.0):
+    """Is cumulative spending of cum_musd over `years` years within the money accrued (config.budget,
+    with its tolerance)? The one rule both the scheduler and the budget check use."""
+    return cum_musd <= cfg["budget"]["musd_per_year"] * scale * (1 + cfg["budget"]["tolerance"]) * years + BUDGET_SLACK_MUSD
+
+
 def allocate_spending(items, cfg, horizon=2200):
     """Spend each (opening_year, cost, construction_years) item in the years before it
     opens, earliest years first and no year more than 1.5x an even share, without
@@ -352,13 +373,14 @@ def over_budget(net, last_year):
     cfg = net.cfg
     spend = spend_by_year(net)
     per_year = cfg["budget"]["musd_per_year"]
-    cum_s = cum_b = 0.0
+    ex = cfg["existing_year"]
+    cum_s = 0.0
     worst = None
-    for y in range(cfg["existing_year"] + 1, last_year + 1):
+    for y in range(ex + 1, last_year + 1):
         cum_s += spend.get(y, 0.0)
-        cum_b += per_year
-        if cum_s > cum_b * (1 + cfg["budget"]["tolerance"]) + 1e-6 and (worst is None or cum_s - cum_b > worst[1]):   # (rounding at the limit)
-            worst = (y, cum_s - cum_b)
+        over = cum_s - per_year * (y - ex)
+        if not within_budget(cum_s, cfg, y - ex) and (worst is None or over > worst[1]):
+            worst = (y, over)
     return worst
 
 
@@ -366,7 +388,7 @@ def _repair(scenario, rows, last_year, tries=150):
     """Per-stage costs (what exact_years schedules with) and the year-by-year spending
     check disagree a little where track ownership shifts. Close the gap locally: push the
     first stage that opens after the over-budget year back a year (and its line's later
-    stages with it), until the plan fits. Returns the rows, or None if it doesn't fit."""
+    stages with it), one without a deadline if there is one, until the plan fits. Returns the rows, or None if it doesn't fit."""
     from .network import Network
     from .validate import islands as find_islands
     rows = copy.deepcopy(rows)
@@ -380,10 +402,14 @@ def _repair(scenario, rows, last_year, tries=150):
         cand = [r for r in rows if r.get("locked") != "1" and r["kind"] != "via" and y < int(r["year_opens"]) <= y + cy]
         if not cand:
             return None
+        due = {id(test.stage_rows[i]) for i in _deadlines(test, test.stage_rows)}
+        free = [r for r in cand if id(r) not in due]   # delay a stage without a deadline first
+        cand = free or cand
         r = min(cand, key=lambda r: (int(r["year_opens"]), r["line_id"], -int(r["stage"])))
         new = int(r["year_opens"]) + 1
         for q in rows:
-            if q["line_id"] == r["line_id"] and q["kind"] != "via" and int(q["stage"]) >= int(r["stage"]) and int(q["year_opens"]) < new:
+            if q["line_id"] == r["line_id"] and q["kind"] != "via" and int(q["stage"]) >= int(r["stage"]) and int(q["year_opens"]) < new \
+                    and (q is r or id(q) not in due):   # a later stage with a deadline stays (keep_attached checks it still joins)
                 q["year_opens"] = str(new)
     return None
 
@@ -454,6 +480,9 @@ def schedule(scenario=None, log=print):
             if log:
                 log(f"{moved} of {len(rows)} stages moved to their earliest affordable year "
                     f"(scheduled against {scale:.0%} of the budget)")
+                for f in check(test):
+                    if f[1] == "DEADLINE_MISSED":
+                        log(f"warning: {f[2]}: {f[3]}")
             return rows
     raise RuntimeError("could not fit the stages in the budget")
 
@@ -648,7 +677,10 @@ def _fair_order(net, rows, idx, value, oc, deadline, per_year):
     falls behind (staging.fair_share): once a county's population share (x ratio) of the capital
     committed so far covers its best remaining line, that line goes next (the county furthest
     behind first). Stages with a deadline count from about the year they open (the cumulative
-    budget reaching it)."""
+    budget reaching it). With fair_share.band_years, a county whose share of the capital committed
+    over the last band_years of budget falls below band_low x its population share goes next
+    with its best line, whatever that line costs (review 3, R3: deadline stages fill the early
+    decades, and Collin had nothing until 2040)."""
     fs = net.cfg["staging"].get("fair_share") or {}
     by_line = collections.defaultdict(list)
     for i in idx:
@@ -682,25 +714,45 @@ def _fair_order(net, rows, idx, value, oc, deadline, per_year):
     home = {lid: max(w, key=w.get) for lid, w in line_w.items()}
     dl = sorted(((y, cost[i], weights(i)) for i, y in deadline.items()), key=lambda d: d[:2])
     cum, total, k, order = collections.Counter(), 0.0, 0, []
+    events = []   # (total committed before, county -> $M): for the decade bands
+    band = fs.get("band_years") and per_year * fs["band_years"]
+
+    def commit(w, c_musd):
+        nonlocal total
+        events.append((total, {c: v * c_musd for c, v in w.items()}))
+        for c, v in w.items():
+            cum[c] += v * c_musd
+        total += c_musd
+
+    def window():
+        got = collections.Counter()
+        for t0, ws in events:
+            if t0 >= total - band:
+                for c, v in ws.items():
+                    got[c] += v
+        return got, min(total, band)
     left = list(lines)
     while left:
         while k < len(dl) and dl[k][0] <= ex + total / per_year:   # deadline stages, about when they're funded
-            for c, v in dl[k][2].items():
-                cum[c] += v * dl[k][1]
-            total += dl[k][1]
+            commit(dl[k][2], dl[k][1])
             k += 1
         best = {}
         for l in left:   # each county's best remaining line (left is in value order)
             best.setdefault(home[l], l)
-        due = sorted((cum[c] / (share[c] * total), c) for c, l in best.items()
-                     if total and cum[c] + sum(cost[i] for i in by_line[l]) * line_w[l].get(c, 0) <= fs["ratio"] * share[c] * total)
-        pick = best[due[0][1]] if due else left[0]
+        pick = None
+        if band and total >= band / 2:   # a county far behind over the last decade or so goes first
+            got, wt = window()
+            low = sorted((got[c] / (share[c] * wt), c) for c in best if got[c] < fs.get("band_low", 0.5) * share[c] * wt)
+            if low:
+                pick = best[low[0][1]]
+        if pick is None:
+            due = sorted((cum[c] / (share[c] * total), c) for c, l in best.items()
+                         if total and cum[c] + sum(cost[i] for i in by_line[l]) * line_w[l].get(c, 0) <= fs["ratio"] * share[c] * total)
+            pick = best[due[0][1]] if due else left[0]
         left.remove(pick)
         order += by_line[pick]
         for i in by_line[pick]:
-            for c, v in line_w[pick].items():
-                cum[c] += v * cost[i]
-            total += cost[i]
+            commit(line_w[pick], cost[i])
     return order
 
 
@@ -761,7 +813,7 @@ def _exact_years(net, rows, log=print, scale=1.0, floor=None):
         cum = 0.0
         for t in range(ex + 1, horizon):
             cum += sp.get(t, 0.0)
-            if cum > per_year * (t - ex) + 1e-6:
+            if not within_budget(cum, cfg, t - ex, scale):
                 return False
         return True
 
@@ -770,6 +822,18 @@ def _exact_years(net, rows, log=print, scale=1.0, floor=None):
     # in the last schedule)
     pieces = _stage_pieces(net, rows) if by_value else {}
     charged, agg = {}, collections.Counter()
+    # no more than staging.max_km_per_interval of a line opens in one year (a stage bigger than
+    # that opens alone): the work is spread, and riders get the first part sooner
+    km_cap = cfg["staging"]["max_km_per_interval"] if by_value and cfg["staging"].get("enforce_interval") else None
+    skm = _stage_km(net, rows) if km_cap else {}
+    opened_km = collections.Counter()
+
+    def fits(i, t):
+        if not km_cap or i in deadline:   # a deadline wins over the per-year limit
+            return True
+        host = net.host_line(rows[i]["line_id"])
+        key = (host.id if host else rows[i]["line_id"], t)
+        return opened_km[key] == 0 or opened_km[key] + skm.get(i, 0.0) <= km_cap[oc[i][1]]
 
     def with_stage(i, t, commit=False):
         trial = agg if commit else collections.Counter(agg)
@@ -808,9 +872,9 @@ def _exact_years(net, rows, log=print, scale=1.0, floor=None):
         fund = (lambda t: with_stage(i, t)) if by_value else (lambda t: placed + [(t, cost, n)])
         if i in deadline:     # by its deadline, as late as that allows (the money goes to value first)
             d = max(deadline[i], lo)
-            y = next((t for t in [*range(d, lo - 1, -1), *range(d + 1, hi + 1)] if ok(fund(t))), None)
+            y = next((t for t in [*range(d, lo - 1, -1), *range(d + 1, hi + 1)] if fits(i, t) and ok(fund(t))), None)
         else:
-            y = next((t for t in range(lo, hi + 1) if ok(fund(t))), None)
+            y = next((t for t in range(lo, hi + 1) if fits(i, t) and ok(fund(t))), None)
         if y is None:
             y = max(y0, lo)   # keep it where it was (or after its line's previous stage)
         if y > end:
@@ -818,6 +882,9 @@ def _exact_years(net, rows, log=print, scale=1.0, floor=None):
         elif (r.get("note") or "").startswith(("after the", "deferred by the optimizer")):
             r["note"] = "value per $" if by_value else "optimizer"
         r["year_opens"] = str(y)
+        if km_cap:
+            host = net.host_line(r["line_id"])
+            opened_km[(host.id if host else r["line_id"], y)] += skm.get(i, 0.0)
         if by_value:
             with_stage(i, y, commit=True)
         else:
@@ -829,6 +896,22 @@ def _exact_years(net, rows, log=print, scale=1.0, floor=None):
     if log:
         log(f"{moved} of {len(rows)} stages moved to their earliest affordable year")
     return renumber(keep_attached(net, rows))
+
+
+def _stage_km(net, rows):
+    """Row index -> km of track the stage spans on its line."""
+    names = {k: v.name for k, v in net.stations.items()}
+    out = {}
+    for i, r in enumerate(rows):
+        ln = net.host_line(r["line_id"])
+        if ln is None or r["kind"] == "via":
+            continue
+        try:
+            a, b = sorted(resolve_on(net, ln, r[c], names) for c in ("from_stop", "to_stop"))
+        except KeyError:
+            continue
+        out[i] = sum(s.km for s in ln.segments[a:b])
+    return out
 
 
 def _stage_pieces(net, rows):

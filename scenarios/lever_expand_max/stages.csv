@@ -20,7 +20,7 @@ E17,2,extension,Legacy West,Addison Circle,2039,,,,,optimizer
 E17,3,extension,First Baptist Medical Center,Pearl/Arts District,2043,,,,,optimizer
 E17,4,extension,Frisco Main St,Legacy West,2043,,,,,optimizer
 E17,5,extension,Pearl/Arts District,Buckner Boulevard / Forney Road,2050,,,,,optimizer
-E17,6,extension,Buckner Boulevard / Forney Road,Rowlett,2054,,,,,optimizer
+E17,6,extension,Buckner Boulevard / Forney Road,Town East / Belt Line,2054,,,,,optimizer
 E18,1,starter,Irving West,Bachman Lake,2052,,,,,optimizer
 E18,2,extension,Bachman Lake,Saint Paul,2052,,,,,optimizer
 E18,3,extension,Saint Paul,Buckner Boulevard / Forney Road,2053,,,,,optimizer
@@ -35,8 +35,8 @@ E19,7,extension,Outlet Mall,Center / Main,2059,,,,,optimizer
 E19,8,extension,Parks Mall,Outlet Mall,2059,,,,,optimizer
 E19,9,extension,Berry / Stalcup,Parks Mall,2066,,,,,optimizer
 E20,1,starter,DFW Airport Terminal B,Shiloh Road,2025,,,,,
-E21,1,starter,#1,Rowlett,2031,,,,,optimizer
-E21,2,extension,Rowlett,1st Street / Castle,2031,,,,,optimizer
+E21,1,starter,#1,Town East / Belt Line,2031,,,,,optimizer
+E21,2,extension,Town East / Belt Line,1st Street / Castle,2031,,,,,optimizer
 E21,3,extension,1st Street / Castle,Belt Line / Quorum,2035,,,,,optimizer
 E21,4,extension,Belt Line / Quorum,Downtown Carrollton,2035,,,,,optimizer
 E21,5,extension,Downtown Carrollton,Belt Line / Irving Boulevard,2036,,,,,optimizer
@@ -87,8 +87,8 @@ F01,1,starter,Courthouse,7th Street / Carroll,2042,,,,,optimizer
 F01,2,extension,Woodhaven,Courthouse,2042,,,,,optimizer
 F01,3,extension,7th Street / Carroll,Ridglea Hills,2047,,,,,optimizer
 F01,4,extension,Ridglea Hills,Ridgmar Mall / BRT Transfer,2048,,,,,budget scheduler
-F02,1,starter,Central Station,7th Street / Carroll,2046,,,,,optimizer
-F02,2,extension,Handley,Central Station,2054,,,,,optimizer
+F02,1,starter,Fort Worth Central,7th Street / Carroll,2046,,,,,optimizer
+F02,2,extension,Handley,Fort Worth Central,2054,,,,,optimizer
 F02,3,extension,7th Street / Carroll,Ridgmar Mall / BRT Transfer,2054,,,,,optimizer
 F03,1,starter,Main / Terminal,Medical City - Baylor,2035,,,,1,Stockyards/Panther Island leg pinned to 2035 by the owner (tourism + TOD demand LODES undercounts)
 F04,1,starter,Main / Terminal,John Peter Smith,2046,,,,,optimizer
@@ -96,7 +96,7 @@ F04,2,extension,John Peter Smith,Everman,2068,,,,,optimizer
 F05,1,starter,Lake Worth,TCC Trinity River,2052,,,,,optimizer
 F05,2,extension,TCC Trinity River,Berry / Stalcup,2064,,,,,optimizer
 F06,1,starter,Benbrook,Museum Way,2057,,,,,optimizer
-F07,1,starter,Central Station,Bluebonnet Circle,2039,,,,,optimizer
+F07,1,starter,Fort Worth Central,Bluebonnet Circle,2039,,,,,optimizer
 XB01,1,starter,X132,XS0079,2065,,,,,expansion lever (hand-staged)
 XB02,1,starter,XS0079,XS0088,2065,,,,,expansion lever (hand-staged)
 XB03,1,starter,XS0089,XS0101,2065,,,,,expansion lever (hand-staged)

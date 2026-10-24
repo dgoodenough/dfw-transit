@@ -6,6 +6,8 @@ docs/map.html.
 
 Everything on the page comes from here, from the model, or from cited facts in
 dfwt/templates/story_facts.json; the template (dfwt/templates/story.html) only draws it."""
+import collections
+import copy
 import csv
 import json
 import os
@@ -17,7 +19,8 @@ from .network import Network
 
 YEARS = (2025, 2050, 2100)
 SCEN = ("current_track", "two_million")
-WALK_KM = 0.8    # "a 10-minute walk": station-area figures use block groups within this distance
+WALK_KM = 0.8    # "a 10-minute walk": station-area figures count the share of each block group's land within it
+MERGE_KM = 0.3   # stations of the same name this close are one place on the page
 
 # A few trips that show what the network connects: (origin station, destination station, title, why).
 CONNECTIONS = [
@@ -25,15 +28,36 @@ CONNECTIONS = [
      "An express bus in I-35E's managed lanes from 2027: Ellis County's first frequent link, decades before rail."),
     ("Downtown Arlington", "Union Station", "Arlington to downtown Dallas",
      "The largest US city without regular public transit gets the I-30 Line by 2038, on to Fort Worth with FW Blue by about 2043."),
-    ("Downtown Arlington", "Central Station", "Arlington to downtown Fort Worth",
-     "One line between the two downtowns, through Arlington's stadiums and UTA."),
+    ("Downtown Arlington", "Fort Worth Central", "Arlington to downtown Fort Worth",
+     "One line between the two downtowns from {year}: I-30 trains run on as FW Blue at Handley, through Arlington's stadiums and UTA."),
     ("Irving Convention Center", "DFW Airport North", "Las Colinas to DFW Airport north",
      "The SH-114 Line ties the region's second job center to the airport and Grapevine."),
     ("Frisco Main St", "Pearl/Arts District", "Frisco to downtown Dallas",
-     "DNT East reaches Frisco in the 2040s; BRT on Dallas Parkway and Preston Road comes first."),
-    ("Stockyards Main", "Central Station", "The Stockyards to downtown Fort Worth",
-     "FW Orange, the first of Fort Worth's own metro lines (2035)."),
+     "BRT on Dallas Parkway and Preston Road comes first; DNT East rail reaches Frisco Main St in {year}."),
+    ("Stockyards Main", "Magnolia / 8th Avenue", "The Stockyards to Magnolia Avenue",
+     "FW Orange, the first of Fort Worth's own metro lines ({year}), from the Stockyards through downtown to the Near Southside."),
+    ("Bishop Arts District", "Deep Ellum", "Bishop Arts to Deep Ellum",
+     "Jefferson Boulevard BRT from 2030 and the Green Line: two of Dallas's night-out districts, with late-night service to about 2 a.m."),
+    ("Union Station", "Fort Worth Central", "Downtown Dallas to downtown Fort Worth",
+     "No high-speed link is planned between the two downtowns: TRE trains, faster and more often, and the I-30 / FW Blue Line through Arlington."),
 ]
+
+
+# The range (review 3, R1 and R4): 2100 trips on three growth cases, for the plan, the current
+# track, and the current track with the plan's access and parking policies (so the page can say
+# what the network does and what policy does).
+GROWTH_CASES = {"mid": {}, "county": {"spatial": "county"}, "low": {"case": "low"}}
+POLICY_KEYS = ("access", "ridership")
+
+
+def _variant(scen, growth=None, policy_from=None):
+    cfg = config.load(scenario=scen)
+    if policy_from:
+        pol = config.load(scenario=policy_from)
+        for k in POLICY_KEYS:
+            cfg[k] = copy.deepcopy(pol[k])
+    cfg["growth"].update(growth or {})
+    return cfg, Network.load(scen, cfg=cfg)
 
 
 def _simplify(pts, tol):
@@ -53,12 +77,12 @@ def _simplify(pts, tol):
 
 
 def _station_index(net):
-    """station name -> station id, among stations some line serves (first one wins)."""
-    served = {s for ln in net.lines.values() for s in ln.stop_ids}
+    """station name -> station id, among stations some line serves (where platforms of several
+    modes share a name, the one most lines serve)."""
+    n_lines = collections.Counter(s for ln in net.lines.values() for s in set(ln.stop_ids))
     out = {}
-    for sid, s in net.stations.items():
-        if sid in served:
-            out.setdefault(s.name, sid)
+    for sid in sorted(n_lines, key=lambda s: (-n_lines[s], s)):
+        out.setdefault(net.stations[sid].name, sid)
     return out
 
 
@@ -79,6 +103,43 @@ def _garage(net, sid):
     return best
 
 
+def _grade_timeline(net):
+    """station_id -> {mode: [[year, grade], ...]}: where its platform is from each year on
+    ("surface", "elevated", "tunnel"), from the segments on either side as they open (Deep Ellum
+    is at street level today and underground once the D2 subway opens)."""
+    out = {}
+    for ln in net.lines.values():
+        for i, sid in enumerate(ln.stop_ids):
+            adj = [ln.segments[k] for k in (i - 1, i) if 0 <= k < len(ln.segments) and ln.segments[k].year < 9999]
+            tl = []
+            for y in sorted({sg.year for sg in adj}):
+                near = {sg.grade for sg in adj if sg.year <= y}
+                g = "tunnel" if "tunnel" in near else "elevated" if "elevated" in near else "surface"
+                if not tl or tl[-1][1] != g:
+                    tl.append([y, g])
+            if tl:
+                cur = out.setdefault(sid, {}).get(ln.mode)
+                if cur is None or tl[-1][1] == "tunnel" or (cur[-1][1] == "surface" and tl[-1][1] != "surface"):
+                    out[sid][ln.mode] = tl
+    return out
+
+
+def _existing_lots(net, base):
+    """Today's park & ride lots (access.pnr_existing, as the demand model gives them): station_id -> spaces."""
+    ex = net.cfg["access"].get("pnr_existing") or {}
+    if not ex.get("enabled"):
+        return {}
+    today = net.cfg["existing_year"]
+    out = {}
+    for ln in net.lines.values():
+        for sid, y in zip(ln.stop_ids, ln.stop_years):
+            if y <= today and sid not in out:
+                st = net.stations[sid]
+                if growth.setting(base, st.lat, st.lon, net.cfg) in ex["settings"]:
+                    out[sid] = ex["spaces"]
+    return out
+
+
 def _years_csv(key):
     p = config.path("results", key, "years.csv")
     if not os.path.exists(p):
@@ -92,7 +153,6 @@ def _years_csv(key):
 
 
 def compute(log=print):
-    from . import webmap
     from .evaluate import Context, run_year
     cfg0 = config.load()
     base = demand.Zones(cfg0)
@@ -107,6 +167,18 @@ def compute(log=print):
                              "graph": r["graph"], "z": z, "trips": r["daily_trips"]}
             if log:
                 log(f"  story: {sc} {y}: {r['daily_trips']:,.0f} daily trips")
+    rng = {}
+    for case, gr in GROWTH_CASES.items():
+        rng[case] = {}
+        for key, scen, pol in (("pr", "two_million", None), ("ct", "current_track", None),
+                               ("ct_policy", "current_track", "two_million")):
+            if case == "mid" and not pol:
+                rng[case][key] = runs[(scen, 2100)]["trips"]
+                continue
+            cfg, n = _variant(scen, gr, pol)
+            rng[case][key] = run_year(Context(cfg), n, 2100, want_loads=False)["daily_trips"]
+            if log:
+                log(f"  story: range {case} {key} 2100: {rng[case][key]:,.0f}")
     # jobs a rush-hour drive reaches in 45 minutes (the same for both: the roads don't change)
     drive45 = {}
     for y in YEARS:
@@ -126,9 +198,11 @@ def compute(log=print):
         zones[f"pop_{y}"] = [int(round(float(v))) for v in runs[("two_million", y)]["pop"]]
     zones["pop_ct_2100"] = [int(round(float(v))) for v in runs[("current_track", 2100)]["pop"]]
 
-    # stations of the proposal, with what is built there and how the area around it changes
+    # stations of the proposal, with what is built there and how the area around it changes.
+    # Stations of one name within MERGE_KM are one place on the page (a BRT stop beside a rail
+    # station, say): their lines, years and walksheds together.
     net = nets["two_million"]
-    grades = webmap.station_grades(net)
+    ex = cfg0["existing_year"]
     my = net.station_mode_years()
     pj = geo.Projector()
     zx, zy = pj.xy(base.lat, base.lon)
@@ -136,45 +210,75 @@ def compute(log=print):
     for ln in net.lines.values():
         for sid in ln.stop_ids:
             st_lines.setdefault(sid, []).append(ln)
-    stations = []
-    for sid, lns in st_lines.items():
+    places = []
+    for sid in sorted(st_lines):
         s = net.stations[sid]
-        years = {m: y for m, y in my[sid].items() if y < 9999}
-        if not years:
+        if not any(y < 9999 for y in my[sid].values()):
             continue
-        x, y = pj.xy(s.lat, s.lon)
-        near = np.hypot(zx - x, zy - y) <= WALK_KM
+        hit = next((p for p in places if p["name"] == s.name and
+                    geo.hav_km(s.lat, s.lon, net.stations[p["ids"][0]].lat, net.stations[p["ids"][0]].lon) <= MERGE_KM), None)
+        if hit:
+            hit["ids"].append(sid)
+        else:
+            places.append({"name": s.name, "ids": [sid]})
+    timeline = _grade_timeline(net)
+    lots = _existing_lots(net, base)
+    ws = growth.walksheds(base)
+    stations, near_cells = [], []
+    for p in places:
+        ids = p["ids"]
+        s = net.stations[ids[0]]
+        lns = [ln for sid in ids for ln in st_lines[sid]]
+        years = {}
+        for sid in ids:
+            for m, y in my[sid].items():
+                if y < 9999:
+                    years[m] = min(y, years.get(m, y))
+        first = min(years.values())
+        cells = np.concatenate([ws.cells_near(*pj.xy(net.stations[sid].lat, net.stations[sid].lon)) for sid in ids])
+        near_cells.append(cells)
+        near = ws.share(cells)   # each block group's share inside this walkshed
+        hw_year = max(2050, first)   # how often it runs once it is open
+        grade = {}
+        for sid in ids:
+            for m, tl in timeline.get(sid, {}).items():
+                grade.setdefault(m, tl)
+        garage = max(max(_garage(net, sid) for sid in ids), max(lots.get(sid, 0) for sid in ids))
         stations.append({
-            "id": sid, "name": s.name, "lat": round(s.lat, 5), "lon": round(s.lon, 5),
+            "id": ids[0], "name": s.name, "lat": round(s.lat, 5), "lon": round(s.lon, 5),
             "setting": growth.setting(base, s.lat, s.lon, net.cfg),
-            "years": years, "grade": grades.get(sid, {}),
+            "years": years, "grade": grade,
             "lines": sorted({(ln.name, ln.color, ln.mode) for ln in lns}),
-            "headway": min(ln.headway_at(2050) for ln in lns),
-            "garage": _garage(net, sid),
-            "existing": min(years.values()) <= net.cfg["existing_year"],
-            "pop": [int(round(float(runs[k]["pop"][near].sum()), -1)) for k in
+            "headway": [hw_year, min(ln.headway_at(hw_year) for ln in lns
+                                     if min(my[sid].get(ln.mode, 9999) for sid in ids) <= hw_year)],
+            "garage": garage, "garage_today": max(lots.get(sid, 0) for sid in ids),
+            "existing": first <= ex,
+            "pop": [int(round(float((runs[k]["pop"] * near).sum()), -1)) for k in
                     (("two_million", 2025), ("current_track", 2100), ("two_million", 2100))],
-            "jobs": [int(round(float(runs[k]["jobs"][near].sum()), -1)) for k in
+            "jobs": [int(round(float((runs[k]["jobs"] * near).sum()), -1)) for k in
                      (("two_million", 2025), ("current_track", 2100), ("two_million", 2100))],
         })
     stations.sort(key=lambda r: r["name"])
-    # how much of the region a station area touches at all
-    near_any = np.zeros(base.n, dtype=bool)
-    for st in stations:
-        x, y = pj.xy(st["lat"], st["lon"])
-        near_any |= np.hypot(zx - x, zy - y) <= WALK_KM
+    # how much of the region is within a walk of a station: of the plan's (2100), and of today's
+    near_any = ws.share(np.concatenate(near_cells))
+    ct = nets["current_track"]
+    ct_cells = [ws.cells_near(*pj.xy(ct.stations[sid].lat, ct.stations[sid].lon))
+                for sid in {s for ln in ct.lines.values() for s in ln.stop_ids}]
+    near_ct = ws.share(np.concatenate(ct_cells))
     p25, p_ct, p_p = (runs[k]["pop"] for k in (("two_million", 2025), ("current_track", 2100), ("two_million", 2100)))
+    far = 1 - near_any
     change = {
-        "zones_near": int(near_any.sum()), "zones": int(base.n),
-        "pop_near_2025": float(p25[near_any].sum()), "pop_2025": float(p25.sum()),
-        "pop_near_2100_ct": float(p_ct[near_any].sum()), "pop_near_2100": float(p_p[near_any].sum()),
-        "pop_far_2100_ct": float(p_ct[~near_any].sum()), "pop_far_2100": float(p_p[~near_any].sum()),
-        "pop_2100": float(p_p.sum()),
+        "pop_near_2025": float((p25 * near_any).sum()), "pop_2025": float(p25.sum()),
+        "pop_near_2100_ct": float((p_ct * near_any).sum()), "pop_near_2100": float((p_p * near_any).sum()),
+        "pop_far_2100_ct": float((p_ct * far).sum()), "pop_far_2100": float((p_p * far).sum()),
+        "pop_2100": float(p_p.sum()), "pop_2100_ct": float(p_ct.sum()),
+        "near_today_2100_ct": float((p_ct * near_ct).sum()),   # current track: today's stations
     }
 
     # connections: ride time on the proposal by year, the rush-hour drive, jobs reachable at the start
     names = _station_index(net)
     conns = []
+    ww = net.cfg["wait"].get("weight", 1.0)
     for o, d, title, why in CONNECTIONS:
         if o not in names or d not in names:
             if log:
@@ -182,7 +286,7 @@ def compute(log=print):
             continue
         so, sd = net.stations[names[o]], net.stations[names[d]]
         oz = int(np.argmin(np.hypot(zx - pj.xy(so.lat, so.lon)[0], zy - pj.xy(so.lat, so.lon)[1])))
-        row = {"from": o, "to": d, "title": title, "why": why,
+        row = {"from": o, "to": d, "from_id": names[o], "to_id": names[d], "title": title, "why": why,
                "from_ll": [so.lat, so.lon], "to_ll": [sd.lat, sd.lon], "ride": {}, "drive": {}, "jobs45": {}}
         km = geo.hav_km(so.lat, so.lon, sd.lat, sd.lon)
         for y in YEARS:
@@ -193,32 +297,39 @@ def compute(log=print):
                 t = None
                 if a is not None and b is not None:
                     legs, _ = g.itinerary(a, b)
-                    if any(k == "ride" for k, *_ in legs):
-                        t = round(sum(m for *_, m in legs))
+                    if any(k == "ride" for k, *_ in legs):   # clock minutes, station to station: waits unweighted
+                        t = round(sum(m / ww if k == "wait" else m for k, *_, m in legs))
                         if sc == "two_million" and y == 2100:   # the lines the trip rides, for its map
                             row["lines"] = list(dict.fromkeys(run.line.id for k, _, _, run, _ in legs if k == "ride"))
                 row["ride"][f"{sc}_{y}"] = t
                 row["jobs45"][f"{sc}_{y}"] = int(round(float(runs[(sc, y)]["jobs45"][oz]), -2))
         row["opens"] = min(net.station_mode_years()[names[o]].values())
+        rail = [min((y for m, y in my[names[x]].items() if m in ("metro", "commuter")), default=9999) for x in (o, d)]
+        row["why"] = why.replace("{year}", str(max(rail)))   # when rail serves both ends
         conns.append(row)
 
-    # network lines, simplified, with the years each piece opens
-    lines = []
-    for ln in net.lines.values():
-        segs = []
-        for s in ln.segments:
-            if s.year >= 9999:
-                continue
-            pts = _simplify([(round(x, 5), round(y, 5)) for x, y in s.pts], 0.0006)
-            segs.append([s.year, [[round(x, 4), round(y, 4)] for x, y in pts]])
-        if segs:
-            lines.append({"id": ln.id, "name": ln.name, "mode": ln.mode, "color": ln.color,
-                          "existing": ln.status == "existing", "segs": segs})
+    # network lines, simplified, with the years each piece opens. Today's system (and the current
+    # track) is drawn from current_track, where today's lines keep their own names and colors (in
+    # the proposal several run through onto new lines)
+    def line_rows(n, last):
+        out = []
+        for ln in n.lines.values():
+            segs = []
+            for s in ln.segments:
+                if s.year > last:
+                    continue
+                pts = _simplify([(round(x, 5), round(y, 5)) for x, y in s.pts], 0.0006)
+                segs.append([s.year, [[round(x, 4), round(y, 4)] for x, y in pts]])
+            if segs:
+                out.append({"id": ln.id, "name": ln.name, "mode": ln.mode, "color": ln.color, "segs": segs})
+        return out
+    lines, lines_today = line_rows(net, 9998), line_rows(nets["current_track"], ex)
 
     budget = cfg0["budget"]["musd_per_year"]
     return {
         "years": {k: _years_csv(k) for k in ("current_track", "two_million", "plan")},
         "zones": zones, "stations": stations, "change": change, "connections": conns, "lines": lines,
+        "lines_today": lines_today, "range": rng,
         "assumptions": {
             "budget_musd": budget,
             "cost_per_km": {m: v for m, v in cfg0["cost_musd_per_km"].items() if not m.startswith("_")},

@@ -127,12 +127,15 @@ def cmd_values(args):
         with open(path, encoding="utf-8") as f:
             rows = [r for r in csv.DictReader(f) if r["line_id"] not in only] + rows
         for r in rows:
-            r["marginal_final"], r["cost_shared_musd"] = int(r["marginal_final"]), int(r["cost_shared_musd"])
+            for k in ("marginal_final", "marginal_alone", "cost_shared_musd"):
+                r[k] = int(float(r.get(k) or 0))
+            r["opex_musd"] = float(r.get("opex_musd") or 0)
             r["value_per_musd"] = float(r["value_per_musd"]) if r["value_per_musd"] != "" else ""
     evaluate.write_final_values(config.path("results", net.name), rows)
     for r in sorted(rows, key=lambda r: -(r["value_per_musd"] or 0)):
-        print(f"  {r['line_id']:6} {net.host_line(r['line_id']).name if not r['host'] else r['line_id'] + ' (via ' + r['host'] + ')':32}"
-              f" {r['marginal_final']:>8,} trips  ${r['cost_shared_musd']:>7,}M  {r['value_per_musd']}")
+        nm = net.host_line(r["line_id"]).name if not r["host"] else r["line_id"] + " (on " + r["host"] + ")"
+        print(f"  {r['line_id']:6} {nm:32} {r['marginal_final']:>8,} / {r['marginal_alone']:>8,} trips"
+              f"  ${r['cost_shared_musd']:>7,}M + ${r['opex_musd']:>6,.1f}M/yr  {r['value_per_musd']}")
     print(f"wrote {config.path('results', net.name, 'line_values.csv')}")
     return 0
 
