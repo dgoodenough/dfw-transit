@@ -1098,7 +1098,7 @@ function route() {
     else if (info.t === 'walk') legs.push({t: 'walk', from: p, to: v, min: w});
     else if (info.t === 'board') legs.push({t: 'wait', ri: info.ri, at: p, min: w - D.boardPenalty - X});
   }
-  const nB = legs.filter(l => l.t === 'wait').length, total = dist.get('P' + b) - nB * X - (nB ? D.boardPenalty : 0);   // the first boarding is no transfer
+  const nB = legs.filter(l => l.t === 'wait').length, total = dist.get('P' + b) - nB * (X + D.boardPenalty);   // clock minutes: the transfer penalty is perceived, not time
   let h = `<div class="tot">${A} → ${B}: ${Math.round(total)} min</div><div class="hint">${Y} network, station to station` +
     (hidden.size ? ', without the hidden lines' : '') + `.${clear}</div>`;
   h += transitLegs(legs, yd) + selfPowered(ptOf({sid: a}), ptOf({sid: b}), S.trip.rules[S.trip.yearRules[Y]]);

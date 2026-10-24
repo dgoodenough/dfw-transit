@@ -119,12 +119,12 @@ led to thirteen steps, and v2 implements the ones the data supports
 
 | | v1 plan | v2 plan (budget-constrained) | **2 million riders (default)** |
 |---|---|---|---|
-| Daily transit trips, 2050 (each trip counted once) | 319k | 370k | **866k** (705k on the low growth path) |
-| Daily transit trips, 2100 | 632k | 756k | **1.88M** (1.17M on the low growth path) |
-| Daily boardings, all modes, 2100 | 1.03M | 1.24M | **3.42M** |
-| Jobs the average resident reaches in 45 min, 2100 | 91k | 107k | **169k** |
-| Capital through 2100 (2025 $, lines, stations, garages) | $112.2B | $103.2B | **$136.4B** |
-| Operating cost, 2100 (per year: trains, buses, feeder buses, late-night service) | $2.6B | $2.7B | **$4.8B** |
+| Daily transit trips, 2050 (each trip counted once) | 331k | 370k | **919k** |
+| Daily transit trips, 2100 | 654k | 778k | **1.99M** (1.73M if growth follows the county forecasts; 1.23M on the low growth path) |
+| Daily boardings, all modes, 2100 | 1.06M | 1.28M | **3.60M** |
+| Jobs the average resident reaches in 45 min, 2100 | 93k | 106k | **178k** |
+| Capital through 2100 (2025 $, lines, stations, garages) | $112.2B | $103.4B | **$135.2B** |
+| Operating cost, 2100 (per year: trains, buses, feeder buses, late-night service) | $2.6B | $2.7B | **$4.9B** |
 | Validation: errors / islands | 1 / 10 | 0 / 0 | 0 / 0 |
 
 The **2 million riders** scenario adds an arterial BRT grid on real streets (10 weak corridors left out), an SH-114 metro, job-campus BRT and
@@ -132,8 +132,10 @@ infill stations, the D2 subway downtown, the Red Line on to McKinney, regional r
 2090s, through-running regional rail, frequent service, 15-minute feeder buses, bike and walk access, moderate upzoning with 20% of
 growth steered to station areas, and parking pricing (downtown prices double by 2050, $5/day at the densest job centers). With the
 2026 review's more realistic model (a 5-minute transfer penalty, faster driving on long trips, slower BRT, operating cost per
-train-hour) it no longer reaches 2 million: **about 1.9M daily trips in 2100 on the mid growth path, 1.2M on the low one**, so
-read the headline as a range. It stays within the flat $2.3B/yr budget for lines, stations and garages at 2025 peer unit costs that fall 25% by
+train-hour) it falls just short of 2 million: **about 2.0M daily trips in 2100 on the mid growth path, 1.7M if growth follows
+the county forecasts out to Collin and Denton, 1.2M on the low path**, so read the headline as a range. Today's network with
+no expansion (the current track) carries about 185k in 2100, or 327k with the plan's parking and access policies: the network
+itself multiplies ridership about 6 times, the network and policies together about 11. It stays within the flat $2.3B/yr budget for lines, stations and garages at 2025 peer unit costs that fall 25% by
 2055 as a steady program matures; feeder buses and operations are extra (see `scenarios/two_million/config.json`).
 Ridership is a model estimate calibrated to today's ~80k rail
 boardings; treat the long-range numbers as orders of magnitude.
