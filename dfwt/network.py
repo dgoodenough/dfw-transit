@@ -600,12 +600,13 @@ class Network:
     def capital_items(self, ln):
         """[(year, $M at 2025 prices, note)]: fixed works charged with a line (config
         capital_items: e.g. a pocket track where it runs over another line's track), in the year
-        its borrowed track opens (or its first year)."""
+        its borrowed track opens (or its first year), or the item's own "year" if later."""
         out = []
         for it in self.cfg.get("capital_items") or []:
             if isinstance(it, dict) and it.get("line_id") == ln.id:
                 ys = [s.year for s in ln.segments if s.borrowed] or [ln.first_year]
-                out.append((min(ys), float(it["musd"]), it.get("note", "")))
+                y = max(min(ys), int(it["year"])) if it.get("year") else min(ys)   # "year": not before (when it's needed)
+                out.append((y, float(it["musd"]), it.get("note", "")))
         return out
 
     def shared_cost_musd(self, ln, idx=None):

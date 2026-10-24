@@ -9,12 +9,14 @@
     {
       "line_id": "E19",
       "musd": 300,
-      "note": "4-car platforms on the I-20 Crosstown (review 3, R6: the I-20 / I-30 trunk is 88% full at 24 trains an hour with 3-car trains): about $6M a surface platform, $25M underground"
+      "note": "4-car platforms on the I-20 Crosstown (review 3, R6; built by 2060, as the trunk fills: the I-20 / I-30 trunk is 88% full at 24 trains an hour with 3-car trains): about $6M a surface platform, $25M underground",
+      "year": 2060
     },
     {
       "line_id": "E22",
       "musd": 275,
-      "note": "4-car platforms on the I-30 / FW Blue Line (review 3, R6), as on the I-20 Crosstown"
+      "note": "4-car platforms on the I-30 / FW Blue Line (review 3, R6; built by 2060, as the trunk fills), as on the I-20 Crosstown",
+      "year": 2060
     }
   ],
   "growth": {

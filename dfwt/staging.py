@@ -388,7 +388,7 @@ def _repair(scenario, rows, last_year, tries=150):
     """Per-stage costs (what exact_years schedules with) and the year-by-year spending
     check disagree a little where track ownership shifts. Close the gap locally: push the
     first stage that opens after the over-budget year back a year (and its line's later
-    stages with it), until the plan fits. Returns the rows, or None if it doesn't fit."""
+    stages with it), one without a deadline if there is one, until the plan fits. Returns the rows, or None if it doesn't fit."""
     from .network import Network
     from .validate import islands as find_islands
     rows = copy.deepcopy(rows)
@@ -402,10 +402,14 @@ def _repair(scenario, rows, last_year, tries=150):
         cand = [r for r in rows if r.get("locked") != "1" and r["kind"] != "via" and y < int(r["year_opens"]) <= y + cy]
         if not cand:
             return None
+        due = {id(test.stage_rows[i]) for i in _deadlines(test, test.stage_rows)}
+        free = [r for r in cand if id(r) not in due]   # delay a stage without a deadline first
+        cand = free or cand
         r = min(cand, key=lambda r: (int(r["year_opens"]), r["line_id"], -int(r["stage"])))
         new = int(r["year_opens"]) + 1
         for q in rows:
-            if q["line_id"] == r["line_id"] and q["kind"] != "via" and int(q["stage"]) >= int(r["stage"]) and int(q["year_opens"]) < new:
+            if q["line_id"] == r["line_id"] and q["kind"] != "via" and int(q["stage"]) >= int(r["stage"]) and int(q["year_opens"]) < new \
+                    and (q is r or id(q) not in due):   # a later stage with a deadline stays (keep_attached checks it still joins)
                 q["year_opens"] = str(new)
     return None
 
@@ -825,7 +829,7 @@ def _exact_years(net, rows, log=print, scale=1.0, floor=None):
     opened_km = collections.Counter()
 
     def fits(i, t):
-        if not km_cap:
+        if not km_cap or i in deadline:   # a deadline wins over the per-year limit
             return True
         host = net.host_line(rows[i]["line_id"])
         key = (host.id if host else rows[i]["line_id"], t)
