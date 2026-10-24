@@ -17,7 +17,8 @@ LABELS = {"two_million": "2 million riders by 2100 (default)", "plan": "v2 plan,
           "right_sized": "v2, suburban metro as BRT", "staged": "v2, optimizer's build order",
           "unstaged": "v2, lines open whole",
           "downtown_main": "Downtown FW: Main St trunk", "downtown_jones": "Downtown FW: Jones St trunk",
-          "downtown_events": "Downtown FW: Main St via Convention Center"}
+          "downtown_events": "Downtown FW: Main St via Convention Center",
+          "current_track": "Today's lines only (current track)"}
 
 # Regions for the Lines panel. Each stop falls in one of four zones, split along county
 # lines that are nearly straight survey lines: the Tarrant / Dallas county line

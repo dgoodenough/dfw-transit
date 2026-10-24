@@ -45,12 +45,14 @@ line, the 2-million plan's arterial grid included, tinted by area) and **Rail + 
 corridors** (rail and the plan's main BRT corridors: all 47 routes on top of the rail
 network would not stay legible, so the full BRT network has its own version).
 Geography gives way to straight lines: a line that runs along one
-axis overall (the Fort Worth north-south trunk, the east-west lines out to Ridgmar)
-is drawn on that axis through its junctions, turns cost more than a little
-geographic fidelity, and a turn straight back (a zig-zag) costs more still. Every
-walk transfer the model uses (stations within the walk radius, or linked in
-`transfers.csv`) is drawn: the layout pulls such stations side by side, and a pair
-it can't bring together gets a dotted walk link. Hover or tap a line to light up
+axis overall (the Fort Worth Main / Terminal - La Gran Plaza trunk, the east-west lines
+out to Ridgmar) is drawn on that axis through its junctions, turns cost more than a little
+geographic fidelity, a turn straight back (a zig-zag) costs more still, and no line is
+drawn doubling back on itself at a station. Stations a short walk apart (within 300 m)
+are one interchange ("Akard · Metro Center"); other walk transfers the model uses
+(stations within the walk radius, or linked in `transfers.csv`) are pulled side by side
+and joined by a short connector, and a longer walk is not drawn across the core but shown
+faintly when its station is selected. Hover or tap a line to light up
 its route; BRT routes are named at their ends. A trip that rides a mode the version
 leaves out says so and offers the version that shows it.
 
@@ -117,12 +119,12 @@ led to thirteen steps, and v2 implements the ones the data supports
 
 | | v1 plan | v2 plan (budget-constrained) | **2 million riders (default)** |
 |---|---|---|---|
-| Daily transit trips, 2050 (each trip counted once) | 319k | 370k | **866k** (705k on the low growth path) |
-| Daily transit trips, 2100 | 632k | 756k | **1.88M** (1.17M on the low growth path) |
-| Daily boardings, all modes, 2100 | 1.03M | 1.24M | **3.42M** |
-| Jobs the average resident reaches in 45 min, 2100 | 91k | 107k | **169k** |
-| Capital through 2100 (2025 $, lines, stations, garages) | $112.2B | $103.2B | **$136.4B** |
-| Operating cost, 2100 (per year: trains, buses, feeder buses, late-night service) | $2.6B | $2.7B | **$4.8B** |
+| Daily transit trips, 2050 (each trip counted once) | 331k | 370k | **919k** |
+| Daily transit trips, 2100 | 654k | 778k | **1.99M** (1.73M if growth follows the county forecasts; 1.23M on the low growth path) |
+| Daily boardings, all modes, 2100 | 1.06M | 1.28M | **3.60M** |
+| Jobs the average resident reaches in 45 min, 2100 | 93k | 106k | **178k** |
+| Capital through 2100 (2025 $, lines, stations, garages) | $112.2B | $103.4B | **$135.2B** |
+| Operating cost, 2100 (per year: trains, buses, feeder buses, late-night service) | $2.6B | $2.7B | **$4.9B** |
 | Validation: errors / islands | 1 / 10 | 0 / 0 | 0 / 0 |
 
 The **2 million riders** scenario adds an arterial BRT grid on real streets (10 weak corridors left out), an SH-114 metro, job-campus BRT and
@@ -130,8 +132,10 @@ infill stations, the D2 subway downtown, the Red Line on to McKinney, regional r
 2090s, through-running regional rail, frequent service, 15-minute feeder buses, bike and walk access, moderate upzoning with 20% of
 growth steered to station areas, and parking pricing (downtown prices double by 2050, $5/day at the densest job centers). With the
 2026 review's more realistic model (a 5-minute transfer penalty, faster driving on long trips, slower BRT, operating cost per
-train-hour) it no longer reaches 2 million: **about 1.9M daily trips in 2100 on the mid growth path, 1.2M on the low one**, so
-read the headline as a range. It stays within the flat $2.3B/yr budget for lines, stations and garages at 2025 peer unit costs that fall 25% by
+train-hour) it falls just short of 2 million: **about 2.0M daily trips in 2100 on the mid growth path, 1.7M if growth follows
+the county forecasts out to Collin and Denton, 1.2M on the low path**, so read the headline as a range. Today's network with
+no expansion (the current track) carries about 185k in 2100, or 327k with the plan's parking and access policies: the network
+itself multiplies ridership about 6 times, the network and policies together about 11. It stays within the flat $2.3B/yr budget for lines, stations and garages at 2025 peer unit costs that fall 25% by
 2055 as a steady program matures; feeder buses and operations are extra (see `scenarios/two_million/config.json`).
 Ridership is a model estimate calibrated to today's ~80k rail
 boardings; treat the long-range numbers as orders of magnitude.
@@ -152,13 +156,17 @@ Live numbers are in [`reports/RESULTS.md`](reports/RESULTS.md).
   as overlays: the untouched v1 plan, the v2 plan's hand-set phasing from before
   the optimizer, and a "right-sized" version with suburban metro as BRT. Every build compares them side by side.
 - **Phasing follows demand, and doesn't flip between builds.** In the 2 million
-  scenario each line is valued by the trips lost if it's removed from the 2100 network
-  (on one land use, the network's with everything open), per $M of its share of
-  capital (shared track and stations split among their lines, 2025 prices), so the value
-  doesn't depend on which line opens first (`python -m dfwt values`). The schedule starts
-  from the generated stages every time, takes lines by value with a few rules (downtown
-  cores no later than in the budget plan, every county's fair share of the money, every
-  city over 150,000 served by about 2040, no short stubs), and a second run moves nothing.
+  scenario each line is valued two ways in 2100, on one land use (the network's with
+  everything open): the trips lost when its stages are held back from the full network,
+  and the trips it adds on its own to the network without the new lines. The average is
+  divided by its share of capital (shared track and stations split among their lines,
+  2025 prices) plus 20 years of its operating cost, so the value doesn't depend on which
+  line opens first; a line that runs through onto another is valued by its own stages
+  (`python -m dfwt values`). The schedule starts from the generated stages every time,
+  takes lines by value with a few rules (downtown cores and the inner ring no later than
+  in the budget plan, every county's fair share of the money over each ten years, every
+  city over 150,000 served by about 2040, no short stubs, no more than a stage's worth of
+  a line opening in one year), warns about any missed deadline, and a second run moves nothing.
 - **Geometry stays buildable.** Commuter rail follows existing rail, metro follows
   existing right-of-way, BRT follows ROW only, and river tunnels are minimized.
 - **Portable stack.** Python 3 + numpy, and Leaflet. It runs anywhere, with tests

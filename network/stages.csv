@@ -17,33 +17,33 @@ E16,2,extension,Turtle Creek,Elsie Faye Heggins / M Wright,2047,,,,,optimizer
 E16,3,extension,Frankford / Vail,Forest and Marsh,2047,,,,,optimizer
 E17,1,starter,Addison Circle,First Baptist Medical Center,2039,,,,,optimizer
 E17,2,extension,Legacy West,Addison Circle,2039,,,,,optimizer
-E17,3,extension,First Baptist Medical Center,Pearl/Arts District,2043,,,,,optimizer
-E17,4,extension,Frisco Main St,Legacy West,2043,,,,,optimizer
-E17,5,extension,Pearl/Arts District,Buckner Boulevard / Forney Road,2050,,,,,optimizer
-E17,6,extension,Buckner Boulevard / Forney Road,Rowlett,2054,,,,,optimizer
+E17,3,extension,First Baptist Medical Center,Pearl/Arts District,2040,,,,,optimizer
+E17,4,extension,Frisco Main St,Legacy West,2040,,,,,optimizer
+E17,5,extension,Pearl/Arts District,Buckner Boulevard / Forney Road,2051,,,,,optimizer
+E17,6,extension,Buckner Boulevard / Forney Road,Town East / Belt Line,2056,,,,,optimizer
 E18,1,starter,Irving West,Bachman Lake,2052,,,,,optimizer
 E18,2,extension,Bachman Lake,Saint Paul,2052,,,,,optimizer
 E18,3,extension,Saint Paul,Buckner Boulevard / Forney Road,2053,,,,,optimizer
 E18,4,extension,Buckner Boulevard / Forney Road,Main / Galloway,2056,,,,,optimizer
 E19,1,starter,Commerce / Fort Worth Avenue,Central / Hall,2043,,,,,optimizer
-E19,2,extension,Central / Hall,Ross / Bennett,2046,,,,,optimizer
-E19,3,extension,Ross / Bennett,Lakewood,2046,,,,,optimizer
-E19,4,extension,Zang / 12th Street,Commerce / Fort Worth Avenue,2046,,,,,optimizer
-E19,5,extension,Lakewood,Kingsley / Wood,2054,,,,,optimizer
-E19,6,extension,Center / Main,Zang / 12th Street,2057,,,,,optimizer
-E19,7,extension,Outlet Mall,Center / Main,2059,,,,,optimizer
+E19,2,extension,Central / Hall,Ross / Bennett,2043,,,,,optimizer
+E19,3,extension,Ross / Bennett,Lakewood,2043,,,,,optimizer
+E19,4,extension,Zang / 12th Street,Commerce / Fort Worth Avenue,2043,,,,,optimizer
+E19,5,extension,Lakewood,Kingsley / Wood,2056,,,,,optimizer
+E19,6,extension,Center / Main,Zang / 12th Street,2056,,,,,optimizer
+E19,7,extension,Outlet Mall,Center / Main,2058,,,,,optimizer
 E19,8,extension,Parks Mall,Outlet Mall,2059,,,,,optimizer
-E19,9,extension,Berry / Stalcup,Parks Mall,2066,,,,,optimizer
+E19,9,extension,Berry / Stalcup,Parks Mall,2065,,,,,optimizer
 E20,1,starter,DFW Airport Terminal B,Shiloh Road,2025,,,,,
-E21,1,starter,#1,Rowlett,2031,,,,,optimizer
-E21,2,extension,Rowlett,1st Street / Castle,2031,,,,,optimizer
+E21,1,starter,#1,Town East / Belt Line,2031,,,,,optimizer
+E21,2,extension,Town East / Belt Line,1st Street / Castle,2031,,,,,optimizer
 E21,3,extension,1st Street / Castle,Belt Line / Quorum,2035,,,,,optimizer
-E21,4,extension,Belt Line / Quorum,Downtown Carrollton,2035,,,,,optimizer
-E21,5,extension,Downtown Carrollton,Belt Line / Irving Boulevard,2036,,,,,optimizer
+E21,4,extension,Belt Line / Quorum,Downtown Carrollton,2036,,,,,optimizer
+E21,5,extension,Downtown Carrollton,Belt Line / Irving Boulevard,2037,,,,,optimizer
 E21,6,extension,Belt Line / Irving Boulevard,Jefferson / Belt Line,2037,,,,,optimizer
 E21,7,extension,Jefferson / Belt Line,FM 1382 / Old Straus,2037,,,,,optimizer
-E21,8,extension,FM 1382 / Old Straus,Wilmer,2054,,,,,optimizer
-E21,9,extension,Wilmer,#66,2055,,,,,optimizer: closes the ring at Main / Galloway
+E21,8,extension,FM 1382 / Old Straus,Wilmer,2053,,,,,optimizer
+E21,9,extension,Wilmer,#66,2053,,,,,optimizer: closes the ring at Main / Galloway
 E22,1,starter,Cockrell Hill Road,Commerce / Fort Worth Avenue,2052,,,,,optimizer
 E22,2,extension,Commerce / Fort Worth Avenue,Garland Road / Buckner Boulevard,2052,,,,,optimizer
 E22,3,extension,Jefferson / Belt Line,Cockrell Hill Road,2060,,,,,optimizer
@@ -51,30 +51,30 @@ E22,4,extension,Davis Drive,Jefferson / Belt Line,2063,,,,,optimizer
 E22,5,extension,Handley,Davis Drive,2063,,,,,optimizer
 E22,6,extension,Garland Road / Buckner Boulevard,Kingsley / Wood,2063,,,,,optimizer
 E23,1,starter,Estelle,Jackson / Belt Line,2060,,,,,optimizer
-E23,2,extension,Jackson / Belt Line,Great Southwest Parkway,2061,,,,,optimizer
-E23,3,extension,Cowboys/Rangers Stadiums,Estelle,2061,,,,,optimizer
+E23,2,extension,Cowboys/Rangers Stadiums,Estelle,2061,,,,,optimizer
+E23,3,extension,Jackson / Belt Line,Great Southwest Parkway,2062,,,,,optimizer
 E23,4,extension,Parks Mall,Cowboys/Rangers Stadiums,2062,,,,,optimizer
-E23,5,extension,Great Southwest Parkway,Lake Port Village,2064,,,,,optimizer
+E23,5,extension,Great Southwest Parkway,Lake Port Village,2065,,,,,optimizer
 E23,6,extension,Mansfield,Parks Mall,2069,,,,,optimizer
 E24,1,starter,Berry / McCart,Ridglea Hills,2031,,,,,optimizer
 E24,2,extension,Ridglea Hills,#31,2031,,,,,optimizer
 E24,3,extension,Berry / Riverside,Berry / McCart,2031,,,,,optimizer
 E24,4,extension,Berry / Miller,Berry / Riverside,2031,,,,,optimizer
-E24,5,extension,Marine Park,Berry / Miller,2053,,,,,budget scheduler
-E24,6,extension,#1,Marine Park,2054,,,,,budget scheduler
+E24,5,extension,Marine Park,Berry / Miller,2052,,,,,budget scheduler
+E24,6,extension,#1,Marine Park,2052,,,,,budget scheduler
 E25,1,starter,Parker Road,McKinney,2030,,,,,optimizer
-E26,1,starter,Pearl/Arts District,Spring Creek Parkway,2043,,,,,optimizer
+E26,1,starter,Pearl/Arts District,Spring Creek Parkway,2046,,,,,optimizer
 E27,1,starter,Medical/Market Center,Abrams / La Vista,2030,,,,,optimizer
 E28,1,starter,Forest and Marsh,LBJ/Skillman,2030,,,,,optimizer
 E29,1,starter,Union Station,Cockrell Hill Road,2030,,,,,optimizer
 E30,1,starter,Fort Worth T&P,Alvarado,2036,,,,,optimizer
-E31,1,starter,Decatur,Saginaw,2065,,,,,optimizer
-E31,2,extension,Saginaw,Fort Worth Central,2065,,,,,optimizer
-E31,3,extension,Bowie,Decatur,2069,,,,,budget scheduler
+E31,1,starter,Decatur,Saginaw,2066,,,,,optimizer
+E31,2,extension,Saginaw,Fort Worth Central,2066,,,,,optimizer
+E31,3,extension,Bowie,Decatur,2067,,,,,budget scheduler
 E32,1,starter,Bailey Boswell / Basswood,Fort Worth Central,2033,,,,,optimizer
 E32,2,extension,Gainesville,Bailey Boswell / Basswood,2069,,,,,budget scheduler
 E33,1,starter,Trinity Mills,Main / Frisco Street,2030,,,,,optimizer
-E33,2,extension,Main / Frisco Street,Sherman,2057,,,,,optimizer
+E33,2,extension,Main / Frisco Street,Sherman,2058,,,,,optimizer
 E34,1,starter,Dallas,Main / Scyene,2030,,,,,optimizer
 E34,2,extension,Main / Scyene,Terrell,2033,,,,,optimizer
 E35,1,starter,Dallas,Hutchins,2075,,,,,optimizer
@@ -87,13 +87,13 @@ F01,1,starter,Courthouse,7th Street / Carroll,2042,,,,,optimizer
 F01,2,extension,Woodhaven,Courthouse,2042,,,,,optimizer
 F01,3,extension,7th Street / Carroll,Ridglea Hills,2047,,,,,optimizer
 F01,4,extension,Ridglea Hills,Ridgmar Mall / BRT Transfer,2048,,,,,budget scheduler
-F02,1,starter,Central Station,7th Street / Carroll,2046,,,,,optimizer
-F02,2,extension,Handley,Central Station,2054,,,,,optimizer
-F02,3,extension,7th Street / Carroll,Ridgmar Mall / BRT Transfer,2054,,,,,optimizer
+F02,1,starter,Fort Worth Central,7th Street / Carroll,2046,,,,,optimizer
+F02,2,extension,Handley,Fort Worth Central,2055,,,,,optimizer
+F02,3,extension,7th Street / Carroll,Ridgmar Mall / BRT Transfer,2055,,,,,optimizer
 F03,1,starter,Main / Terminal,Medical City - Baylor,2035,,,,1,Stockyards/Panther Island leg pinned to 2035 by the owner (tourism + TOD demand LODES undercounts)
 F04,1,starter,Main / Terminal,John Peter Smith,2046,,,,,optimizer
-F04,2,extension,John Peter Smith,Everman,2068,,,,,optimizer
+F04,2,extension,John Peter Smith,Everman,2066,,,,,optimizer
 F05,1,starter,Lake Worth,TCC Trinity River,2052,,,,,optimizer
 F05,2,extension,TCC Trinity River,Berry / Stalcup,2064,,,,,optimizer
 F06,1,starter,Benbrook,Museum Way,2057,,,,,optimizer
-F07,1,starter,Central Station,Bluebonnet Circle,2039,,,,,optimizer
+F07,1,starter,Fort Worth Central,Bluebonnet Circle,2039,,,,,optimizer

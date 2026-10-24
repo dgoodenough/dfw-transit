@@ -224,7 +224,6 @@ X474,Fort Worth Stockyards National Historic District E,28th Street / Sylvania,3
 X480,Ederville N,Handley Ederville / Randol Mill,32.778605,-97.217085,cross streets Handley Ederville x Randol Mill (52 m)
 X482,Ederville SW,Loop 820 / Meadowbrook,32.748642,-97.221013,cross streets Loop 820 x Meadowbrook (292 m)
 X483,Handley,Loop 820 / Tension,32.732446,-97.225386,cross streets Loop 820 x Tension (181 m)
-X484,Berry/Stalcup,Berry / Stalcup,32.708631,-97.237985,"one station, one spelling (the plan's)"
 X485,Lindberg NW,Berry / Miller,32.713742,-97.260889,cross streets Berry x Miller (185 m)
 X489,TCU E,Berry / McCart,32.706084,-97.353596,cross streets Berry x McCart (17 m)
 X490,Bluebonnet Circle,Berry / Stadium,32.702455,-97.365547,cross streets Berry x Stadium (29 m)
@@ -2224,3 +2223,13 @@ XS1053,Country Club Drive,Ragland Road,32.597775,-97.100887,street Ragland Road 
 XS1054,Country Club / Matlock,Matlock / Ragland,32.594296,-97.108069,"nearest streets Matlock (46 m), Ragland (446 m)"
 XS1056,Country Club / Clover Hill,Clover Hill Road,32.587473,-97.122524,street Clover Hill Road (409 m)
 XS1058,Walnut Creek / US-287,Walnut Creek / Pleasant Ridge,32.578497,-97.132517,cross streets Walnut Creek x Pleasant Ridge (394 m)
+X248,Rowlett,Town East / Belt Line,32.814214,-96.595111,review 3: 'Rowlett' is in Mesquite; cross streets Town East x Belt Line
+X209,Pearl,Pearl / Cedar Springs,32.793373,-96.804541,review 3: one of four 'Pearl's; cross streets Pearl x Cedar Springs
+X501,Frisco,Main / 5th Street,33.150543,-96.823930,review 3: two 'Frisco' stations 1 km apart; cross streets Main x 5th Street
+XS0065,Frisco Station,John Hickman / Legendary,33.112500,-96.811100,review 3: 'Frisco Station' beside 'Frisco'; cross streets John Hickman x Legendary
+X217,The T's,John Hickman / Dallas Parkway,33.116544,-96.823901,review 3: 'The T's' means nothing to riders; cross streets John Hickman x Dallas Parkway
+XS0444,The W's,Colony Boulevard,33.097803,-96.880916,review 3: 'The W's' is a neighbourhood 600 m away; on North Colony Boulevard
+X344,Addison Double East,Belt Line / Preston,32.954038,-96.803655,review 3: 'Addison Double East'; cross streets Belt Line x Preston
+X347,Addison S Central,Belt Line / Midway,32.954423,-96.838661,review 3: 'Addison S Central'; cross streets Belt Line x Midway Road
+S011,Central Station,Fort Worth Central,32.752543,-97.326747,review 3: the metro platform at Fort Worth Central (120 m from the regional rail one) takes its name
+S012,T&P Station,Fort Worth T&P,32.745606,-97.327894,review 3: the metro platform at Fort Worth T&P (110 m from the regional rail one) takes its name

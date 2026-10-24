@@ -92,7 +92,7 @@ class NetworkTests(unittest.TestCase):
         cost = sum(net.line_cost_musd(l) for l in net.lines.values())
         net.apply_edits([{"op": "run_over", "target": "F07", "field": "F02", "value": "TCC Trinity River"}])
         names = [net.stations[s].name for s in ln.stop_ids]
-        self.assertEqual(names[:3], ["TCC Trinity River", "Sundance Square", "Central Station"])
+        self.assertEqual(names[:3], ["TCC Trinity River", "Sundance Square", "Fort Worth Central"])
         self.assertEqual(len(ln.stop_ids), n_stops + 2)
         self.assertEqual(len(ln.segments), len(ln.stop_ids) - 1)
         self.assertAlmostEqual(ln.km, km + sum(s.km for s in ln.segments[:2]), places=6)
@@ -110,7 +110,8 @@ class NetworkTests(unittest.TestCase):
             for lid in lines:
                 ln = net.lines[lid]
                 k = ln.stop_ids.index("XI01")
-                self.assertEqual(ln.stop_years[k], max(s.year for s in ln.segments[max(k - 1, 0):k + 1]), (sc, lid))
+                own = max(s.year for s in ln.segments[max(k - 1, 0):k + 1])
+                self.assertEqual(ln.stop_years[k], max(own, 2030), (sc, lid))   # infill.csv year_min 2030
                 self.assertLess(ln.stop_years[k], 2100)
 
     def test_no_new_garages_downtown(self):
@@ -463,6 +464,64 @@ class LandUsePolicyTests(unittest.TestCase):
         self.assertEqual(float(cov[usd > 0].max()), 0.0)             # no cash-out where parking is priced
 
 
+
+class Review3Tests(unittest.TestCase):
+    """Round-3 review fixes: interim express buses, riding open track, one budget rule,
+    county-led growth, area-weighted walksheds."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls.net = Network.load("two_million")
+
+    def test_interim_express_retires_when_its_rail_opens(self):
+        ln = self.net.lines["XE02"]
+        self.assertNotIn("XE03", self.net.lines)   # the Red Line reaches McKinney (2030) before the express would start
+        self.assertLess(ln.retire, 9999)
+        runs = lambda y: any(r.line.id == "XE02" for r in self.net.runs(y))
+        self.assertTrue(runs(ln.retire - 1))
+        self.assertFalse(runs(ln.retire))
+
+    def test_express_speed_is_slower_than_the_freeway(self):
+        for lid in ("XE01", "XE02"):
+            self.assertLess(self.net.lines[lid].cruise_kmh, 60)
+
+    def test_a_line_rides_track_another_line_opened(self):
+        n = self.net
+        first = {}
+        for ln in n.lines.values():
+            for i, s in enumerate(ln.segments):
+                k = (ln.mode, frozenset(ln.stop_ids[i:i + 2]))
+                first[k] = min(first.get(k, 9999), s.year)
+        ln = n.lines["E22"]
+        for i, s in enumerate(ln.segments):   # never waits for its own stage on open, connected track
+            k = (ln.mode, frozenset(ln.stop_ids[i:i + 2]))
+            nb = [ln.segments[j].year for j in (i - 1, i + 1) if 0 <= j < len(ln.segments)]
+            self.assertLessEqual(s.year, max(first[k], min(nb)))
+
+    def test_scheduler_and_check_share_one_budget_rule(self):
+        from dfwt import staging
+        cfg = self.net.cfg
+        cap = cfg["budget"]["musd_per_year"] * (1 + cfg["budget"]["tolerance"]) * 10
+        self.assertTrue(staging.within_budget(cap, cfg, 10))
+        self.assertFalse(staging.within_budget(cap + 1, cfg, 10))
+
+    def test_county_led_growth_keeps_the_regional_total(self):
+        cfg = config.load()
+        z = demand.Zones(cfg)
+        even = growth.grown_zones(z, self.net, 2100, cfg)
+        cfg["growth"]["spatial"] = "county"
+        fringe = growth.grown_zones(z, self.net, 2100, cfg)
+        self.assertAlmostEqual(fringe.pop.sum() / even.pop.sum(), 1.0, places=2)
+        collin = np.array([i.startswith("48085") for i in z.ids])
+        self.assertGreater(fringe.pop[collin].sum(), even.pop[collin].sum())
+
+    def test_walksheds_count_part_of_a_block_group(self):
+        z = demand.Zones(config.load())
+        ws = growth.walksheds(z)
+        share = ws.share(ws.cells_near(float(z.x[0]), float(z.y[0])))
+        self.assertTrue(((share >= 0) & (share <= 1)).all())
+        self.assertGreater(share[0], 0)
+
 if __name__ == "__main__":
     unittest.main()
 
@@ -537,7 +596,7 @@ class StagingTests(unittest.TestCase):
             {"line_id": "E17", "stage": "2", "kind": "extension", "from_stop": "Frisco Main St",
              "to_stop": "Galleria", "year_opens": "2050"},
             {"line_id": "E17", "stage": "3", "kind": "extension", "from_stop": "Pearl/Arts District",
-             "to_stop": "Rowlett", "year_opens": "2055"},
+             "to_stop": "Town East / Belt Line", "year_opens": "2055"},
         ]
         net = Network.load(stage_rows=rows)
         km = {y: sum(sum(r.hop_km) for r in net.runs(y) if r.line.id == "E17") for y in (2045, 2050, 2055)}

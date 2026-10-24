@@ -422,3 +422,99 @@ From the second review (experts, six residents across the region, and a downtown
   - BRT routes are named and tinted by area;
   - area names sit at each city's core station;
   - fewer label collisions.
+
+## v2.14 — Third review: honest baselines, fairer early decades, faster fixes
+
+From the third review (experts and residents on v2.13 and the new story page). The owner
+approved all of the recommendations.
+
+**Headline numbers.** The 2 million riders scenario carries ~919k daily trips in 2050 and ~1.99M
+in 2100. It carries ~1.73M if growth follows the county forecasts out to Collin and Denton (new:
+`growth.spatial = "county"`), and ~1.23M on the low growth path. The budget plan carries ~370k
+and ~778k. Capital is $135.2B and $103.4B; operating cost in 2100 is $4.9B and $2.7B a year.
+Today's network with no expansion (the current track) carries ~185k in 2100. Run with the plan's
+parking and access policies, it carries ~327k. The story now shows both baselines: the network
+alone multiplies ridership about 6 times, and the network with the policies about 11 (5-12 across
+the growth cases).
+
+**Bugs fixed.**
+- **Express buses.**
+  - They are routed on the freeway network (`tools/express_buses.py`) and run at freeway speed
+    only on the freeway parts: I-35E 51 km/h (every 7.5 min), Mesquite 51 km/h.
+  - An interim express stops when its rail opens (`retire_with`). It is dropped altogether if the
+    rail opens first: the McKinney Express goes, because the Red Line reaches McKinney in 2030.
+- **Duplicate stations merged.** Handley, Berry / Stalcup, TCC Trinity River and Fair Oaks each
+  had two ids a few metres apart, which wasted access slots and paid for two platforms. A
+  station also takes only one of a block group's eight access slots.
+- **Stops open with their track.** About 110 stops on new track used to open five years after
+  it; they now open with it. Rescheduling the plan to fit the earlier spending moves 27 of 98
+  stages by 1-3 years.
+- **Today's lots.** Today's park & ride lots stay on lines that run through onto new track
+  (Dallas Zoo, Tyler / Vernon).
+- **Line values.** A line is valued by its own stages, so a through-run (Red Line to McKinney)
+  is no longer scored as if riders had to change. It is valued two ways:
+  - the trips lost when its stages are held back from the full 2100 network;
+  - the trips it adds to the network without the new lines.
+  The average is divided by its share of capital plus 20 years of operating cost.
+- **Scheduling.**
+  - One budget rule is shared by the scheduler and the check.
+  - Missed deadlines are reported.
+  - The budget repair delays stages without a deadline first.
+  - Two schedules in a row are identical, and every deadline is met.
+- **Story.**
+  - Today's maps show today's lines, including TRE, TEXRail, the Red Line and the A-train.
+  - Station areas count the share of each block group's land within a walk, so no station
+    shows 0 residents.
+  - Station cards: platform level over time, service in the year a station is open, today's lots,
+    one entry per place.
+  - Wrong claims corrected: "ten times either way", "grow exactly as on the current track",
+    "commuters only", 43% vs 38%, the $277 / $271 / $270 per resident, DNT East in the 2040s,
+    "one line between the downtowns".
+- **Trip planner.**
+  - Totals are clock minutes; the transfer penalty is perceived, not added.
+  - One clear note when a faster trip exists.
+  - No doubled line names.
+  - "Today's lines only" is labelled in the plan picker.
+
+**Owner decisions R1-R7.**
+- **Service.**
+  - I-30 and FW Blue run through at Handley as one line.
+  - A line runs over track another line has already opened (`staging.ride_open_track`), so I-30
+    uses the I-20 Crosstown's downtown track from 2043.
+  - DNT East and Legacy run every 7.5 min.
+  - 4-car trains on the I-20 / I-30 trunk, with platforms built by 2060 ($575M).
+- **Trims.** FW Orange every 10 min, Riverside-Forest Hill every 12, Bowie and Gainesville at
+  rush hours only. The Waxahachie Line is left out (about 436 trips for $1.5B).
+- **Late night** is added on FW Blue, FW Purple, Jefferson BRT and the streetcars.
+- **Order.**
+  - The inner ring opens no later than in the budget plan: I-20 to Oak Cliff, the FW Crosstown
+    Loop, FW Green and Blue west of 7th Street, and DNT West north.
+  - Knox-Henderson infill opens in 2035.
+  - Fair share is measured over ten-year bands. Collin gets 16% of capital through the 2030s
+    (it had none before 2040); Denton is still short (4-7% against 12% of population).
+  - No more than a stage's worth of a line opens in one year, unless a deadline requires it.
+- **Consequence of counting operating cost.** The SH-114 Line ranks lower (5.6 trips per $M) and
+  opens in 2066, not 2031.
+- **Station names.** Town East / Belt Line (was "Rowlett", in Mesquite), Pearl / Cedar Springs,
+  Fort Worth Central and Fort Worth T&P for the metro platforms, Main / 5th Street (Frisco),
+  John Hickman / Legendary, John Hickman / Dallas Parkway, Colony Boulevard, Belt Line / Preston,
+  Belt Line / Midway.
+- **Story.**
+  - The case is framed as reach, not speed.
+  - Connections: Bishop Arts - Deep Ellum, Stockyards - Magnolia, and downtown to downtown (no
+    high-speed link is planned).
+  - Operating cost per resident, Mobility 2050's $57.9B (likely including operations) put in
+    context, the 2100 population cited.
+  - Votes chart sorted with a 50% line.
+  - City names and labelled colour steps on the maps.
+  - Phone charts stay above the text.
+  - Better contrast, reduced motion and text equivalents for the charts.
+  - Links into the map (`map.html#station=`, `#trip=`, `#year=`).
+- **Diagram (owner's screenshots).**
+  - Same-place interchanges are one node (Akard · Metro Center).
+  - Long walk links are no longer drawn across downtown Dallas.
+  - FW Pink runs straight north-south through La Gran Plaza.
+  - No line doubles back around DFW Airport, Grapevine and Las Colinas.
+- **Recalibrated** after the access-slot fix: transit constant 0.3594 -> 0.4062.
+
+**Not done.** The one-seat Tollway - Las Colinas route and a Denton County corridor test.

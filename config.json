@@ -351,6 +351,8 @@
       "commuter": 4,
       "streetcar": 3
     },
+    "value_opex_years": 20,
+    "_doc_value": "Line values for the build order (evaluate.final_values): the mean of trips lost when a line is deferred from the finished network and trips gained when it alone is added to today's, per $M of its share of capital plus value_opex_years of its operating cost.",
     "max_stub_years": 20
   },
   "geometry": {
@@ -453,6 +455,7 @@
       "2100": 2.018
     },
     "case": "mid",
+    "spatial": "even",
     "alt": {
       "low_pop": {
         "2020": 1.0,
@@ -477,6 +480,17 @@
         "2080": 2.474,
         "2090": 2.67,
         "2100": 2.827
+      },
+      "county_weights": {
+        "_doc": "growth.spatial = \"county\": where growth lands when it follows the county forecasts instead of today's map. Each zone's growth (regional multiplier - 1) is scaled by its county's weight (jobs by jobs_factor of the deviation from 1), then normalized so the regional totals don't change. NCTCOG's county forecasts and recent Census estimates have Collin, Denton and the outer counties growing several times faster than Dallas County; these weights are milder than that trend (review 3, R4). The story reports it as the low end of the range.",
+        "weights": {
+          "48113": 0.5,
+          "48439": 1.0,
+          "48085": 1.8,
+          "48121": 1.8
+        },
+        "other": 2.0,
+        "jobs_factor": 0.5
       }
     },
     "tod": {
@@ -565,7 +579,7 @@
   },
   "ridership": {
     "_doc": "Daily riders from the commute model (dfwt/demand.py). Each commute chooses drive, transit or walk/bike the whole way (multinomial logit, drive is the reference). Transit utility: asc + b_ivt*(drive - transit door-to-door minutes) - b_ovt_extra*(access + egress minutes) - b_ratio*(how far transit exceeds 1x the drive time, as a ratio) + 0.125/$ x (driving cost avoided at drive_usd_per_km + parking avoided at paid-parking destinations). FTA/MWCOG ranges: IVT -0.02..-0.03/min, out-of-vehicle 2-3x. asc is calibrated so the 2025 network carries today's rail ridership with today's buses as feeders; active.asc so ~2% walk or bike. Transit commuters x telework; daily trips = commuters x round_trip / work_share_of_transit_trips; boardings = trips x boardings per trip (from the load assignment). Drive-to-transit has its own constant (pnr_asc_offset, as in MPO models: parking, walking in from the lot), set so about half of 2025 rail riders drive to a garage, near DART's on-board surveys; riders without a car (no_car) can't.",
-    "asc": 0.3594,
+    "asc": 0.4062,
     "b_ivt_per_min": 0.025,
     "b_ovt_extra_per_min": 0.0375,
     "b_per_dollar": 0.125,
@@ -698,7 +712,14 @@
       "from_year": 2030,
       "hours": 3,
       "headway_min": 20,
-      "lines": ["E12", "E13", "E14", "E15", "F03", "E10"],
+      "lines": [
+        "E12",
+        "E13",
+        "E14",
+        "E15",
+        "F03",
+        "E10"
+      ],
       "feeder_share": 0.05
     }
   }

@@ -40,7 +40,7 @@
    "source": "NCTCOG news release, 'DFW Transportation-AQ Balance Approved by Federal Government'",
    "url": "https://nctcog.org/trans/about/news/dfw-transportation-aq-balance-approved-by-federal-government",
    "year": 2025,
-   "note": "Year-of-expenditure dollars, 2025-2050"
+   "note": "Year-of-expenditure dollars, 2025-2050. The 'Rail & Bus' line likely includes operating and maintaining today's systems (NCTCOG's financial chapter files transit operations and maintenance under transit), so it isn't directly comparable to this plan's capital-only budget."
   },
   "m2050need": {
    "source": "NCTCOG Mobility 2050, Chapter 8 Conclusion",
@@ -191,6 +191,12 @@
    "url": "https://www.dart.org/about/news-and-events/newsreleases/newsrelease-detail/silver-line-launches-oct.-25--connecting-seven-cities-and-dfw-airport-with-modern--reliable-transit",
    "year": 2025,
    "note": null
+  },
+  "pop2100": {
+   "source": "NCTCOG Mobility 2050 demographic forecast (12.4 million by 2050); extended to 2100 by this project along the Census Bureau's 2023 national projections, which flatten after mid-century",
+   "url": "https://www.nctcog.org/regional-data/demographic-forecasts",
+   "year": 2025,
+   "note": "Beyond 2050 the population is this project's assumption, not an official forecast."
   }
  },
  "steps": {
@@ -244,7 +250,7 @@
   ],
   "budget": [
    [
-    "That is not a radical number. Mobility 2050 already plans about $57.9 billion for transit over 25 years, a little over $2 billion a year, beside $97.5 billion for roads. The difference is that this plan keeps going, every year, on a network designed around where people live and work.",
+    "That is not a radical number. Mobility 2050 already plans about $57.9 billion for rail and bus over 25 years, beside $97.5 billion for roads, though that figure most likely also pays to run and maintain today's systems, while this plan's {budget_b} a year is for building alone (running the new lines costs about {opex_2050} a year by 2050, {opex_per_res} per resident). The difference is that this plan keeps going, every year, on a network designed around where people live and work.",
     [
      "m2050"
     ]
@@ -252,7 +258,7 @@
   ],
   "peers": [
    [
-    "Other American regions already spend this much. Seattle's Sound Transit 3 spends about $630 per resident a year and LA's Measure M about $310. This plan is about $270 per resident today.",
+    "Other American regions already spend this much. Seattle's Sound Transit 3 spends about $630 per resident a year and LA's Measure M about $310. This plan is about {per_res} per resident today.",
     [
      "st3",
      "measurem",
@@ -436,8 +442,8 @@
     },
     {
      "label": "This plan, today",
-     "value": 271,
-     "text": "$271",
+     "value": null,
+     "text": "",
      "plan": true
     },
     {
@@ -459,9 +465,14 @@
    ]
   },
   "_appetite": {
-   "title": "Share voting for transit",
-   "sub": "Percent of votes, recent Texas elections",
+   "title": "Recent votes on transit in Texas",
+   "sub": "Share voting yes (for a transit tax or plan, or to stay in DART)",
    "rows": [
+    {
+     "label": "Addison: stay in DART (2026)",
+     "value": 70,
+     "text": "70%"
+    },
     {
      "label": "San Antonio, VIA (2020)",
      "value": 68,
@@ -471,11 +482,6 @@
      "label": "Houston, METRONext (2019)",
      "value": 67.9,
      "text": "68%"
-    },
-    {
-     "label": "Addison: stay in DART (2026)",
-     "value": 70,
-     "text": "70%"
     },
     {
      "label": "Austin, Project Connect (2020)",

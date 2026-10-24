@@ -51,7 +51,8 @@ class StationNameTests(unittest.TestCase):
         for m in self.mapping:
             for sid in existing:
                 s = st[sid]
-                if s["name"] in (m["old_name"], m["new_name"]):
+                adopts = m["station_id"] != sid and s["name"] == m["new_name"]   # another platform takes this name
+                if s["name"] in (m["old_name"], m["new_name"]) and not adopts:
                     self.assertGreater(rs.km(s["lat"], s["lon"], m["lat"], m["lon"]), rs.MATCH_KM,
                                        f"{s['name']} ({sid}) is on a line that exists today")
 
