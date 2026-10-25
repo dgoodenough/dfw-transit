@@ -37,3 +37,8 @@ data/raw/
 
 # Overture/OSM extracts for alignment routing (reproducible: tools/fetch_osm.py)
 data/osm/*.parquet
+
+# metro/ inputs (python -m metro fetch <id>): raw downloads and large Overture extracts are
+# reproducible; meta.json records URLs, releases and checksums
+data/metros/*/raw/
+data/metros/*/osm/*.parquet

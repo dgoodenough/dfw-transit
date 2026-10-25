@@ -8,6 +8,7 @@
 | `existing_geom.json`, `existing_stops.json` | today's DART/TRE/TEXRail/A-train alignments and stops (OSM) | v1 network build (archived) |
 | `waterways.geojson` | the Trinity (West, Clear, Elm and East Forks and the main stem) and 14 major lakes (Lake Worth, Eagle Mountain, Benbrook, Arlington, Grapevine, Lewisville, White Rock, Ray Hubbard, Joe Pool, Mountain Creek, Lavon, Ray Roberts, North Lake, Bachman), simplified with Douglas–Peucker to ~80 KB. From Overture Maps release `2026-09-23.1`, theme `base`, type `water`, read anonymously from S3 with a bounding-box filter by `tools/fetch_waterways.py`. Overture water is OpenStreetMap data: © OpenStreetMap contributors, [ODbL](https://www.openstreetmap.org/copyright) | map "Waterways" layer and diagram view (`dfwt/schematic.py`) |
 | `fw_rivers.json`, `dfw_yards.json`, `dfw_poi.json`, `dfw_hoods.json`, `dfw_gazetteer.json`, `dfw_route_stops.json` | OpenStreetMap extracts (© OpenStreetMap contributors, ODbL) | v1 audits and naming (archived); kept for the v2 backlog |
+| `metros/<id>/` | inputs for any US metro gathered by `python -m metro fetch <id>`: block-group zones, LODES OD, existing transit from GTFS, Overture roads/rail, `meta.json` (see `metro/README.md`) | the metro-agnostic planner |
 
 ## Optional: real commute flows
 
