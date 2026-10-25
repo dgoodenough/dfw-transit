@@ -1,0 +1,337 @@
+{
+  "metro": {
+    "id": "houston",
+    "name": "Houston-Pasadena-The Woodlands, TX",
+    "cbsa": "26420",
+    "state_fips": [
+      "48"
+    ],
+    "state_abbr": {
+      "48": "tx"
+    },
+    "county_fips": [
+      "48015",
+      "48039",
+      "48071",
+      "48157",
+      "48167",
+      "48201",
+      "48291",
+      "48339",
+      "48473"
+    ],
+    "county_names": {
+      "48015": "Austin",
+      "48039": "Brazoria",
+      "48071": "Chambers",
+      "48157": "Fort Bend",
+      "48167": "Galveston",
+      "48201": "Harris",
+      "48291": "Liberty",
+      "48339": "Montgomery",
+      "48473": "Waller"
+    },
+    "downtowns": [
+      {
+        "name": "Downtown Houston",
+        "lat": 29.7604,
+        "lon": -95.3698
+      }
+    ],
+    "brt_name_pattern": "\\bBRT\\b|Silver Line|Rapid"
+  },
+  "sources": {
+    "cbsa_delineation": {
+      "registry_matches": null,
+      "note": "county list in metros.json not verified against the delineation file",
+      "status": "blocked",
+      "host": "www2.census.gov",
+      "url": "https://www2.census.gov/programs-surveys/metro-micro/geographies/reference-files/2023/delineation-files/list1_2023.xlsx",
+      "error": "blocked: Tunnel connection failed: 403 Forbidden",
+      "checked_at": "2026-10-25T01:54:10+00:00"
+    },
+    "cenpop2020": {
+      "vintage": "2020 Census (P.L. 94-171), centres of population by block group",
+      "status": "ok",
+      "files": [
+        {
+          "state": "48",
+          "url": "https://www2.census.gov/geo/docs/reference/cenpop2020/blkgrp/CenPop2020_Mean_BG48.txt",
+          "status": "ok",
+          "read_from": "repo copy",
+          "path": "data/CenPop2020_BG_TX.txt",
+          "rows": 4154
+        }
+      ],
+      "checked_at": "2026-10-25T01:54:10+00:00"
+    },
+    "tiger2020_bg": {
+      "vintage": "TIGER/Line 2020 block groups (ALAND)",
+      "status": "blocked",
+      "files": [
+        {
+          "state": "48",
+          "url": "https://www2.census.gov/geo/tiger/TIGER2020/BG/tl_2020_48_bg.zip",
+          "status": "blocked",
+          "host": "www2.census.gov",
+          "error": "blocked: Tunnel connection failed: 403 Forbidden"
+        }
+      ],
+      "checked_at": "2026-10-25T01:54:11+00:00"
+    },
+    "lodes_wac": {
+      "vintage": null,
+      "year": null,
+      "status": "blocked",
+      "files": [
+        {
+          "state": "48",
+          "url": "https://lehd.ces.census.gov/data/lodes/LODES8/tx/wac/tx_wac_S000_JT00_2024.csv.gz",
+          "tried": [
+            "https://lehd.ces.census.gov/data/lodes/LODES8/tx/wac/tx_wac_S000_JT00_2024.csv.gz",
+            "https://lehd.ces.census.gov/data/lodes/LODES8/tx/wac/tx_wac_S000_JT00_2023.csv.gz",
+            "https://lehd.ces.census.gov/data/lodes/LODES8/tx/wac/tx_wac_S000_JT00_2022.csv.gz",
+            "https://lehd.ces.census.gov/data/lodes/LODES8/tx/wac/tx_wac_S000_JT00_2021.csv.gz"
+          ],
+          "status": "blocked",
+          "host": "lehd.ces.census.gov",
+          "error": "blocked: Tunnel connection failed: 403 Forbidden"
+        }
+      ],
+      "checked_at": "2026-10-25T01:54:11+00:00"
+    },
+    "mobility_database": {
+      "status": "ok",
+      "url": "https://storage.googleapis.com/mdb-csv/sources.csv",
+      "catalog_rows": 3613,
+      "selected": [
+        "625",
+        "2060"
+      ],
+      "checked_at": "2026-10-25T01:54:12+00:00"
+    },
+    "gtfs": {
+      "status": "ok",
+      "feeds": [
+        {
+          "mdb_source_id": "625",
+          "provider": "Connect Transit",
+          "tag": "m625",
+          "status": "ok",
+          "url": "https://storage.googleapis.com/storage/v1/b/mdb-latest/o/us-texas-gulf-coast-center-gtfs-625.zip?alt=media",
+          "sha256": "9c5f4da00e9e4bc20bb3866d7a25a0ef6b2ee411710e4526045a5c3562063d92",
+          "feed_info": {
+            "feed_publisher_name": "Trillium Solutions, Inc.",
+            "feed_version": "UTC: 08-Mar-2022 18:40",
+            "feed_start_date": "20220308",
+            "feed_end_date": "20220701"
+          },
+          "label": "Connect Transit",
+          "service_date": "2022-03-08",
+          "trips_on_date": 174,
+          "am_window": [
+            7.0,
+            9.0
+          ],
+          "frequent_headway_min": 15.0,
+          "lines": 0,
+          "stations": 0,
+          "routes_considered": 13,
+          "warning": "stale: the feed's weekday service is over a year old; it may not match today's service"
+        },
+        {
+          "mdb_source_id": "2060",
+          "provider": "METRO Houston",
+          "tag": "m2060",
+          "status": "ok",
+          "url": "https://storage.googleapis.com/storage/v1/b/mdb-latest/o/us-texas-metro-houston-gtfs-2060.zip?alt=media",
+          "sha256": "14e6e9650bf81f7c1c8c3a6a70a6c0f901832407273c081ea2da3bdaf29c1b15",
+          "feed_info": {
+            "feed_publisher_name": "Metropolitan Transit Authority of Harris County",
+            "feed_version": "FIFA2026IVOMS_20260526",
+            "feed_start_date": "20260607",
+            "feed_end_date": "20260711"
+          },
+          "label": "METRO Houston",
+          "service_date": "2026-06-09",
+          "trips_on_date": 9882,
+          "am_window": [
+            7.0,
+            9.0
+          ],
+          "frequent_headway_min": 15.0,
+          "lines": 44,
+          "stations": 1961,
+          "routes_considered": 115,
+          "warning": "short validity window (34 days, version 'FIFA2026IVOMS_20260526'): may be a special-event or seasonal schedule rather than regular service"
+        }
+      ],
+      "checked_at": "2026-10-25T01:54:18+00:00"
+    },
+    "overture_transportation": {
+      "status": "ok",
+      "release": "2026-09-23.1",
+      "url": "s3://overturemaps-us-west-2/release/2026-09-23.1/theme=transportation/type=segment/",
+      "license": "\u00a9 OpenStreetMap contributors, ODbL 1.0 (via Overture Maps Foundation)",
+      "bbox": [
+        -96.6374,
+        28.8123,
+        -94.2623,
+        30.5882
+      ],
+      "files": {
+        "roads.parquet": {
+          "subtype": "road",
+          "classes": [
+            "motorway",
+            "trunk",
+            "primary",
+            "secondary",
+            "tertiary"
+          ],
+          "rows": 143792,
+          "sha256": "b9ebf929a04c24c4710fb808358831e7ec107bc25d0ff41184b1837e69846404"
+        },
+        "rail.parquet": {
+          "subtype": "rail",
+          "classes": null,
+          "rows": 8843,
+          "sha256": "37fe3eeb424c1ca4b706b87f9229245551764826e790ce077c58f1ff4917c052"
+        }
+      },
+      "checked_at": "2026-10-25T01:55:02+00:00"
+    },
+    "lodes_od": {
+      "vintage": null,
+      "year": null,
+      "status": "blocked",
+      "files": [
+        {
+          "state": "48",
+          "url": "https://lehd.ces.census.gov/data/lodes/LODES8/tx/od/tx_od_main_JT00_2024.csv.gz",
+          "tried": [
+            "https://lehd.ces.census.gov/data/lodes/LODES8/tx/od/tx_od_main_JT00_2024.csv.gz",
+            "https://lehd.ces.census.gov/data/lodes/LODES8/tx/od/tx_od_main_JT00_2023.csv.gz",
+            "https://lehd.ces.census.gov/data/lodes/LODES8/tx/od/tx_od_main_JT00_2022.csv.gz",
+            "https://lehd.ces.census.gov/data/lodes/LODES8/tx/od/tx_od_main_JT00_2021.csv.gz"
+          ],
+          "status": "blocked",
+          "host": "lehd.ces.census.gov",
+          "error": "blocked: Tunnel connection failed: 403 Forbidden"
+        },
+        {
+          "state": "48",
+          "url": "https://lehd.ces.census.gov/data/lodes/LODES8/tx/od/tx_od_aux_JT00_2024.csv.gz",
+          "tried": [
+            "https://lehd.ces.census.gov/data/lodes/LODES8/tx/od/tx_od_aux_JT00_2024.csv.gz",
+            "https://lehd.ces.census.gov/data/lodes/LODES8/tx/od/tx_od_aux_JT00_2023.csv.gz",
+            "https://lehd.ces.census.gov/data/lodes/LODES8/tx/od/tx_od_aux_JT00_2022.csv.gz",
+            "https://lehd.ces.census.gov/data/lodes/LODES8/tx/od/tx_od_aux_JT00_2021.csv.gz"
+          ],
+          "status": "blocked",
+          "host": "lehd.ces.census.gov",
+          "error": "blocked: Tunnel connection failed: 403 Forbidden"
+        }
+      ],
+      "checked_at": "2026-10-25T01:54:12+00:00"
+    },
+    "overture_places": {
+      "status": "ok",
+      "release": "2026-09-23.1",
+      "url": "s3://overturemaps-us-west-2/release/2026-09-23.1/theme%3Dplaces/type%3Dplace/",
+      "rows": 346251,
+      "assigned": 333880,
+      "ignored_over_5km": 12371,
+      "license": "Overture Maps places (CDLA Permissive 2.0 / ODbL sources)",
+      "method": "open places with confidence >= 0.5 in the bbox, each assigned to the nearest block-group centre of population within 5 km (no block-group polygons available, so places just outside the counties can land in edge zones); a proxy for where jobs are, NOT a job count",
+      "checked_at": "2026-10-25T01:47:11+00:00"
+    }
+  },
+  "outputs": {
+    "zones.csv": {
+      "rows": 4154,
+      "pop": 7122240,
+      "jobs": null,
+      "jobs_in_unknown_block_groups": 0,
+      "by_county": {
+        "48015": 21,
+        "48039": 231,
+        "48071": 22,
+        "48157": 366,
+        "48167": 276,
+        "48201": 2830,
+        "48291": 53,
+        "48339": 328,
+        "48473": 27
+      },
+      "empty_columns": [
+        "jobs",
+        "area_km2"
+      ],
+      "written_at": "2026-10-25T01:54:11+00:00"
+    },
+    "existing/lines.csv": {
+      "rows": 44,
+      "written_at": "2026-10-25T01:54:18+00:00"
+    },
+    "existing/stations.csv": {
+      "rows": 1961,
+      "written_at": "2026-10-25T01:54:18+00:00"
+    },
+    "existing/line_stops.csv": {
+      "rows": 2152,
+      "written_at": "2026-10-25T01:54:18+00:00"
+    },
+    "existing/line_segments.csv": {
+      "rows": 2108,
+      "written_at": "2026-10-25T01:54:18+00:00"
+    },
+    "existing/routes.csv": {
+      "rows": 128,
+      "written_at": "2026-10-25T01:54:18+00:00"
+    },
+    "osm/roads.parquet": {
+      "rows": 143792,
+      "written_at": "2026-10-25T01:55:02+00:00"
+    },
+    "osm/rail.parquet": {
+      "rows": 8843,
+      "written_at": "2026-10-25T01:55:02+00:00"
+    },
+    "zones_places_proxy.csv": {
+      "rows": 4154,
+      "places": 333880,
+      "proxy": true,
+      "written_at": "2026-10-25T01:47:11+00:00"
+    }
+  },
+  "bbox": [
+    -96.6374,
+    28.8123,
+    -94.2623,
+    30.5882
+  ],
+  "fetched_at": "2026-10-25T01:55:02+00:00",
+  "missing": [
+    {
+      "item": "zones.csv jobs",
+      "source": "lodes_wac",
+      "why": "host blocked by network policy: lehd.ces.census.gov"
+    },
+    {
+      "item": "zones.csv area_km2",
+      "source": "tiger2020_bg",
+      "why": "host blocked by network policy: www2.census.gov"
+    },
+    {
+      "item": "od_tracts.csv",
+      "source": "lodes_od",
+      "why": "host blocked by network policy: lehd.ces.census.gov"
+    },
+    {
+      "item": "CBSA county list verification",
+      "source": "cbsa_delineation",
+      "why": "host blocked by network policy: www2.census.gov"
+    }
+  ]
+}
