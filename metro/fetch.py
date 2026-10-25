@@ -175,7 +175,7 @@ class Run:
                          "county_fips": z["county_fips"]})
         p = os.path.join(self.dir, "zones.csv")
         with open(p, "w", newline="", encoding="utf-8") as f:
-            w = csv.DictWriter(f, fieldnames=ZONE_COLUMNS)
+            w = csv.DictWriter(f, fieldnames=ZONE_COLUMNS, lineterminator="\n")
             w.writeheader()
             w.writerows(rows)
         empty = [c for c in ("jobs", "area_km2") if all(r[c] == "" for r in rows)]
@@ -300,7 +300,7 @@ class Run:
         counts, dropped = overture.nearest_zone_counts([(float(z["lon"]), float(z["lat"])) for z in zones], pts)
         out = os.path.join(self.dir, "zones_places_proxy.csv")
         with open(out, "w", newline="", encoding="utf-8") as f:
-            w = csv.writer(f)
+            w = csv.writer(f, lineterminator="\n")
             w.writerow(["geoid", "places"])
             for z, n in zip(zones, counts):
                 w.writerow([z["geoid"], n])

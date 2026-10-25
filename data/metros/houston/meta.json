@@ -48,7 +48,7 @@
       "host": "www2.census.gov",
       "url": "https://www2.census.gov/programs-surveys/metro-micro/geographies/reference-files/2023/delineation-files/list1_2023.xlsx",
       "error": "blocked: Tunnel connection failed: 403 Forbidden",
-      "checked_at": "2026-10-25T01:54:10+00:00"
+      "checked_at": "2026-10-25T01:55:56+00:00"
     },
     "cenpop2020": {
       "vintage": "2020 Census (P.L. 94-171), centres of population by block group",
@@ -63,7 +63,7 @@
           "rows": 4154
         }
       ],
-      "checked_at": "2026-10-25T01:54:10+00:00"
+      "checked_at": "2026-10-25T01:55:56+00:00"
     },
     "tiger2020_bg": {
       "vintage": "TIGER/Line 2020 block groups (ALAND)",
@@ -77,7 +77,7 @@
           "error": "blocked: Tunnel connection failed: 403 Forbidden"
         }
       ],
-      "checked_at": "2026-10-25T01:54:11+00:00"
+      "checked_at": "2026-10-25T01:55:56+00:00"
     },
     "lodes_wac": {
       "vintage": null,
@@ -98,7 +98,7 @@
           "error": "blocked: Tunnel connection failed: 403 Forbidden"
         }
       ],
-      "checked_at": "2026-10-25T01:54:11+00:00"
+      "checked_at": "2026-10-25T01:55:57+00:00"
     },
     "mobility_database": {
       "status": "ok",
@@ -108,7 +108,7 @@
         "625",
         "2060"
       ],
-      "checked_at": "2026-10-25T01:54:12+00:00"
+      "checked_at": "2026-10-25T01:55:57+00:00"
     },
     "gtfs": {
       "status": "ok",
@@ -166,7 +166,7 @@
           "warning": "short validity window (34 days, version 'FIFA2026IVOMS_20260526'): may be a special-event or seasonal schedule rather than regular service"
         }
       ],
-      "checked_at": "2026-10-25T01:54:18+00:00"
+      "checked_at": "2026-10-25T01:56:02+00:00"
     },
     "overture_transportation": {
       "status": "ok",
@@ -238,13 +238,13 @@
     "overture_places": {
       "status": "ok",
       "release": "2026-09-23.1",
-      "url": "s3://overturemaps-us-west-2/release/2026-09-23.1/theme%3Dplaces/type%3Dplace/",
+      "url": "s3://overturemaps-us-west-2/release/2026-09-23.1/theme=places/type=place/",
       "rows": 346251,
       "assigned": 333880,
       "ignored_over_5km": 12371,
-      "license": "Overture Maps places (CDLA Permissive 2.0 / ODbL sources)",
+      "license": "Overture Maps places theme, CDLA Permissive 2.0",
       "method": "open places with confidence >= 0.5 in the bbox, each assigned to the nearest block-group centre of population within 5 km (no block-group polygons available, so places just outside the counties can land in edge zones); a proxy for where jobs are, NOT a job count",
-      "checked_at": "2026-10-25T01:47:11+00:00"
+      "checked_at": "2026-10-25T01:56:27+00:00"
     }
   },
   "outputs": {
@@ -268,27 +268,27 @@
         "jobs",
         "area_km2"
       ],
-      "written_at": "2026-10-25T01:54:11+00:00"
+      "written_at": "2026-10-25T01:55:57+00:00"
     },
     "existing/lines.csv": {
       "rows": 44,
-      "written_at": "2026-10-25T01:54:18+00:00"
+      "written_at": "2026-10-25T01:56:02+00:00"
     },
     "existing/stations.csv": {
       "rows": 1961,
-      "written_at": "2026-10-25T01:54:18+00:00"
+      "written_at": "2026-10-25T01:56:02+00:00"
     },
     "existing/line_stops.csv": {
       "rows": 2152,
-      "written_at": "2026-10-25T01:54:18+00:00"
+      "written_at": "2026-10-25T01:56:02+00:00"
     },
     "existing/line_segments.csv": {
       "rows": 2108,
-      "written_at": "2026-10-25T01:54:18+00:00"
+      "written_at": "2026-10-25T01:56:02+00:00"
     },
     "existing/routes.csv": {
       "rows": 128,
-      "written_at": "2026-10-25T01:54:18+00:00"
+      "written_at": "2026-10-25T01:56:02+00:00"
     },
     "osm/roads.parquet": {
       "rows": 143792,
@@ -302,7 +302,7 @@
       "rows": 4154,
       "places": 333880,
       "proxy": true,
-      "written_at": "2026-10-25T01:47:11+00:00"
+      "written_at": "2026-10-25T01:56:27+00:00"
     }
   },
   "bbox": [
@@ -311,7 +311,7 @@
     -94.2623,
     30.5882
   ],
-  "fetched_at": "2026-10-25T01:55:02+00:00",
+  "fetched_at": "2026-10-25T01:56:27+00:00",
   "missing": [
     {
       "item": "zones.csv jobs",

@@ -428,7 +428,7 @@ def write_tables(tables, folder):
     counts = {}
     for k, cols in COLUMNS.items():
         with open(os.path.join(folder, f"{k}.csv"), "w", newline="", encoding="utf-8") as f:
-            w = csv.DictWriter(f, fieldnames=cols)
+            w = csv.DictWriter(f, fieldnames=cols, lineterminator="\n")
             w.writeheader()
             w.writerows(tables[k])
         counts[f"{k}.csv"] = len(tables[k])

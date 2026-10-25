@@ -52,7 +52,7 @@ def aggregate_od(paths, counties):
 def write_od(od, path):
     """Same columns dfwt reads (config demand.lodes_od_path): h_tract, w_tract, jobs."""
     with open(path, "w", newline="") as f:
-        w = csv.writer(f)
+        w = csv.writer(f, lineterminator="\n")
         w.writerow(["h_tract", "w_tract", "jobs"])
         for (h, wk), n in sorted(od.items()):
             w.writerow([h, wk, n])
