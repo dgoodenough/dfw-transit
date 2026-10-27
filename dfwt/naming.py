@@ -91,10 +91,12 @@ def clean_street(name, keep_type=False, places=()):
 
 
 class Namer:
-    def __init__(self, roads=True):
+    def __init__(self, roads=True, roads_path=None, places=True):
+        """roads_path: another region's roads.parquet (default data/osm/roads.parquet);
+        places=False skips the DFW gazetteer files (a metro elsewhere)."""
         self.proj = geo.Projector()
         self.places, self.hoods, self.landmarks, self.towns = [], [], [], []
-        for fn in ("dfw_gazetteer.json", "dfw_hoods.json", "dfw_poi.json"):
+        for fn in ("dfw_gazetteer.json", "dfw_hoods.json", "dfw_poi.json") if places else ():
             p = config.path("data", fn)
             if not os.path.exists(p):
                 continue
@@ -121,14 +123,15 @@ class Namer:
         self.grid = collections.defaultdict(set)        # 250 m cell -> segment indices
         self.conn = collections.defaultdict(set)        # connector id -> segment indices
         self.conn_xy = {}
-        if roads and os.path.exists(config.path("data", "osm", "roads.parquet")):
-            self._load_roads()
+        roads_path = roads_path or config.path("data", "osm", "roads.parquet")
+        if roads and os.path.exists(roads_path):
+            self._load_roads(roads_path)
 
     # ------------------------------------------------------------ roads
-    def _load_roads(self):
+    def _load_roads(self, path=None):
         import pyarrow.parquet as pq
         from .osmroute import wkb_linestring
-        t = pq.read_table(config.path("data", "osm", "roads.parquet"), columns=["geometry", "class", "names", "connectors"])
+        t = pq.read_table(path or config.path("data", "osm", "roads.parquet"), columns=["geometry", "class", "names", "connectors"])
         for r in t.to_pylist():
             nm = ((r["names"] or {}).get("primary") or "").strip()
             if not nm:

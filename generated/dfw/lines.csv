@@ -1,0 +1,47 @@
+line_id,name,mode,status,color,headway_min,notes
+E09,TEXRail,commuter,existing,#7E4A52,30,
+E10,TRE,commuter,existing,#4A5D7E,30,
+E11,A-train,commuter,existing,#5E7F4F,30,
+E12,Orange Line,metro,existing,#F57C00,15,
+E13,Green Line,metro,existing,#097138,15,
+E14,Red Line,metro,existing,#A52714,15,
+E15,Blue Line,metro,existing,#0071BC,15,
+E20,Silver Line,metro,existing,#A7A9AC,30,
+E50,Dallas Streetcar,streetcar,existing,#e57373,20,Today's Dallas Streetcar: Union Station - Oak Cliff - Bishop Arts.
+E51,M-Line Trolley,streetcar,existing,#8d6e63,15,Today's M-Line (McKinney Avenue Trolley): Arts District - Uptown - CityPlace.
+G01,Highland / Vista Ridge Mall - Country Club / Las Brisas BRT,brt,proposed,#8e24aa,,"generated (R342): 6,814 per route-km >= BRT 3,000 (< metro 7,000); 1,511 new daily trips for $0.62B capital (1.71 per $M incl. opex)"
+G02,Excel / Westgrove - Matilda / University Metro,metro,proposed,#d32f2f,,"generated (R267): 13,861 people+jobs per route-km >= metro 7,000; 1,706 new daily trips for $0.54B capital (2.29 per $M incl. opex); extends R141"
+G03,Matilda / University - Grauwyler / O'Connor BRT,brt,proposed,#00897b,,"generated (R324): 6,755 per route-km >= BRT 3,000 (< metro 7,000); 1,946 new daily trips for $0.87B capital (1.56 per $M incl. opex)"
+G04,Mustang Drive - Alsbury / Edgehill Rail,commuter,proposed,#4e342e,,"generated (Q515): rail corridor, 8,457 people+jobs within 1.6 km per km >= 2,000; 3,798 new daily trips for $2.57B capital (1.19 per $M incl. opex)"
+G05,Lake Carolyn / O'Connor - Park Row / Susan BRT,brt,proposed,#6d4c41,,"generated (R235): 6,705 per route-km >= BRT 3,000 (< metro 7,000); 1,575 new daily trips for $0.96B capital (1.14 per $M incl. opex)"
+G06,Henderson / 5th Street - Silver Creek / Las Vegas BRT,brt,proposed,#3949ab,,"generated (R076): 6,942 per route-km >= BRT 3,000 (< metro 7,000); 886 new daily trips for $0.54B capital (1.14 per $M incl. opex)"
+G07,Waverly Drive - Bedford / Barr BRT,brt,proposed,#c0ca33,,"generated (R265): 6,063 per route-km >= BRT 3,000 (< metro 7,000); 1,173 new daily trips for $0.79B capital (1.04 per $M incl. opex)"
+G08,Coit / McCallum - F / Executive BRT,brt,proposed,#e64a19,,"generated (R291): 6,786 per route-km >= BRT 3,000 (< metro 7,000); 422 new daily trips for $0.30B capital (1.01 per $M incl. opex)"
+G09,Adleta / Skillman - Avenue C / Hickory Rail,commuter,proposed,#37474f,,"generated (Q488): rail corridor, 7,200 people+jobs within 1.6 km per km >= 2,000; 3,483 new daily trips for $3.07B capital (0.92 per $M incl. opex)"
+G10,Country Club / Las Brisas - Southwestern / Douglas BRT,brt,proposed,#546e7a,,"generated (R363): 5,959 per route-km >= BRT 3,000 (< metro 7,000); 349 new daily trips for $0.27B capital (0.91 per $M incl. opex); extends R230"
+G11,Country Club / Las Brisas - Cooper / Mitchell BRT,brt,proposed,#8e24aa,,"generated (R365): 6,620 per route-km >= BRT 3,000 (< metro 7,000); 1,209 new daily trips for $0.97B capital (0.87 per $M incl. opex)"
+G12,Bowser / Belt Line - Cockrell Hill / Falls Metro,metro,proposed,#1976d2,,"generated (R333): 12,428 people+jobs per route-km >= metro 7,000; 1,645 new daily trips for $1.08B capital (1.19 per $M incl. opex); extends R175"
+G13,Highland / Vista Ridge Mall - Bedford / Barr BRT,brt,proposed,#00897b,,"generated (R346): 5,068 per route-km >= BRT 3,000 (< metro 7,000); 283 new daily trips for $0.23B capital (0.83 per $M incl. opex); extends R378"
+G14,Lake Carolyn / O'Connor - US-80 / Pinson Rail,commuter,proposed,#1b5e20,,"generated (Q523): rail corridor, 11,318 people+jobs within 1.6 km per km >= 2,000; 2,708 new daily trips for $2.84B capital (0.77 per $M incl. opex)"
+G15,Bush Turnpike - Adleta / Skillman Metro,metro,proposed,#388e3c,,"generated (R131): 11,870 people+jobs per route-km >= metro 7,000; 3,571 new daily trips for $3.70B capital (0.74 per $M incl. opex); extends R182"
+G16,Henderson / 5th Street - Gilford / Denton Rail,commuter,proposed,#4a148c,,"generated (Q458): rail corridor, 11,313 people+jobs within 1.6 km per km >= 2,000; 2,946 new daily trips for $3.28B capital (0.72 per $M incl. opex)"
+G17,Waverly Drive - Hill / SH-161 BRT,brt,proposed,#6d4c41,,"generated (R256): 5,555 per route-km >= BRT 3,000 (< metro 7,000); 519 new daily trips for $0.56B capital (0.66 per $M incl. opex)"
+G18,Gilford / Denton - Highland / Vista Ridge Mall BRT,brt,proposed,#3949ab,,"generated (R281): 5,393 per route-km >= BRT 3,000 (< metro 7,000); 452 new daily trips for $0.39B capital (0.79 per $M incl. opex); extends R331"
+G19,Centreport / Sovereign - Mercantile Drive BRT,brt,proposed,#c0ca33,,"generated (R312): 5,989 per route-km >= BRT 3,000 (< metro 7,000); 377 new daily trips for $0.31B capital (0.84 per $M incl. opex); extends R388"
+G20,Communications / Legacy - Southwestern / Douglas Metro,metro,proposed,#7b1fa2,,"generated (R107): 11,022 people+jobs per route-km >= metro 7,000; 1,947 new daily trips for $1.91B capital (0.79 per $M incl. opex); extends R052"
+G21,Noel / Alpha - John Arden / Solon Rail,commuter,proposed,#4e342e,,"generated (Q430): rail corridor, 9,035 people+jobs within 1.6 km per km >= 2,000; 31 new daily trips for $0.04B capital (0.66 per $M incl. opex); extends Q472"
+G22,Fountain / Westpark - Cooper / Mitchell Metro,metro,proposed,#f57c00,,"generated (R252): 8,669 people+jobs per route-km >= metro 7,000; 1,278 new daily trips for $2.02B capital (0.49 per $M incl. opex)"
+G23,Central / Fall Creek - Dowdy Ferry Road Rail,commuter,proposed,#37474f,,"generated (Q495): rail corridor, 7,173 people+jobs within 1.6 km per km >= 2,000; 233 new daily trips for $0.38B capital (0.49 per $M incl. opex); extends Q491"
+G24,Dallas / Arapaho - Central / Fall Creek Metro,metro,proposed,#0097a7,,"generated (R172): 9,771 people+jobs per route-km >= metro 7,000; 1,022 new daily trips for $1.36B capital (0.58 per $M incl. opex); extends R189"
+G25,Stemmons / Medical District - Greenville / Holly Hill Metro,metro,proposed,#c2185b,,"generated (R044): 12,233 people+jobs per route-km >= metro 7,000; 740 new daily trips for $0.97B capital (0.58 per $M incl. opex); extends R038"
+G26,Mustang Drive - Perry Road Metro,metro,proposed,#5d4037,,"generated (R205): 7,762 people+jobs per route-km >= metro 7,000; 950 new daily trips for $1.01B capital (0.74 per $M incl. opex); extends R119"
+G27,Henderson / 5th Street - Waverly Drive BRT,brt,proposed,#e64a19,,"generated (R069): 4,452 per route-km >= BRT 3,000 (< metro 7,000); 477 new daily trips for $0.81B capital (0.41 per $M incl. opex)"
+G28,Bush Turnpike - Hill / SH-161 BRT,brt,proposed,#546e7a,,"generated (R128): 6,239 per route-km >= BRT 3,000 (< metro 7,000); 577 new daily trips for $1.00B capital (0.40 per $M incl. opex)"
+G29,Schwartz / Jasper - Silver Creek / Las Vegas BRT,brt,proposed,#8e24aa,,"generated (R392): 3,160 per route-km >= BRT 3,000 (< metro 7,000); 323 new daily trips for $0.59B capital (0.38 per $M incl. opex)"
+G30,Mustang Drive - Centreport / Sovereign Metro,metro,proposed,#303f9f,,"generated (R215): 7,714 people+jobs per route-km >= metro 7,000; 1,008 new daily trips for $2.27B capital (0.35 per $M incl. opex)"
+G31,Country Club / Las Brisas - Cockrell Hill / Falls BRT,brt,proposed,#00897b,,"generated (R368): 4,330 per route-km >= BRT 3,000 (< metro 7,000); 94 new daily trips for $0.25B capital (0.26 per $M incl. opex); extends R356"
+G32,Lake Carolyn / O'Connor - Russell / Park Rail,commuter,proposed,#1b5e20,,"generated (Q530): rail corridor, 5,315 people+jobs within 1.6 km per km >= 2,000; 1,186 new daily trips for $4.43B capital (0.21 per $M incl. opex)"
+G33,Waverly Drive - Park Row / Susan Metro,metro,proposed,#689f38,,"generated (R255): 7,821 people+jobs per route-km >= metro 7,000; 364 new daily trips for $1.89B capital (0.15 per $M incl. opex)"
+G34,Bush Turnpike - Highland / Vista Ridge Mall BRT,brt,proposed,#6d4c41,,"generated (R133): 6,521 per route-km >= BRT 3,000 (< metro 7,000); 97 new daily trips for $0.47B capital (0.15 per $M incl. opex)"
+G35,Henderson / 5th Street - Avenue C / Hickory Rail,commuter,proposed,#4a148c,,"generated (Q453): rail corridor, 5,530 people+jobs within 1.6 km per km >= 2,000; 175 new daily trips for $2.75B capital (0.05 per $M incl. opex)"
+G36,Henderson / 5th Street - John Arden / Solon Rail,commuter,proposed,#4e342e,,"generated (Q468): rail corridor, 3,943 people+jobs within 1.6 km per km >= 2,000; 98 new daily trips for $3.15B capital (0.03 per $M incl. opex)"
