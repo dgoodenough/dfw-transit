@@ -23,7 +23,7 @@ Model runs: dfwt's demand model (gravity flows, the config.json logit calibrated
 
 ## Which corridors match
 
-Share of each network's new track lying within 1 km (500 m) of the other's, length-weighted: hand plan near generated 55% (40%), generated near hand plan 69% (51%); counting only a line of the same family (rail transit / BRT / regional rail): hand plan 36%, generated 47%. Chance level: 51% of the region's residents live within 1 km of the hand plan's new track, so a corridor drawn through populated places at random would lie near it about that often.
+Share of each network's new track lying within 1 km (500 m) of the other's, length-weighted: hand plan near generated 55% (40%), generated near hand plan 69% (51%); counting only a line of the same family (rail transit / BRT / regional rail): hand plan 36%, generated 47%. Chance level: 51% of the region's residents live within 1 km of the hand plan's new track (27% within 500 m), 68% (41%) of those in urban-density zones; a corridor drawn at random through populated (urban) places would lie that close about that often, so only the excess over these numbers is agreement.
 
 A hand-plan line is **matched** when at least half of its new track lies within 1 km of generated track (any mode), **partly** at 20-50%. Of 76 hand-plan lines with new track: 48 matched (1,322 km), 22 partly (759 km), 6 missed (345 km). Of 73 generated lines: 60 lie in hand-plan corridors (1,734 km), 13 partly (317 km), 0 are corridors the hand plan doesn't have (0 km).
 

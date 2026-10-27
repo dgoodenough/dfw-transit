@@ -1,10 +1,10 @@
-# metro/: inputs for any US metro
+# metro/: inputs and a generated network for any US metro
 
 `dfwt/` is a hand-built plan for Dallas–Fort Worth. `metro/` is the first half of a
 version that works for any US metro. It gathers the inputs (population, jobs, commute
 flows, today's transit, roads and rail) for a metro listed in `metro/metros.json` and
 writes them to `data/metros/<id>/` in a fixed format (the **data contract** below).
-The network builder reads that format.
+The network builder (step 2, `python -m metro generate`, at the end of this page) reads that format.
 
 ```
 python -m metro list
@@ -139,3 +139,53 @@ count**. It is never written into `zones.jobs`.
 - `sources.<name>`: for each source, its `status` (`ok` / `blocked` / `failed`), its URLs, vintage or year or release, row counts, checksums and errors.
 - `outputs.<file>`: row counts. `zones.csv` also has `empty_columns`.
 - `missing`: everything the contract asks for that this run could not supply, and why.
+
+## Step 2: a potential network (`python -m metro generate <id>`)
+
+```
+python -m metro generate houston                      # budget: config budget.musd_per_year x 30 years
+python -m metro generate houston --budget-musd 100000 --no-model
+python -m metro generate houston --jobs-proxy places  # no jobs data: places proxy, flagged (generated/houston_places_proxy/)
+python -m metro check-dfw [--reuse]                   # DFW cross-check against the hand plan
+```
+
+It reads only `data/metros/<id>/` (DFW is presented in that shape by `metro/inputs.py:adapt_dfw`,
+which `generate dfw` runs on first use) and writes `generated/<id>/`:
+
+- `lines.csv`, `stations.csv`, `line_stops.csv`, `line_segments.csv`, `transfers.csv`: today's lines
+  (status `existing`) plus the generated ones (`proposed`, opening five years after `existing_year`),
+  with empty `stages.csv` / `service.csv` / `infill.csv` so nothing falls back to DFW's plan. They load in
+  the DFW tools: `python -m dfwt validate --scenario $PWD/generated/<id>`.
+- `report.md`: inputs and their gaps, the centers, the corridors, every chosen line (order, mode and why,
+  km, cost, value) and the best rejected ones with the reason; `candidates.csv` (all of them), `centers.csv`,
+  `preview.png`.
+
+How it works (every threshold is in `metro/generate.json`, documented there; costs, speeds, headways,
+walksheds and the ridership logit come from `config.json`):
+
+1. **Centers** (`metro/centers.py`): people + jobs per km2 on a 500 m grid (1 km kernel); dense cells climb
+   to their local peak (density clustering), clusters of 20,000+ people + jobs are centers; downtowns by
+   jobs; smaller towns at the edge for regional rail.
+2. **Corridors** (`metro/candidates.py`, `metro/routing.py`): a Gabriel graph over the centers, each link
+   routed on the metro's own Overture roads with `tools/gen_expansion.py`'s metro and BRT profiles (via
+   `dfwt/osmroute.py`); candidate lines are shortest paths through it. Regional rail: routes on existing
+   standard-gauge track from each downtown or major center to centers and towns 13-90 km away.
+3. **Mode and stations**: people + jobs within 800 m per route-km picks metro / streetcar / BRT (BRT over
+   capacity becomes metro); stations at every center, at today's stations within 300 m (shared ids) and at
+   the mode's spacing (urban / suburban) in between; walk transfers up to 650 m.
+4. **Value and selection** (`metro/sketch.py`, `metro/select.py`): a sketch demand model (the same commute
+   flows and logit as `dfwt`) gives each line the daily trips it adds over today's lines and the lines
+   already chosen; lazy-greedy selection by new trips per $M (capital + 20 years' operating cost) within the
+   budget, rejecting duplicates and lines that would be islands.
+5. **Model run** (`metro/model.py`): `dfwt`'s demand model (`Network.from_tables` + `evaluate.run_year`) on
+   the metro's zones, today's land use, every line open, against today's lines.
+
+Data gaps are never filled silently: without jobs (Houston today) every people + jobs threshold is scaled by
+0.65, commutes go to where people live, downtowns come from the registry's reference points
+(`meta.json` `metro.downtowns`), and `report.md` says so at the top. `--jobs-proxy places` (opt-in) uses
+Overture places as where jobs are, scaled to 0.53 jobs per resident, flagged the same way. Local buses in
+`existing/` (mode `bus`) are left out of the network, as in DFW (they are the model's feeder grid). The
+model's behavioural constants are DFW's calibration; elsewhere they are a transfer, not a fit.
+
+Results: `reports/generator_dfw_check.md` (DFW against the hand-built 2M plan), `generated/houston/report.md`
+(population only) and `generated/houston_places_proxy/report.md`.

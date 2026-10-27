@@ -143,18 +143,19 @@ class Existing:
         return out
 
 
-def generate(metro_id, budget_musd=None, years=None, out=None, run_model=True, override=None, log=print, metro=None):
+def generate(metro_id, budget_musd=None, years=None, out=None, run_model=True, override=None, log=print, metro=None,
+             jobs_proxy=None):
     """Run every step for one metro; `metro` (an inputs.Metro) replaces reading data/metros/<id>/ (tests)."""
     t0 = time.time()
     gp = params(metro_id, override)
     cfg0 = config.load()
-    m = metro or inputs.load(metro_id)
-    out = out or config.path("generated", metro_id)
+    m = metro or inputs.load(metro_id, jobs_proxy)
+    out = out or config.path("generated", metro_id + ("_places_proxy" if m.jobs_proxy else ""))
     os.makedirs(out, exist_ok=True)
     log(f"{metro_id}: " + "; ".join(m.status()))
     if not m.osm.get("roads"):
         raise SystemExit(f"{metro_id}: osm/roads.parquet is missing; corridors can't be routed")
-    flags = [] if m.jobs_ok else [m.jobs_note]
+    flags = ([] if m.jobs_ok else [m.jobs_note]) + ([m.jobs_proxy] if m.jobs_proxy else [])
     if not m.jobs_ok:
         f = pop_only(gp)
         flags.append(f"every people + jobs threshold (centers, towns, mode densities) x {f} "
@@ -166,7 +167,7 @@ def generate(metro_id, budget_musd=None, years=None, out=None, run_model=True, o
     surf = centers.Surface(m, cp["grid_km"], cp["kernel_km"])
     urban = centers.find(m, surf, cp)
     centers.classify(m, urban, cp)
-    if not m.jobs_ok:
+    if not m.jobs_ok or m.jobs_proxy:   # residents or a proxy can't place a downtown reliably
         note = centers.registry_downtowns(m, surf, urban, cp)
         if note:
             flags.append(note)

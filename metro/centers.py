@@ -216,7 +216,7 @@ def registry_downtowns(m, surf, centers, p):
             centers.append(c)
         c.x, c.y, c.lat, c.lon, c.kind = x, y, d["lat"], d["lon"], "downtown"
         names.append(d.get("name", "downtown"))
-    return ("no jobs data: downtown placed at the registry's reference point" + ("s " if len(names) > 1 else " ")
+    return ("no (real) jobs data: downtown placed at the registry's reference point" + ("s " if len(names) > 1 else " ")
             + ", ".join(names) + " (meta.json metro.downtowns) instead of the densest residential cluster")
 
 

@@ -82,6 +82,7 @@ class Metro:
         self.existing = existing          # {table name: rows} or None
         self.osm = osm                    # {"roads": path or None, "rail": path or None}
         self.od_path = od_path
+        self.jobs_proxy = None           # a note when jobs are a proxy (load(..., jobs_proxy="places"))
         w = self.pop + self.jobs
         # projection origin: the activity-weighted centre (equirectangular, km)
         self.lat0 = float(np.average(self.lat, weights=w)) if w.sum() else float(self.lat.mean())
@@ -110,6 +111,8 @@ class Metro:
                + (f"{self.jobs.sum() / 1e6:.2f}M jobs" if self.jobs_ok else "NO JOBS DATA")]
         if not self.jobs_ok:
             out.append(self.jobs_note)
+        if self.jobs_proxy:
+            out.append(self.jobs_proxy)
         out.append("existing transit: " + (f"{len(self.existing['lines.csv'])} lines" if self.existing else "none given"))
         for k in ("roads", "rail"):
             out.append(f"osm {k}: " + (os.path.relpath(self.osm[k], config.ROOT) if self.osm.get(k) else "MISSING"))
@@ -117,7 +120,14 @@ class Metro:
         return out
 
 
-def load(metro_id):
+JOBS_PER_RESIDENT = 0.53   # US: ~160M jobs / ~330M residents (BLS, Census); used only by the opt-in proxy
+
+
+def load(metro_id, jobs_proxy=None):
+    """The metro's inputs. jobs_proxy="places" (opt-in, flagged everywhere): when zones.csv has
+    no jobs, use zones_places_proxy.csv (Overture places per block group, from step 1's
+    --jobs-proxy places) as the *spatial distribution* of jobs, scaled to JOBS_PER_RESIDENT x
+    population. Where jobs are is then a proxy; how many is an assumption, not data."""
     folder = metro_dir(metro_id)
     if metro_id == "dfw" and not os.path.exists(os.path.join(folder, "zones.csv")):
         adapt_dfw()
@@ -125,6 +135,24 @@ def load(metro_id):
     if not os.path.exists(zp):
         raise SystemExit(f"{os.path.relpath(zp, config.ROOT)} is missing: run step 1 (python -m metro fetch {metro_id}) first")
     zones = [z for z in read_csv(zp) if _num(z.get("lat")) is not None and _num(z.get("lon")) is not None]
+    proxy_note = None
+    if jobs_proxy == "places":
+        pp = os.path.join(folder, "zones_places_proxy.csv")
+        if not os.path.exists(pp):
+            raise SystemExit(f"--jobs-proxy places: {os.path.relpath(pp, config.ROOT)} is missing "
+                             f"(python -m metro fetch {metro_id} --jobs-proxy places)")
+        if sum(_num(z.get("jobs")) is not None for z in zones) >= 0.95 * len(zones):
+            raise SystemExit("--jobs-proxy places: zones.csv has jobs; the proxy is only for metros without them")
+        places = {r["geoid"]: _num(r.get("places")) or 0.0 for r in read_csv(pp)}
+        tot_p = sum(places.get(z["geoid"], 0.0) for z in zones)
+        tot_pop = sum(_num(z.get("pop")) or 0.0 for z in zones)
+        if tot_p <= 0:
+            raise SystemExit("--jobs-proxy places: the proxy file has no places")
+        k = JOBS_PER_RESIDENT * tot_pop / tot_p
+        zones = [dict(z, jobs=str(places.get(z["geoid"], 0.0) * k)) for z in zones]
+        proxy_note = (f"JOBS ARE A PROXY: Overture places per block group (zones_places_proxy.csv, {tot_p:,.0f} places) "
+                      f"scaled to {JOBS_PER_RESIDENT} jobs per resident; where jobs are is approximate, how many is "
+                      "an assumption, not LODES data")
     meta = {}
     if os.path.exists(os.path.join(folder, "meta.json")):
         with open(os.path.join(folder, "meta.json"), encoding="utf-8") as f:
@@ -141,7 +169,9 @@ def load(metro_id):
         p = os.path.join(folder, "osm", f"{k}.parquet")
         osm[k] = p if os.path.exists(p) else None
     od = os.path.join(folder, "od_tracts.csv")
-    return Metro(metro_id, folder, zones, meta, existing, osm, od if os.path.exists(od) else None)
+    m = Metro(metro_id, folder, zones, meta, existing, osm, od if os.path.exists(od) else None)
+    m.jobs_proxy = proxy_note
+    return m
 
 
 # ---------------------------------------------------------------- DFW adapter

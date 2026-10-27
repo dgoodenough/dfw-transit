@@ -13,6 +13,8 @@ networks differ). Writes reports/generator_dfw_check.md and generated/dfw/compar
 import collections
 import os
 
+import numpy as np
+
 from dfwt import config
 from dfwt.network import Network
 
@@ -118,11 +120,19 @@ def main(run_model=True, reuse=False, log=print):
     output.write_csv(os.path.join(g["out"], "compare_lines.csv"), rows)
     nets = {"today": cur, "generated": gen, "2M hand plan": hand}
     cov = {k: output.coverage_800(m, model.all_open(n)) for k, n in nets.items()}
-    # chance level: how much of the region's population lives within 1 km of the hand plan's new track
-    near = set()
-    for P in (Q for pieces in hand_tr.values() for Q in pieces):
-        near.update(_near(m, P))
-    base = float(m.pop[list(near)].sum() / m.pop.sum())
+    # chance level: how much of the region's population lives near the hand plan's new track
+    from . import centers as _c
+    dens = _c.Surface(m, 0.5, 0.8).density_at(m.x, m.y)
+    urban = dens >= cfg["growth"]["tod"]["setting_density_per_km2"]["urban"]
+    base = {}
+    for r in (MATCH_KM, 0.5):
+        near = set()
+        for P in (Q for pieces in hand_tr.values() for Q in pieces):
+            near.update(_near(m, P, r))
+        z = np.zeros(m.n, dtype=bool)
+        z[list(near)] = True
+        base[r] = float(m.pop[z].sum() / m.pop.sum())
+        base[(r, "urban")] = float(m.pop[z & urban].sum() / m.pop[urban].sum())
     cache = os.path.join(out, "compare_model.json")
     res = {}
     if run_model and reuse and os.path.exists(cache):
@@ -141,9 +151,9 @@ def main(run_model=True, reuse=False, log=print):
 _ZI = {}
 
 
-def _near(m, P):
+def _near(m, P, r=MATCH_KM):
     zi = _ZI.setdefault(id(m), geom.ZoneIndex(m, 1.0))
-    return zi.near_points(geom.resample(P, 0.25), MATCH_KM).tolist()
+    return zi.near_points(geom.resample(P, 0.25), r).tolist()
 
 
 def write_report(m, g, nets, rows, cov, res, budget, hand_tr, gen_tr, base):
@@ -218,8 +228,10 @@ def write_report(m, g, nets, rows, cov, res, budget, hand_tr, gen_tr, base):
       f"generated near hand plan {kw(gen_rows, 'share_near_other'):.0%} ({kw(gen_rows, 'share_within_500m'):.0%}); "
       f"counting only a line of the same family (rail transit / BRT / regional rail): hand plan "
       f"{kw(hand_rows, 'share_near_same_family'):.0%}, generated {kw(gen_rows, 'share_near_same_family'):.0%}. "
-      f"Chance level: {base:.0%} of the region's residents live within {MATCH_KM:g} km of the hand plan's new track, "
-      "so a corridor drawn through populated places at random would lie near it about that often.")
+      f"Chance level: {base[MATCH_KM]:.0%} of the region's residents live within {MATCH_KM:g} km of the hand plan's new "
+      f"track ({base[0.5]:.0%} within 500 m), {base[(MATCH_KM, 'urban')]:.0%} ({base[(0.5, 'urban')]:.0%}) of those in "
+      "urban-density zones; a corridor drawn at random through populated (urban) places would lie that close about that "
+      "often, so only the excess over these numbers is agreement.")
     w("")
     w(f"A hand-plan line is **matched** when at least half of its new track lies within {MATCH_KM:g} km of "
       f"generated track (any mode), **partly** at 20-50%. Of {len(hand_rows)} hand-plan lines with new track: "
