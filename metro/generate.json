@@ -1,7 +1,7 @@
 {
   "_doc": "Parameters of the network generator (python -m metro generate <id>). Nothing here names a place: the same numbers run for every metro. A metro can override any of them in data/metros/<id>/generate.json (deep-merged). Unit costs, mode speeds, headways, capacities, walksheds and the logit come from the repo's config.json, the same file the DFW model reads.",
   "centers": {
-    "_doc": "Activity centers (metro/centers.py): people + jobs per km2 within kernel_km of each grid_km cell; cells at or above min_density climb to their local peak, peaks within merge_km of a denser one merge, and a cluster with at least min_activity people + jobs is a center. Downtown: jobs within downtown_radius_km >= downtown_jobs and peak job density >= downtown_job_density (the region's top job center always is one). Major: activity >= major_activity. Towns (regional-rail ends at the edge of the region): the same clustering at town_min_density / town_min_activity, at least town_min_sep_km from every center. Without jobs data the downtown tests use people + jobs (= people) and thresholds x pop_only_factor. The DFW values: 4,000/km2 is about the 85th percentile of DFW block groups; a 20,000-person+job cluster is a small suburban office park or a dense neighbourhood.",
+    "_doc": "Activity centers (metro/centers.py): people + jobs per km2 within kernel_km of each grid_km cell; cells at or above min_density climb to their local peak, peaks within merge_km of a denser one merge, and a cluster with at least min_activity people + jobs is a center. Downtown: jobs within downtown_radius_km >= downtown_jobs and peak job density >= downtown_job_density and no bigger job center within downtown_sep_km (a second downtown is a separate city, like Fort Worth beside Dallas, not an office park on the first one's freeways; the region's top job center always is one). Major: activity >= major_activity. Towns (regional-rail ends at the edge of the region): the same clustering at town_min_density / town_min_activity, at least town_min_sep_km from every center. Without jobs data (population-only, flagged) every people + jobs threshold here and in modes is multiplied by pop_only_factor (people are about 65% of people + jobs in US metros: ~0.53 jobs per resident), and the downtowns are the registry's reference points (meta.json metro.downtowns) when it has them, since a downtown has few residents. The DFW values: 4,000/km2 is about the 85th percentile of DFW block groups; a 20,000-person+job cluster is a small suburban office park or a dense neighbourhood.",
     "grid_km": 0.5,
     "kernel_km": 1.0,
     "min_density": 4000,
@@ -15,17 +15,17 @@
     "town_min_density": 1500,
     "town_min_activity": 8000,
     "town_min_sep_km": 8,
-    "pop_only_factor": 1.0
+    "pop_only_factor": 0.65
   },
   "links": {
-    "_doc": "Center-to-center links (metro/candidates.py): a Gabriel graph (a link a-b exists when no other center lies inside the circle on a-b as diameter, shrunk by gabriel_slack), at most max_km long. Road links (metro and BRT profiles) join urban centers; rail links also reach towns. A routed link is kept if its route is at most max_detour x the straight line and starts/ends within end_gap_km of the centers.",
-    "max_km": {"road": 25, "rail": 45},
+    "_doc": "Road links (metro/candidates.py): a Gabriel graph over centers and towns (a link a-b exists when no other center lies inside the circle on a-b as diameter, shrunk by gabriel_slack), at most max_km.road long, routed with the metro and the BRT profile. Regional rail: a route on standard-gauge track from every downtown or major center to every center or town lines.min_km.commuter / max_circuity to max_km.commuter / 1.1 away. A route is kept if it is at most max_detour x the straight line and starts/ends within end_gap_km of its two places.",
+    "max_km": {"road": 25},
     "gabriel_slack": 0.9,
     "max_detour": {"road": 1.6, "rail": 1.5},
     "end_gap_km": {"road": 1.2, "rail": 2.5}
   },
   "lines": {
-    "_doc": "Candidate lines are shortest paths through the link graph between every pair of centers (towns too, for rail). A path is a candidate if its length is within the mode's [min_km, max_km], it is at most max_circuity x the straight distance between its ends and it turns no more than max_turn_deg at any center it passes. Regional rail lines must start at a downtown or major center.",
+    "_doc": "Road candidate lines are shortest paths (route km) through the road links between every pair of centers and towns; a path is a candidate if its length is within some mode's [min_km, max_km], it is at most max_circuity x the straight distance between its ends and it turns no more than max_turn_deg at any center it passes. Each rail route is a candidate serving every center and town within links.end_gap_km.rail of the track.",
     "min_km": {"metro": 6, "brt": 5, "streetcar": 2, "commuter": 20},
     "max_km": {"metro": 45, "brt": 35, "streetcar": 8, "commuter": 100},
     "max_circuity": 1.5,

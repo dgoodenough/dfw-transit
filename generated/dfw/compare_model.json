@@ -1,0 +1,65 @@
+{
+ "today": {
+  "daily_trips": 80552.98473603533,
+  "daily_boardings": 82964.84437485515,
+  "transit_commuters": 21198.153877904035,
+  "pop_800m": 302265.9554000001,
+  "jobs_800m": 678399.6995999999,
+  "pop": 8450199.1886,
+  "jobs": 4287824.7047999995,
+  "all_boardings": 108020.53898504472,
+  "feeder_boardings": 25055.69461018958,
+  "competitive_commutes": 11.84118906008104,
+  "boardings_by_mode": {
+   "metro": 71424.95743183001,
+   "brt": 0.0,
+   "commuter": 10771.044514550229,
+   "streetcar": 768.8424284749109,
+   "feeder_bus": 25055.69461018958
+  },
+  "access_jobs_45": 21260.539331100277,
+  "stations": 104
+ },
+ "generated": {
+  "daily_trips": 251328.7050887666,
+  "daily_boardings": 322838.35885002674,
+  "transit_commuters": 66139.13291809648,
+  "pop_800m": 2574911.3982,
+  "jobs_800m": 2347715.8403999996,
+  "pop": 8450199.1886,
+  "jobs": 4287824.7047999995,
+  "all_boardings": 366726.7603759122,
+  "feeder_boardings": 43888.40152588543,
+  "competitive_commutes": 859.0061119283821,
+  "boardings_by_mode": {
+   "metro": 186682.63645770244,
+   "brt": 98696.35777854583,
+   "commuter": 36886.51314071902,
+   "streetcar": 572.851473059402,
+   "feeder_bus": 43888.40152588543
+  },
+  "access_jobs_45": 67949.87490210892,
+  "stations": 1051
+ },
+ "2M hand plan": {
+  "daily_trips": 315142.90814673644,
+  "daily_boardings": 422868.7424184402,
+  "transit_commuters": 82932.34424914117,
+  "pop_800m": 2590163.8016000004,
+  "jobs_800m": 2412133.6931999996,
+  "pop": 8450199.1886,
+  "jobs": 4287824.7047999995,
+  "all_boardings": 485831.5055492227,
+  "feeder_boardings": 62962.76313078249,
+  "competitive_commutes": 3978.161576473087,
+  "boardings_by_mode": {
+   "metro": 301235.56894120784,
+   "brt": 100429.82363563369,
+   "commuter": 20972.163362973344,
+   "streetcar": 231.1864786253129,
+   "feeder_bus": 62962.76313078249
+  },
+  "access_jobs_45": 69090.68919201581,
+  "stations": 1001
+ }
+}

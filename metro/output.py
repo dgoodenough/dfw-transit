@@ -224,7 +224,8 @@ def _f(x, unit=""):
     return f"{x:,.0f}{unit}"
 
 
-def report(out, m, gp, cfg, urban, towns, links, cands, chosen, budget, spent, st, res, flags, secs, metro_id):
+def report(out, m, gp, cfg, urban, towns, links, cands, chosen, budget, spent, st, res, flags, secs, metro_id,
+           rail_why=None, skipped=None):
     L = []
     w = L.append
     w(f"# Generated network: {metro_name(m)}")
@@ -241,6 +242,9 @@ def report(out, m, gp, cfg, urban, towns, links, cands, chosen, budget, spent, s
     w("")
     for s in m.status():
         w(f"- {s}")
+    if skipped:
+        w("- left out of today's network (not a dfwt mode; local buses are the model's feeder grid, as in DFW): "
+          + ", ".join(f"{n} {k} lines" for k, n in skipped.items()))
     w("")
     w("## Summary")
     w("")
@@ -292,11 +296,10 @@ def report(out, m, gp, cfg, urban, towns, links, cands, chosen, budget, spent, s
     w("## 2. Corridors")
     w("")
     nr = sum(1 for k in links if k.kind == "road")
-    nrail = sum(1 for k in links if k.kind == "rail")
-    w(f"{nr} road links (Gabriel graph over centers, <= {gp['links']['max_km']['road']} km) and {nrail} rail links "
-      f"(centers + towns, <= {gp['links']['max_km']['rail']} km). Routed: metro profile "
-      f"{sum(1 for k in links if k.routes.get('metro'))}, BRT profile {sum(1 for k in links if k.routes.get('brt'))}, "
-      f"rail {sum(1 for k in links if k.routes.get('rail'))}.")
+    w(f"{nr} road links (Gabriel graph over centers and towns, <= {gp['links']['max_km']['road']} km). Routed: "
+      f"metro profile {sum(1 for k in links if k.routes.get('metro'))}, BRT profile "
+      f"{sum(1 for k in links if k.routes.get('brt'))}. Regional rail routes from downtown and major centers on "
+      "standard-gauge track: " + (", ".join(f"{k} {v}" for k, v in (rail_why or {}).items()) or "none") + ".")
     why = collections.Counter(_bucket_link(v) for k in links for v in k.why.values())
     if why:
         w("Link routes dropped: " + "; ".join(f"{n} x {k}" for k, n in why.most_common()) + ".")

@@ -9,7 +9,7 @@
   python -m metro generate houston [--budget-musd N | --years N] [--no-model] [--out DIR]
                                                       build a potential network (generated/<id>/)
   python -m metro adapt-dfw                           write DFW's inputs in the contract shape
-  python -m metro check-dfw [--no-model]              generate DFW, compare with the hand plan
+  python -m metro check-dfw [--no-model] [--reuse]     generate DFW, compare with the hand plan
                                                       (reports/generator_dfw_check.md)
 """
 import argparse
@@ -41,6 +41,7 @@ def main(argv=None):
     sub.add_parser("adapt-dfw", help="write data/metros/dfw/ from the repo's DFW inputs")
     c = sub.add_parser("check-dfw", help="generate DFW at the 2M plan's capital and compare with it")
     c.add_argument("--no-model", action="store_true")
+    c.add_argument("--reuse", action="store_true", help="compare generated/dfw/ as it is (no regeneration)")
     a = ap.parse_args(argv)
 
     if a.cmd in ("generate", "check-dfw"):
@@ -57,7 +58,7 @@ def main(argv=None):
         return 0
     if a.cmd == "check-dfw":
         from .compare import main as check
-        check(run_model=not a.no_model)
+        check(run_model=not a.no_model, reuse=a.reuse)
         return 0
 
     from . import fetch

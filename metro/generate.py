@@ -45,6 +45,19 @@ def params(metro_id=None, override=None):
     return gp
 
 
+def pop_only(gp):
+    """Without jobs, activity is people alone: scale every people + jobs threshold by
+    centers.pop_only_factor (in place). Returns the factor."""
+    f = gp["centers"]["pop_only_factor"]
+    c = gp["centers"]
+    for k in ("min_density", "min_activity", "major_activity", "town_min_density", "town_min_activity",
+              "downtown_jobs", "downtown_job_density"):
+        c[k] = c[k] * f
+    for k in ("metro", "streetcar", "brt", "commuter_1600m"):
+        gp["modes"][k] = gp["modes"][k] * f
+    return f
+
+
 class Cand:
     """One candidate line."""
 
@@ -130,23 +143,33 @@ class Existing:
         return out
 
 
-def generate(metro_id, budget_musd=None, years=None, out=None, run_model=True, override=None, log=print):
+def generate(metro_id, budget_musd=None, years=None, out=None, run_model=True, override=None, log=print, metro=None):
+    """Run every step for one metro; `metro` (an inputs.Metro) replaces reading data/metros/<id>/ (tests)."""
     t0 = time.time()
     gp = params(metro_id, override)
     cfg0 = config.load()
-    m = inputs.load(metro_id)
+    m = metro or inputs.load(metro_id)
     out = out or config.path("generated", metro_id)
     os.makedirs(out, exist_ok=True)
     log(f"{metro_id}: " + "; ".join(m.status()))
     if not m.osm.get("roads"):
         raise SystemExit(f"{metro_id}: osm/roads.parquet is missing; corridors can't be routed")
     flags = [] if m.jobs_ok else [m.jobs_note]
+    if not m.jobs_ok:
+        f = pop_only(gp)
+        flags.append(f"every people + jobs threshold (centers, towns, mode densities) x {f} "
+                     "(people are about that share of people + jobs in US metros); commutes go to where people "
+                     "live (destinations follow population); the full model's absolute numbers are not meaningful")
 
     # 1. centers -------------------------------------------------------------
     cp = gp["centers"]
     surf = centers.Surface(m, cp["grid_km"], cp["kernel_km"])
     urban = centers.find(m, surf, cp)
     centers.classify(m, urban, cp)
+    if not m.jobs_ok:
+        note = centers.registry_downtowns(m, surf, urban, cp)
+        if note:
+            flags.append(note)
     towns = centers.towns(m, surf, cp, urban)
     namer = output.make_namer(m)
     used_names = set()
@@ -172,7 +195,6 @@ def generate(metro_id, budget_musd=None, years=None, out=None, run_model=True, o
     road_metro = dict(candidates.paths(urban + towns, links, "road", "metro", gp))
     road_brt = dict(candidates.paths(urban + towns, links, "road", "brt", gp))
     rail, rail_why = candidates.rail_lines(m, router, urban, towns, gp, log)
-    links_rail_why = rail_why
     log(f"  paths: {len(road_metro)} metro-profile, {len(road_brt)} BRT-profile, {len(rail)} rail")
 
     # 3. mode, stations, cost, sketch value per candidate ---------------------------
@@ -218,7 +240,7 @@ def generate(metro_id, budget_musd=None, years=None, out=None, run_model=True, o
         log("  demand model (dfwt, today's land use, every line open) ...")
         res = output.model_runs(m, cfg, ctx, tables, ex)
     output.report(out, m, gp, cfg, urban, towns, links, cands, chosen, budget, spent, stats, res, flags,
-                  time.time() - t0, metro_id)
+                  time.time() - t0, metro_id, rail_why=rail_why, skipped=ex.skipped)
     output.preview(out, m, surf, urban, towns, ex, chosen, tables)
     log(f"  wrote {os.path.relpath(out, config.ROOT)}/ in {time.time() - t0:.0f}s")
     return {"out": out, "chosen": chosen, "cands": cands, "centers": urban, "towns": towns, "stats": stats,

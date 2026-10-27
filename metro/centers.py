@@ -13,7 +13,8 @@ Method (DENCLUE-style density clustering, numpy only):
    `kernel_km` of the peak.
 4. Tiers, by jobs (people + jobs if the metro has no jobs data, flagged):
    downtown  jobs within `downtown_radius_km` >= `downtown_jobs` and peak job density
-             >= `downtown_job_density` (the region's top one always qualifies)
+             >= `downtown_job_density`, and the biggest job center within `downtown_sep_km`
+             (a second downtown is a separate city); the region's top one always qualifies
    major     activity >= `major_activity`
    minor     the rest
    Town centers for regional rail are found the same way with the lower `town_*`
@@ -175,8 +176,8 @@ def classify(m, centers, p):
     sep = p["downtown_sep_km"]
     for c in centers:
         dens = c.peak_jobs_density if m.jobs_ok else c.peak_density
-        lim_j = p["downtown_jobs"] if m.jobs_ok else p["downtown_jobs"] * p["pop_only_factor"]
-        lim_d = p["downtown_job_density"] if m.jobs_ok else p["downtown_job_density"] * p["pop_only_factor"]
+        lim_j = p["downtown_jobs"]          # (already scaled for population-only data: generate.pop_only)
+        lim_d = p["downtown_job_density"]
         # the biggest job center within downtown_sep_km: a second downtown is a separate city
         # (Fort Worth beside Dallas), not a big office park on the first one's freeways
         biggest = all(o.near_jobs <= c.near_jobs for o in centers if math.hypot(o.x - c.x, o.y - c.y) <= sep)
@@ -186,6 +187,37 @@ def classify(m, centers, p):
             c.kind = "major"
         else:
             c.kind = "minor"
+
+
+def registry_downtowns(m, surf, centers, p):
+    """Population-only data can't see a downtown (few residents, many jobs). When step 1's
+    registry gives downtown reference points (meta.json metro.downtowns), they become the
+    downtowns: the center within merge_km moves onto the point (or a new center is made
+    there), and the residential peaks lose their downtown label. Returns a note for the report,
+    or None when the registry has no points."""
+    meta = m.meta or {}
+    pts = (meta.get("metro") or {}).get("downtowns") or meta.get("downtowns") or []
+    if not pts:
+        return None
+    for c in centers:
+        if c.kind == "downtown":
+            c.kind = "major"
+    names = []
+    for d in pts:
+        x, y = (float(v) for v in m.xy(d["lat"], d["lon"]))
+        near = [c for c in centers if math.hypot(c.x - x, c.y - y) <= p["merge_km"]]
+        r2 = p["downtown_radius_km"] ** 2
+        z = (m.x - x) ** 2 + (m.y - y) ** 2 <= r2
+        if near:
+            c = min(near, key=lambda c: math.hypot(c.x - x, c.y - y))
+        else:
+            c = Center(f"C{len(centers) + 1:02d}", x, y, d["lat"], d["lon"], float(m.activity[z].sum()),
+                       float(m.pop[z].sum()), 0.0, float(surf.density_at(x, y)), 0.0, "downtown", 0)
+            centers.append(c)
+        c.x, c.y, c.lat, c.lon, c.kind = x, y, d["lat"], d["lon"], "downtown"
+        names.append(d.get("name", "downtown"))
+    return ("no jobs data: downtown placed at the registry's reference point" + ("s " if len(names) > 1 else " ")
+            + ", ".join(names) + " (meta.json metro.downtowns) instead of the densest residential cluster")
 
 
 def towns(m, surf, p, centers):
