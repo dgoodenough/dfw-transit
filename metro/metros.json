@@ -1,0 +1,46 @@
+{
+  "_doc": "Metro registry for `python -m metro fetch <id>`. Data, not code: one entry per metro. county_fips are 5-digit state+county FIPS codes of the CBSA (2023 OMB delineation, list1_2023.xlsx); state_fips are the 2-digit states they fall in; state_abbr maps each state FIPS to its USPS code (LODES and Census file names use it). downtowns are reference points (lat/lon) for the network builder. Optional keys: gtfs_include (Mobility Database source ids to use instead of the bbox search), gtfs_exclude (ids to drop from it), brt_name_pattern (regex on route names that marks a bus route as BRT), bbox_margin_deg (padding around the block-group centroids, default 0.1).",
+  "metros": [
+    {
+      "id": "houston",
+      "name": "Houston-Pasadena-The Woodlands, TX",
+      "cbsa": "26420",
+      "state_fips": [
+        "48"
+      ],
+      "state_abbr": {
+        "48": "tx"
+      },
+      "county_fips": [
+        "48015",
+        "48039",
+        "48071",
+        "48157",
+        "48167",
+        "48201",
+        "48291",
+        "48339",
+        "48473"
+      ],
+      "county_names": {
+        "48015": "Austin",
+        "48039": "Brazoria",
+        "48071": "Chambers",
+        "48157": "Fort Bend",
+        "48167": "Galveston",
+        "48201": "Harris",
+        "48291": "Liberty",
+        "48339": "Montgomery",
+        "48473": "Waller"
+      },
+      "downtowns": [
+        {
+          "name": "Downtown Houston",
+          "lat": 29.7604,
+          "lon": -95.3698
+        }
+      ],
+      "brt_name_pattern": "\\bBRT\\b|Silver Line|Rapid"
+    }
+  ]
+}

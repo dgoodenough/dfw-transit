@@ -1,0 +1,1962 @@
+station_id,name,lat,lon
+m2060_100,West Loop Transit Center,29.679521,-95.457190
+m2060_10014,Airline Dr @ Aldine Bender Rd,29.931103,-95.409626
+m2060_10015,Airline Dr @ West Rd Mb,29.917703,-95.405826
+m2060_1002,Harrisburg Blvd @ 74th St,29.733117,-95.294292
+m2060_1003,Harrisburg Blvd @ S 75th St,29.732557,-95.292457
+m2060_1004,Harrisburg Blvd @ Pineview Dr,29.732132,-95.291140
+m2060_10041,Jensen Dr @ Providence St,29.770824,-95.343353
+m2060_10042,Jensen Dr @ Opelousas St,29.772316,-95.342453
+m2060_1005,Harrisburg Blvd @ 77th St,29.731280,-95.288258
+m2060_10056,Richmond Ave @ Cummins St,29.732563,-95.438633
+m2060_10067,Long Point Rd @ Big Bend Dr,29.799140,-95.518762
+m2060_10073,Airline Dr @ Louise Rd,29.887649,-95.393705
+m2060_10089,Westheimer Rd @ Kettering Dr,29.741263,-95.452869
+m2060_1009,Broadway St @ Glover St,29.703798,-95.277860
+m2060_10092,Eastex Freeway @ Hopper Rd,29.880469,-95.323467
+m2060_10093,Eastex Freeway @ Mount Houston Rd,29.891822,-95.316912
+m2060_10094,Eastex Freeway @ Brunswick St,29.894524,-95.315344
+m2060_10095,Eastex Freeway @ Winfield Rd,29.899138,-95.312667
+m2060_1010,Broadway St @ Scanlock St,29.704959,-95.277892
+m2060_10107,FM 1960 Rd @ Hollister St,29.974298,-95.522715
+m2060_1011,Broadway St @ Keller St,29.706495,-95.277936
+m2060_1012,Broadway St @ Galveston Rd,29.709352,-95.277969
+m2060_10125,Rosslyn Rd @ W Donovan St,29.844381,-95.442040
+m2060_10126,Rosslyn Rd @ Pinemont Dr,29.841231,-95.441925
+m2060_10127,Pinemont Dr @ Wheatley St,29.840944,-95.429061
+m2060_1013,Broadway St @ Brutus St,29.711233,-95.277995
+m2060_10133,Bissonnet St @ S Gessner Rd,29.676592,-95.528658
+m2060_1014,Harrisburg Blvd @ 80th St,29.729614,-95.282041
+m2060_10140,Westheimer Rd @ Yorktown St,29.738943,-95.470975
+m2060_10143,Long Point Rd @ Butlercrest St,29.794440,-95.535907
+m2060_1015,Harrisburg Blvd @ 79th St,29.730216,-95.284052
+m2060_10152,Tidwell Rd @ Fairbanks N Houston Rd,29.850759,-95.524604
+m2060_10153,W Tidwell Rd @ Guhn Rd,29.850793,-95.516044
+m2060_1016,Harrisburg Blvd @ 78th St,29.730762,-95.285929
+m2060_10168,Canal St @ S Lockwood Dr,29.748112,-95.326961
+m2060_1017,Harrisburg Blvd @ 77th St,29.731377,-95.287987
+m2060_10173,S Main St @ S Loop W,29.676209,-95.428514
+m2060_1018,Harrisburg Blvd @ 76th St,29.732082,-95.290382
+m2060_10186,Scott St @ S Loop E,29.680123,-95.366757
+m2060_10198,78th St @ E Navigation Blvd,29.737495,-95.283309
+m2060_10202,El Camino St @ Holly Hall St,29.686486,-95.383145
+m2060_10206,Holcombe Blvd @ Pressler St,29.706092,-95.408078
+m2060_10223,Bissonnet St @ Mercer St,29.725187,-95.432469
+m2060_10238,East Freeway @ Westshire Dr,29.774112,-95.242362
+m2060_10240,Sam Houston Pkwy @ Atrium Dr,29.939049,-95.391894
+m2060_10241,Greens Rd @ Air Center Blvd,29.953252,-95.373024
+m2060_10242,Eastex Freeway @ Easthampton Dr,29.901398,-95.311504
+m2060_1028,Capitol St @ 71st St,29.733770,-95.300330
+m2060_10280,South Point Park & Ride,29.613761,-95.208258
+m2060_1029,Capitol St @ 71st St,29.733703,-95.300612
+m2060_10344,Pinemont Dr @ Rosslyn Rd Mb2,29.841023,-95.433071
+m2060_10345,Pinemont Dr @ Rosslyn Rd Mb1,29.841003,-95.437121
+m2060_10400,Synott Rd @ Alief Clodine Rd,29.713926,-95.614797
+m2060_10407,S Rice Ave @ Westpark Dr MB,29.723221,-95.468224
+m2060_1041,78th St @ Harrisburg Blvd,29.731162,-95.285918
+m2060_10413,Fondren Rd @ Moonmist Dr,29.711148,-95.521213
+m2060_1042,78th St @ Sherman St,29.732703,-95.285335
+m2060_1043,78th St @ Avenue I,29.736085,-95.283953
+m2060_10433,Bissonnet St @ Dunlavy St,29.725632,-95.402321
+m2060_10452,Elgin St @ Smith St,29.743518,-95.380364
+m2060_10457,St Joseph Pkwy @ Smith St,29.752200,-95.373355
+m2060_10465,Bissonnet St @ Mandell St Mb,29.725688,-95.397712
+m2060_10495,Bissonnet St @ Sam Houston Pkwy,29.674429,-95.561305
+m2060_1051,Canal St @ 75th St,29.736897,-95.291386
+m2060_10510,San Jacinto St @ Pease St,29.750516,-95.367365
+m2060_10512,Main St @ Cambridge St,29.715698,-95.397410
+m2060_1052,Canal St @ 74th St,29.737192,-95.292311
+m2060_1053,Canal St @ Hedrick St,29.738228,-95.295499
+m2060_1054,Canal St @ 71st St,29.739031,-95.298099
+m2060_1055,Canal St @ 70th St,29.739812,-95.300516
+m2060_1056,Canal St @ Ssgt Macario Garcia Dr,29.740444,-95.302457
+m2060_10567,Hobby Airport,29.655337,-95.275771
+m2060_10581,Congress St @ Chenevert St,29.758090,-95.353669
+m2060_10582,Congress St @ Jackson St,29.758610,-95.354553
+m2060_10583,Congress St @ Crawford St,29.759011,-95.355214
+m2060_10585,Northline Transit Center,29.832531,-95.376705
+m2060_10594,Louisiana St @ Franklin St,29.764345,-95.362788
+m2060_10596,Hamilton St @ Congress St,29.757806,-95.352930
+m2060_10601,St Joseph Pkwy @ Milam St,29.751211,-95.371734
+m2060_10602,John F Kennedy Blvd @ Heathrow Fore,29.925764,-95.331227
+m2060_10603,John F Kennedy Blvd @ Aldine Bender,29.929917,-95.331168
+m2060_10624,Woodforest Blvd @ Charlie Voix Ave,29.792258,-95.198266
+m2060_10625,Woodforest Blvd @ Forestwood Dr,29.793266,-95.196607
+m2060_10626,Woodforest Blvd @ Grand Oaks Blvd,29.793736,-95.192772
+m2060_10627,Woodforest Blvd @ Claire Ln,29.791803,-95.187643
+m2060_10665,Woodforest Blvd @ Wild Plum,29.789332,-95.211125
+m2060_10667,Woodforest Blvd @ Maxey Rd,29.787570,-95.214359
+m2060_10668,San Jacinto St @ Webster St,29.746763,-95.370309
+m2060_10678,Preston St @ Bagby St,29.764715,-95.366784
+m2060_10680,Washington Ave @ TC Jester Blvd,29.770708,-95.417199
+m2060_10681,Jensen Dr @ Saunders Rd,29.864322,-95.333442
+m2060_10683,Memorial Dr @ Cowan Dr,29.763609,-95.426064
+m2060_107,S Rice Ave @ Westpark Dr,29.725076,-95.468260
+m2060_10706,Townsen Park & Ride,30.019122,-95.263117
+m2060_10732,Fulton St @ Van Molan,29.829100,-95.375955
+m2060_10758,Antoine Dr @ West Rd,29.913075,-95.479450
+m2060_10759,Antoine Dr @ Duckett Park Dr,29.917675,-95.481099
+m2060_10760,Antoine Dr @ Fallbrook Rd,29.919293,-95.481422
+m2060_10761,Antoine Dr @ Frick Rd,29.922683,-95.481466
+m2060_10762,Antoine Dr @ Cloud Swept Ln,29.925949,-95.481191
+m2060_10763,Antoine Dr @ Wheat,29.929392,-95.481228
+m2060_10764,Antoine Dr @ Canyon Way Dr,29.932338,-95.482185
+m2060_10765,Antoine Dr @ Billikin Dr,29.933684,-95.482793
+m2060_10766,Antoine Dr @ Greenyard Dr,29.935610,-95.483079
+m2060_10767,Antoine Dr @ Sam Houston Pkwy,29.938629,-95.483105
+m2060_10768,Antoine Dr @ W Greens Rd,29.942830,-95.483246
+m2060_10769,Antoine Dr @ Breckenridge Dr,29.947271,-95.483282
+m2060_10770,Antoine Dr @ Claverton Dr,29.950484,-95.483175
+m2060_10771,Antoine Dr @ Suttonford Dr,29.954787,-95.483247
+m2060_10772,Antoine Dr @ Wirksworth Dr,29.957761,-95.482059
+m2060_10773,Antoine Dr @ Veterans Memorial Dr,29.960765,-95.478154
+m2060_10860,Franklin St @ Mentor,29.765884,-95.368178
+m2060_10903,Veterans Memorial Dr @ N Camden Pky,29.957967,-95.475771
+m2060_10904,Veterans Memorial Dr @ Kelly Ln,29.955968,-95.474253
+m2060_10905,Veterans Memorial Dr @ Milroy Ln,29.952204,-95.471383
+m2060_10906,Veterans Memorial Dr @ Greens Rd,29.948603,-95.468641
+m2060_10923,San Jacinto St @ McIlhenny St,29.745140,-95.371613
+m2060_10930,S Main St @ Willowbend Blvd,29.664550,-95.437649
+m2060_10935,Fondren Rd @ E Hampton Cir,29.631836,-95.507781
+m2060_10953,Fulton St @ Fichter Ave,29.841348,-95.375898
+m2060_10957,Metro Blvd @ Winter Rose Way,29.707072,-95.627951
+m2060_10970,Imperial Valley Dr @ Aldine Bender,29.932529,-95.402037
+m2060_10991,Milam St @ Franklin St,29.764194,-95.361875
+m2060_10998,W Bellfort Ave @ Knight  Rd,29.673398,-95.399575
+m2060_11019,Bellfort Ave @ Canyon St,29.669284,-95.377602
+m2060_11025,Texas Medical Center Transit Center,29.704323,-95.403613
+m2060_11029,Fannin South PR,29.673816,-95.402138
+m2060_11030,Wheeler Station (Bus),29.733193,-95.383191
+m2060_11031,Downtown Transit Center,29.750226,-95.371139
+m2060_11041,Main St @ Southgate Blvd,29.708899,-95.403135
+m2060_11047,Richmond Ave @ Bute,29.734704,-95.384280
+m2060_11049,Main St @ Wheeler Station,29.733095,-95.383690
+m2060_11053,Hempstead Rd @ Post Oak Rd,29.799020,-95.456509
+m2060_11105,Imperial Valley Dr @ Greens Rd,29.949931,-95.399348
+m2060_11106,Imperial Valley Dr @ Seminar Dr,29.947432,-95.397370
+m2060_11108,Imperial Valley Dr @ Benmar Dr,29.943730,-95.395972
+m2060_11109,Benmar Dr @ City View Pl,29.944228,-95.399553
+m2060_11111,Benmar Dr @ Northchase Dr,29.943735,-95.403725
+m2060_1112,Ernestine St @ Bell St,29.736680,-95.333248
+m2060_1113,Ernestine St @ Pease St,29.735003,-95.334287
+m2060_1114,Ernestine St @ Coyle St,29.733506,-95.334896
+m2060_1115,Ernestine St @ Harby St,29.731671,-95.335644
+m2060_11202,Franklin St @ Travis St,29.763586,-95.361257
+m2060_11216,Pressler St @ Main St,29.704171,-95.406376
+m2060_11239,Bissonnet St @ Mellow Brook Dr,29.678730,-95.605571
+m2060_11240,Bissonnet St @ Old Richmond Rd,29.679574,-95.608513
+m2060_11243,Main St @ Southmore Blvd,29.728340,-95.387452
+m2060_11251,Wheeler Ave @ San Jacinto St,29.733076,-95.381101
+m2060_11254,Bertner Ave @ Pressler St,29.704602,-95.399545
+m2060_11255,Pressler St @ Rjv Johnson MB,29.704090,-95.401464
+m2060_11257,Cypress Park & Ride,29.964321,-95.684963
+m2060_11258,FM 1960 Rd @ North Fwy,30.021559,-95.427084
+m2060_11264,Gessner Rd @ Genard Rd Mb2,29.838542,-95.545204
+m2060_11273,Antoine Dr @ Arncliffe Dr,29.881645,-95.473727
+m2060_11307,Bertner Ave @ Holcombe Blvd,29.705944,-95.398999
+m2060_11342,S Main St @ W Bellfort Ave,29.672223,-95.431567
+m2060_11347,Fulton St @ Lyerly St,29.835012,-95.375906
+m2060_11407,Richmond Ave @ Yupon St,29.734537,-95.395892
+m2060_11413,Polk St @ Hughes St,29.733136,-95.316185
+m2060_11414,Harrisburg Blvd @ 75th St,29.732582,-95.291993
+m2060_11415,78th St @ Canal St,29.734614,-95.284530
+m2060_11423,Bissonnet St @ Boone Loop Rd,29.674094,-95.566768
+m2060_11424,M L King Blvd @ Uh University Dr,29.718212,-95.339505
+m2060_11426,Greens Rd @ Aldine Westfield Rd,29.951198,-95.359184
+m2060_11448,Tidwell Rd @ Havens St Mb,29.846128,-95.365147
+m2060_11456,Tidwell Rd @ Antoine Dr,29.848790,-95.471280
+m2060_11458,Tidwell Rd @ Goldspier St,29.846611,-95.445995
+m2060_11463,S Main St @ Kirby Dr,29.694850,-95.413900
+m2060_11469,FM 1960 Rd @ Beaver Springs Dr,30.011929,-95.454562
+m2060_11474,M L King Blvd @ Wheeler St,29.716366,-95.339990
+m2060_11484,Blodgett St @ Sauer St,29.719989,-95.363755
+m2060_11488,Blodgett St @ Canfield St,29.717661,-95.356068
+m2060_11491,Ennis St @ Blodgett St,29.721785,-95.367364
+m2060_11492,Blodgett St @ Tierwester St,29.718408,-95.358541
+m2060_11509,Main St @ Prospect St,29.726998,-95.388518
+m2060_11512,Memorial Dr @ Picnic Ln,29.768000,-95.446193
+m2060_11514,Westheimer Rd @ Weslayan St,29.741660,-95.441979
+m2060_11518,W Bellfort Ave @ South Freeway,29.667909,-95.385490
+m2060_11520,Bellfort Ave @ McLean St,29.669640,-95.361562
+m2060_11528,Braeswood Blvd @ Stella Link Rd,29.691535,-95.440282
+m2060_11531,Hiram Clarke Rd @ Town Plaza Dr,29.647727,-95.446421
+m2060_11544,Long Point Rd @ Campbell Rd Mb,29.800677,-95.511721
+m2060_11545,Long Point Rd @ Spring Branch Rd,29.802517,-95.509738
+m2060_11546,Hempstead Rd @ Fairway Park Dr Mb,29.810142,-95.471807
+m2060_11552,Bertner Ave @ Bates St,29.707481,-95.399205
+m2060_11570,Aldine Westfield Rd @ Marvel Dr,29.946848,-95.357404
+m2060_11575,Canal St @ Sidney St,29.749477,-95.331493
+m2060_11584,Richmond Ave @ Royal Oaks Club Dr,29.731121,-95.586040
+m2060_11601,Fondren Dr @ W Orem Dr,29.624630,-95.507253
+m2060_11603,Beechnut St @ Cook Rd,29.688969,-95.596147
+m2060_11616,Grand Parkway Park & Ride,29.787786,-95.776249
+m2060_11623,FM 1960 Rd @ Wunderlich Rd,29.983925,-95.505273
+m2060_11636,Woodforest Blvd @ Normandy St,29.791188,-95.201665
+m2060_11641,Wheeler St @ Cullen Blvd,29.718633,-95.349053
+m2060_11649,Gears Rd @ Trickey Rd,29.945945,-95.444958
+m2060_11650,Gears Rd @ Greensmark Dr,29.945975,-95.441503
+m2060_11651,Gears Rd @ Spears Rd,29.946017,-95.436411
+m2060_11652,Gears Rd @ Ella Blvd,29.946042,-95.433703
+m2060_11653,W Greens Rd @ Greens Crossing Blvd,29.948819,-95.426826
+m2060_11656,Westheimer Rd @ Huldy St,29.742583,-95.409784
+m2060_11658,Holcombe Blvd @ Kirby Dr,29.706026,-95.417744
+m2060_11661,Bellaire Blvd @ Hillcroft Ave,29.705310,-95.493459
+m2060_11664,Bellaire Blvd @ Fondren Rd,29.705034,-95.520164
+m2060_11665,Bellaire Blvd @ S Gessner Rd,29.704858,-95.537406
+m2060_11668,Bellaire Blvd @ Ranchester Dr,29.704782,-95.544693
+m2060_11671,W Bellfort Ave @ Sam Houston Pkwy,29.654335,-95.548270
+m2060_11673,Bellaire Blvd @ Southwest Freeway,29.704906,-95.515671
+m2060_11679,W Tidwell Rd @ Deep Creek Ln,29.848196,-95.463987
+m2060_11683,FM 1960 Rd @ Butte Creek Dr,30.010982,-95.456283
+m2060_11689,University Dr @ M L King Blvd,29.718818,-95.337949
+m2060_11697,Willow Chase Blvd @ Centerfield Dr,29.966183,-95.547710
+m2060_11702,Burdine St @ Braes Valley Dr,29.678858,-95.481798
+m2060_11703,Braes Valley Dr @ Renwick Dr,29.679198,-95.484089
+m2060_11705,Renwick Dr @ Birdwood Rd,29.681854,-95.484233
+m2060_11707,Renwick Dr @ Imogene St,29.683752,-95.484260
+m2060_11709,Renwick Dr @ Jackwood St,29.684888,-95.484278
+m2060_11711,Renwick Dr @ Darnell St,29.687189,-95.484288
+m2060_11713,Renwick Dr @ Beechnut St,29.688803,-95.484317
+m2060_11715,Renwick Dr @ Maple St,29.690776,-95.484344
+m2060_11717,Renwick Dr @ Pine St,29.694508,-95.484408
+m2060_11719,Renwick Dr @ Bissonnet St,29.698909,-95.484455
+m2060_11721,Renwick Dr @ Jessamine St,29.701755,-95.484496
+m2060_11723,Renwick Dr @ Edgemoor Dr,29.703472,-95.484519
+m2060_11725,Renwick Dr @ Bellaire Blvd,29.705329,-95.484537
+m2060_11727,Renwick Dr @ Dashwood Dr,29.707132,-95.484555
+m2060_11729,Renwick Dr @ Clarewood Dr,29.709033,-95.484576
+m2060_11731,Renwick Dr @ Moonmist Dr,29.710591,-95.484605
+m2060_11733,Renwick Dr @ Elm St,29.712629,-95.484632
+m2060_11735,Renwick Dr @ Gulfton Dr,29.716246,-95.484662
+m2060_11737,Renwick Dr @ Glenmont Dr,29.719854,-95.484729
+m2060_11739,Renwick Dr @ Westpark Dr,29.724206,-95.484158
+m2060_11741,Fountain View Dr @ Schumacher Ln,29.728668,-95.484046
+m2060_11743,Fountain View Dr @ Richmond Ave,29.731294,-95.484113
+m2060_11745,Fountain View Dr @ Winsome Ln,29.735287,-95.484147
+m2060_11747,Fountain View Dr @ Westheimer Rd,29.737598,-95.484187
+m2060_11778,Cambridge St @ Woodbury St,29.704178,-95.390682
+m2060_11780,Cambridge St @ Butler Blvd,29.700125,-95.392354
+m2060_11786,Main St @ Arbor Pl,29.730807,-95.385504
+m2060_11790,Woodway Dr @ Post Oak Ln,29.763766,-95.461120
+m2060_11795,Cambridge St @ Old Spanish Trl,29.697425,-95.392853
+m2060_11806,Greens Rd @ Central Green Blvd,29.953605,-95.376516
+m2060_11807,Bissonnet St @ Keegan Rd Mb,29.675245,-95.589968
+m2060_11851,Bellaire Blvd @ Stella Link Rd,29.705853,-95.439561
+m2060_11855,Long Point Rd @ Freedonia Dr,29.798616,-95.521601
+m2060_11886,W Bellfort Ave @ SH 288,29.667858,-95.392284
+m2060_11889,Beechnut St @ Dairy View Ln,29.688948,-95.600047
+m2060_11902,Holly Hall St @ Almeda Rd,29.685427,-95.392180
+m2060_11904,Airmail Rd @ Pallet Rd,29.980148,-95.344917
+m2060_11906,Tidwell Rd @ Tidwell Fountains Ln,29.849592,-95.281347
+m2060_11946,Scott St @ Jipsie Ln,29.646744,-95.368302
+m2060_11947,Scott St @ Corksie St,29.648322,-95.368340
+m2060_11948,Scott St @ Sunbeam St,29.649741,-95.368377
+m2060_11949,Scott St @ Sparrow St,29.652166,-95.368431
+m2060_11950,Scott St @ Dawson Ln,29.653765,-95.368460
+m2060_11951,Scott St @ Wilmington St,29.655464,-95.368501
+m2060_11952,Scott St @ Reed Rd,29.658005,-95.367892
+m2060_11978,Antoine Dr @ Wirksworth Dr Mb,29.959527,-95.480370
+m2060_11980,Beechnut St @ Dairy Ashford Rd,29.688837,-95.604553
+m2060_11982,Beechnut St @ Brookwulf Dr,29.688801,-95.607390
+m2060_11984,Beechnut St @ Crescent Park Village,29.688539,-95.612757
+m2060_11986,Beechnut St @ Synott Rd,29.688423,-95.614671
+m2060_11987,Beechnut St @ Mystic Grove Ln,29.688408,-95.617838
+m2060_11990,Beechnut St @ Eldridge Pkwy,29.688399,-95.622547
+m2060_11992,Beechnut St @ Hemlock Hill Dr,29.687850,-95.626588
+m2060_11994,Beechnut St @ Rustling Leaves Dr,29.688931,-95.630281
+m2060_11995,Beechnut St @ Howell Sugar Land Rd,29.690074,-95.633666
+m2060_11997,Pavilion Point @ Howell Sugar Land,29.693008,-95.634549
+m2060_12000,Pavilion Dr @ Pavilion Point,29.693334,-95.638087
+m2060_12004,Pavilion Dr @ Bellaire Blvd,29.703288,-95.638220
+m2060_12005,Pavilion Dr @ Summer Garden,29.700515,-95.638084
+m2060_12006,Pavilion Dr @ Rancho Mission Dr,29.699154,-95.638049
+m2060_12022,Pavilion Dr @ Empanada  Dr,29.695852,-95.638568
+m2060_12031,Bellaire Blvd @ Synott Rd,29.703260,-95.611590
+m2060_12032,Peakwood Dr @ Red Oak Dr,30.020484,-95.445727
+m2060_12045,Cleburne St @ Canfield St,29.721910,-95.354376
+m2060_12064,Bertner Ave @ Braeswood Blvd,29.701177,-95.399331
+m2060_12071,W 18th St @ Mangum Rd,29.801371,-95.458983
+m2060_12083,Antoine Dr @ Houston Rosslyn Rd,29.852682,-95.473180
+m2060_12087,N Post Oak Rd @ Hempstead Hwy,29.797257,-95.456642
+m2060_12089,Buffalo Speedway   @ Bissonnet St,29.724771,-95.427884
+m2060_12091,East Rd @ Cambridge St,29.694003,-95.394185
+m2060_12092,Montrose Blvd @ W Dallas St,29.757238,-95.392116
+m2060_12098,Harrisburg Blvd @ 73rd St,29.733807,-95.295931
+m2060_12099,Forest Hill Blvd @ Harrisburg Blvd,29.733924,-95.297284
+m2060_12102,North Freeway @ Fallbrook Dr,29.929936,-95.412292
+m2060_12137,Scott St @ South Acres Dr,29.641948,-95.368179
+m2060_12138,Scott St @ Kipp Academy Driveway N,29.638468,-95.368157
+m2060_12140,Scott St @ Botany Ln,29.634061,-95.368104
+m2060_12142,Scott St @ Hickok Ln,29.631832,-95.368060
+m2060_12144,Scott St @ Cork Dr,29.625044,-95.368270
+m2060_12146,MLK Clinic,29.619660,-95.367884
+m2060_12156,Scott St @ Bessie Swindle Way,29.635522,-95.368125
+m2060_12167,Capitol St @ 72nd St,29.733331,-95.298926
+m2060_12237,El Dorado Park & Ride,29.547784,-95.157886
+m2060_12301,W Bellfort Ave @ Centerpoint Dr,29.672429,-95.408289
+m2060_12304,W Bellfort Ave @ Buffalo Speedway,29.671997,-95.425104
+m2060_12306,W Bellfort Ave @ S Main St,29.673129,-95.431801
+m2060_12308,W Bellfort Ave @ Stella Link Rd,29.673192,-95.440458
+m2060_12315,Beckford Dr @ Newbrook Dr,29.684568,-95.610662
+m2060_12316,Beckford Dr @ Bissonnet St,29.680925,-95.610677
+m2060_12321,Howell Sugarland Rd @ Bellaire Blvd,29.704255,-95.634546
+m2060_12323,Howell Sugarland Rd @ Rio Bonito Rd,29.708404,-95.634594
+m2060_12334,Wheeler Ave @ Labranch St,29.731543,-95.378527
+m2060_12336,Wheeler Ave @ Almeda Rd,29.729987,-95.375912
+m2060_12338,Wheeler Ave @ Emancipation Ave,29.726893,-95.370748
+m2060_12344,San Felipe Rd @ Briarglen Dr,29.746557,-95.450848
+m2060_12355,Sage Rd @ San Felipe Rd,29.749780,-95.467295
+m2060_12357,Sage Rd @ Chevy Chase Dr,29.746396,-95.467151
+m2060_12359,Sage Rd @ Meadow Lake Ln,29.743722,-95.467087
+m2060_1236,Navigation Blvd @ Canal St,29.758251,-95.347608
+m2060_12360,Sage Rd @ Westheimer Rd,29.740725,-95.467049
+m2060_12361,Sage Rd @ Alabama St,29.738256,-95.466918
+m2060_12362,Sage Rd @ Hidalgo St,29.734807,-95.466859
+m2060_12410,Memorial City Way @ Barryknoll Ln,29.780310,-95.536020
+m2060_12412,Barryknoll Ln @ Gessner Rd,29.778254,-95.544059
+m2060_12413,W 18th St @ W TC Jester Blvd,29.801533,-95.428981
+m2060_12414,W 18th St @ Seaspray Ct,29.801506,-95.435272
+m2060_1250,Canal St @ N Super St,29.748630,-95.328737
+m2060_1251,Canal St @ Jenkins St,29.749152,-95.330428
+m2060_1252,Canal St @ Drennan St,29.749923,-95.332897
+m2060_1253,Canal St @ N Milby St,29.750584,-95.334603
+m2060_1254,Canal St @ N York St,29.752115,-95.336878
+m2060_1255,Canal St @ N Sampson St,29.752651,-95.337743
+m2060_1256,Canal St @ N Palmer St,29.754155,-95.340241
+m2060_12568,Gessner Rd @ Papalote St,29.860415,-95.545202
+m2060_1257,Canal St @ N Paige St,29.755132,-95.341841
+m2060_12570,Hempstead Rd @ Windfern Rd,29.857130,-95.537965
+m2060_12572,Hempstead Rd @ Campbell Rd,29.853117,-95.532347
+m2060_12574,S Gessner Rd @ Westbrae Pkwy,29.663029,-95.528198
+m2060_12575,Gessner Rd @ Williamcrest Rd,29.660585,-95.528161
+m2060_12576,S Gessner Rd @ Northern St,29.658293,-95.528127
+m2060_12577,S Gessner Rd @ W Bellfort Ave,29.655920,-95.528145
+m2060_12578,S Gessner Rd @ Mcgee Ln,29.651878,-95.528092
+m2060_1258,Canal St @ N Delano St,29.755706,-95.342758
+m2060_12581,Fondren Rd @ Clarkcrest St,29.732715,-95.520403
+m2060_12583,Fondren Rd @ Westheimer Rd,29.737178,-95.521020
+m2060_12585,Fondren Rd @ Woodway Dr,29.739605,-95.521193
+m2060_12586,Woodway Dr @ Lazy Hollow Dr,29.741119,-95.517547
+m2060_12587,Old Farm Rd @ Lazy Hollow Dr Mb,29.741578,-95.513325
+m2060_12588,Old Farm Rd @ Westheimer Rd,29.737903,-95.510246
+m2060_1259,Canal St @ N St Charles St,29.757006,-95.344940
+m2060_12591,S Voss Rd @ Olympia Dr,29.744287,-95.500840
+m2060_12592,S Voss Rd @ San Felipe Rd,29.750256,-95.500984
+m2060_1261,Navigation Blvd @ Canal St,29.758436,-95.347860
+m2060_1262,Franklin St @ Chartres St,29.757811,-95.351358
+m2060_12632,Gears Rd @ Lilleux Rd,29.945906,-95.450292
+m2060_12634,Gears Rd @ TC Jester Blvd,29.945852,-95.455307
+m2060_12635,Gears Rd @ Mckamy Dr,29.945824,-95.460481
+m2060_12637,Gears Rd @ Walters Rd,29.945773,-95.464851
+m2060_12643,W Loop N @ Woodway Dr,29.768283,-95.456536
+m2060_12654,Studemont St @ Summer St,29.773507,-95.390559
+m2060_12656,Studemont St @ Washington Ave,29.768436,-95.391919
+m2060_12658,Montrose Blvd @ Allen Pkwy,29.761220,-95.392305
+m2060_12661,Almeda Genoa Rd @ Land Rd,29.616621,-95.371733
+m2060_12664,Almeda Genoa Rd @ Furman Rd,29.614065,-95.380364
+m2060_12665,Almeda Genoa Rd @ McGrath Rd,29.613877,-95.388787
+m2060_12667,Almeda Genoa Rd @ Lew Biggs Rd,29.613847,-95.392947
+m2060_12669,Almeda Genoa Rd @ Elaine Rd,29.613776,-95.398285
+m2060_12675,John F Kennedy Blvd @ Cypress Knee*,29.918870,-95.330790
+m2060_12677,Aldine Bender Rd @ Heathrow Forest,29.930143,-95.325651
+m2060_12678,Aldine Bender Rd @ Heathrow Frst MB,29.930209,-95.321900
+m2060_12679,John F Kennedy Blvd @ World Houston,29.945825,-95.331856
+m2060_12681,World Houston Pkwy @ International,29.944457,-95.326221
+m2060_12683,World Houston Pkwy @ Diplomatic Pl,29.943553,-95.321273
+m2060_12685,World Houston Pkwy @ Vickery Dr,29.943471,-95.316372
+m2060_12686,Vickery Dr @ Sam Houston Pkwy,29.938523,-95.315464
+m2060_127,Westheimer Rd @ W Loop S,29.741033,-95.456859
+m2060_12712,Vickery Dr @ Aero Park Dr,29.934906,-95.316065
+m2060_12772,Buffalo Speedway @ S Main St Mb,29.678998,-95.425125
+m2060_12773,610 W Loop @ Lakes At 610 Dr,29.677270,-95.418521
+m2060_12774,Lakes At 610 Dr @ W Bellfort Ave,29.673232,-95.419546
+m2060_128,Westheimer Rd @ Eastgrove Ln,29.741559,-95.438683
+m2060_12823,Imperial Valley Dr @ Double Tree G,30.016821,-95.418314
+m2060_12825,Imperial Valley Dr @ Imperial Arbor,30.014041,-95.416661
+m2060_12827,Imperial Valley Dr @ North Vista Dr,30.009419,-95.413281
+m2060_12829,Imperial Valley Dr @ North Sky Dr,30.004970,-95.409784
+m2060_12831,Imperial Valley Dr @ North Bend Dr,30.001892,-95.408159
+m2060_12833,Imperial Valley Dr @ Richey Rd,29.997120,-95.407813
+m2060_12835,Imperial Valley Dr @ Lockhaven Dr,29.990028,-95.410893
+m2060_12837,Imperial Valley Dr @ Airtex Blvd,29.983319,-95.410554
+m2060_12839,Imperial Valley Dr @ Remington Hei*,29.978100,-95.409686
+m2060_12840,Imperial Valley Dr @ Cooper Elem S*,29.968146,-95.402124
+m2060_12843,Imperial Valley Dr @ Rankin Rd,29.966203,-95.402407
+m2060_12845,Imperial Valley Dr @ Regional Park*,29.959162,-95.401631
+m2060_12847,Imperial Valley Dr @ Harvest Time *,29.953381,-95.399995
+m2060_12848,Imperial Valley Dr @ Greens Rd,29.950848,-95.399685
+m2060_12874,White Heather Dr @ Tiffany Dr,29.617235,-95.439046
+m2060_12875,White Heather Dr @ Simsbrook Dr,29.620846,-95.437862
+m2060_12876,White Heather Dr @ Heatherbrook Dr,29.622293,-95.437911
+m2060_12877,White Heather Dr @ Darlinghurst Dr,29.623828,-95.437930
+m2060_12878,White Heather Dr @ Prudence Dr,29.624583,-95.437939
+m2060_12879,White Heather Dr @ Ripplebrook Dr,29.626030,-95.437954
+m2060_12880,W Orem Dr @ Lynden St,29.628129,-95.440569
+m2060_12881,W Orem Dr @ Hiram Clarke Rd,29.628033,-95.445913
+m2060_129,Westheimer Rd @ Buffalo Speedway,29.741982,-95.430283
+m2060_12901,Cambridge St @ Holcombe Blvd,29.705035,-95.390347
+m2060_12946,Fulton St @ Deerfield St,29.831784,-95.375894
+m2060_12948,Chimney Rock Rd @ Bissonnet St,29.704074,-95.476150
+m2060_12953,W 18th St @ Ella Blvd,29.801522,-95.430426
+m2060_12955,Almeda Genoa Rd @ Chiswick Rd,29.613715,-95.404069
+m2060_12964,Lyerly St @ Spady,29.834773,-95.378350
+m2060_12965,Lyerly St @ Spady,29.834719,-95.380688
+m2060_12966,Lyerly St @ Airline,29.834674,-95.384034
+m2060_12967,Montrose Blvd @ W Gray St,29.753169,-95.391997
+m2060_12977,S Gessner Rd @ Gustine Ln,29.669790,-95.528298
+m2060_12981,W Bellfort Ave @ Ice Palace Dr,29.672716,-95.436860
+m2060_12987,Almeda Genoa Rd @ Hycohen Rd,29.614011,-95.384534
+m2060_13003,S Voss Rd @ Westheimer Rd,29.738603,-95.500776
+m2060_13044,Pressler St @ Richard Jv Johnson Av,29.704054,-95.400559
+m2060_13071,W 18th St @ W TC Jester Blvd,29.801532,-95.427918
+m2060_1308,Tidwell Rd @ Maddox St,29.849708,-95.279497
+m2060_13089,Wheeler Ave @ Chartres St,29.728959,-95.374163
+m2060_1309,Tidwell Rd @ Mosswood Dr,29.849744,-95.276985
+m2060_1310,Tidwell Rd @ Wiloak St,29.849805,-95.274401
+m2060_13101,Beckford @ Newbrook Layover,29.685394,-95.610702
+m2060_13109,Shepherd Dr @ Pinemont Dr,29.842085,-95.410768
+m2060_1311,Tidwell Rd @ Haddick St,29.849844,-95.271517
+m2060_13112,John F Kennedy Service Rd @ Fed Ex*,29.976597,-95.343726
+m2060_1312,Tidwell Rd @ Hillis,29.849886,-95.268724
+m2060_13125,Airline Rd @ Wellford St,29.838388,-95.384238
+m2060_13127,Studemont St @ Memorial Ct,29.765177,-95.392249
+m2060_1313,Tidwell Rd @ Mayberry St,29.849898,-95.266510
+m2060_13130,Scott St @ Almeda Genoa Rd,29.617315,-95.367933
+m2060_13169,Westpark / Lower Uptown Transit Center,29.725148,-95.464659
+m2060_13170,Northwest Transit Center - Platform 1,29.783514,-95.455468
+m2060_13200,Winsome Ln @ Fountain View Dr,29.735506,-95.483581
+m2060_13204,Travis St @ Rosalie St,29.742604,-95.377484
+m2060_13206,Scott St @ Wheeler St,29.720013,-95.352320
+m2060_13214,Studewood St @ Voight St,29.779962,-95.387005
+m2060_134,N Post Oak Rd @ Memorial Dr,29.773925,-95.456457
+m2060_137,N Post Oak Rd @ Oakford Dr Mb,29.780041,-95.456548
+m2060_138,Westheimer Rd @ Crescent Park Dr,29.736384,-95.585709
+m2060_1395,Woodforest Blvd @ Uvalde Rd,29.791713,-95.186159
+m2060_1397,White Cedar Dr @ Holly Park Dr,29.789362,-95.185721
+m2060_1398,Uvalde Rd @ Granada St,29.788353,-95.187099
+m2060_1399,Uvalde Rd @ Force St,29.787204,-95.187068
+m2060_1400,Uvalde Rd @ Louisville St,29.785447,-95.187022
+m2060_1401,Uvalde Rd @ Joliet St,29.783697,-95.186977
+m2060_1402,Uvalde Rd @ Orleans St,29.781818,-95.186923
+m2060_1403,Uvalde Rd @ Emporia St,29.779942,-95.186880
+m2060_1404,Uvalde Rd @ Mobile St,29.778356,-95.186829
+m2060_1405,Uvalde Rd @ Vicksburg St,29.775912,-95.186769
+m2060_1406,Uvalde Rd @ Duluth St,29.774038,-95.186721
+m2060_1407,Uvalde Rd @ East Freeway,29.771518,-95.186691
+m2060_1409,East Freeway @ Rockglen St,29.771428,-95.192312
+m2060_1410,East Freeway @ Rockglen St,29.771552,-95.193974
+m2060_1411,East Freeway   @ Dwight,29.771954,-95.202147
+m2060_1412,East Freeway @ Normandy St,29.771771,-95.206807
+m2060_1414,East Freeway @ Keyport Ln,29.770915,-95.215352
+m2060_1415,East Freeway @ Maxey Rd,29.770769,-95.218112
+m2060_1416,East Freeway   @ Mae Dr,29.770966,-95.221367
+m2060_1417,East Freeway @ Centerwood Dr,29.771996,-95.226028
+m2060_1418,East Freeway   @ Centerwood Dr,29.772970,-95.230169
+m2060_142,Cavalcade St @ Russell St,29.800041,-95.332696
+m2060_1420,East Freeway @ John Ralston Rd,29.773765,-95.233739
+m2060_1421,East Freeway @ Baca St,29.774152,-95.238091
+m2060_1422,East Freeway @ Mercury Dr,29.774141,-95.246494
+m2060_1428,Jensen Dr @ Navigation Blvd,29.759688,-95.344910
+m2060_1429,S Jensen Dr @ Kennedy St,29.761015,-95.343849
+m2060_143,Tidwell Rd @ Shoreham St,29.848034,-95.344674
+m2060_1430,S Jensen Dr @ Kermac Blvd,29.763270,-95.342871
+m2060_1431,Jensen Dr @ Baron St,29.765502,-95.342900
+m2060_1432,Jensen Dr @ East Freeway,29.766937,-95.342926
+m2060_1526,Broadway St @ La Porte Rd,29.714479,-95.278089
+m2060_1527,Broadway St @ Channelside,29.716758,-95.278152
+m2060_1528,Broadway St @ Manchester St,29.718798,-95.278245
+m2060_1549,Broadway St @ Cypress St,29.723200,-95.278333
+m2060_1550,Broadway St @ Sycamore St,29.724898,-95.278384
+m2060_1551,Broadway St @ Hockley St,29.726064,-95.278434
+m2060_1552,Navigation Blvd @ 77th St,29.739459,-95.284731
+m2060_160,Westheimer Rd @ Old Farm Rd,29.737377,-95.509030
+m2060_1615,Cleburne St @ Ennis St,29.725320,-95.363823
+m2060_1616,Cleburne St @ Cuney Dr,29.724346,-95.362324
+m2060_1617,Cleburne St @ Burkett St,29.723114,-95.359668
+m2060_1618,Cleburne St @ Tierwester St,29.722606,-95.357013
+m2060_1665,Elgin St @ E18 U Of H,29.726181,-95.340963
+m2060_1666,McGowen St @ Scott St,29.732979,-95.349127
+m2060_1667,McGowen St @ Sampson St,29.733648,-95.351318
+m2060_1669,McGowen St @ Burkett St,29.734737,-95.354865
+m2060_1671,McGowen St @ Delano St,29.735983,-95.358328
+m2060_1672,McGowen St @ Live Oak St,29.736963,-95.359949
+m2060_1673,McGowen St @ Emancipation Ave,29.738407,-95.362347
+m2060_1674,McGowen St @ Hutchins St,29.739167,-95.363607
+m2060_1898,Wheeler St @ University Oaks Blvd,29.716400,-95.342449
+m2060_1899,Wheeler St @ Rockwood Dr,29.717241,-95.345181
+m2060_1904,Cullen Blvd @ Universtiy Of Houston,29.724467,-95.345810
+m2060_1905,Cullen Blvd @ Elgin St,29.727017,-95.343509
+m2060_2043,Hirsch Rd @ Cavalcade St,29.800739,-95.328110
+m2060_2044,Hirsch Rd @ Rand St,29.803702,-95.328178
+m2060_2045,Hirsch Rd @ Pardee St,29.805573,-95.328203
+m2060_2046,Hirsch Rd @ N Loop E,29.807753,-95.328270
+m2060_2105,Montrose Blvd @ Woodrow St,29.732315,-95.390999
+m2060_2110,Mac Gregor Way @ Ardmore St,29.713804,-95.370874
+m2060_2114,Mac Gregor Way @ South Freeway,29.712006,-95.376686
+m2060_213,Breton Ridge Dr @ FM 1960 Rd,29.966130,-95.539956
+m2060_2130,Ennis St @ Calumet St,29.716435,-95.371529
+m2060_2131,Ennis St @ Southmore Blvd,29.718063,-95.370340
+m2060_2132,Ennis St @ Wichita St,29.718743,-95.369782
+m2060_2133,Ennis St @ Rosedale St,29.719897,-95.368868
+m2060_2134,Ennis St @ Wentworth,29.721219,-95.367814
+m2060_2136,Ennis St @ Wheeler Ave,29.723668,-95.365870
+m2060_2137,Ennis St @ Eagle,29.724908,-95.364888
+m2060_2143,Blodgett St @ Ennis St,29.722261,-95.367646
+m2060_2144,Blodgett St @ Delano,29.722938,-95.368821
+m2060_2145,Blodgett St @ Live Oak St,29.723983,-95.370548
+m2060_2146,Live Oak St @ Rosewood St,29.725167,-95.369752
+m2060_215,Fannin St @ Preston St,29.761153,-95.360420
+m2060_2169,Scott St @ S Mac Gregor Way,29.708774,-95.356812
+m2060_2170,Scott St @ Southmore Blvd,29.711145,-95.355878
+m2060_2172,Scott St @ Rosedale St,29.714455,-95.354549
+m2060_2173,Scott St @ Blodgett St,29.717187,-95.353454
+m2060_2176,Scott St @ Cleburne St,29.722431,-95.351353
+m2060_2177,Scott St @ Holman St,29.724543,-95.350521
+m2060_2179,Scott St @ Elgin St,29.727372,-95.349726
+m2060_218,Fannin St @ Leeland St,29.752116,-95.367575
+m2060_2181,Scott St @ Tuam St,29.730824,-95.349088
+m2060_219,Fannin St @ Jefferson St,29.750621,-95.368759
+m2060_2192,Scott St @ Blodgett St,29.717317,-95.353616
+m2060_222,San Jacinto St @ Prairie St,29.759566,-95.360190
+m2060_2240,Cavalcade St @ Des Chaumes,29.801180,-95.338850
+m2060_2241,Cavalcade St @ Linn St,29.800525,-95.336363
+m2060_2242,Cavalcade St @ Falls,29.800100,-95.330990
+m2060_2343,FM 1960 Rd @ Nanes Dr,30.015675,-95.447247
+m2060_2344,Red Oak Dr @ FM 1960 Rd,30.017595,-95.444035
+m2060_2346,Cali Dr @ FM 1960 Rd,30.018806,-95.439891
+m2060_2347,FM 1960 Rd @ Cypress Station Dr,30.018768,-95.436770
+m2060_2348,FM 1960 Rd @ Westfield Place Dr,30.019961,-95.432632
+m2060_2349,FM 1960 Rd @ Imperial Valley Dr,30.023350,-95.420776
+m2060_2361,Houston Northwest Hospital,30.020344,-95.441266
+m2060_2363,Houston Northwest Hospital,30.021873,-95.443207
+m2060_2374,Aldine Westfield Rd @ Greenbriar Co,29.944341,-95.356864
+m2060_2380,Sam Houston Pkwy @ Milner Rd,29.939562,-95.337163
+m2060_2381,Sam Houston Pkwy @ Morales Rd,29.939533,-95.345490
+m2060_2382,Sam Houston Pkwy @ Aldine Westfield,29.939394,-95.355960
+m2060_2384,W Tidwell Rd @ Ash Oak Dr,29.848826,-95.466789
+m2060_2385,W Tidwell Rd @ TC Jester Blvd,29.845811,-95.457910
+m2060_2386,W Tidwell Rd @ Balbo St,29.846355,-95.454622
+m2060_2387,W Tidwell Rd @ Bertellis Ln,29.846387,-95.452789
+m2060_2388,W Tidwell Rd @ Goldspier St,29.846422,-95.449449
+m2060_2389,W Tidwell Rd @ Rosslyn Rd,29.846763,-95.443281
+m2060_242,Fannin St @ Texas Ave,29.759604,-95.361657
+m2060_2434,Long Point Rd @ Jacquelyn Dr,29.802759,-95.481127
+m2060_2435,Long Point Rd @ Woodvine Dr,29.802754,-95.479024
+m2060_2436,Long Point Rd @ Thonig Rd,29.802773,-95.477530
+m2060_2437,Long Point Rd @ Antoine Dr,29.802768,-95.475988
+m2060_2438,Long Point Rd @ Afton St,29.802787,-95.472138
+m2060_2439,Long Point Rd @ Afton St,29.802815,-95.470597
+m2060_244,Fannin St @ Rusk St,29.758110,-95.362833
+m2060_2440,Long Point Rd @ Silber Rd,29.802796,-95.468440
+m2060_2441,Long Point Rd @ Hafner Dr,29.802840,-95.465047
+m2060_2442,Hempstead Rd @ Long Point Rd,29.802489,-95.461692
+m2060_2445,Gessner Rd @ Springwood Forest Dr,29.810428,-95.545331
+m2060_2446,Gessner Rd @ Knoboak Dr,29.807924,-95.545317
+m2060_2447,Gessner Rd @ Neuens Rd,29.806381,-95.545302
+m2060_2448,Gessner Rd @ Shadow Wood Dr,29.804773,-95.545273
+m2060_2449,Gessner Rd @ Imperial Crown Dr,29.802769,-95.544995
+m2060_2450,Gessner Rd @ Warwana Rd,29.800929,-95.544966
+m2060_2451,Gessner Rd @ Eddystone Dr,29.799364,-95.544939
+m2060_2452,Gessner Rd @ Hazelhurst Dr,29.797677,-95.544904
+m2060_2453,Gessner Rd @ Hanka Dr,29.795887,-95.544871
+m2060_2454,Gessner Rd @ Long Point Rd,29.794402,-95.544833
+m2060_2455,Gessner Rd @ Beekman Place Dr,29.792858,-95.544799
+m2060_2456,Gessner Rd @ Westview Dr,29.791277,-95.544759
+m2060_2457,Gessner Rd @ Westview Dr Mb,29.788206,-95.544536
+m2060_2458,Gessner Rd @ Katy Freeway,29.786550,-95.544194
+m2060_2459,Gessner Rd @ Katy Freeway,29.786359,-95.543871
+m2060_246,Fannin St @ McKinney St,29.756585,-95.364047
+m2060_2460,Gessner Rd @ Katy Freeway Mb,29.788244,-95.544262
+m2060_2461,Gessner Rd @ Westview Dr,29.790687,-95.544484
+m2060_2462,Gessner Rd @ Beekman Place Dr,29.792293,-95.544525
+m2060_2463,Gessner Rd @ Long Point Rd,29.794022,-95.544563
+m2060_248,Fannin St @ Dallas St,29.755098,-95.365216
+m2060_250,Fannin St @ Clay St,29.753680,-95.366331
+m2060_25002,Fannin South Stn SB,29.673584,-95.402862
+m2060_25004,Houston Stadium SB,29.685928,-95.403411
+m2060_25006,Smith Lands Stn SB,29.696464,-95.404859
+m2060_25008,Texas Medical Center Transit Center,29.704117,-95.402931
+m2060_25010,Dryden/Tmc Stn SB,29.709348,-95.401206
+m2060_25012,Memorial Hermann/Houston Zoo Stn SB,29.714860,-95.396850
+m2060_25014,Hermann Park/Rice U Stn SB,29.720043,-95.393604
+m2060_25016,Museum District Stn SB,29.724740,-95.389090
+m2060_25018,Wheeler Stn SB,29.732732,-95.383421
+m2060_25020,Ensemble/Hcc Stn SB,29.738854,-95.379280
+m2060_25022,Mcgowen Stn SB,29.745034,-95.374392
+m2060_25024,Downtown Transit Center Stn SB,29.749871,-95.370569
+m2060_25026,Bell Stn SB,29.752868,-95.368191
+m2060_25028,Main Street Square Stn SB,29.755860,-95.365840
+m2060_25030,Preston Stn SB,29.761140,-95.361660
+m2060_25032,Uh-Downtown Stn SB,29.765878,-95.358743
+m2060_25034,Burnett TC Casa De Amigos SB,29.771800,-95.359304
+m2060_25036,Quitman Near Northside SB,29.780157,-95.363599
+m2060_25038,Fulton North Central SB,29.786090,-95.360664
+m2060_25040,Moody Park SB,29.795356,-95.365815
+m2060_25042,Cavalcade SB,29.802741,-95.368148
+m2060_25044,Lindale Park SB,29.808821,-95.369576
+m2060_25046,Melbourne North Lindale SB,29.815781,-95.370535
+m2060_25048,Northline Transit Center Hcc SB,29.832459,-95.376039
+m2060_25049,Central Stn Main SB,29.758788,-95.363510
+m2060_25051,Theater District Rusk EB,29.760751,-95.367692
+m2060_25052,Theater District Capitol WB,29.760969,-95.366257
+m2060_25053,Central Station Rusk EB,29.757693,-95.362608
+m2060_25054,Central Station Capitol WB,29.758368,-95.361938
+m2060_25055,Convention District Rusk EB,29.754720,-95.357716
+m2060_25056,Convention District Capitol WB,29.754992,-95.356331
+m2060_25057,Eado / Stadium Stn EB,29.753528,-95.351979
+m2060_25058,Eado Stadium Stn WB,29.753566,-95.351947
+m2060_25059,Coffee Plant /  2Nd Ward EB,29.747536,-95.340126
+m2060_25061,Lockwood / Eastwood EB,29.743593,-95.329334
+m2060_25063,Altic / Howard Hughes EB,29.741143,-95.320161
+m2060_25065,Cesar Chavez / 67Th St EB,29.737329,-95.307709
+m2060_25067,Magnolia Park Transit Center EB,29.735851,-95.302900
+m2060_25072,Leeland Third Ward NB,29.739671,-95.345592
+m2060_25076,Elgin Third Ward NB,29.728388,-95.349851
+m2060_25078,Robertson Stadium Uh Tsu NB,29.722062,-95.351318
+m2060_25080,Uh South University Oaks NB,29.716152,-95.341169
+m2060_25082,Macgregor Park Mlk NB,29.709411,-95.336464
+m2060_25086,Palm Center Transit Center NB,29.696498,-95.332293
+m2060_25088,Dwntwn Line End (No Service),29.763325,-95.370260
+m2060_2527,S Main St @ Buffalo Speedway,29.679512,-95.425852
+m2060_2528,S Main St @ Westridge St,29.681449,-95.424320
+m2060_2529,S Main St @ Murworth Dr,29.685088,-95.421486
+m2060_253,San Jacinto St @ St Joseph Pkwy,29.749023,-95.368538
+m2060_2530,S Main St @ Broadmead Dr,29.686807,-95.420125
+m2060_2532,S Main St @ McNee Rd,29.689318,-95.418145
+m2060_2533,S Main St @ Old Spanish Trail,29.692413,-95.415797
+m2060_2535,S Main St @ Braeswood Park Dr,29.695558,-95.413366
+m2060_2536,S Main St @ Braeswood Blvd,29.696849,-95.412339
+m2060_2537,Main St @ Morningside Dr,29.698228,-95.411247
+m2060_2538,Main St @ Underwood Rd,29.699705,-95.410064
+m2060_2539,Main St @ Greenbriar Dr,29.700932,-95.409109
+m2060_254,San Jacinto St @ Bell St,29.752015,-95.366173
+m2060_2543,Main St @ Palm St,29.728962,-95.386954
+m2060_2545,Main St @ Southgate Blvd,29.708465,-95.403212
+m2060_256,San Jacinto St @ Polk St,29.753517,-95.364977
+m2060_2576,Hirsch Rd @ Fairbanks St,29.810054,-95.328527
+m2060_2577,Hirsch Rd @ Kelley St,29.812514,-95.328564
+m2060_258,San Jacinto St @ Lamar St,29.754989,-95.363818
+m2060_260,San Jacinto St @ Walker St,29.756448,-95.362635
+m2060_263,San Jacinto St @ Capitol St,29.757971,-95.361452
+m2060_264,San Jacinto St @ Congress St,29.760944,-95.359093
+m2060_2670,Montrose Blvd @ Bissonnet St,29.725972,-95.390930
+m2060_2671,Montrose Blvd @ Bartlett St,29.727688,-95.390945
+m2060_2672,Montrose Blvd @ Milford St,29.729278,-95.390976
+m2060_2673,Montrose Blvd @ Chelsea Pl,29.730581,-95.390975
+m2060_2674,Bissonnet St @ Montrose Blvd,29.726006,-95.390595
+m2060_2685,Eastex Freeway @ Langley Rd,29.866394,-95.331567
+m2060_2686,Eastex Freeway @ Little York Rd,29.869002,-95.330118
+m2060_2687,Eastex Freeway @ Littlecrest Rd,29.870918,-95.329098
+m2060_2688,Eastex Freeway @ Darwin Rd,29.873762,-95.327367
+m2060_2689,Eastex Freeway @ Cedar Hill Ln,29.876470,-95.325827
+m2060_2690,Eastex Freeway   @ Hanley Rd,29.878553,-95.324603
+m2060_2691,Eastex Freeway   @ Hartwick Rd,29.884714,-95.321022
+m2060_2692,Eastex Freeway @ Charwon St,29.887285,-95.319546
+m2060_2693,Eastex Freeway   @ Collins St,29.889727,-95.318115
+m2060_2694,Tidwell Rd @ Dodson St,29.848624,-95.331894
+m2060_2695,Tidwell Rd @ Friendly Rd,29.848653,-95.327692
+m2060_2696,Tidwell Rd @ Lundy Rd,29.848002,-95.324361
+m2060_2697,Tidwell Rd @ Lavender St,29.848050,-95.321285
+m2060_2698,Tidwell Rd @ Lockwood Dr,29.848077,-95.319336
+m2060_2763,Tidwell Rd @ Peachtree St,29.848128,-95.316407
+m2060_2764,Tidwell Rd @ Sandra St,29.848208,-95.313993
+m2060_2765,Tidwell Rd @ Dandy,29.848275,-95.312029
+m2060_2766,Tidwell Rd @ Allwood St,29.848291,-95.311119
+m2060_2767,Tidwell Rd @ Bertwood St,29.848296,-95.310120
+m2060_2768,Tidwell Rd @ Camay Dr,29.848329,-95.307387
+m2060_2769,Tidwell Rd @ Lanewood St,29.848357,-95.304809
+m2060_277,Franklin St @ Fannin St,29.762509,-95.359494
+m2060_2770,Tidwell Rd @ Homestead Rd,29.848394,-95.302605
+m2060_2771,Tidwell Rd @ Sundown Dr,29.848422,-95.300097
+m2060_2772,Tidwell Rd @ Sherbourne St,29.848474,-95.295707
+m2060_2773,Tidwell Rd @ N Wayside Dr,29.848377,-95.285473
+m2060_2818,University Blvd @ Vanderbilt,29.714927,-95.426220
+m2060_2819,University Blvd @ Brompton St,29.714955,-95.423272
+m2060_2820,University Blvd @ Kirby Dr,29.715023,-95.418564
+m2060_2821,University Blvd @ Morningside Dr,29.715010,-95.415009
+m2060_2822,University Blvd @ Greenbriar Dr,29.715037,-95.412811
+m2060_2823,University Blvd @ Stockton Dr,29.713349,-95.406703
+m2060_2824,University Blvd @ Lanier Dr,29.712573,-95.404308
+m2060_2825,University Blvd @ Main St,29.711533,-95.401276
+m2060_2846,University Blvd @ Belmont,29.714946,-95.424736
+m2060_2847,University Blvd @ Annapolis,29.715000,-95.420371
+m2060_2848,University Blvd @ Montclair Dr,29.714374,-95.409785
+m2060_2950,Westheimer Rd @ Hazard St,29.742688,-95.407187
+m2060_2951,Westheimer Rd @ Woodhead St,29.742636,-95.404889
+m2060_2952,Westheimer Rd @ Dunlavy St,29.742715,-95.402216
+m2060_2953,Westheimer Rd @ Mandell St,29.742734,-95.399842
+m2060_2954,Westheimer Rd @ Mulberry St,29.742734,-95.397682
+m2060_2956,Westheimer Rd @ Commonwealth St,29.744206,-95.394071
+m2060_2958,Westheimer Rd @ Montrose Blvd,29.744587,-95.391533
+m2060_2959,Westheimer Rd @ Stanford St,29.744440,-95.389027
+m2060_2961,Westheimer Rd @ Taft St,29.744513,-95.386114
+m2060_2962,Westheimer Rd @ Bagby St,29.744446,-95.381907
+m2060_2974,Richmond Ave @ Jack St,29.734574,-95.386794
+m2060_2976,Richmond Ave @ Montrose Blvd,29.734584,-95.391722
+m2060_2977,Richmond Ave @ Graustark St,29.734554,-95.394257
+m2060_2978,Richmond Ave @ Loretto Dr,29.734534,-95.397183
+m2060_2979,Richmond Ave @ Mandell St,29.734512,-95.399236
+m2060_2980,Richmond Ave @ Dunlavy St,29.734443,-95.401911
+m2060_2981,Richmond Ave @ Woodhead St,29.734388,-95.404333
+m2060_2982,Richmond Ave @ Hazard St,29.734372,-95.406921
+m2060_2983,Richmond Ave @ S Shepherd Dr,29.734336,-95.410189
+m2060_3020,Memorial Dr @ Bayou Park Village,29.761860,-95.406254
+m2060_3021,Memorial Dr @ Shepherd Dr,29.761848,-95.408483
+m2060_306,St Joseph Pkwy @ Caroline St,29.748650,-95.367482
+m2060_3062,Scott St @ Mainer St,29.682981,-95.365687
+m2060_3064,Scott St @ Corder St,29.686044,-95.364599
+m2060_3066,Scott St @ Southlawn St,29.689144,-95.363342
+m2060_3067,Scott St @ Idaho St,29.690536,-95.362780
+m2060_3068,Scott St @ Yellowstone Blvd,29.693802,-95.361468
+m2060_3070,Scott St @ Luca St,29.696505,-95.360382
+m2060_3072,Scott St @ Scottcrest Dr,29.700092,-95.359165
+m2060_308,St Joseph Pkwy @ Fannin St,29.749692,-95.369194
+m2060_309,St Joseph Pkwy @ Main St,29.750018,-95.369749
+m2060_310,St Joseph Pkwy @ Travis St,29.750747,-95.370944
+m2060_3194,John F Kennedy Blvd @ Greens Rd,29.950787,-95.331907
+m2060_3195,John F Kennedy Blvd @ World Houston,29.946640,-95.331866
+m2060_321,Gray St @ Brazos St,29.751316,-95.375542
+m2060_326,St Joseph Pkwy @ La Branch St,29.747603,-95.365743
+m2060_3277,Cavalcade St @ Fulton St,29.803182,-95.368780
+m2060_3279,Cavalcade St @ Hain St,29.803177,-95.364529
+m2060_328,St Joseph Pkwy @ Louisiana St,29.751741,-95.372594
+m2060_3280,Cavalcade St @ Irvington Blvd,29.803203,-95.361290
+m2060_3281,Cavalcade St @ Cetti St,29.803243,-95.358985
+m2060_3283,Cavalcade St @ Gano St,29.803220,-95.355034
+m2060_3333,Montrose Blvd @ Richmond Ave,29.734237,-95.391029
+m2060_3334,Montrose Blvd @ Colquitt,29.735167,-95.391048
+m2060_3335,Montrose Blvd @ Branard St,29.736933,-95.391067
+m2060_3336,Montrose Blvd @ W Alabama St,29.738687,-95.391089
+m2060_3337,Montrose Blvd @ Marshall St,29.739940,-95.391106
+m2060_3338,Montrose Blvd @ Hawthorne St,29.742231,-95.391131
+m2060_3340,Montrose Blvd @ Westheimer Rd,29.744331,-95.391155
+m2060_3341,Montrose Blvd @ Missouri St,29.746205,-95.391644
+m2060_3342,Montrose Blvd @ Fairview St,29.747981,-95.391881
+m2060_3343,Montrose Blvd @ W Drew St,29.749686,-95.391936
+m2060_3344,Montrose Blvd @ Bomar St,29.751660,-95.391977
+m2060_3628,Bissonnet St @ Wilmington Dr,29.712508,-95.458164
+m2060_3629,Bissonnet St @ Avenue B,29.713744,-95.455761
+m2060_3630,Bissonnet St @ Larch Ln,29.714869,-95.453539
+m2060_3631,Bissonnet St @ Newcastle Dr,29.715827,-95.451675
+m2060_3632,Bissonnet St @ Mulberry Ln,29.716813,-95.449745
+m2060_3633,Bissonnet St @ Community Dr,29.718127,-95.447160
+m2060_3634,Bissonnet St @ Academy St,29.720137,-95.443178
+m2060_3635,Bissonnet St @ Weslayan St,29.720733,-95.442024
+m2060_3636,Bissonnet St @ College St,29.722113,-95.439324
+m2060_3637,Bissonnet St @ Auden St,29.722980,-95.437627
+m2060_3639,Bissonnet St @ Westchester St,29.725217,-95.430214
+m2060_3640,Bissonnet St @ Buffalo Speedway,29.725245,-95.427958
+m2060_3641,Bissonnet St @ Belmont St,29.725284,-95.424889
+m2060_3642,Bissonnet St @ Wakeforest St,29.725336,-95.422226
+m2060_3643,Bissonnet St @ Dincans,29.725364,-95.420678
+m2060_3644,Bissonnet St @ Kirby Dr,29.725387,-95.418780
+m2060_3645,Bissonnet St @ Morningside Dr,29.725458,-95.415123
+m2060_3646,Bissonnet St @ Greenbriar Dr,29.725484,-95.412941
+m2060_3647,Bissonnet St @ S Shepherd Dr,29.725515,-95.410690
+m2060_3648,Bissonnet St @ Wilton,29.725551,-95.408844
+m2060_3650,Bissonnet St @ Kent St,29.725592,-95.405293
+m2060_3651,Bissonnet St @ Ashby St,29.725616,-95.403587
+m2060_3653,Bissonnet St @ Mandell St,29.725662,-95.399749
+m2060_3654,Bissonnet St @ Dora St,29.725709,-95.396293
+m2060_3655,Bissonnet St @ Shadow Lawn St,29.725816,-95.394803
+m2060_3656,Bissonnet St @ Yoakum Blvd,29.726088,-95.392921
+m2060_3663,Bissonnet St @ Hazard St,29.725575,-95.407074
+m2060_3735,Jensen Dr @ Lyons Ave,29.773704,-95.341722
+m2060_3736,Jensen Dr @ Burnett St,29.774909,-95.341709
+m2060_3737,Jensen Dr @ Mills St,29.777499,-95.341766
+m2060_3738,Jensen Dr @ Lorraine St,29.778485,-95.341789
+m2060_3739,Jensen Dr @ Sumpter,29.779768,-95.341804
+m2060_3740,Jensen Dr @ Lee St,29.781802,-95.341827
+m2060_3741,Jensen Dr @ Quitman St,29.783321,-95.341845
+m2060_3742,Jensen Dr @ Newhoff St,29.785390,-95.341875
+m2060_3743,Jensen Dr @ Florida,29.787375,-95.341911
+m2060_3744,Jensen Dr @ Jewel St,29.789773,-95.341937
+m2060_3745,Jensen Dr @ Evella,29.791215,-95.341964
+m2060_3746,Jensen Dr @ Collingsworth St,29.793334,-95.342009
+m2060_3747,Jensen Dr @ Crane St,29.796460,-95.342083
+m2060_3748,Jensen Dr @ Bay St,29.800505,-95.342134
+m2060_3749,Jensen Dr @ Cavalcade St,29.801750,-95.342090
+m2060_3750,Jensen Dr @ Le Badie,29.804720,-95.342158
+m2060_3751,Jensen Dr @ Ivy St,29.807252,-95.342221
+m2060_3752,Jensen Dr @ Milwaukee St,29.809117,-95.342247
+m2060_3955,Greens Rd @ Waverly Dr,29.951400,-95.363261
+m2060_3956,Greens Rd @ Old Greens Rd,29.952032,-95.370217
+m2060_3957,Greens Rd @ Seminar Dr,29.950841,-95.390452
+m2060_3958,Greens Rd @ Wayforest Dr,29.950773,-95.393043
+m2060_3959,Greens Rd @ Wayforest Dr,29.950742,-95.396114
+m2060_3961,Greens Rd @ Imperial Valley Dr,29.950692,-95.400892
+m2060_3962,Greens Rd @ Greenchase Dr,29.950653,-95.403794
+m2060_3963,Greens Rd @ Northchase Dr,29.950588,-95.407931
+m2060_3964,Greens Rd @ Northchase Dr Mb,29.950568,-95.409473
+m2060_3969,W Greens Rd @ Greens Pkwy,29.948846,-95.422432
+m2060_3970,Greens Rd @ North Freeway MB,29.948746,-95.414665
+m2060_3984,Imperial Valley Dr @ Imperial Plaza,29.941061,-95.396418
+m2060_3985,Imperial Valley Dr @ Benmar Dr,29.943761,-95.395706
+m2060_3986,Imperial Valley Dr @ Seminar Dr,29.947176,-95.396821
+m2060_3989,Imperial Valley Dr @ Greens Rd,29.949655,-95.398908
+m2060_3992,Greenspoint Dr @ Greens Rd Mb,29.946431,-95.408439
+m2060_3993,Greenspoint Dr @ Benmar Dr,29.943465,-95.407655
+m2060_3999,Greenspoint Dr @ Sam Houston Pkwy,29.941508,-95.407604
+m2060_4011,Northchase Dr @ Benmar Dr Mb1,29.944964,-95.404329
+m2060_4012,Northchase Dr @ Benmar Dr MB2,29.946590,-95.404745
+m2060_4013,Northchase Dr @ Benmar Dr Mb3,29.948315,-95.406640
+m2060_4031,Imperial Valley Dr @ Cotillion Dr,29.935178,-95.398654
+m2060_4032,Imperial Valley Dr @ Sam Houston Pk,29.938398,-95.397231
+m2060_4105,Beechnut St @ W Loop S Mb,29.689024,-95.456757
+m2060_4106,Beechnut St @ Frankway Dr,29.689061,-95.454232
+m2060_4107,Beechnut St @ Newcastle Dr,29.689158,-95.451233
+m2060_4108,Beechnut St @ Newcastle Dr,29.689781,-95.448289
+m2060_4109,N Braeswood Blvd @ Newcastle Dr Mb2,29.689851,-95.445305
+m2060_4110,Braeswood Blvd @ Academy St,29.690901,-95.443189
+m2060_4112,Braeswood Blvd @ Glen Arbor Dr MB,29.691546,-95.438003
+m2060_4113,Braeswood Blvd @ Glen Arbor Dr,29.692060,-95.436194
+m2060_4114,Braeswood Blvd @ Glen Arbor Dr 3701,29.692639,-95.433603
+m2060_4115,Braeswood Blvd @ Glen Arbor Dr 3501,29.693494,-95.429731
+m2060_4116,Braeswood Blvd @ Grennoch Ln,29.695649,-95.427701
+m2060_4117,Braeswood Blvd @ Aberdeen Way,29.697191,-95.425846
+m2060_4118,Braeswood Blvd @ Brompton St,29.697302,-95.423686
+m2060_4119,Braeswood Blvd @ Seuss Dr,29.697064,-95.419441
+m2060_4120,Braeswood Blvd @ Kirby Dr,29.697633,-95.418360
+m2060_4229,Hardy St @ Frawley St,29.801823,-95.352481
+m2060_4230,Hardy St @ Weiss St,29.800111,-95.352439
+m2060_4231,Hardy St @ Egypt,29.798417,-95.352390
+m2060_4232,Hardy St @ Erin,29.796279,-95.352335
+m2060_4233,Hardy St @ Alber St,29.795040,-95.352302
+m2060_430,Post Oak Park Dr @ Briar Hollow Pl,29.752443,-95.453954
+m2060_431,Post Oak Park Dr @ Post Oak Pl,29.750071,-95.453954
+m2060_432,Post Oak Park Dr @ Post Oak Pkwy,29.747803,-95.453895
+m2060_4329,Scott St @ Airport Blvd,29.644814,-95.368255
+m2060_4330,Scott St @ Phlox St,29.659267,-95.367920
+m2060_4331,Scott St @ Larkspur St,29.661202,-95.367958
+m2060_4332,Scott St @ Kewanee St,29.663561,-95.368011
+m2060_4333,Scott St @ Knoxville Dr,29.664899,-95.368035
+m2060_4334,Scott St @ Davenport,29.666415,-95.368067
+m2060_4335,Scott St @ Elmwood,29.667831,-95.368101
+m2060_4336,Scott St @ Bellfort Ave,29.669217,-95.368057
+m2060_4352,Scott St @ Shelby Cir,29.670861,-95.367461
+m2060_4353,Scott St @ Stassen St,29.672469,-95.366837
+m2060_4354,Scott St @ Redbud St,29.675238,-95.366768
+m2060_4355,Scott St @ Lockhart St,29.678079,-95.366829
+m2060_4475,Tidwell Rd @ Jensen Dr,29.848070,-95.342241
+m2060_4476,Tidwell Rd @ Edell,29.848173,-95.338257
+m2060_4477,Tidwell Rd @ Weedy Ln,29.848626,-95.335305
+m2060_4484,Tidwell Rd @ Burden St,29.847826,-95.352925
+m2060_4485,Tidwell Rd @ Aldine Westfield Rd,29.847981,-95.348744
+m2060_4537,Sam Houston Pkwy @ Greenspoint Dr,29.941314,-95.410782
+m2060_4540,W Greens Rd @ North Freeway,29.948897,-95.418861
+m2060_4561,Kirby Dr @ La Concha Ln,29.691209,-95.412751
+m2060_4562,Kirby Dr @ McNee Rd,29.687732,-95.412624
+m2060_4564,Kirby Dr @ Westridge St,29.682269,-95.412487
+m2060_4593,Buffalo Speedway @ Westpark Dr,29.728526,-95.428115
+m2060_4595,Buffalo Speedway   @ Nottingham,29.722075,-95.427830
+m2060_4596,Buffalo Speedway   @ Tangley,29.720054,-95.427774
+m2060_4597,Buffalo Speedway   @ Plumb St,29.719044,-95.427772
+m2060_4598,Buffalo Speedway   @ Jarrard,29.716823,-95.427715
+m2060_4606,Fulton St @ Burress St,29.841713,-95.375837
+m2060_4607,Fulton St @ Ben Dr,29.843428,-95.376610
+m2060_4719,Fondren Rd @ Orem Dr,29.627400,-95.507216
+m2060_4720,Fondren Rd @ S Main St,29.629327,-95.507258
+m2060_4760,Hiram Clarke Rd @ Beran Dr,29.630952,-95.446119
+m2060_4761,Hiram Clarke Rd @ Wuthering Heights,29.634646,-95.446190
+m2060_4762,Hiram Clarke Rd @ Brookston St,29.636296,-95.446212
+m2060_4763,Hiram Clarke Rd @ W Airport Blvd,29.640595,-95.446265
+m2060_4764,W Airport Blvd @ Glenwyck St,29.641130,-95.444442
+m2060_4765,Taintor St @ Airport Blvd,29.643495,-95.443012
+m2060_4766,Taintor St @ Town Plaza Dr,29.645549,-95.443047
+m2060_4767,Town Plaza Dr @ Hiram Clarke Rd,29.645786,-95.446282
+m2060_4768,Hiram Clarke Rd @ S Main St,29.652677,-95.446469
+m2060_4796,Bellfort Ave @ Mykawa Rd,29.666256,-95.318948
+m2060_4797,Bellfort Ave @ S Wayside Dr,29.666661,-95.321481
+m2060_4798,Bellfort Ave @ Belbay St,29.666746,-95.323568
+m2060_4799,Bellfort Ave @ Belgard St,29.666706,-95.325124
+m2060_4800,Bellfort Ave @ Crestmont St,29.666637,-95.328951
+m2060_4801,Bellfort Ave @ Southbank St,29.666585,-95.332575
+m2060_4802,Bellfort Ave @ M L King Blvd,29.666499,-95.336694
+m2060_4803,Bellfort Ave @ Windemere St,29.666468,-95.337970
+m2060_4804,Bellfort Ave @ Sharondale Dr,29.666420,-95.340582
+m2060_4805,Bellfort Ave @ St Lo Rd,29.666397,-95.341576
+m2060_4806,Bellfort Ave @ Sandhurst Dr,29.666362,-95.343301
+m2060_4807,Bellfort Ave @ Herschellwood Dr,29.666332,-95.345081
+m2060_4808,Bellfort Ave @ Redfern Dr,29.666642,-95.346635
+m2060_4809,Bellfort Ave @ Jutland Rd,29.666990,-95.348750
+m2060_481,Washington Ave @ Preston St,29.766607,-95.369747
+m2060_4810,Bellfort Ave @ Coffee St,29.668512,-95.354209
+m2060_4816,Bellfort Ave @ Cullen Blvd,29.669409,-95.356285
+m2060_4817,Bellfort Ave @ Stassen St,29.669685,-95.357802
+m2060_4818,Bellfort Ave @ Coma St,29.669655,-95.360010
+m2060_4819,Bellfort Ave @ Vera Lou St,29.669604,-95.363709
+m2060_482,Washinton Ave @ Hickory St,29.767223,-95.371400
+m2060_4820,Bellfort Ave @ Southview St,29.669569,-95.365898
+m2060_4821,Bellfort Ave @ Scott St,29.669540,-95.367755
+m2060_4822,Bellfort Ave @ Brandon St,29.669524,-95.369315
+m2060_4823,Bellfort Ave @ Livingston St,29.669484,-95.372216
+m2060_4824,Bellfort Ave @ Woodward St,29.669464,-95.373474
+m2060_4825,Bellfort Ave @ Parnell St,29.669443,-95.375137
+m2060_4826,Bellfort Ave @ Cannon St,29.669397,-95.376829
+m2060_4827,Bellfort Ave @ South Freeway,29.668052,-95.381622
+m2060_483,Washington Ave @ Ash Pl,29.767561,-95.374170
+m2060_484,Washington Ave @ Silver St,29.767849,-95.376956
+m2060_4845,John F Kennedy Blvd @ Aldine Mail,29.902927,-95.332337
+m2060_4846,John F Kennedy Blv @ Charriton Dr,29.904576,-95.332005
+m2060_4847,John F Kennedy Blvd @ Sandydale Ln,29.906817,-95.331245
+m2060_4848,John F Kennedy Blvd @ Connorvale Rd,29.909330,-95.331261
+m2060_4849,John F Kennedy Blvd @ Lauder Rd,29.911001,-95.331299
+m2060_485,Washington Ave @ Henderson St,29.768152,-95.379844
+m2060_4855,Aldine Mail Route Rd @ Eastex Fwy,29.903009,-95.313340
+m2060_4856,Aldine Mail Route Rd @ Fantasy Dr,29.902967,-95.315545
+m2060_4857,Aldine Mail Route Rd @ MacNaughton,29.902933,-95.318583
+m2060_4858,Aldine Mail Route Rd @ Mac Naughton,29.902907,-95.321086
+m2060_4859,Aldine Mail Route Rd @ Vickery Dr,29.902886,-95.323356
+m2060_486,Washington Ave @ Taylor St,29.768324,-95.381542
+m2060_4860,Aldine Mail Route Rd @ Determined D,29.902789,-95.325953
+m2060_4861,Aldine Mail Route Rd @ Determined D,29.902715,-95.327703
+m2060_4862,Aldine Mail Route Rd @ Determined D,29.902631,-95.329987
+m2060_487,Washington Ave @ Brashear St,29.768442,-95.383752
+m2060_488,Washington Ave @ Custus St,29.768660,-95.386546
+m2060_490,Washington Ave @ Studemont St,29.769010,-95.391476
+m2060_4909,Jensen Dr @ Woodard St,29.810910,-95.342217
+m2060_4911,Jensen Dr @ Kelley St,29.813655,-95.342302
+m2060_4912,Jensen Dr @ Caplin St,29.816264,-95.342300
+m2060_4913,Jensen Dr @ King St,29.817748,-95.342331
+m2060_4914,Jensen Dr @ Bennington St,29.822931,-95.342415
+m2060_4915,Jensen Dr @ Vance St,29.824806,-95.342435
+m2060_4916,Jensen Dr @ Vaughn St,29.826416,-95.342499
+m2060_4917,Jensen Dr @ E Crosstimbers St,29.828399,-95.342520
+m2060_4918,Jensen Dr @ McDaniel St,29.830935,-95.342529
+m2060_4919,Jensen Dr @ Deams,29.833849,-95.342575
+m2060_492,Washington Ave @ Heights Blvd,29.769557,-95.396504
+m2060_4920,Jensen Dr @ Bostic St,29.835658,-95.342598
+m2060_4921,Jensen Dr @ Berry Rd,29.837293,-95.342636
+m2060_4922,Jensen Dr @ Luell St,29.839161,-95.342644
+m2060_4923,Jensen Dr @ Sherwick St,29.841039,-95.342689
+m2060_4924,Jensen Dr @ Hohl St,29.844493,-95.342812
+m2060_4925,Jensen Dr @ Hurley St,29.846076,-95.342781
+m2060_4926,Jensen Dr @ Tidwell Rd,29.847245,-95.342798
+m2060_4928,Jensen Dr @ Skippy St,29.852326,-95.340487
+m2060_4929,Jensen Dr @ Hitchcock St,29.855816,-95.338356
+m2060_493,Washington Ave @ Yale St,29.769829,-95.399061
+m2060_4930,Jensen Dr @ Topping St,29.857908,-95.337124
+m2060_4931,Jensen Dr @ Parker Rd,29.859320,-95.336301
+m2060_4932,Jensen Dr @ Deutser,29.861254,-95.335131
+m2060_4933,Jensen Dr @ Eastex Freeway,29.862411,-95.334442
+m2060_494,Washington Ave @ Bonner St,29.770162,-95.402124
+m2060_4953,E Tidwell Rd @ Nordling Rd,29.845421,-95.389885
+m2060_4954,E Tidwell Rd @ Barrett St,29.845427,-95.387665
+m2060_4955,E Tidwell Rd @ Airline Dr,29.845442,-95.384747
+m2060_4956,Tidwell Rd @ Airline Dr,29.845453,-95.383033
+m2060_4957,Tidwell Rd @ Fulton St,29.845508,-95.378084
+m2060_4958,Tidwell Rd @ Highlawn St,29.845532,-95.374931
+m2060_4959,Tidwell Rd @ Bauman Rd,29.845572,-95.371933
+m2060_496,Washington Ave @ Patterson St,29.770578,-95.406442
+m2060_4960,Tidwell Rd @ McGallion Rd,29.846094,-95.368496
+m2060_4961,Tidwell Rd @ Irvington Blvd,29.846152,-95.362889
+m2060_4972,Crosstimbers St @ North Freeway,29.828525,-95.380031
+m2060_498,Washington Ave @ Shepherd Dr,29.770533,-95.409353
+m2060_4987,Airline Dr @ Burress St,29.841498,-95.384285
+m2060_4989,Airline Dr @ Tidwell Rd,29.846123,-95.384351
+m2060_4991,Airline Dr @ E Witcher Ln,29.850171,-95.384413
+m2060_4993,Airline Dr @ Salerno Ln,29.854122,-95.384473
+m2060_4995,Airline Dr @ E Wellington St,29.857595,-95.384534
+m2060_4996,Airline Dr @ E Parker Rd,29.859878,-95.384579
+m2060_4997,Airline Dr @ McCabe St,29.861991,-95.384618
+m2060_4999,Airline Dr @ Rittenhouse St,29.864698,-95.384662
+m2060_5000,Airline Dr @ Benbrook Dr,29.867448,-95.384728
+m2060_50001,West Alabama / Galleria Station SB,29.737682,-95.460709
+m2060_50003,Westheimer / Galleria Station SB,29.740557,-95.460830
+m2060_50005,Guilford Station SB,29.743954,-95.461149
+m2060_50007,Ambassador Station SB,29.746465,-95.461197
+m2060_50009,San Felipe Station SB,29.749980,-95.461304
+m2060_5001,Airline Dr @ E Little York Rd,29.869744,-95.384752
+m2060_50011,Four Oaks Station SB,29.752303,-95.460346
+m2060_50013,Uptown Park Station SB,29.753677,-95.458039
+m2060_50014,Richmond Station SB,29.732889,-95.460559
+m2060_50017,Westpark / Lower Uptown BRT,29.725355,-95.464657
+m2060_5019,Fulton St @ Ben Dr,29.843594,-95.376942
+m2060_5022,Fulton St @ Berry Rd,29.837741,-95.375768
+m2060_5028,Fulton St @ Julia St,29.834363,-95.375728
+m2060_5029,Fulton St @ Meadow Lea Dr,29.835707,-95.375662
+m2060_5030,Fulton St @ Berry Rd,29.837451,-95.375569
+m2060_5036,S Post Oak Ln @ Riverway Dr,29.761515,-95.463420
+m2060_5037,S Post Oak Ln @ West Oak Dr,29.759164,-95.463351
+m2060_5038,S Post Oak Ln @ Tangle Ln,29.757149,-95.463271
+m2060_5039,S Post Oak Ln @ Doliver Dr,29.754737,-95.463199
+m2060_5040,S Post Oak Ln @ Westbriar Ln,29.751977,-95.463093
+m2060_5067,S Voss Rd @ San Felipe Rd Mb,29.752368,-95.500992
+m2060_5068,Woodway Dr @ S Voss Rd,29.754893,-95.499968
+m2060_5069,Woodway Dr @ S Ripple Creek Dr,29.755780,-95.497208
+m2060_5070,Woodway Dr @ Clearbrook Ln,29.756453,-95.494824
+m2060_5071,Woodway Dr @ Briar Ridge Dr,29.757343,-95.491745
+m2060_5072,Woodway Dr @ Potomac Dr,29.758042,-95.489042
+m2060_5073,Woodway Dr @ Nantucket Dr,29.758242,-95.487693
+m2060_5074,Woodway Dr @ Fountain View Dr,29.758441,-95.486365
+m2060_5075,Woodway Dr @ Augusta Dr,29.760005,-95.483074
+m2060_5076,Woodway Dr @ Deerwood Rd,29.761335,-95.481588
+m2060_5077,Woodway Dr @ Bering Dr,29.762725,-95.480040
+m2060_5079,Woodway Dr @ W Broad Oaks Dr,29.763748,-95.474944
+m2060_5080,Woodway Dr @ Pine Shadows Dr,29.763450,-95.471184
+m2060_5081,Woodway Dr @ Sage Rd,29.762474,-95.467148
+m2060_5082,Woodway Dr @ Post Oak Ln,29.762350,-95.462914
+m2060_5097,S Gessner Rd @ Southwest Freeway,29.688390,-95.531587
+m2060_5098,S Gessner Rd @ Tybor Dr,29.687152,-95.529641
+m2060_5099,S Gessner Rd @ Jason St,29.685382,-95.528721
+m2060_5100,S Gessner Rd @ Ariel St,29.683171,-95.528685
+m2060_5101,S Gessner Rd @ Shadow Crest Rd,29.681609,-95.528667
+m2060_5102,S Gessner Rd @ Nairn St,29.680060,-95.528644
+m2060_5103,S Gessner Rd @ Bissonnet St,29.677018,-95.528547
+m2060_5104,S Gessner Rd @ Bissonnet St Mb,29.673780,-95.528321
+m2060_5105,S Gessner Rd @ Braeswood Blvd,29.671598,-95.528310
+m2060_5124,Fondren Rd @ Wanda Ln,29.678286,-95.508537
+m2060_5125,Fondren Rd @ Wanda Ln Mb,29.680617,-95.508563
+m2060_5126,Fondren Rd @ Ariel St,29.682421,-95.508583
+m2060_5127,Fondren Rd @ Jackwood St,29.684365,-95.508602
+m2060_5128,Fondren Rd @ Bissonnet St,29.686624,-95.508606
+m2060_5129,Fondren Rd @ Kingsgate Cir,29.688278,-95.508717
+m2060_5130,Fondren Rd @ Beechnut St,29.691821,-95.509728
+m2060_5131,Fondren Rd @ Sharpcrest Ln,29.695251,-95.511842
+m2060_5132,Fondren Rd @ Sharpview Dr,29.697005,-95.513779
+m2060_5133,Fondren Rd @ Guildford Rd,29.698188,-95.515157
+m2060_5140,Westheimer Rd @ McCue Rd,29.740514,-95.464628
+m2060_5141,Westheimer Rd @ Post Oak Blvd,29.740694,-95.461679
+m2060_5142,Westheimer Rd @ Sage Rd,29.740170,-95.467385
+m2060_5147,Long Point Rd @ Johanna Dr,29.802750,-95.483225
+m2060_5151,Westheimer Rd @ River Oaks Blvd,29.742047,-95.426727
+m2060_5153,Westheimer Rd @ Ferndale St,29.742098,-95.422012
+m2060_5154,Westheimer Rd @ Kirby Dr,29.742207,-95.419041
+m2060_5156,Westheimer Rd @ Greenbriar Dr,29.742477,-95.413356
+m2060_5157,Westheimer Rd @ S Shepherd Dr,29.742503,-95.411037
+m2060_5168,Weslayan St @ Westheimer Rd,29.741903,-95.441746
+m2060_5169,Weslayan St @ Essex Ln,29.739788,-95.441738
+m2060_5170,Weslayan St @ W Alabama St,29.738666,-95.441721
+m2060_5171,Weslayan St @ Colquitt St,29.734991,-95.441630
+m2060_5189,Richmond Ave @ Cummins,29.732822,-95.438213
+m2060_5190,Richmond Ave @ Weslayan St,29.732806,-95.441092
+m2060_5191,Richmond Ave @ Weslayan St,29.732785,-95.442564
+m2060_5192,Richmond Ave @ Drexel Dr,29.732688,-95.445893
+m2060_5193,Richmond Ave @ Drexel Dr,29.732669,-95.447490
+m2060_5194,Richmond Ave @ Drexel Dr,29.732642,-95.448884
+m2060_5195,Richmond Ave @ Mid Ln,29.732575,-95.450319
+m2060_5196,Richmond Ave @ Newcastle Dr,29.732875,-95.452126
+m2060_5197,Richmond Ave @ Staunton St,29.732846,-95.453628
+m2060_5198,Richmond Ave @ Lancashire St,29.732794,-95.456516
+m2060_5199,Richmond Ave @ Guiton St,29.732166,-95.458528
+m2060_5208,Richmond Ave @ Weslayan St,29.732550,-95.440482
+m2060_5212,Post Oak Blvd @ Post Oak Park Dr,29.754067,-95.454246
+m2060_533,Main St @ Pressler St,29.704013,-95.406657
+m2060_5331,W Fuqua St @ Bathurst Dr,29.613568,-95.435010
+m2060_5332,Fuqua St @ Bathurst Dr,29.613544,-95.437167
+m2060_5333,W Fuqua St @ White Heather Dr,29.613525,-95.438651
+m2060_534,Main St @ John Freeman St,29.713254,-95.399356
+m2060_5349,Fuqua St @ Alrover St,29.613422,-95.427988
+m2060_535,Main St @ University Blvd,29.714760,-95.398178
+m2060_5350,Fuqua St @ Waterloo Dr,29.613462,-95.424266
+m2060_5351,Fuqua St @ Almeda Rd,29.613494,-95.420231
+m2060_5352,Almeda Genoa Rd @ Almeda School Rd,29.613541,-95.417702
+m2060_5353,Almeda Genoa Rd @ Del Papa St,29.613656,-95.409517
+m2060_5354,Almeda Genoa Rd @ Monarch Rd,29.613685,-95.406754
+m2060_539,Richmond Ave @ Timmons Ln,29.732856,-95.436179
+m2060_5448,Braeswood Blvd @ Moursund St,29.707752,-95.392652
+m2060_5590,San Felipe Rd @ Willowick Rd,29.746685,-95.441838
+m2060_5601,Washington Ave @ Sandman St,29.770518,-95.411368
+m2060_5602,Washington Ave @ Reinerman St,29.770542,-95.413730
+m2060_5611,Washington Ave @ Cohn,29.771127,-95.422066
+m2060_5612,Washington Ave @ Schuler St,29.772300,-95.423942
+m2060_5613,Washington Ave @ Dell,29.774678,-95.426048
+m2060_5614,Washington Ave @ Hamman St,29.775848,-95.427071
+m2060_5657,Westheimer Rd @ Mid Ln,29.741424,-95.450295
+m2060_5659,Westheimer Rd @ Drexel Dr,29.741588,-95.445858
+m2060_5660,Westheimer Rd @ Drexel Dr MB,29.741631,-95.443757
+m2060_5661,Westheimer Rd @ Timmons Ln,29.741481,-95.436775
+m2060_5663,Westheimer Rd @ Joanel St,29.741459,-95.434504
+m2060_571,Louisiana St @ Pease St,29.753135,-95.371666
+m2060_5720,W Bellfort Ave @ S Post Oak Rd,29.670875,-95.460685
+m2060_5721,W Bellfort Ave @ Nenana Dr,29.671408,-95.459026
+m2060_5722,Bellfort St @ Willowgrove Dr,29.673021,-95.454529
+m2060_5723,W Bellfort Ave @ Cliffwood Dr,29.673051,-95.453148
+m2060_5724,W Bellfort Ave @ Greenwillow Dr,29.673084,-95.450485
+m2060_5725,W Bellfort Ave @ Woodwind Dr,29.673157,-95.445465
+m2060_5726,W Bellfort Ave @ Woodwind Dr Mb,29.673184,-95.441925
+m2060_573,Louisiana St @ Bell St,29.754619,-95.370484
+m2060_575,Louisiana St @ Polk St,29.756107,-95.369308
+m2060_5769,W Bellfort Ave @ Buffalo Spdwy MB,29.672826,-95.421781
+m2060_577,Louisiana St @ Lamar St,29.757609,-95.368118
+m2060_5770,W Bellfort Ave @ Lakes At 610 Dr,29.672881,-95.419615
+m2060_5771,W Bellfort Ave @ Lakes At 610 Dr,29.672942,-95.417012
+m2060_5772,W Bellfort Ave @ Interchange Dr,29.672998,-95.414712
+m2060_5773,W Bellfort Ave @ Kirby Dr,29.672954,-95.412424
+m2060_5776,S Main St @ Stella Link Rd,29.661278,-95.440260
+m2060_5779,S Main St @ Charleston Park Dr,29.668209,-95.434870
+m2060_579,Louisiana St @ Walker St,29.759101,-95.366928
+m2060_581,Louisiana St @ Capitol St,29.760577,-95.365761
+m2060_583,Louisiana St @ Prairie St,29.762139,-95.364532
+m2060_5855,Aldine Bender Rd @ Wagon Rd,29.931607,-95.406406
+m2060_5883,Airline Dr @ John Alber Rd,29.872947,-95.384908
+m2060_5884,Airline Dr @ Canino Rd,29.875920,-95.386596
+m2060_5885,Airline Dr @ Carby Rd,29.877935,-95.387826
+m2060_5887,Airline Dr @ Mitchell Rd,29.883463,-95.391191
+m2060_5888,Airline Dr @ Louise Rd,29.885723,-95.392541
+m2060_5889,Airline Dr @ Gulf Bank Rd,29.889728,-95.394957
+m2060_5890,Airline Dr @ Hill Rd,29.895816,-95.397994
+m2060_5892,Airline Dr @ Nicar St,29.899923,-95.399474
+m2060_5893,Airline Dr @ Aldine Mail Route Rd,29.903078,-95.400612
+m2060_5894,Airline Dr @ Busch Dr,29.905080,-95.401330
+m2060_5896,Airline Dr @ Airway Rd,29.892521,-95.396622
+m2060_5897,Airline Dr @ Blue Bell Rd,29.907295,-95.402128
+m2060_5898,Airline Dr @ Hambrick Rd,29.909463,-95.402908
+m2060_5899,Airline Dr @ McFarland Rd,29.912738,-95.404097
+m2060_5900,Airline Dr @ West Rd,29.915730,-95.405124
+m2060_5901,Airline Dr @ Hardwicke Rd,29.919426,-95.406448
+m2060_5902,Airline Dr @ Dyna Dr,29.922015,-95.407372
+m2060_5903,Airline Dr @ Goodson Dr,29.924795,-95.408365
+m2060_5904,Airline Dr @ Buckboard Dr,29.928088,-95.409556
+m2060_5936,Chimney Rock Rd @ Bellaire Blvd,29.705369,-95.476165
+m2060_5944,S Rice Ave @ Glenmont Dr,29.720464,-95.468196
+m2060_5945,S Rice Ave @ Fournace Pl,29.716925,-95.468146
+m2060_5946,S Rice Ave @ Elm,29.712807,-95.468132
+m2060_5947,S Rice Ave @ Beech St,29.710808,-95.468086
+m2060_5948,S Rice Ave @ Bissonnet St,29.707685,-95.468086
+m2060_5963,S Rice Ave @ Bissonnet St,29.707483,-95.467820
+m2060_5970,Bellaire Blvd @ Cannock Rd,29.703781,-95.511420
+m2060_5971,Bellaire Blvd @ Larkwood Dr,29.703664,-95.508956
+m2060_5972,Bellaire Blvd @ Larkwood Dr Mb,29.704002,-95.506935
+m2060_5973,Bellaire Blvd @ Bintliff Dr,29.704805,-95.504518
+m2060_5974,Bellaire Blvd @ Tarnef Dr,29.705229,-95.500764
+m2060_5975,Bellaire Blvd @ Rookin St,29.705247,-95.497463
+m2060_5978,Bellaire Blvd @ Rampart St,29.705354,-95.489149
+m2060_5979,Bellaire Blvd @ Mullins Dr,29.705369,-95.487038
+m2060_5980,Bellaire Blvd @ Renwick Dr,29.705393,-95.485032
+m2060_5981,Bellaire Blvd @ Atwell Dr,29.705413,-95.482666
+m2060_5982,Bellaire Blvd @ Alder Dr,29.705433,-95.481240
+m2060_5983,Bellaire Blvd @ Chetwood Dr,29.705454,-95.478845
+m2060_5984,Bellaire Blvd @ Chimney Rock Rd,29.705479,-95.476578
+m2060_5986,Bellaire Blvd @ Bissonnet St,29.705516,-95.472643
+m2060_5987,Bellaire Blvd @ 2nd St,29.705469,-95.463776
+m2060_5988,Bellaire Blvd @ 1st St,29.705610,-95.461117
+m2060_6026,Airline Dr @ W Cavalcade St,29.804690,-95.381823
+m2060_6027,Airline Dr @ Nadine St,29.806637,-95.381851
+m2060_6028,Airline Dr @ Link Rd,29.809134,-95.381905
+m2060_6030,Airline Dr @ E 29th St,29.812918,-95.382248
+m2060_6070,W 20th St @ Lawrence St,29.803745,-95.408186
+m2060_6071,W 20th St @ Ashland St,29.803826,-95.403764
+m2060_6072,W 20th St @ Rutland St,29.803831,-95.401549
+m2060_6073,W 20th St @ Heights Blvd,29.803889,-95.398245
+m2060_6074,E 20th St @ Arlington St,29.803945,-95.394583
+m2060_6075,E 20th St @ Oxford St,29.803980,-95.392380
+m2060_6076,E 20th St @ Bradshaw St,29.804012,-95.390670
+m2060_6077,W Cavalcade St @ N Main St,29.803844,-95.387495
+m2060_6078,Cavalcade St @ Norhill St,29.803845,-95.386277
+m2060_6079,W Cavalcade St @ Michaux St,29.803854,-95.384558
+m2060_6080,W Cavalcade St @ Airline Dr,29.803727,-95.382138
+m2060_6081,W Cavalcade St @ Northwood St,29.803785,-95.378228
+m2060_6082,W Cavalcade St @ Enid St,29.803810,-95.375505
+m2060_61,Main St @ Dryden Rd,29.710571,-95.401783
+m2060_610,Louisiana St @ Elgin St,29.742968,-95.379697
+m2060_6123,Hillcroft Ave @ Braeswood Blvd,29.679097,-95.492723
+m2060_6124,Hillcroft Ave @ Birdwood Rd,29.681693,-95.492677
+m2060_6125,Hillcroft Ave @ Jackwood St,29.684145,-95.492714
+m2060_6126,Hillcroft Ave @ Indigo St,29.685720,-95.492531
+m2060_6127,Hillcroft Ave @ Beechnut St,29.687921,-95.492296
+m2060_6128,Hillcroft Ave @ Hazen St,29.691500,-95.492828
+m2060_6129,Hillcroft Ave @ Bissonnet St,29.694733,-95.492874
+m2060_6130,Hillcroft Ave @ Evergreen,29.698085,-95.492774
+m2060_6131,Hillcroft Ave @ Neff St,29.700154,-95.492802
+m2060_6132,Hillcroft Ave @ Jessamine St,29.701715,-95.492830
+m2060_6133,Hillcroft Ave @ Edgemoor Dr,29.703546,-95.492844
+m2060_6134,Hillcroft Ave @ Bellaire Blvd,29.705255,-95.492874
+m2060_6135,Hillcroft Ave @ Dashwood Dr,29.707086,-95.492898
+m2060_6136,Hillcroft Ave @ Clarewood Dr,29.708955,-95.492921
+m2060_6137,Hillcroft Ave @ Westward St Mb,29.712047,-95.493685
+m2060_6138,Hillcroft Ave @ Sands Point Dr,29.713568,-95.495259
+m2060_6139,Hillcroft Ave @ Gulfton Dr,29.714865,-95.496752
+m2060_6157,S Rice Ave @ Mayfair St,29.719163,-95.468188
+m2060_617,Louisiana St @ St Joseph Pkwy,29.751632,-95.372833
+m2060_6175,Studewood St @ White Oak Dr,29.781877,-95.387585
+m2060_6177,Studewood St @ Euclid,29.785056,-95.387675
+m2060_6179,Studewood St @ 11th St,29.791041,-95.387768
+m2060_6181,Studewood St @ Fugate St,29.794813,-95.387840
+m2060_6182,Studewood St @ Algregg St,29.796956,-95.387871
+m2060_6184,Studewood St @ E 16th St,29.800036,-95.387939
+m2060_6186,Studewood St @ E 19th St,29.802998,-95.387978
+m2060_620,Milam St @ Preston St,29.762716,-95.363052
+m2060_621,Milam St @ Jefferson St,29.752206,-95.371362
+m2060_622,Milam St @ St Joseph Pkwy,29.751491,-95.371924
+m2060_624,Travis St @ St. Joseph Pkwy,29.750604,-95.371170
+m2060_625,Travis St @ Jefferson St,29.751347,-95.370567
+m2060_6259,Bissonnet St @ Southwest Freeway,29.675810,-95.540681
+m2060_626,Travis St @ Pease St,29.752125,-95.369973
+m2060_627,Travis St @ Leeland St,29.752841,-95.369404
+m2060_628,Travis St @ Bell St,29.753612,-95.368796
+m2060_629,Travis St @ Clay St,29.754346,-95.368210
+m2060_630,Travis St @ Preston St,29.761906,-95.362236
+m2060_632,Travis St @ Franklin St,29.763254,-95.361169
+m2060_6329,Green Craig Dr @ Hillcroft Ave,29.637634,-95.493680
+m2060_6330,Green Craig Dr @ Dunlap St,29.637172,-95.495053
+m2060_6331,Dunlap St @ Fonmeadow Dr,29.638514,-95.495323
+m2060_6332,Dunlap St @ Fonmeadow Dr MB,29.639635,-95.495329
+m2060_6333,Alvarado Dr @ Hillcroft Ave,29.640784,-95.493664
+m2060_6334,Hillcroft Ave @ Densmore Dr,29.642571,-95.492950
+m2060_6335,Hillcroft Ave @ W Airport Blvd,29.644303,-95.493004
+m2060_6336,Hillcroft Ave @ Dryad Dr,29.646938,-95.493073
+m2060_6337,Hillcroft Ave @ Ludington Dr,29.649795,-95.492683
+m2060_6338,Hillcroft Ave @ Burlinghall Dr,29.652864,-95.491783
+m2060_6339,Hillcroft Ave @ McKnight St,29.655340,-95.491824
+m2060_634,Smith St @ Preston St,29.763723,-95.364786
+m2060_6340,Hillcroft Ave @ Bellfort Ave,29.656820,-95.491882
+m2060_6341,Hillcroft Ave @ Portal Dr,29.660926,-95.491908
+m2060_6342,Hillcroft Ave @ Bankside Dr,29.662954,-95.491940
+m2060_6343,Hillcroft Ave @ Willowbend Blvd,29.666246,-95.491997
+m2060_6344,Hillcroft Ave @ Cheena Dr,29.668442,-95.492103
+m2060_6345,Hillcroft Ave @ Yarwell Dr,29.670121,-95.492134
+m2060_6346,Hillcroft Ave @ Rutherglenn Dr,29.673152,-95.492729
+m2060_6348,Hillcroft Ave @ Braesheather Dr,29.675868,-95.493599
+m2060_635,Smith St @ Texas Ave,29.762225,-95.365959
+m2060_636,Smith St @ Clay St,29.756189,-95.370745
+m2060_637,Smith St @ Bell St,29.755378,-95.371396
+m2060_6370,Fondren Rd @ Minetta St,29.635299,-95.508072
+m2060_6371,Fondren Rd @ Fonmeadow Dr,29.638326,-95.508102
+m2060_6372,Fondren Rd @ Turk Ln,29.640775,-95.508133
+m2060_6373,Fondren Rd @ W Airport Blvd,29.643892,-95.508168
+m2060_6374,Fondren Rd @ Airport Blvd,29.645549,-95.508200
+m2060_6375,Fondren Rd @ Southmeadow Dr,29.647116,-95.508209
+m2060_6376,Fondren Rd @ Southmeadow Dr MB,29.649819,-95.508239
+m2060_6377,Fondren Rd @ Ludington Dr,29.651262,-95.508255
+m2060_6378,Fondren Rd @ Ludington Dr,29.653276,-95.508278
+m2060_6379,Fondren Rd @ W Bellfort Ave,29.655727,-95.508293
+m2060_638,Smith St @ Ruthven St Mb,29.754745,-95.371879
+m2060_6380,Fondren Rd @ Sanford Rd,29.659025,-95.508331
+m2060_6381,Fondren Rd @ Portal Dr,29.660463,-95.508342
+m2060_6382,Fondren Rd @ Bankside Dr,29.662605,-95.508362
+m2060_6383,Fondren Rd @ Bankside Dr Mb,29.664376,-95.508387
+m2060_6384,Fondren Rd @ Willowbend Blvd,29.667091,-95.508415
+m2060_6385,Fondren Rd @ Dumfries Dr,29.670558,-95.508453
+m2060_6390,Fondren Rd @ Braeswood Blvd,29.674692,-95.508503
+m2060_64,Maxey Road Park & Ride,29.784356,-95.217505
+m2060_6412,Pinemont Dr @ Golf Dr,29.840865,-95.424915
+m2060_6413,Pinemont Dr @ Golf Dr,29.840919,-95.422357
+m2060_6414,Pinemont Dr @ Alba Rd,29.840919,-95.420465
+m2060_6416,Pinemont Dr @ Brinkman St,29.841010,-95.416634
+m2060_6433,Crosstimbers St @ North Freeway,29.828516,-95.382080
+m2060_647,Milam St @ Prairie St,29.761944,-95.363652
+m2060_648,Milam St @ Texas Ave,29.761223,-95.364227
+m2060_649,Milam St @ Capitol St,29.760407,-95.364883
+m2060_6491,W 20th St @ W 19th St,29.802658,-95.424227
+m2060_6492,W 20th St @ Bevis St,29.803642,-95.422451
+m2060_6493,W 20th St @ Bevis St Mb,29.803646,-95.420209
+m2060_6494,W 20th St @ Beall St,29.803672,-95.418171
+m2060_6495,W 20th St @ Beall St Mb,29.803693,-95.414760
+m2060_6496,W 20th St @ N Durham Dr,29.803680,-95.412450
+m2060_650,Milam St @ Rusk St,29.759654,-95.365469
+m2060_651,Milam St @ Walker St,29.758927,-95.366031
+m2060_652,Milam St @ McKinney St,29.758154,-95.366644
+m2060_6520,W 18th St @ N Loop W,29.801421,-95.447821
+m2060_6521,W 18th St @ Salford Dr,29.801436,-95.445551
+m2060_6522,W 18th St @ Mill Creek Dr,29.801450,-95.443290
+m2060_6523,W 18th St @ Millwood Dr,29.801468,-95.440195
+m2060_653,Milam St @ Lamar St,29.757416,-95.367225
+m2060_654,Milam St @ Dallas St,29.756674,-95.367818
+m2060_6547,Washington Ave @ Katy Freeway MB,29.778894,-95.430839
+m2060_6548,Old Katy Rd @ Hempstead Rd,29.781310,-95.438129
+m2060_6549,Old Katy Rd @ Portway St,29.782135,-95.441101
+m2060_655,Milam St @ Polk St,29.755949,-95.368385
+m2060_6550,Old Katy Rd @ Katy Rd,29.783624,-95.446027
+m2060_6551,Old Katy Rd @ Portwest Dr,29.784118,-95.449641
+m2060_656,Milam St @ Clay St,29.755205,-95.368976
+m2060_6568,Memorial Dr @ Asbury St,29.761535,-95.418287
+m2060_6569,Memorial Dr @ Birdsall St,29.761513,-95.420549
+m2060_657,Milam St @ Bell St,29.754454,-95.369579
+m2060_6570,Memorial Dr @ Terrace Dr,29.762925,-95.424415
+m2060_6571,Memorial Dr @ Crestwood Dr,29.763621,-95.427582
+m2060_6572,Memorial Dr @ Crestwood Dr Mb,29.764160,-95.429887
+m2060_6573,Woodway Dr @ Memorial Dr,29.767864,-95.452603
+m2060_658,Milam St @ Leeland St,29.753702,-95.370176
+m2060_659,Milam St @ Pease St,29.752938,-95.370778
+m2060_6597,Richmond Ave @ Greenbriar Dr,29.734313,-95.412623
+m2060_6598,Richmond Ave @ Morningside Dr,29.734282,-95.415075
+m2060_6599,Richmond Ave @ Kirby Dr,29.734248,-95.418402
+m2060_660,Travis St @ Dallas St,29.755835,-95.367027
+m2060_6600,Richmond Ave @ Wakeforest St,29.734187,-95.421990
+m2060_6601,Richmond Ave @ Eastside,29.734163,-95.424351
+m2060_6602,Richmond Ave @ Eastside St,29.734131,-95.427307
+m2060_6603,Richmond Ave @ Buffalo Speedway,29.733922,-95.430113
+m2060_6605,Richmond Ave @ Edloe St,29.733292,-95.432663
+m2060_661,Travis St @ Lamar St,29.756609,-95.366416
+m2060_662,Travis St @ McKinney St,29.757345,-95.365814
+m2060_664,Travis St @ Rusk St,29.758861,-95.364652
+m2060_666,Travis St @ Texas Ave,29.760325,-95.363472
+m2060_667,Travis St @ Prairie St,29.761153,-95.362807
+m2060_669,Smith St @ Prairie St,29.762955,-95.365380
+m2060_67,Greenspoint TC,29.948593,-95.410372
+m2060_670,Smith St @ Capitol St,29.761422,-95.366585
+m2060_671,Smith St @ Rusk St,29.760730,-95.367150
+m2060_672,Smith St @ Walker St,29.759938,-95.367767
+m2060_6721,Beechnut St @ Brae Acres Rd,29.691440,-95.522163
+m2060_6722,Beechnut St @ Braeburn Valley Dr,29.690941,-95.518298
+m2060_6723,Beechnut St @ Bonhomme Rd,29.690970,-95.513996
+m2060_6724,Beechnut St @ Fondren Rd,29.691917,-95.509506
+m2060_6725,Beechnut St @ Bintliff Dr,29.691372,-95.505696
+m2060_6726,Beechnut St @ Bissonnet St,29.690155,-95.503578
+m2060_6727,Beechnut St @ Tanager St,29.688519,-95.501074
+m2060_6728,Beechnut St @ Robindell Dr,29.688121,-95.498802
+m2060_6729,Beechnut St @ Braewick Dr,29.688135,-95.497004
+m2060_673,Smith St @ McKinney St,29.759197,-95.368355
+m2060_6730,Beechnut St @ Dunlap St,29.688161,-95.494468
+m2060_6731,Beechnut St @ Hillcroft Ave,29.688201,-95.491539
+m2060_6732,Beechnut St @ Pontiac Dr,29.688677,-95.489531
+m2060_6733,Beechnut St @ Mullins Dr,29.688903,-95.486641
+m2060_6734,Beechnut St @ Renwick Dr,29.688918,-95.484817
+m2060_6735,Beechnut St @ Renwick Dr,29.688957,-95.481779
+m2060_6736,Beechnut St @ Braesmont Dr,29.688982,-95.479508
+m2060_6737,Beechnut St @ Chimney Rock Rd,29.688898,-95.476612
+m2060_6738,Beechnut St @ Ferris Dr,29.688991,-95.471978
+m2060_6739,Beechnut St @ S Rice Ave,29.689031,-95.468030
+m2060_674,Smith St @ Lamar St,29.758441,-95.368958
+m2060_6740,Beechnut St @ Endicott Ln,29.689061,-95.465145
+m2060_6741,Beechnut St @ Endicott Ln Mb,29.689081,-95.461905
+m2060_6742,Beechnut St @ W Loop S,29.689104,-95.459758
+m2060_675,Smith St @ Dallas St,29.757692,-95.369545
+m2060_676,Smith St @ Polk St,29.756741,-95.370306
+m2060_677,Smith St @ Pease St,29.754024,-95.372465
+m2060_679,Smith St @ Jefferson St,29.753251,-95.373059
+m2060_6793,North Freeway   @ Plaza Verde Dr,29.935335,-95.412849
+m2060_6794,North Freeway @ Aldine Bender Rd,29.933041,-95.412470
+m2060_6795,North Freeway @ Gillespie Rd,29.927875,-95.412407
+m2060_6803,Tomball Pkwy @ Willow Chase Blvd,29.963497,-95.549864
+m2060_6804,Willow Chase Blvd @ Tomball Pkwy,29.964555,-95.549931
+m2060_6805,Willow Chase Blvd @ Breton Ridge Dr,29.968511,-95.543173
+m2060_681,Smith St @ St Joseph Pkwy,29.752482,-95.373673
+m2060_6821,FM 1960 Rd @ Cutten Rd,29.969089,-95.532152
+m2060_6822,FM 1960 Rd @ Haynes Rd MB,29.971553,-95.527710
+m2060_6823,FM 1960 Rd @ Champions Dr,29.973344,-95.524467
+m2060_6824,FM 1960 Rd @ Paradise Valley Dr,29.977429,-95.517032
+m2060_6825,FM 1960 Rd @ Champion Forest Dr,29.979472,-95.513335
+m2060_6826,FM 1960 Rd @ Glen Erica Dr,29.981742,-95.509236
+m2060_6827,FM 1960 Rd @ Greenwood Forest Dr,29.982942,-95.507023
+m2060_6828,FM 1960 Rd @ Breck St,29.985383,-95.502619
+m2060_6829,FM 1960 Rd @ Stuebner Airline Dr,29.987364,-95.499030
+m2060_6830,FM 1960 Rd @ Forest Branch Rd,29.988922,-95.496210
+m2060_6831,FM 1960 Rd @ Torrey Chase Blvd,29.990663,-95.493037
+m2060_6832,FM 1960 Rd @ Gladebrook Dr,29.992157,-95.490306
+m2060_6833,FM 1960 Rd @ Falling Creek Dr,29.993974,-95.487033
+m2060_6834,FM 1960 Rd @ Walters Rd,29.995054,-95.485083
+m2060_6835,FM 1960 Rd @ Walters Rd MB,29.996468,-95.482559
+m2060_6836,FM 1960 Rd @ TC Jester Blvd,29.997361,-95.480949
+m2060_6837,FM 1960 Rd @ Terrace Oaks Dr,29.998895,-95.478227
+m2060_6838,FM 1960 Rd @ Cypress Woods Medical,30.001977,-95.472745
+m2060_6839,FM 1960 Rd @ Fritz Ln,30.003724,-95.469649
+m2060_6840,FM 1960 Rd @ Bammel Village Dr,30.006086,-95.465414
+m2060_6841,FM 1960 Rd @ Kuykendahl Rd,30.007701,-95.462199
+m2060_6842,FM 1960 Rd @ Sugar Pine Dr,30.009382,-95.459198
+m2060_6844,FM 1960 Rd @ Ella Blvd,30.014003,-95.450760
+m2060_6849,Roark Rd @ W Bellfort Ave,29.653681,-95.563413
+m2060_685,Travis St @ Polk St,29.755105,-95.367588
+m2060_6850,W Bellfort Av @ Bellfort Village Dr,29.652525,-95.560492
+m2060_6851,W Bellfort Ave @ Keegans Ridge Rd,29.652546,-95.557613
+m2060_6852,W Bellfort Ave @ Dover,29.652589,-95.555704
+m2060_6853,W Bellfort Ave @ Chessington Dr,29.652854,-95.551648
+m2060_6854,W Bellfort Ave @ Stanwood Dr,29.655584,-95.545648
+m2060_6855,W Bellfort Ave @ Plainfield St,29.656169,-95.542632
+m2060_6856,W Bellfort Ave @ Gatlinburg Dr,29.656209,-95.539082
+m2060_6857,W Bellfort Ave @ Westbrae Pkwy,29.656208,-95.534392
+m2060_6858,W Bellfort Ave @ Westbrae Pkwy Mb,29.655900,-95.530823
+m2060_6859,W Bellfort Ave @ S Gessner Rd,29.655558,-95.528388
+m2060_6860,W Bellfort Ave @ Braes Park Dr,29.655550,-95.523820
+m2060_6861,W Bellfort Ave @ Braes Forest Dr,29.655478,-95.520617
+m2060_6862,W Bellfort Ave @ Pembridge Dr,29.655514,-95.517067
+m2060_6863,W Bellfort Ave @ Kitty Brook Dr,29.655655,-95.514605
+m2060_6864,W Bellfort Ave @ Braesridge Dr,29.655873,-95.511134
+m2060_6865,W Bellfort Ave @ Larkwood Dr,29.655904,-95.507378
+m2060_6866,W Bellfort Ave @ Larkwood Dr,29.655909,-95.504714
+m2060_6867,W Bellfort Ave @ Sandpiper Dr,29.656006,-95.502935
+m2060_6868,W Bellfort Ave @ Bob White Dr,29.656522,-95.501007
+m2060_6869,W Bellfort Ave @ Albury Dr,29.656982,-95.497629
+m2060_687,Main St @ Sunset Blvd,29.720342,-95.393768
+m2060_6870,W Bellfort Ave @ Kirkside Dr,29.657015,-95.495007
+m2060_6871,W Bellfort Ave @ Hillcroft Ave,29.657036,-95.492388
+m2060_6872,W Bellfort Ave @ Rampart St,29.657072,-95.489626
+m2060_6873,W Bellfort Ave @ Mullins Dr,29.657111,-95.486127
+m2060_6874,W Bellfort Ave @ Burdine St,29.657393,-95.481573
+m2060_6875,W Bellfort Ave @ Checkerboard St,29.658099,-95.478964
+m2060_6876,W Bellfort Ave @ Chimney Rock Rd,29.659059,-95.476809
+m2060_6877,W Bellfort Ave @ Starkridge Dr,29.660718,-95.474401
+m2060_6878,W Bellfort Ave @ Briarbend Dr,29.663084,-95.471836
+m2060_6879,W Bellfort Ave @ Willowbend Blvd,29.665484,-95.469268
+m2060_688,Main St @ Remington Ln,29.722944,-95.391716
+m2060_6880,W Bellfort Ave @ Balmforth Ln,29.668315,-95.466248
+m2060_6881,W Bellfort Ave @ S Post Oak Rd,29.670377,-95.462857
+m2060_69,Fifth Ward/Denver Harbor Transit Center,29.775350,-95.315375
+m2060_690,Main St @ University Blvd,29.711172,-95.400976
+m2060_691,Main St @ Dryden Rd,29.710103,-95.401802
+m2060_6928,S Gessner Rd @ Twin Hills Dr,29.667732,-95.528295
+m2060_6929,S Gessner Rd @ Willow Meadow Dr,29.665122,-95.528247
+m2060_6930,Fondren Meadow Dr @ S Gessner Rd,29.649172,-95.527152
+m2060_6967,N Braeswood Blvd @ Chimney Rock Rd,29.678203,-95.476185
+m2060_6968,Braeswood Blvd @ Braesmont Dr,29.677569,-95.478725
+m2060_6969,Braeswood Blvd @ Burdine St,29.676989,-95.480759
+m2060_698,Richmond Ave @ Edloe St,29.732943,-95.434493
+m2060_6989,Bissonnet St @ Braeswood Blvd,29.676199,-95.534613
+m2060_699,Richmond Ave @ Timmons Ln,29.732594,-95.435441
+m2060_6990,Bissonnet St @ Braeburn Glen Blvd,29.676252,-95.532692
+m2060_6991,Bissonnet St @ S Gessner Rd Mb1,29.677883,-95.526154
+m2060_6992,Bissonnet St @ S Gessner Rd Mb2,29.679119,-95.523712
+m2060_6993,Bissonnet St @ Brae Acres Rd,29.680144,-95.521675
+m2060_6994,Bissonnet St @ Braeburn Valley Dr,29.681698,-95.518593
+m2060_6995,Bissonnet St @ Braeburn Valley Dr,29.682709,-95.516595
+m2060_6996,Bissonnet St @ Rue Crillon Dr,29.683636,-95.514746
+m2060_6997,Bissonnet St @ Bonhomme Rd,29.684655,-95.512726
+m2060_6998,Bissonnet St @ Lugary Dr,29.686091,-95.509900
+m2060_6999,Bissonnet St @ Larkwood Dr,29.687191,-95.507764
+m2060_700,Richmond Ave @ Edloe St,29.733008,-95.432785
+m2060_7000,Bissonnet St @ Larkwood Dr MB,29.688698,-95.504803
+m2060_7001,Bissonnet St @ Beechnut St,29.689346,-95.503529
+m2060_7002,Bissonnet St @ Albacore Dr,29.690908,-95.500488
+m2060_7003,Bissonnet St @ Braewick Dr,29.692617,-95.497139
+m2060_7004,Bissonnet St @ Dunlap St,29.693754,-95.494899
+m2060_7005,Bissonnet St @ Hillcroft Ave,29.694598,-95.493255
+m2060_7006,Bissonnet St @ Ashcroft Dr,29.695891,-95.490727
+m2060_7007,Bissonnet St @ Rampart St,29.696767,-95.489034
+m2060_7008,Bissonnet St @ Mullins Dr,29.697991,-95.486660
+m2060_7009,Bissonnet St @ Renwick Dr,29.698836,-95.485008
+m2060_701,Richmond Ave @ Buffalo Speedway,29.733606,-95.430387
+m2060_7010,Bissonnet St @ Atwell Dr,29.699893,-95.482918
+m2060_7011,Bissonnet St @ Alder Dr,29.701076,-95.480599
+m2060_7012,Bissonnet St @ Chetwood Dr,29.702298,-95.478225
+m2060_7013,Bissonnet St @ Chimney Rock Rd,29.703138,-95.476562
+m2060_7014,Bissonnet St @ Mapleridge St,29.704270,-95.474335
+m2060_7015,Bissonnet St @ Locust St,29.708849,-95.465370
+m2060_7016,Bissonnet St @ 1st St,29.710332,-95.462441
+m2060_7017,Bissonnet St @ W Loop S,29.711046,-95.461045
+m2060_7096,W Tidwell Rd @ Stuebner Airline Rd,29.847085,-95.408412
+m2060_7097,W Tidwell Rd @ Yale St,29.845869,-95.403160
+m2060_7098,W Tidwell Rd @ Yale St Mb,29.845158,-95.399734
+m2060_7099,E Tidwell Rd @ Cortlandt St,29.845318,-95.397726
+m2060_7100,E Tidwell Rd @ Werner St,29.845398,-95.394425
+m2060_7165,Gessner Rd @ Kingsride Ln,29.778875,-95.544285
+m2060_7166,Gessner Rd @ Kingsride Ln,29.780652,-95.544221
+m2060_7167,Gessner Rd @ Katy Freeway,29.782608,-95.543790
+m2060_7168,Gessner Rd @ Katy Freeway,29.783139,-95.544213
+m2060_7169,Gessner Rd @ Katy Freeway Mb,29.781217,-95.544467
+m2060_7170,Gessner Rd @ Barryknoll Ln,29.777605,-95.544614
+m2060_7171,Gessner Rd @ Perthshire Rd,29.775695,-95.544594
+m2060_7172,Gessner Rd @ Taylorcrest Rd,29.774031,-95.544577
+m2060_7173,Gessner Rd @ Cobblestone Dr,29.771521,-95.544543
+m2060_7174,Gessner Rd @ Old Oaks Dr,29.769820,-95.544546
+m2060_7175,Gessner Rd @ Boheme Dr,29.767844,-95.544510
+m2060_7176,Gessner Rd @ Beauregard Dr,29.766367,-95.544487
+m2060_7177,Gessner Rd @ Memorial Dr,29.764161,-95.544609
+m2060_7178,Gessner Rd @ Vanderpool Ln,29.758786,-95.544968
+m2060_7179,Gessner Rd @ Warrenton Dr,29.754814,-95.543511
+m2060_7180,Gessner Rd @ Stoney Creek Dr,29.753735,-95.541958
+m2060_7181,Gessner Rd @ Bayou Island Dr,29.750603,-95.538976
+m2060_7182,Gessner Rd @ Briar Forest Dr,29.747724,-95.538574
+m2060_7183,Gessner Rd @ Woodlake Sq,29.744245,-95.538538
+m2060_7184,Gessner Rd @ Ella Lee Ln,29.742546,-95.538518
+m2060_7185,Gessner Rd @ Ella Lee Ln,29.739584,-95.538492
+m2060_7186,Richmond Ave @ Post Oak Blvd,29.732069,-95.461506
+m2060_7187,Richmond Ave @ McCue Rd,29.731947,-95.463841
+m2060_7188,Richmond Ave @ S Rice Ave,29.731684,-95.468014
+m2060_7189,Richmond Ave @ Yorktown St,29.731657,-95.471550
+m2060_7190,Richmond Ave @ Berrington Dr,29.731634,-95.473842
+m2060_72,Southeast Transit Center,29.701387,-95.357172
+m2060_7212,Sage Rd @ Richmond Ave,29.731104,-95.466731
+m2060_7213,Sage Rd @ S Rice Ave,29.728066,-95.467603
+m2060_7289,Shepherd Dr @ Donovan St,29.844021,-95.410812
+m2060_7290,N Shepherd Dr @ W Tidwell Rd,29.846560,-95.410858
+m2060_73,Hiram Clarke Transit Center,29.613892,-95.431850
+m2060_74,Bellaire Transit Center,29.705711,-95.468828
+m2060_7453,Bellaire Blvd @ Sam Houston Pkwy,29.704431,-95.556017
+m2060_7454,Bellaire Blvd @ Corporate Dr,29.704643,-95.551743
+m2060_7455,Bellaire Blvd @ Corporate Dr,29.704740,-95.548101
+m2060_7457,Bellaire Blvd @ Pella Dr,29.704797,-95.542685
+m2060_7458,Bellaire Blvd @ Pella Dr,29.704813,-95.541278
+m2060_746,Broadway St @ Morley St,29.662280,-95.276692
+m2060_7460,Bellaire Blvd @ Burning Tree Dr,29.704885,-95.534836
+m2060_7461,Bellaire Blvd @ Mary Bates Blvd,29.704909,-95.532009
+m2060_7462,Bellaire Blvd @ Waldo St,29.704956,-95.527680
+m2060_7463,Bellaire Blvd @ Osage St,29.704990,-95.524783
+m2060_7464,Bellaire Blvd @ Fondren Rd,29.705013,-95.521553
+m2060_7465,Plazamericas,29.705056,-95.517913
+m2060_747,Broadway St @ Morley St,29.663480,-95.276723
+m2060_7476,Richmond Ave @ W Sam Houston Pkwy S,29.727752,-95.555527
+m2060_748,Broadway St @ Rockhill St,29.665246,-95.276768
+m2060_749,Broadway St @ Rockhill St Mb1,29.666862,-95.276829
+m2060_75,Eastwood Transit Center,29.728231,-95.335165
+m2060_750,Broadway St @ Rockhill St Mb2,29.669753,-95.276912
+m2060_751,Broadway St @ Bellfort Ave,29.672158,-95.276968
+m2060_752,Broadway St @ Bellfort St,29.674021,-95.277022
+m2060_753,Broadway St @ Bellfort Ave,29.675724,-95.277071
+m2060_754,Broadway St @ Santa Elena St,29.676874,-95.277096
+m2060_755,Broadway St @ Dixie Dr,29.681805,-95.277226
+m2060_7550,Airline Dr @ E 32nd 1/2 St,29.816076,-95.382739
+m2060_7551,Airline Dr @ E 40th St,29.822037,-95.383416
+m2060_7552,Airline Dr @ Riggs Rd,29.823944,-95.383637
+m2060_7553,Airline Dr @ Neyland St,29.826039,-95.383864
+m2060_7554,Airline Dr @ W Crosstimbers St,29.828249,-95.384124
+m2060_756,Broadway St @ Moline St,29.683382,-95.277274
+m2060_76,Kashmere Transit Center,29.814114,-95.327869
+m2060_762,Bellfort Ave @ Broadway St,29.672486,-95.277685
+m2060_764,Bellfort Ave @ Glenloch Dr,29.672415,-95.281743
+m2060_765,Bellfort Ave @ Glenloch Dr Mb,29.672429,-95.284634
+m2060_7655,Woodway Dr @ N Post Oak Ln,29.765256,-95.457291
+m2060_7656,N Post Oak Ln @ Woodway Dr,29.766024,-95.457397
+m2060_7657,N Post Oak Ln @ Houstonian,29.768447,-95.457443
+m2060_7658,N Post Oak Ln @ Memorial Dr,29.773116,-95.457537
+m2060_766,Bellfort Ave @ Telephone Rd,29.672858,-95.287776
+m2060_767,Bellfort Ave @ Telephone Rd,29.673828,-95.291217
+m2060_768,Bellfort Ave @ Lancaster St,29.673558,-95.295891
+m2060_7688,Fondren Rd @ Bellerive Dr,29.712955,-95.520776
+m2060_7689,Fondren Rd @ Gulfton Dr,29.714537,-95.520066
+m2060_769,Bellfort Ave @ Westover St,29.672877,-95.300096
+m2060_7690,Fondren Rd @ Prestwood Dr,29.715910,-95.519844
+m2060_7691,Fondren Rd @ Harwin Dr,29.718458,-95.519874
+m2060_7692,Fondren Rd @ Westpark Dr,29.721303,-95.520128
+m2060_7693,Fondren Rd @ Westpark Dr,29.722883,-95.520374
+m2060_7694,Fondren Rd @ Lipan Rd,29.723674,-95.520393
+m2060_7695,Fondren Rd @ Pagewood Ln,29.726046,-95.520431
+m2060_7696,Fondren Rd @ Richmond Ave,29.728793,-95.520437
+m2060_77,Magnolia Transit Center,29.735182,-95.303042
+m2060_770,Bellfort Ave @ Waltrip St,29.671751,-95.302154
+m2060_7706,Hillcroft Ave @ Southwest Freeway,29.717715,-95.500015
+m2060_7707,Hillcroft Ave @ Harwin Dr,29.719474,-95.500832
+m2060_7709,Hillcroft Ave @ Westpark Dr,29.722820,-95.500898
+m2060_771,Bellfort Ave @ Plainview St,29.669732,-95.304946
+m2060_7710,Hillcroft Ave @ Windswept Dr,29.725576,-95.500954
+m2060_7711,Hillcroft Ave @ Skyline Dr,29.728358,-95.501012
+m2060_7712,Hillcroft Ave @ Beverly Hill St,29.730238,-95.501057
+m2060_7713,Hillcroft Ave @ Richmond Ave,29.731208,-95.501072
+m2060_7714,Hillcroft Ave @ Unity Dr,29.734703,-95.500986
+m2060_7716,Westheimer Rd @ Hillcroft Ave,29.737474,-95.499917
+m2060_7717,Westheimer Rd @ Winrock Blvd,29.737517,-95.496535
+m2060_7718,Westheimer Rd @ Briarhurst Dr,29.737561,-95.493101
+m2060_7719,Westheimer Rd @ Greenridge Dr,29.737598,-95.490119
+m2060_772,Bellfort Ave @ Bullfinch St,29.668981,-95.306146
+m2060_7720,Westheimer Rd @ Nantucket Dr,29.737618,-95.487411
+m2060_7721,Westheimer Rd @ Fountain View Dr,29.737647,-95.484763
+m2060_7722,Westheimer Rd @ Augusta Dr,29.737695,-95.482041
+m2060_7723,Westheimer Rd @ Bering Dr,29.737720,-95.479508
+m2060_7724,Westheimer Rd @ Chimney Rock Rd,29.737759,-95.476860
+m2060_7725,Westheimer Rd @ W Alabama St,29.738146,-95.473321
+m2060_773,Bellfort Ave @ Nunn St,29.668174,-95.308988
+m2060_774,Bellfort Ave @ Ledbetter St,29.667710,-95.311133
+m2060_775,Bellfort Ave @ Northdale St,29.667265,-95.313096
+m2060_7758,Antoine Dr @ Bethel Blvd,29.825103,-95.472762
+m2060_7759,Antoine Dr @ Chantilly Ln,29.828714,-95.472630
+m2060_776,Bellfort Ave @ Crosswell Ave,29.666584,-95.317161
+m2060_7760,Antoine Dr @ Hewitt Dr,29.830424,-95.472684
+m2060_7761,Antoine Dr @ W 43rd St,29.832750,-95.472731
+m2060_7763,Antoine Dr @ De Soto St,29.854138,-95.473160
+m2060_7764,Antoine Dr @ Holly View Dr,29.857819,-95.473216
+m2060_7765,Antoine Dr @ Sheraton Oaks Dr,29.859267,-95.473230
+m2060_7766,Antoine Dr @ W Little York Rd,29.863104,-95.473293
+m2060_7776,W Tidwell Rd @ Hollister Rd,29.851492,-95.504974
+m2060_7777,W Tidwell Rd @ Langfield Rd,29.850538,-95.500183
+m2060_7778,W Tidwell Rd @ Chinaberry Dr,29.850515,-95.498354
+m2060_7779,W Tidwell Rd @ Northwest Central Dr,29.850495,-95.494965
+m2060_7780,W Tidwell Rd @ Burr Oak Dr,29.850480,-95.492351
+m2060_7781,W Tidwell Rd @ Bingle Rd,29.850458,-95.489165
+m2060_7782,W Tidwell Rd @ Lumberdale Rd,29.850458,-95.485213
+m2060_7783,W Tidwell Rd @ Lumberdale Rd Mb,29.850474,-95.482094
+m2060_7784,W Tidwell Rd @ W Sunforest Dr,29.850472,-95.480438
+m2060_7785,W Tidwell Rd @ Thousand Oaks Cir,29.849846,-95.477811
+m2060_7786,W Tidwell Rd @ Deep Forest Dr,29.849043,-95.475756
+m2060_7787,W Tidwell Rd @ Antoine Dr,29.848773,-95.473898
+m2060_78,Mesa Transit Center,29.849775,-95.264267
+m2060_7801,Tidwell Rd @ Northwest Freeway,29.851575,-95.507623
+m2060_7833,Bissonnet St @ Dairy Ashford Rd,29.677662,-95.601792
+m2060_7834,Bissonnet St @ Dairy View Ln,29.677154,-95.599991
+m2060_7835,Bissonnet St @ Cook Rd,29.676037,-95.596043
+m2060_7836,Bissonnet St @ Coventry Square Dr,29.675454,-95.592308
+m2060_7837,Bissonnet St @ S Kirkwood Rd,29.675145,-95.587733
+m2060_7838,Bissonnet St @ Court Glen Dr,29.674811,-95.582436
+m2060_7839,Bissonnet St @ Court Glen Dr,29.674682,-95.580524
+m2060_7840,Bissonnet St @ Leawood Blvd,29.674518,-95.577507
+m2060_7841,Bissonnet St @ Boone Rd,29.674358,-95.574714
+m2060_7842,Bissonnet St @ Brooklet Dr,29.674317,-95.563430
+m2060_7845,Dairy Ashford Rd @ Skymeadow Dr,29.727782,-95.605867
+m2060_7846,Dairy Ashford Rd @ Westpark Dr,29.724014,-95.605031
+m2060_7847,Dairy Ashford Rd @ Ashford Point Dr,29.720081,-95.604956
+m2060_7886,Richmond Ave @ Westheimer Rd,29.732510,-95.653186
+m2060_7887,Westheimer Rd @ Westheimer Pkwy Mb,29.735301,-95.648545
+m2060_7888,Westheimer Rd @ SH 6,29.735424,-95.644992
+m2060_7891,Westheimer Rd @ Briargreen Dr,29.735486,-95.640555
+m2060_7892,Westheimer Rd @ Westhollow Dr,29.735537,-95.636843
+m2060_7893,Westheimer Rd @ Panagard Dr,29.735597,-95.632210
+m2060_7894,Westheimer Rd @ Windchase Blvd,29.735638,-95.628998
+m2060_7895,Westheimer Rd @ Eldridge Pkwy,29.735712,-95.624089
+m2060_7896,Westheimer Rd @ Synott Rd,29.735755,-95.619919
+m2060_7897,Westheimer Rd @ Ashford Oak Dr,29.735844,-95.613970
+m2060_7898,Westheimer Rd @ Ashford Park Dr,29.735973,-95.609589
+m2060_7899,Westheimer Rd @ Dairy Ashford Rd,29.736027,-95.606085
+m2060_79,Northwest Transit Center - Platform 2,29.783072,-95.455458
+m2060_7900,Westheimer Rd @ Shadow View Ln,29.736063,-95.601669
+m2060_7901,Westheimer Rd @ Shadowbriar Dr,29.736108,-95.598505
+m2060_7902,Westheimer Rd @ Westminster Plaza D,29.736143,-95.595946
+m2060_7903,Westheimer Rd @ S Kirkwood Rd,29.736335,-95.588867
+m2060_7904,Westheimer Rd @ Woodland Park Dr,29.736475,-95.580691
+m2060_7905,Westheimer Rd @ Hayes Rd,29.736532,-95.576556
+m2060_7906,Westheimer Rd @ Wilcrest Dr,29.736579,-95.572073
+m2060_7908,Westheimer Rd @ Walnut Bend Ln,29.736668,-95.567144
+m2060_7909,Westheimer Rd @ Wallingford Dr,29.736684,-95.564426
+m2060_7910,Westheimer Rd @ Blue Willow Dr Mb,29.736727,-95.562808
+m2060_7911,Westheimer Rd @ Rogerdale Rd,29.736749,-95.560280
+m2060_7914,Alief Clodine Rd @ Eldridge Pkwy,29.712521,-95.623746
+m2060_7967,Richmond Ave @ Rogerdale Rd,29.727754,-95.559516
+m2060_7968,Richmond Ave @ Rogerdale Rd,29.727825,-95.562068
+m2060_7969,Richmond Ave @ Woodland Park Dr,29.728061,-95.580000
+m2060_7970,Richmond Ave @ S Kirkwood Rd,29.731342,-95.588344
+m2060_7971,Richmond Ave @ West Houston Center,29.730844,-95.592196
+m2060_7972,Richmond Ave @ Westminster Plaza Dr,29.730516,-95.594751
+m2060_7973,Richmond Ave @ Shadowbriar Dr,29.729964,-95.599526
+m2060_7974,Richmond Ave @ Dairy Ashford Rd,29.729921,-95.604332
+m2060_80,Tidwell Transit Center,29.851630,-95.337046
+m2060_8005,Bellaire Blvd @ Eldridge Pkwy,29.703607,-95.624146
+m2060_8006,Bellaire Blvd @ Puerta Vista Ln,29.703512,-95.621268
+m2060_8007,Bellaire Blvd @ Puerta Vista Ln,29.703403,-95.617820
+m2060_8008,Bellaire Blvd @ Westbranch Dr,29.703292,-95.608071
+m2060_8009,Bellaire Blvd @ Dairy Ashford Rd,29.703353,-95.603703
+m2060_801,Wright Rd @ Colonel Fischer Dr MB,29.986911,-95.323415
+m2060_8022,Ashford Point Dr @ Dairy Ashford Mb,29.720102,-95.608722
+m2060_8023,Ashford Point Dr @ Ashburnham Dr,29.720086,-95.610995
+m2060_8024,Ashford Point Dr @ Overture Dr,29.719993,-95.613447
+m2060_8025,Ashford Point Dr @ Brant Rock Dr,29.717753,-95.614086
+m2060_8026,Ashford Point Dr @ Synott Rd,29.716721,-95.614838
+m2060_8027,Bellaire Blvd @ Dairy Ashford Rd,29.703410,-95.600180
+m2060_8028,Bellaire Blvd @ Cook Rd,29.703457,-95.596485
+m2060_8029,Bellaire Blvd @ Jetty Ln,29.703493,-95.592696
+m2060_8030,Bellaire Blvd @ S Kirkwood Rd,29.703528,-95.588245
+m2060_8031,Bellaire Blvd @ Belle Park Dr,29.703610,-95.583686
+m2060_8032,Bellaire Blvd @ Baneway Dr,29.703661,-95.579179
+m2060_805,John F Kennedy @ Pallet Rd Mb1,29.973470,-95.341606
+m2060_806,John F Kennedy Service Rd @ Pallet,29.969643,-95.339259
+m2060_807,John F Kennedy @ Pallet Rd Mb3,29.967030,-95.337676
+m2060_808,John F Kennedy Blvd @ Rankin Rd,29.965099,-95.336498
+m2060_809,John F Kennedy Serv Rd @ Rankin MB,29.963037,-95.335226
+m2060_81,Fuqua Park & Ride,29.609886,-95.216930
+m2060_810,John F Kennedy Serv Rd @ Rankin MB2,29.960901,-95.333937
+m2060_811,Bush IAH Terminal C,29.986029,-95.337945
+m2060_812,John F Kennedy Blvd @ Sam Houston,29.940682,-95.331802
+m2060_8177,Metro Blvd @ Bellaire Blvd,29.704426,-95.627593
+m2060_8179,Bellaire Blvd @ Wilcrest Dr,29.703769,-95.571613
+m2060_8180,Bellaire Blvd @ Turtlewood Dr,29.703834,-95.567675
+m2060_8181,Bellaire Blvd @ Turtlewood Dr,29.704087,-95.562809
+m2060_8182,Bellaire Blvd @ Rodgerdale Rd,29.704211,-95.560569
+m2060_82,Monroe Park & Ride,29.663950,-95.254618
+m2060_8223,Beechnut St @ Toulon Dr,29.688724,-95.592105
+m2060_8224,Beechnut St @ S Kirkwood Rd,29.688780,-95.588029
+m2060_8225,Beechnut St @ Regentview Dr,29.688784,-95.584856
+m2060_8226,Beechnut St @ Baneway Dr,29.688721,-95.581507
+m2060_8227,Beechnut St @ Leawood Blvd,29.688166,-95.578337
+m2060_8228,Beechnut St @ Boone Rd,29.687922,-95.575050
+m2060_8229,Beechnut St @ Wilcrest Dr,29.688204,-95.570516
+m2060_8230,Beechnut St @ Maplecrest Dr,29.688776,-95.567675
+m2060_8231,Beechnut St @ Cinnamon Ln,29.689067,-95.565804
+m2060_8232,Beechnut St @ South Course MB,29.689503,-95.560231
+m2060_8233,Beechnut St @ Sam Houston Pkwy,29.689463,-95.558660
+m2060_8245,Bissonnet St @ Wilcrest Dr,29.674134,-95.570997
+m2060_8248,Post Oak Rd @ Awty School Ln,29.787183,-95.456810
+m2060_8249,N Post Oak Rd @ Post Oak Green Ln,29.789398,-95.456848
+m2060_8260,Antoine Dr @ Viking Dr,29.834669,-95.472765
+m2060_8262,Antoine Dr @ Victory Dr,29.866696,-95.472666
+m2060_8263,Antoine Dr @ Maple Hill Dr,29.868434,-95.472901
+m2060_8264,Antoine Dr @ Long Creek Ln,29.873122,-95.473713
+m2060_8265,Antoine Dr @ Long Creek Ln Mb,29.876403,-95.473638
+m2060_8267,Antoine Dr @ W Gulf Bank Rd,29.884111,-95.473772
+m2060_8268,Antoine Dr @ Bridge Forest Dr,29.887189,-95.474389
+m2060_8269,Antoine Dr @ Windsor Forest Dr,29.889181,-95.476190
+m2060_8270,Antoine Dr @ Maywood Forest Dr,29.890985,-95.478617
+m2060_8271,Antoine Dr @ W Mt Houston Rd,29.893417,-95.479863
+m2060_8272,Antoine Dr @ Fairview Forest Dr,29.895823,-95.479971
+m2060_8273,Antoine Dr @ Breen Dr,29.899482,-95.480269
+m2060_8274,Antoine Dr @ Chippewa Blvd,29.905291,-95.480093
+m2060_8275,Antoine Dr @ Romona Blvd,29.908524,-95.480047
+m2060_8276,Antoine Dr @ SH 249,29.910779,-95.479909
+m2060_83,North Shepherd Park & Ride,29.876016,-95.414097
+m2060_836,Broadway St @ Gulf Freeway,29.686390,-95.277350
+m2060_8364,Barryknoll Ln @ Bettina Ct,29.778633,-95.539432
+m2060_837,Broadway St @ Joplin St,29.689076,-95.277453
+m2060_8377,N Post Oak Rd @ Katy Fwy,29.779931,-95.456796
+m2060_838,Broadway St @ Hartford St,29.691263,-95.277505
+m2060_8380,N Post Oak Rd @ Memorial Dr,29.774013,-95.456712
+m2060_839,Broadway St @ Findlay,29.693438,-95.277571
+m2060_84,Spring Park & Ride,30.022103,-95.417595
+m2060_840,Broadway St @ Detroit St,29.695538,-95.277619
+m2060_8412,W 18th St @ Mangum Rd Mb,29.801389,-95.455846
+m2060_8413,W 18th St @ Northwest Freeway,29.801396,-95.452963
+m2060_8446,W Tidwell @ Fairbanks N Houston Mb,29.850793,-95.521325
+m2060_8447,W Tidwell Rd @ Raywood Blvd,29.850774,-95.518779
+m2060_8448,Tidwell Rd @ Guhn Rd,29.850815,-95.513371
+m2060_8449,W Tidwell Rd @ Dow Rd,29.850829,-95.511885
+m2060_8456,Gessner Rd @ Talley Ln,29.857639,-95.545319
+m2060_8457,Gessner Rd @ Grover Ln,29.855837,-95.545308
+m2060_8458,Gessner Rd @ Alfred Ln,29.853937,-95.545294
+m2060_8459,Gessner Rd @ Chickasaw Ln,29.852096,-95.545276
+m2060_8460,Gessner Rd @ Tanner Rd,29.850898,-95.545275
+m2060_8461,Gessner Rd @ Bamboo Rd,29.848459,-95.545248
+m2060_8462,Gessner Rd @ Tangiers Rd,29.846395,-95.545241
+m2060_8463,Gessner Rd @ Genard Rd,29.844600,-95.545231
+m2060_8464,Gessner Rd @ Genard Rd Mb1,29.841166,-95.545212
+m2060_8473,Gessner Rd @ Clay Rd,29.832416,-95.545473
+m2060_8474,Beechnut St @ Corporate Dr,29.689987,-95.551658
+m2060_8475,Beechnut St @ Colony Dr,29.690424,-95.548388
+m2060_8476,Beechnut St @ Pella Dr,29.690453,-95.545799
+m2060_8477,Beechnut St @ Jorine Dr,29.690485,-95.543227
+m2060_8478,Beechnut St @ Jorine Dr,29.690496,-95.540497
+m2060_8479,Beechnut St @ La Roche Ln,29.690546,-95.537815
+m2060_8480,Beechnut St @ S Gessner Rd,29.690952,-95.535469
+m2060_8481,Beechnut St @ Tanglewilde Ave,29.692183,-95.532345
+m2060_8482,Beechnut St @ Mary Bates Blvd,29.692468,-95.530403
+m2060_8483,Beechnut St @ Southwest Freeway,29.692239,-95.528212
+m2060_8514,Fondren Rd @ Southwest Freeway,29.701008,-95.518396
+m2060_8515,Fondren Rd @ Croton Rd,29.702480,-95.520105
+m2060_8516,Fondren Rd @ Bellaire Blvd,29.703874,-95.520890
+m2060_8517,Fondren Rd @ Bellaire Blvd,29.705972,-95.521162
+m2060_8518,Fondren Rd @ Dashwood Dr,29.707186,-95.521175
+m2060_8519,Fondren Rd @ Clarewood Dr,29.709153,-95.521196
+m2060_8536,Hempstead Rd @ McAllister Rd,29.803943,-95.463337
+m2060_8537,Hempstead Rd @ Dacoma St,29.806327,-95.466392
+m2060_8538,Hempstead Rd @ Fairway Park Dr,29.808552,-95.469618
+m2060_8539,Hempstead Rd @ Antoine Dr,29.811711,-95.473968
+m2060_8581,Antoine Dr @ Mitchelldale St,29.813155,-95.473592
+m2060_8582,Antoine Dr @ Centralcrest St,29.816480,-95.473542
+m2060_8583,Antoine Dr @ W 34th St,29.819129,-95.473616
+m2060_8588,Antoine Dr @ Northwest Freeway,29.823001,-95.473377
+m2060_86,Kingsland Park & Ride,29.774021,-95.744426
+m2060_860,Broadway St @ Concord,29.697737,-95.277702
+m2060_861,Broadway St @ Brockton St,29.699055,-95.277724
+m2060_862,Broadway St @ Park Terrace Blvd,29.701134,-95.277786
+m2060_8620,Gessner Rd @ Westray,29.818536,-95.545372
+m2060_8621,Gessner Rd @ Emnora Ln,29.815785,-95.545358
+m2060_8622,Gessner Rd @ Hammerly Blvd,29.812839,-95.545368
+m2060_8627,Gessner Rd @ Kemp Forest Dr,29.827030,-95.545434
+m2060_8628,Gessner Rd @ Kempwood Dr,29.823036,-95.545401
+m2060_8629,Bissonnet St @ Sam Houston Pkwy,29.674568,-95.559213
+m2060_8630,Bissonnet St @ Forum Park Dr,29.674819,-95.555871
+m2060_8631,Bissonnet St @ Woodfair Dr,29.674951,-95.553740
+m2060_8632,Bissonnet St @ Centre Pkwy,29.675182,-95.550525
+m2060_8633,Bissonnet St @ Country Creek Dr Mb,29.675270,-95.549256
+m2060_8634,Bissonnet St @ Plainfield St,29.675465,-95.546301
+m2060_8635,Bissonnet St @ Southwest Freeway,29.675652,-95.543694
+m2060_8653,Beechnut St @ Club Creek Dr,29.689229,-95.554039
+m2060_8686,Long Point Rd @ Gessner Rd,29.794188,-95.542860
+m2060_8687,Long Point Rd @ Witte Rd,29.794162,-95.540329
+m2060_8688,Long Point Rd @ Centennial Dr,29.794044,-95.537601
+m2060_8689,Long Point Rd @ Bunker Hill Rd,29.794962,-95.533855
+m2060_8690,Long Point Rd @ Springrock Ln,29.796279,-95.529164
+m2060_8691,Long Point Rd @ Oak Tree Dr,29.796939,-95.526815
+m2060_8692,Long Point Rd @ Blalock Rd,29.797786,-95.524150
+m2060_8724,Long Point Rd @ Campbell Rd,29.799548,-95.516561
+m2060_8725,Long Point Rd @ Campbell Rd,29.799898,-95.514633
+m2060_8726,Long Point Rd @ Springwood Dr,29.802876,-95.508468
+m2060_8727,Long Point Rd @ Hollister Rd,29.803005,-95.506681
+m2060_8728,Long Point Rd @ Creek Dr,29.802971,-95.504234
+m2060_8729,Long Point Rd @ Bingle Rd,29.802916,-95.501201
+m2060_8730,Long Point Rd @ Bayram Dr,29.802962,-95.498127
+m2060_8731,Long Point Rd @ Ridgecrest Dr,29.802928,-95.494004
+m2060_8732,Long Point Rd @ Huge Oaks St,29.802855,-95.491243
+m2060_8733,Long Point Rd @ Pine Chase Dr,29.802794,-95.488283
+m2060_8734,Long Point Rd @ Wirt Rd,29.802755,-95.485061
+m2060_88,Addicks Park & Ride,29.787456,-95.638333
+m2060_8800,Westheimer Rd @ W Sam Houston Pkwy,29.736807,-95.554932
+m2060_8801,Westheimer Rd @ Seagler Rd,29.736860,-95.552530
+m2060_8802,Westheimer Rd @ Briarpark Dr,29.736912,-95.548584
+m2060_8803,Westheimer Rd @ Elmside Dr,29.736957,-95.543861
+m2060_8804,Westheimer Rd @ Rivercrest Dr,29.736993,-95.541113
+m2060_8805,Westheimer Rd @ Gessner Rd,29.737042,-95.539574
+m2060_8806,Westheimer Rd @ Gessner Rd Mb,29.737054,-95.537108
+m2060_8807,Westheimer Rd @ Tanglewilde Ave,29.737079,-95.534949
+m2060_8808,Westheimer Rd @ Rockyridge Dr,29.737097,-95.532552
+m2060_8809,Westheimer Rd @ Westerland Dr,29.737133,-95.530797
+m2060_8810,Westheimer Rd @ Shady Ln,29.737170,-95.527853
+m2060_8812,Westheimer Rd @ Jeanetta Ln,29.737195,-95.525307
+m2060_8813,Westheimer Rd @ Fondren Rd,29.737221,-95.522065
+m2060_8814,Westheimer Rd @ Crossview Dr,29.737241,-95.519432
+m2060_8815,Westheimer Rd @ Lazy Hollow Dr,29.737291,-95.516570
+m2060_8816,Westheimer Rd @ Dunvale Rd,29.737325,-95.513652
+m2060_8817,Westheimer Rd @ Dunvale Rd MB,29.737336,-95.512420
+m2060_8818,Westheimer Rd @ Hullsmith Dr,29.737375,-95.507299
+m2060_8819,Westheimer Rd @ Stoney Brook Dr,29.737427,-95.504503
+m2060_8820,Westheimer Rd @ Hillcroft Ave,29.737455,-95.501480
+m2060_8821,Gessner Rd @ Westheimer Rd,29.736481,-95.539053
+m2060_8822,Gessner Rd @ Highmeadow Dr,29.734059,-95.539443
+m2060_8823,Gessner Rd @ Meadowglen Ln,29.732663,-95.539402
+m2060_8824,Gessner Rd @ Meadowland Dr,29.729663,-95.539352
+m2060_8825,S Gessner Rd @ Richmond Ave,29.727256,-95.539332
+m2060_8826,S Gessner Rd @ Pagewood Ln,29.725647,-95.539274
+m2060_8827,S Gessner Rd @ Westpark Dr,29.722659,-95.539278
+m2060_8828,S Gessner Rd @ Harwin Dr,29.717902,-95.539107
+m2060_8829,S Gessner Rd @ Town Park Dr,29.714168,-95.539071
+m2060_8830,Gessner Rd @ Town Park Dr,29.711557,-95.539032
+m2060_8831,S Gessner Rd @ Clarewood Dr,29.709091,-95.538979
+m2060_8832,S Gessner Rd @ Bellaire Blvd,29.705377,-95.538146
+m2060_8833,S Gessner Rd @ Neff St,29.701501,-95.538071
+m2060_8834,S Gessner Rd @ Stroud Dr,29.699001,-95.538056
+m2060_8835,S Gessner Rd @ Triola Ln,29.696678,-95.537926
+m2060_8836,S Gessner Rd @ Hendon Ln,29.693778,-95.537134
+m2060_8837,S Gessner Rd @ Beechnut St,29.691391,-95.535569
+m2060_8843,Antoine Dr @ Acorn St,29.836703,-95.472936
+m2060_8844,Antoine Dr @ Hoover St,29.838914,-95.473038
+m2060_8845,Antoine Dr @ Hardway Dr,29.840528,-95.473066
+m2060_8846,Antoine Dr @ Golden Forest Dr,29.842652,-95.473080
+m2060_8847,Antoine Dr @ Birchmont Dr Nb,29.845214,-95.473121
+m2060_8848,Antoine Dr @ W Tidwell Rd,29.848691,-95.473175
+m2060_8849,N Post Oak Rd @ Clarkson Ln,29.792183,-95.456910
+m2060_8850,N Post Oak Rd @ Westview Dr,29.794312,-95.456956
+m2060_8851,Post Oak Rd @ Westview Dr,29.796114,-95.456993
+m2060_8883,Long Point Rd @ Pech Rd,29.802971,-95.495089
+m2060_8897,Hempstead Rd @ W 18th St,29.801027,-95.459230
+m2060_8898,Hempstead Rd @ Karbach St,29.802543,-95.461385
+m2060_89,Bay Area Park & Ride,29.552892,-95.124068
+m2060_8980,Beechnut St @ South Course Dr,29.689117,-95.562966
+m2060_8983,Bellaire Blvd @ Synott Rd,29.703343,-95.614998
+m2060_8984,Bellaire Blvd @ Boone Rd,29.703717,-95.575560
+m2060_8986,Richmond Ave @ Rogerdale Rd,29.727930,-95.565194
+m2060_8987,Richmond Ave @ Walnut Bend Ln,29.727899,-95.567754
+m2060_8988,Richmond Ave @ Wilcrest Dr,29.727856,-95.571396
+m2060_8989,Richmond Ave @ Wilcrest Dr Mb,29.727833,-95.573830
+m2060_8990,Richmond Ave @ Hayes Rd,29.727956,-95.575890
+m2060_8991,Westheimer Rd @ West Houston Center,29.736190,-95.593040
+m2060_90,Eastex Park & Ride,29.927799,-95.298148
+m2060_90039,Bissonnet St @ Fondren Rd,29.686633,-95.508839
+m2060_9014,Richmond Ave @ Fountain View Dr,29.731650,-95.483914
+m2060_9015,Richmond Ave @ Greenridge Dr,29.731937,-95.489623
+m2060_9016,Richmond Ave @ Unity Dr,29.731842,-95.497627
+m2060_9017,Richmond Ave @ Gessner Rd,29.727843,-95.539898
+m2060_9035,Richmond Ave @ Hillcroft Ave,29.731774,-95.501874
+m2060_9036,Richmond Ave @ Stoney Brook Dr,29.730317,-95.506226
+m2060_9037,Richmond Ave @ Beverly Hill St,29.729605,-95.508336
+m2060_9038,Richmond Ave @ Ann Arbor Dr,29.729465,-95.510309
+m2060_9039,Richmond Ave @ Ann Arbor Dr,29.729458,-95.511929
+m2060_9040,Richmond Ave @ Dunvale Rd,29.729455,-95.513916
+m2060_9041,Richmond Ave @ Buttercup St,29.729414,-95.516725
+m2060_9042,Richmond Ave @ Buttercup St,29.729284,-95.518593
+m2060_9043,Richmond Ave @ Fondren Rd,29.729206,-95.520076
+m2060_9044,Richmond Ave @ Ocee Rd,29.729133,-95.528543
+m2060_9045,Richmond Ave @ Westerland Dr,29.729130,-95.531269
+m2060_9046,Richmond Ave @ Tanglewilde Ave,29.728781,-95.535222
+m2060_9047,Richmond Ave @ Elmside Dr,29.728202,-95.543115
+m2060_9048,Richmond Ave @ Woodchase Dr,29.728691,-95.545087
+m2060_9049,Richmond Ave @ Westchase Dr,29.728625,-95.550673
+m2060_9050,Richmond Ave @ Seagler Rd,29.727892,-95.553427
+m2060_9057,Richmond Ave @ Chimney Rock Rd,29.731620,-95.475954
+m2060_9058,Richmond Ave @ Bering Dr,29.731685,-95.480223
+m2060_9059,Richmond Ave @ Bering Dr,29.731672,-95.482147
+m2060_9060,Richmond Ave @ Greenridge Dr Mb1,29.731914,-95.492287
+m2060_9061,Richmond Ave @ Greenridge Dr Mb2,29.731874,-95.495784
+m2060_9069,Richmond Ave @ Fountain View Dr,29.731926,-95.487179
+m2060_9070,Richmond Ave @ Jeanetta Ln,29.729180,-95.524940
+m2060_9071,Richmond Ave @ Briarpark Dr,29.728884,-95.548796
+m2060_91,Kingwood Park & Ride,30.054341,-95.183067
+m2060_9196,Congress St @ La Branch St,29.759653,-95.356293
+m2060_9197,Congress St @ Austin St,29.760147,-95.357112
+m2060_9198,Congress St @ Caroline St,29.760671,-95.357973
+m2060_9199,Congress St @ San Jacinto St,29.761153,-95.358803
+m2060_92,Kuykendahl Park & Ride,29.973646,-95.425368
+m2060_9201,Congress St @ Main St,29.762209,-95.360542
+m2060_9203,Congress St @ Milam St,29.763258,-95.362296
+m2060_9204,Congress St @ Smith St,29.764157,-95.363768
+m2060_9205,Franklin St @ Bagby St,29.765260,-95.366526
+m2060_9208,Franklin St @ Main St,29.763031,-95.360350
+m2060_9209,Franklin St @ San Jacinto St,29.761969,-95.358581
+m2060_9210,Franklin St @ Caroline St,29.761455,-95.357728
+m2060_9211,Franklin St @ Austin St,29.760932,-95.356849
+m2060_9212,Franklin St @ La Branch St,29.760431,-95.356018
+m2060_9213,Franklin St @ Crawford St,29.759900,-95.355130
+m2060_9216,Franklin St @ Hamilton St,29.758108,-95.352199
+m2060_9225,Franklin St @ Congress St,29.765164,-95.365010
+m2060_9226,Franklin St @ Bagby St,29.765404,-95.366147
+m2060_9229,Holly Hall St @ El Mundo,29.685644,-95.383818
+m2060_9230,Holly Hall St @ El Mundo St,29.685489,-95.386631
+m2060_9231,Holly Hall St @ El Rio St,29.685469,-95.388711
+m2060_9233,Holly Hall St @ Almeda Rd Mb,29.685411,-95.393613
+m2060_9234,Holly Hall St @ Cambridge St,29.685395,-95.395056
+m2060_9235,Holly Hall St @ Cambridge St,29.685376,-95.397074
+m2060_9236,Holly Hall St @ Knight Rd,29.685342,-95.399010
+m2060_9246,Knight Rd @ El Paseo St,29.688549,-95.399987
+m2060_9248,East Freeway @ Halsey St,29.771436,-95.210027
+m2060_93,West Little York Park & Ride,29.869782,-95.553165
+m2060_9359,McGowen St @ US 59,29.741230,-95.367028
+m2060_9360,McGowen St @ Crawford St,29.742174,-95.368623
+m2060_9361,McGowen St @ Austin St,29.743264,-95.370447
+m2060_9362,McGowen St @ San Jacinto St,29.744297,-95.372127
+m2060_9365,Pierce St @ Travis St,29.750037,-95.371938
+m2060_94,Mission Bend TC,29.711374,-95.629410
+m2060_9400,El Paseo St @ Knight Rd,29.688844,-95.396687
+m2060_9401,Cambridge St @ El Paseo St,29.690706,-95.393156
+m2060_9402,Cambridge St @ East Rd,29.694182,-95.391979
+m2060_9406,Knight Rd @ Holly Hall St,29.686244,-95.399947
+m2060_9414,Canal St @ Caylor St,29.743582,-95.312431
+m2060_9415,Canal St @ Greenwood St,29.744058,-95.313949
+m2060_9417,Canal St @ Latham St,29.745235,-95.317703
+m2060_9418,Canal St @ N Delmar St,29.745921,-95.319923
+m2060_9419,Canal St @ N Edgewood St,29.746581,-95.322090
+m2060_9420,Canal St @ N Bryan St,29.747051,-95.323606
+m2060_9421,Canal St @ N Burr St,29.747709,-95.325760
+m2060_9458,Capitol St @ Wayside Dr,29.735457,-95.305783
+m2060_9459,Polk St @ Wayside Dr,29.733506,-95.308794
+m2060_9460,Polk St @ S 66th St,29.732672,-95.312318
+m2060_9461,Polk St @ S 66th St Mb,29.732670,-95.314179
+m2060_9462,Polk St @ Hughes St,29.733389,-95.317024
+m2060_9463,Polk St @ Lansing St,29.733710,-95.318093
+m2060_9464,Polk St @ Henninger St,29.735028,-95.322406
+m2060_9465,Polk St @ Weaver St,29.735494,-95.323946
+m2060_9466,Polk St @ Elm St,29.736167,-95.326280
+m2060_9467,Polk St @ Dumble St,29.736756,-95.328412
+m2060_9492,Travis St @ Tuam St,29.743898,-95.376480
+m2060_9493,Travis St @ McGowen St,29.745761,-95.375004
+m2060_95,Northwest Station Park & Ride,29.902195,-95.594044
+m2060_9582,Travis St @ Webster St,29.748392,-95.372912
+m2060_9588,Holcombe Blvd @ Greenbriar Dr,29.706066,-95.412185
+m2060_9589,Holcombe Blvd @ Main St,29.706097,-95.406448
+m2060_9590,Holcombe Blvd @ Fannin St,29.706117,-95.403591
+m2060_9592,Braeswood Blvd @ Moursund St,29.707580,-95.392458
+m2060_9593,Mac Gregor Way @ Almeda Rd,29.712556,-95.382523
+m2060_9633,Holocombe Blvd @ St Dominic,29.704628,-95.382831
+m2060_9635,Holcombe Blvd @ Ringness Ave,29.706647,-95.387002
+m2060_9638,Holcombe Blvd @ Braeswood Blvd,29.706331,-95.394070
+m2060_9644,Old Spanish Trail @ Greenbriar Dr,29.694946,-95.404545
+m2060_97,Fondren Transit Center,29.621839,-95.507140
+m2060_9824,Canal St @ Wayside Dr,29.741056,-95.304419
+m2060_9825,Canal St @ Cesar Chavez Blvd,29.741673,-95.306374
+m2060_9826,Canal St @ 66th St,29.742304,-95.308384
+m2060_9827,Canal St @ 65th St,29.742890,-95.310249
+m2060_9829,Bellaire Blvd @ Avenue B,29.705690,-95.455673
+m2060_9830,Bellaire Blvd @ Alpine,29.705717,-95.453072
+m2060_9831,Bellaire Blvd @ Newcastle Dr,29.705743,-95.450111
+m2060_9832,Bellaire Blvd @ West Point Dr,29.705787,-95.445792
+m2060_9833,Bellaire Blvd @ Academy St,29.705823,-95.443069
+m2060_9835,Bellaire Blvd @ Braes Blvd,29.705879,-95.437416
+m2060_9836,Bellaire Blvd @ Edloe St,29.705874,-95.433866
+m2060_9837,W Holcombe Blvd @ Sewanee St,29.705929,-95.431336
+m2060_9838,W Holcombe Blvd @ Westchester St,29.705937,-95.429356
+m2060_9839,W Holcombe Blvd @ Buffalo Speedway,29.705958,-95.427688
+m2060_9840,Holcombe Blvd @ Vanderbilt,29.705975,-95.425217
+m2060_9841,Holcombe Blvd @ Brompton St,29.705989,-95.423256
+m2060_9842,Holcombe Blvd @ Annapolis,29.706009,-95.420121
+m2060_9844,Holcombe Blvd @ Morningside Dr,29.706043,-95.414916
+m2060_9861,Westridge St @ Lantern Point Dr,29.682192,-95.415360
+m2060_9862,Westridge St @ Lantern Point Dr,29.682247,-95.417852
+m2060_9863,Westridge St @ Hearth Dr,29.682288,-95.419936
+m2060_9864,Westridge St @ W Bartell Dr,29.682318,-95.421761
+m2060_9872,Old Spanish Trail @ N Stadium Dr,29.694146,-95.407867
+m2060_99,West Bellfort Park & Ride,29.655206,-95.559837
+m2060_9909,Fannin St @ Braeswood Blvd,29.701655,-95.402342
+m2060_9910,Fannin St @ Lehall St,29.699876,-95.401909
+m2060_9911,Fannin St @ Swanson St,29.698398,-95.401589
+m2060_9912,Fannin St @ Dreyfus,29.697070,-95.401303
+m2060_9913,Fannin St @ Old Spanish Trail,29.695918,-95.401028
+m2060_993,75th St @ Avenue K,29.739464,-95.289425
+m2060_994,75th St @ Avenue I,29.738167,-95.289941
+m2060_9951,Moursund St @ Lamar Flemming Ave,29.707836,-95.393784
+m2060_9952,Moursund St @ Lamar Flemming Ave,29.708530,-95.394458
+m2060_9953,Moursund St @ Bertner Ave,29.709951,-95.396865
+m2060_9955,Moursund St @ Md Anderson St,29.708623,-95.394974
+m2060_9956,Moursund St @ Lamar Flemming Ave,29.707980,-95.394134
+m2060_9960,Bertner Ave @ Wilkins St,29.709540,-95.398662
+m2060_9962,Bertner Ave @ Bates St,29.707106,-95.399006
+m2060_9965,Bertner Ave @ Moursund St,29.710004,-95.397467
+m2060_997,Harrisburg Blvd @ 74th St,29.733172,-95.293899
+m2060_9971,Beechnut St @ Wednesbury Ln,29.691525,-95.525502
+m2060_9972,Buffalo Speedway @ Richmond Ave,29.731604,-95.428665
+m2060_9976,Scott St @ Griggs Rd,29.704417,-95.358524
+m2060_9981,Polk St @ Collier St,29.734589,-95.320968
+m2060_9984,Cavalcade St @ Bristol St,29.803673,-95.371083
+m2060_9986,Studewood St @ Merrill St,29.788658,-95.387749
+m2060_9996,Woodway Dr @ Chimney Rock Rd,29.763710,-95.477516
