@@ -6,12 +6,15 @@ of the queue needs re-evaluating. Each pick:
   * the most new daily trips per $M of (capital + value_opex_years x operating cost);
   * stop when the best is below selection.min_trips_per_musd;
   * a pick that would overrun the budget is skipped (cheaper ones may still fit);
+  * a pick with no station within stations.transfer_m of today's or a chosen line's stations
+    waits (it would be an island) and is retried after the next pick;
   * a pick running within duplicate_m of chosen or existing lines for more than
     duplicate_share of its length is rejected as a duplicate, unless it extends a chosen
     line of its mode (that line's centers are the start or end of the candidate's): then the
     chosen line is replaced and only the extra cost is charged.
 """
 import heapq
+import math
 
 from . import geom
 
@@ -25,7 +28,13 @@ def extends(c, d):
     return a[:k] == b or a[-k:] == b or a[:k] == b[::-1] or a[-k:] == b[::-1]
 
 
-def run(cands, sketch, budget, gp, cfg, existing_lines, log=print):
+def connected(c, stations, r_km):
+    """Does a station of c lie within r_km of one of `stations` [(x, y)]?"""
+    return any(math.dist(p, q) <= r_km for p in c.station_xy for q in stations
+               if abs(p[0] - q[0]) <= r_km and abs(p[1] - q[1]) <= r_km)
+
+
+def run(cands, sketch, budget, gp, cfg, existing_lines, existing_stations, log=print):
     sel = gp["selection"]
     years = cfg["staging"].get("value_opex_years", 20)
     floor = sel["min_trips_per_musd"]
@@ -37,6 +46,9 @@ def run(cands, sketch, budget, gp, cfg, existing_lines, log=print):
             heapq.heappush(heap, (-c.ratio, c.uid))
     by = {c.uid: c for c in cands}
     exist_P = [P for P in existing_lines]
+    net_st = list(existing_stations)      # stations of the network so far (today's + chosen)
+    r_link = gp["stations"]["transfer_m"] / 1000
+    waiting = []                          # best when their turn came, but not yet touching the network
     order = 0
     while heap and len(chosen) < sel["max_lines"]:
         _, uid = heapq.heappop(heap)
@@ -70,6 +82,10 @@ def run(cands, sketch, budget, gp, cfg, existing_lines, log=print):
         if spent + cap > budget:
             c.status, c.reason = "rejected", f"over budget (needs ${cap / 1e3:.1f}B, ${(budget - spent) / 1e3:.1f}B left)"
             continue
+        if net_st and not ext and not connected(c, net_st, r_link):
+            waiting.append(c)             # retried after the next pick (which may reach it)
+            c.status = "waiting"
+            continue
         sketch.line(c.mode, c.station_xy, c.along, c.pnr, c.pnr_cap, commit=True)
         order += 1
         spent += cap
@@ -80,12 +96,19 @@ def run(cands, sketch, budget, gp, cfg, existing_lines, log=print):
             chosen.remove(ext)
             c.reason += f"; extends {ext.uid}"
         chosen.append(c)
+        net_st += c.station_xy
+        for d in waiting:
+            d.status = "pool"
+            heapq.heappush(heap, (-d.ratio, d.uid))
+        waiting = []
         log(f"  {order:2d}. {c.uid} {c.mode:9} {c.km:5.1f} km  {c.name[:44]:44}  +{c.new_trips:7,.0f} trips  "
             f"${cap / 1e3:5.2f}B  {c.ratio:5.2f}/$M  spent ${spent / 1e3:.1f}B")
     for _, u in heap:
         d = by[u]
         if d.status == "pool":
             d.status, d.reason = "rejected", "not reached (line limit)" if len(chosen) >= sel["max_lines"] else "not reached"
+    for d in waiting:
+        d.status, d.reason = "rejected", f"no station within {gp['stations']['transfer_m']} m of the network (an island)"
     return chosen, spent
 
 

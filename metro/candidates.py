@@ -1,10 +1,11 @@
 """Candidate corridors (step 2b) and their stations, mode, cost (step 2c).
 
 1. Links: a Gabriel graph over the centers (no other center inside the circle on a link as
-   diameter), up to links.max_km. Road links join urban centers and are routed twice on the
-   road graph (metro profile: freeways and major arterials; BRT profile: arterials); rail
-   links also reach towns and are routed on standard-gauge track. A link whose route is too
-   roundabout (links.max_detour) or starts too far from its centers is dropped.
+   diameter), up to links.max_km, over urban centers and towns, routed twice on the road
+   graph (metro profile: freeways and major arterials; BRT profile: arterials). A link whose
+   route is too roundabout (links.max_detour) or starts too far from its centers is dropped.
+   Regional rail is generated separately (`rail_lines`): from each downtown or major center
+   along standard-gauge track to the centers and towns 20-90 km away.
 2. Lines: for every pair of centers, the shortest path through the links (route km) is a
    candidate line if it is the right length for some mode, not too circuitous and has no
    sharp turn at a center it passes (config "lines").
@@ -58,17 +59,19 @@ def gabriel(nodes, max_km, slack):
 
 
 def build_links(m, router, urban, towns, gp, log=print):
-    """Road links among urban centers, rail links among urban centers + towns, all routed."""
+    """Road links over the Gabriel graph of centers and towns (a town only links to its
+    neighbours, so suburban corridors can reach it), each routed with both road profiles."""
     L = gp["links"]
     links = []
-    xy = [(c.x, c.y) for c in urban]
+    allc = urban + towns
+    xy = [(c.x, c.y) for c in allc]
     for i, j, d in gabriel(xy, L["max_km"]["road"], L["gabriel_slack"]):
-        lk = Link(urban[i].id, urban[j].id, "road")
+        a, b = allc[i], allc[j]
+        lk = Link(a.id, b.id, "road")
         lk.straight = d
         for prof in ("metro", "brt"):
-            pts = router.route(prof, (urban[i].lat, urban[i].lon), (urban[j].lat, urban[j].lon))
-            lk.routes[prof] = _check(m, pts, urban[i], urban[j], d, L["max_detour"]["road"], L["end_gap_km"]["road"],
-                                     lk, prof)
+            pts = router.route(prof, (a.lat, a.lon), (b.lat, b.lon))
+            lk.routes[prof] = _check(m, pts, a, b, d, L["max_detour"]["road"], L["end_gap_km"]["road"], lk, prof)
         links.append(lk)
     router.save()
     n_ok = {p: sum(1 for k in links if k.routes.get(p)) for p in ("metro", "brt")}
@@ -135,10 +138,6 @@ def _check(m, pts, ca, cb, d, max_detour, max_gap, lk, prof):
     if km > max_detour * max(d, 1.0):
         lk.why[prof] = f"route {km:.1f} km for {d:.1f} km straight"
         return None
-    if prof != "rail" and gap > 0.05:
-        # a road line runs to the center point itself (the station there is placed on the route);
-        # a rail line stays on the track (its stop is the track point nearest the center)
-        P = [(ca.x, ca.y)] + P + [(cb.x, cb.y)]
     lk.km[prof] = geom.length(P)
     return P
 
@@ -187,7 +186,7 @@ def paths(centers, links, kind, profile, gp, ends_ok=None):
             P = []
             for k, lk in enumerate(lks):
                 Q = lk.oriented(profile, seq[k])
-                P.extend(Q if not P else Q[1:])
+                P = geom.join(P, Q)
             out[tuple(seq)] = P
     return list(out.items())
 

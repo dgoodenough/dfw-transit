@@ -122,6 +122,26 @@ def share_near(P, Q_list, r_km, step_km=0.2):
     return hit / len(S)
 
 
+def join(P, Q, window_km=2.0):
+    """P then Q, joined where they come closest within window_km of P's end and Q's start
+    (two routed links meeting near a center: no spike to the center point and back)."""
+    if not P:
+        return list(Q)
+    cp, cq = cumlen(P), cumlen(Q)
+    I = [i for i in range(len(P)) if cp[-1] - cp[i] <= window_km] or [len(P) - 1]
+    J = [j for j in range(len(Q)) if cq[j] <= window_km] or [0]
+    i, j = min(((i, j) for i in I for j in J), key=lambda ij: math.dist(P[ij[0]], Q[ij[1]]))
+    return P[:i + 1] + Q[j:]
+
+
+def despike(P):
+    """Remove out-and-back detours (a route that leaves its road to touch a point and comes
+    back), with tools/gen_expansion.py's _cut_loops (which works in metres)."""
+    from .routing import ge
+    Q = ge._cut_loops([(x * 1000, y * 1000) for x, y in P])
+    return [(x / 1000, y / 1000) for x, y in Q]
+
+
 def turn_deg(a, b, c):
     h1 = math.atan2(b[1] - a[1], b[0] - a[0])
     h2 = math.atan2(c[1] - b[1], c[0] - b[0])

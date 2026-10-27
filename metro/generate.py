@@ -169,8 +169,8 @@ def generate(metro_id, budget_musd=None, years=None, out=None, run_model=True, o
     by = {c.id: c for c in urban + towns}
     ex = Existing(m, cfg["modes"])
     zidx = geom.ZoneIndex(m, 1.0)
-    road_metro = dict(candidates.paths(urban, links, "road", "metro", gp))
-    road_brt = dict(candidates.paths(urban, links, "road", "brt", gp))
+    road_metro = dict(candidates.paths(urban + towns, links, "road", "metro", gp))
+    road_brt = dict(candidates.paths(urban + towns, links, "road", "brt", gp))
     rail, rail_why = candidates.rail_lines(m, router, urban, towns, gp, log)
     links_rail_why = rail_why
     log(f"  paths: {len(road_metro)} metro-profile, {len(road_brt)} BRT-profile, {len(rail)} rail")
@@ -204,7 +204,7 @@ def generate(metro_id, budget_musd=None, years=None, out=None, run_model=True, o
     years = years or gp["selection"]["years"]
     budget = budget_musd or cfg0["budget"]["musd_per_year"] * years
     log(f"  budget ${budget / 1e3:.1f}B (capital, 2025 $)")
-    chosen, spent = select.run(cands, sk, budget, gp, cfg, exist_P, log)
+    chosen, spent = select.run(cands, sk, budget, gp, cfg, exist_P, [v[:2] for v in ex.stations.values()], log)
 
     # 5. output ---------------------------------------------------------------------
     y_open = cfg["existing_year"] + gp["opens_after_years"]
@@ -232,6 +232,7 @@ def _cand_key(c):
 
 def _setup(c, mode, P, m, cfg, gp, by, ex, sk, downtowns, core_r, dens_fn, urban_density):
     """Stations, cost and standalone sketch value of candidate c as `mode` on polyline P."""
+    P = geom.despike(P)
     c.mode, c.P = mode, P
     cum = geom.cumlen(P)
     anchors = []
