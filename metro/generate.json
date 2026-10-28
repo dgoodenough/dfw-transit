@@ -1,0 +1,71 @@
+{
+  "_doc": "Parameters of the network generator (python -m metro generate <id>). Nothing here names a place: the same numbers run for every metro. A metro can override any of them in data/metros/<id>/generate.json (deep-merged). Unit costs, mode speeds, headways, capacities, walksheds and the logit come from the repo's config.json, the same file the DFW model reads.",
+  "centers": {
+    "_doc": "Activity centers (metro/centers.py): people + jobs per km2 within kernel_km of each grid_km cell; cells at or above min_density climb to their local peak, peaks within merge_km of a denser one merge, and a cluster with at least min_activity people + jobs is a center. Downtown: jobs within downtown_radius_km >= downtown_jobs and peak job density >= downtown_job_density and no bigger job center within downtown_sep_km (a second downtown is a separate city, like Fort Worth beside Dallas, not an office park on the first one's freeways; the region's top job center always is one). Major: activity >= major_activity. Towns (regional-rail ends at the edge of the region): the same clustering at town_min_density / town_min_activity, at least town_min_sep_km from every center. Without jobs data (population-only, flagged) every people + jobs threshold here and in modes is multiplied by pop_only_factor (people are about 65% of people + jobs in US metros: ~0.53 jobs per resident), and the downtowns are the registry's reference points (meta.json metro.downtowns) when it has them, since a downtown has few residents. The DFW values: 4,000/km2 is about the 85th percentile of DFW block groups; a 20,000-person+job cluster is a small suburban office park or a dense neighbourhood.",
+    "grid_km": 0.5,
+    "kernel_km": 1.0,
+    "min_density": 4000,
+    "min_activity": 20000,
+    "merge_km": 3.0,
+    "downtown_radius_km": 1.5,
+    "downtown_jobs": 60000,
+    "downtown_job_density": 12000,
+    "downtown_sep_km": 35,
+    "major_activity": 60000,
+    "town_min_density": 1500,
+    "town_min_activity": 8000,
+    "town_min_sep_km": 8,
+    "pop_only_factor": 0.65
+  },
+  "links": {
+    "_doc": "Road links (metro/candidates.py): a Gabriel graph over centers and towns (a link a-b exists when no other center lies inside the circle on a-b as diameter, shrunk by gabriel_slack), at most max_km.road long, routed with the metro and the BRT profile. Regional rail: a route on standard-gauge track from every downtown or major center to every center or town lines.min_km.commuter / max_circuity to max_km.commuter / 1.1 away. A route is kept if it is at most max_detour x the straight line and starts/ends within end_gap_km of its two places.",
+    "max_km": {"road": 25},
+    "gabriel_slack": 0.9,
+    "max_detour": {"road": 1.6, "rail": 1.5},
+    "end_gap_km": {"road": 1.2, "rail": 2.5}
+  },
+  "lines": {
+    "_doc": "Road candidate lines are shortest paths (route km) through the road links between every pair of centers and towns; a path is a candidate if its length is within some mode's [min_km, max_km], it is at most max_circuity x the straight distance between its ends and it turns no more than max_turn_deg at any center it passes. Each rail route is a candidate serving every center and town within links.end_gap_km.rail of the track.",
+    "min_km": {"metro": 6, "brt": 5, "streetcar": 2, "commuter": 20},
+    "max_km": {"metro": 45, "brt": 35, "streetcar": 8, "commuter": 100},
+    "max_circuity": 1.5,
+    "max_turn_deg": 75
+  },
+  "modes": {
+    "_doc": "Mode choice from corridor density = people + jobs within 800 m of the routed line per route-km. Road corridors: metro if density >= metro and length >= its min_km; else streetcar if density >= streetcar and length <= its max_km; else BRT if density >= brt (BRT that would run over capacity at its headway is upgraded to metro when the length allows); else not a candidate. Rail corridors: regional (commuter) rail if density within 1.6 km of the line >= commuter_1600m. Calibrated on DFW: today's DART light rail lines run 4,600-10,300 (median 7,800), the hand-planned BRT 1,900-7,700 (median 4,000), proposed metro 3,000-12,000 (median 7,200); 7,000 per route-km is about 4,400 people + jobs per km2 across the 1.6 km wide band, near the 30 per gross acre US light-rail break-even (Guerra & Cervero 2011).",
+    "metro": 7000,
+    "streetcar": 12000,
+    "brt": 3000,
+    "commuter_1600m": 2000
+  },
+  "stations": {
+    "_doc": "Stop spacing (km) by mode and setting: urban where people + jobs density (800 m) at the point >= config growth.tod.setting_density_per_km2.urban, suburban elsewhere. BRT 1.2 / 1.6 km is the rule tools/gen_expansion.py uses for DFW's new BRT; metro 1.0 / 2.0 and regional rail 4 / 8 sit inside the config.json standards.spacing_km bands. Centers the line passes and existing stations within snap_existing_m of it are always stops (shared ids: transfers); stops closer than min_gap_km merge. Explicit walk transfers are added to other lines' stations within transfer_m.",
+    "spacing_km": {
+      "metro": {"urban": 1.0, "suburban": 2.0},
+      "brt": {"urban": 1.2, "suburban": 1.6},
+      "streetcar": {"urban": 0.5, "suburban": 0.8},
+      "commuter": {"urban": 4.0, "suburban": 8.0}
+    },
+    "min_gap_km": {"metro": 0.6, "brt": 0.4, "streetcar": 0.25, "commuter": 2.5},
+    "snap_existing_m": 300,
+    "transfer_m": 650
+  },
+  "grade": {
+    "_doc": "Grade for costing: metro in tunnel within core_radius_km of a downtown center (as the DFW tools cost proposed metro inside config cores), surface elsewhere; BRT, streetcar and regional rail at surface.",
+    "core_radius_km": 1.5
+  },
+  "sketch": {
+    "_doc": "Sketch demand used to rank candidates (metro/sketch.py): commutes (gravity model, or LODES when given) between the walk catchments (walk_km) of a line's stations, and park & ride catchments (pnr from config.access) at regional-rail stations and line termini, each pair's transit share from the config.json ridership logit (drive vs this line's door-to-door time). Value = daily trips the line adds over what today's lines and the lines already chosen already give each zone pair (single-line trips; transfers are left to the full model). Garages cap park & ride riders at config pnr_spaces x pnr_people_per_space.",
+    "walk_km": 0.8
+  },
+  "selection": {
+    "_doc": "Greedy selection: the candidate with the most new daily trips per $M of (capital + value_opex_years x operating cost) is chosen, again and again, until the budget (capital, 2025 $) is spent or no candidate reaches min_trips_per_musd. A candidate within duplicate_m of chosen or existing lines for more than duplicate_share of its length is a duplicate, unless it extends a chosen line of the same mode (that line is replaced by the longer one and only the extra cost is charged). Default budget: config budget.musd_per_year x years.",
+    "years": 30,
+    "min_trips_per_musd": 0.5,
+    "duplicate_m": 400,
+    "duplicate_share": 0.5,
+    "max_lines": 80
+  },
+  "existing_year": null,
+  "opens_after_years": 5
+}

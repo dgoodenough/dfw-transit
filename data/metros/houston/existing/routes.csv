@@ -1,0 +1,129 @@
+feed,route_id,short_name,long_name,route_type,class,trips_on_date,am_trips_busier_dir,headway_min,headway_basis,midday_headway_min,mode,kept,reason
+m625,3713,,Freeport,3,bus,24,4,30.0,am_peak,30.0,bus,0,bus not frequent (peak headway 30.0 > 15 min)
+m625,15150,104,Texas City South,3,bus,24,4,30.0,am_peak,30.0,bus,0,bus not frequent (peak headway 30.0 > 15 min)
+m625,3701,105,Dickinson,3,bus,12,2,60.0,am_peak,60.0,bus,0,bus not frequent (peak headway 60.0 > 15 min)
+m625,15148,106,Texas City Express,3,bus,11,2,60.0,am_peak,60.0,bus,0,bus not frequent (peak headway 60.0 > 15 min)
+m625,3702,107,Bacliff/San Leon,3,bus,12,2,60.0,am_peak,60.0,bus,0,bus not frequent (peak headway 60.0 > 15 min)
+m625,5436,108,La Marque Saturday,3,bus,0,0,,,,,0,no trips on service date
+m625,3716,,Clute/Lake Jackson,3,bus,11,2,60.0,am_peak,60.0,bus,0,bus not frequent (peak headway 60.0 > 15 min)
+m625,3717,,Lake Jackson/Clute,3,bus,12,2,60.0,am_peak,60.0,bus,0,bus not frequent (peak headway 60.0 > 15 min)
+m625,3712,,Angleton,3,bus,12,2,60.0,am_peak,60.0,bus,0,bus not frequent (peak headway 60.0 > 15 min)
+m625,3715,,Regional,3,bus,12,2,60.0,am_peak,60.0,bus,0,bus not frequent (peak headway 60.0 > 15 min)
+m625,3700,101,La Marque North,3,bus,12,2,60.0,am_peak,60.0,bus,0,bus not frequent (peak headway 60.0 > 15 min)
+m625,15147,102,La Marque South,3,bus,20,4,30.0,am_peak,30.0,bus,0,bus not frequent (peak headway 30.0 > 15 min)
+m625,15149,103,Texas City North,3,bus,12,2,60.0,am_peak,60.0,bus,0,bus not frequent (peak headway 60.0 > 15 min)
+m2060,002,002,Bellaire,3,bus,194,11,10.9,am_peak,15.0,bus,1,frequent bus
+m2060,003,003,Langley - Little York,3,bus,63,3,40.0,am_peak,40.0,bus,0,bus not frequent (peak headway 40.0 > 15 min)
+m2060,004,004,Beechnut,3,bus,172,12,10.0,am_peak,15.0,bus,1,frequent bus
+m2060,005,005,Southmore,3,bus,53,4,30.0,am_peak,48.0,bus,0,bus not frequent (peak headway 30.0 > 15 min)
+m2060,006,006,Jensen / Greens,3,bus,110,8,15.0,am_peak,30.0,bus,1,frequent bus
+m2060,007,007,West Airport,3,bus,70,5,24.0,am_peak,30.0,bus,0,bus not frequent (peak headway 24.0 > 15 min)
+m2060,008,008,West Bellfort,3,bus,117,8,15.0,am_peak,20.0,bus,1,frequent bus
+m2060,009,009,Gulfton / Holman,3,bus,79,5,24.0,am_peak,30.0,bus,0,bus not frequent (peak headway 24.0 > 15 min)
+m2060,010,010,Willowbend,3,bus,43,3,40.0,am_peak,60.0,bus,0,bus not frequent (peak headway 40.0 > 15 min)
+m2060,011,011,Almeda / Lyons,3,bus,79,4,30.0,am_peak,30.0,bus,0,bus not frequent (peak headway 30.0 > 15 min)
+m2060,014,014,Hiram Clarke,3,bus,128,8,15.0,am_peak,15.0,bus,1,frequent bus
+m2060,020,020,Canal / Memorial,3,bus,166,8,15.0,am_peak,15.0,bus,1,frequent bus
+m2060,023,023,Clay - W. 43rd,3,bus,36,2,60.0,am_peak,60.0,bus,0,bus not frequent (peak headway 60.0 > 15 min)
+m2060,025,025,Richmond,3,bus,190,12,10.0,am_peak,15.0,bus,1,frequent bus
+m2060,026,026,Long Point / Cavalcade,3,bus,168,8,15.0,am_peak,15.0,bus,1,frequent bus
+m2060,027,027,Shepherd,3,bus,123,6,20.0,am_peak,20.0,bus,0,bus not frequent (peak headway 20.0 > 15 min)
+m2060,028,028,OST - Wayside,3,bus,97,6,20.0,am_peak,20.0,bus,0,bus not frequent (peak headway 20.0 > 15 min)
+m2060,029,029,Cullen / Hirsch,3,bus,116,6,20.0,am_peak,20.0,bus,0,bus not frequent (peak headway 20.0 > 15 min)
+m2060,030,030,Clinton / Ella,3,bus,44,2,60.0,am_peak,48.0,bus,0,bus not frequent (peak headway 60.0 > 15 min)
+m2060,032,032,Renwick,3,bus,135,8,15.0,am_peak,15.0,bus,1,frequent bus
+m2060,035,035,San Felipe,3,bus,38,2,60.0,am_peak,60.0,bus,0,bus not frequent (peak headway 60.0 > 15 min)
+m2060,036,036,Kempwood,3,bus,113,6,20.0,am_peak,20.0,bus,0,bus not frequent (peak headway 20.0 > 15 min)
+m2060,038,038,Manchester - Lawndale,3,bus,33,2,60.0,am_peak,60.0,bus,0,bus not frequent (peak headway 60.0 > 15 min)
+m2060,039,039,Katy Freeway,3,bus,50,3,40.0,am_peak,40.0,bus,0,bus not frequent (peak headway 40.0 > 15 min)
+m2060,040,040,Telephone / Heights,3,bus,98,6,20.0,am_peak,30.0,bus,0,bus not frequent (peak headway 20.0 > 15 min)
+m2060,041,041,Kirby / Polk,3,bus,101,4,30.0,am_peak,30.0,bus,0,bus not frequent (peak headway 30.0 > 15 min)
+m2060,044,044,Acres Homes,3,bus,92,6,20.0,am_peak,30.0,bus,0,bus not frequent (peak headway 20.0 > 15 min)
+m2060,045,045,Tidwell,3,bus,128,8,15.0,am_peak,15.0,bus,1,frequent bus
+m2060,046,046,Gessner,3,bus,147,9,13.3,am_peak,15.0,bus,1,frequent bus
+m2060,047,047,Hillcroft,3,bus,128,10,12.0,am_peak,15.0,bus,1,frequent bus
+m2060,048,048,Market,3,bus,36,2,60.0,am_peak,60.0,bus,0,bus not frequent (peak headway 60.0 > 15 min)
+m2060,049,049,Chimney Rock / S. Post Oak,3,bus,81,5,24.0,am_peak,30.0,bus,0,bus not frequent (peak headway 24.0 > 15 min)
+m2060,050,050,Broadway,3,bus,143,8,15.0,am_peak,15.0,bus,1,frequent bus
+m2060,051,051,Hardy - Kelley,3,bus,62,4,30.0,am_peak,30.0,bus,0,bus not frequent (peak headway 30.0 > 15 min)
+m2060,052,052,Hardy - Ley,3,bus,80,4,30.0,am_peak,30.0,bus,0,bus not frequent (peak headway 30.0 > 15 min)
+m2060,054,054,Scott,3,bus,172,12,10.0,am_peak,14.1,bus,1,frequent bus
+m2060,056,056,Airline / Montrose,3,bus,202,12,10.0,am_peak,10.0,bus,1,frequent bus
+m2060,058,058,Hammerly,3,bus,32,2,60.0,am_peak,60.0,bus,0,bus not frequent (peak headway 60.0 > 15 min)
+m2060,059,059,Aldine Mail,3,bus,34,2,60.0,am_peak,60.0,bus,0,bus not frequent (peak headway 60.0 > 15 min)
+m2060,060,060,Cambridge,3,bus,101,9,13.3,am_peak,20.0,bus,1,frequent bus
+m2060,063,063,Fondren,3,bus,147,8,15.0,am_peak,15.0,bus,1,frequent bus
+m2060,065,065,Bissonnet,3,bus,154,12,10.0,am_peak,15.0,bus,1,frequent bus
+m2060,066,066,Quitman,3,bus,34,2,60.0,am_peak,60.0,bus,0,bus not frequent (peak headway 60.0 > 15 min)
+m2060,067,067,Dairy Ashford,3,bus,34,2,60.0,am_peak,60.0,bus,0,bus not frequent (peak headway 60.0 > 15 min)
+m2060,068,068,Braeswood,3,bus,73,4,30.0,am_peak,30.0,bus,0,bus not frequent (peak headway 30.0 > 15 min)
+m2060,070,070,Memorial,3,bus,32,2,60.0,am_peak,60.0,bus,0,bus not frequent (peak headway 60.0 > 15 min)
+m2060,072,072,Westview,3,bus,34,2,60.0,am_peak,60.0,bus,0,bus not frequent (peak headway 60.0 > 15 min)
+m2060,073,073,Bellfort,3,bus,188,10,12.0,am_peak,12.0,bus,1,frequent bus
+m2060,075,075,Eldridge,3,bus,33,2,60.0,am_peak,60.0,bus,0,bus not frequent (peak headway 60.0 > 15 min)
+m2060,076,076,Evergreen,3,bus,74,4,30.0,am_peak,30.0,bus,0,bus not frequent (peak headway 30.0 > 15 min)
+m2060,077,077,Homestead,3,bus,42,2,60.0,am_peak,60.0,bus,0,bus not frequent (peak headway 60.0 > 15 min)
+m2060,078,078,Wayside,3,bus,42,2,60.0,am_peak,60.0,bus,0,bus not frequent (peak headway 60.0 > 15 min)
+m2060,079,079,Irvington,3,bus,33,2,60.0,am_peak,60.0,bus,0,bus not frequent (peak headway 60.0 > 15 min)
+m2060,080,080,MLK / Lockwood,3,bus,124,6,20.0,am_peak,20.0,bus,0,bus not frequent (peak headway 20.0 > 15 min)
+m2060,082,082,Westheimer,3,bus,298,19,6.3,am_peak,8.0,bus,1,frequent bus
+m2060,083,083,Lee Road - JFK,3,bus,35,2,60.0,am_peak,60.0,bus,0,bus not frequent (peak headway 60.0 > 15 min)
+m2060,084,084,Buffalo Speedway,3,bus,102,8,15.0,am_peak,24.0,bus,1,frequent bus
+m2060,085,085,Antoine / Washington,3,bus,179,10,12.0,am_peak,15.0,bus,1,frequent bus
+m2060,086,086,FM 1960 / Imperial Valley,3,bus,99,8,15.0,am_peak,30.0,bus,1,frequent bus
+m2060,087,087,Sunnyside,3,bus,48,3,40.0,am_peak,60.0,bus,0,bus not frequent (peak headway 40.0 > 15 min)
+m2060,088,088,Sagemont,3,bus,74,4,30.0,am_peak,30.0,bus,0,bus not frequent (peak headway 30.0 > 15 min)
+m2060,089,089,Dacoma,3,bus,44,3,40.0,am_peak,40.0,bus,0,bus not frequent (peak headway 40.0 > 15 min)
+m2060,096,096,Veterans Memorial,3,bus,67,4,30.0,am_peak,26.7,bus,0,bus not frequent (peak headway 30.0 > 15 min)
+m2060,097,097,Settegast,3,bus,34,2,60.0,am_peak,60.0,bus,0,bus not frequent (peak headway 60.0 > 15 min)
+m2060,098,098,Briargate,3,bus,41,3,40.0,am_peak,40.0,bus,0,bus not frequent (peak headway 40.0 > 15 min)
+m2060,099,099,Ella - FM 1960,3,bus,69,4,30.0,am_peak,30.0,bus,0,bus not frequent (peak headway 30.0 > 15 min)
+m2060,102,102,Bush IAH,3,bus,152,8,15.0,am_peak,15.0,bus,1,frequent bus
+m2060,108,108,Veterans Memorial Express,3,bus,102,8,15.0,am_peak,30.0,bus,1,frequent bus
+m2060,137,137,Northshore Express,3,bus,142,8,15.0,am_peak,15.0,bus,1,frequent bus
+m2060,151,151,Westpark Express,3,bus,83,6,20.0,am_peak,30.0,bus,0,bus not frequent (peak headway 20.0 > 15 min)
+m2060,152,152,Harwin Express,3,bus,61,4,30.0,am_peak,30.0,bus,0,bus not frequent (peak headway 30.0 > 15 min)
+m2060,153,153,Harwin Express,3,bus,90,5,24.0,am_peak,30.0,bus,0,bus not frequent (peak headway 24.0 > 15 min)
+m2060,161,161,Wilcrest Express,3,bus,78,4,30.0,am_peak,30.0,bus,0,bus not frequent (peak headway 30.0 > 15 min)
+m2060,162,162,Memorial Express,3,bus,77,4,30.0,am_peak,30.0,bus,0,bus not frequent (peak headway 30.0 > 15 min)
+m2060,202,202,Kuykendahl P&R,3,bus,64,10,12.0,am_peak,,bus,1,frequent bus
+m2060,204,204,Spring P&R,3,bus,59,9,13.3,am_peak,,bus,1,frequent bus
+m2060,209,209,Kuykendahl / Spring P&R,3,bus,64,2,60.0,am_peak,30.0,bus,0,bus not frequent (peak headway 60.0 > 15 min)
+m2060,211,211,West Loop P&R,3,bus,98,4,30.0,am_peak,20.0,bus,0,bus not frequent (peak headway 30.0 > 15 min)
+m2060,212,212,Seton Lake P&R,3,bus,51,6,20.0,am_peak,,bus,0,bus not frequent (peak headway 20.0 > 15 min)
+m2060,216,216,W L York / NW Station P&R,3,bus,61,9,13.3,am_peak,,bus,1,frequent bus
+m2060,217,217,Cypress P&R,3,bus,91,15,8.0,am_peak,,bus,1,frequent bus
+m2060,219,219,Cypress / NW Station / W L York P&R,3,bus,64,2,60.0,am_peak,30.0,bus,0,bus not frequent (peak headway 60.0 > 15 min)
+m2060,221,221,Kingsland P&R,3,bus,59,9,13.3,am_peak,,bus,1,frequent bus
+m2060,222,222,Grand Parkway P&R,3,bus,131,22,5.5,am_peak,,bus,1,frequent bus
+m2060,228,228,Addicks P&R,3,bus,63,8,15.0,am_peak,,bus,1,frequent bus
+m2060,229,229,Grand Parkway / Kingsland / Addicks,3,bus,64,2,60.0,am_peak,30.0,bus,0,bus not frequent (peak headway 60.0 > 15 min)
+m2060,236,236,Maxey P&R,3,bus,36,6,20.0,am_peak,,bus,0,bus not frequent (peak headway 20.0 > 15 min)
+m2060,237,237,Baytown P&R,3,bus,10,1,174.0,all_day_mean,,bus,0,bus not frequent (peak headway 174.0 > 15 min)
+m2060,244,244,Monroe / El Dorado P&R,3,bus,53,8,15.0,am_peak,,bus,1,frequent bus
+m2060,247,247,Fuqua / Bay Area P&R,3,bus,56,8,15.0,am_peak,,bus,1,frequent bus
+m2060,249,249,Bay Area/El Dorado/Fuqua/Monroe P&R,3,bus,64,2,60.0,am_peak,30.0,bus,0,bus not frequent (peak headway 60.0 > 15 min)
+m2060,255,255,Kingwood P&R,3,bus,53,8,15.0,am_peak,,bus,1,frequent bus
+m2060,256,256,Eastex P&R,3,bus,58,8,15.0,am_peak,,bus,1,frequent bus
+m2060,257,257,Townsen P&R,3,bus,55,8,15.0,am_peak,,bus,1,frequent bus
+m2060,259,259,Kingwood / Townsen / Eastex P&R,3,bus,64,2,60.0,am_peak,30.0,bus,0,bus not frequent (peak headway 60.0 > 15 min)
+m2060,265,265,West Bellfort P&R,3,bus,75,12,10.0,am_peak,,bus,1,frequent bus
+m2060,269,269,West Bellfort P&R,3,bus,64,2,60.0,am_peak,30.0,bus,0,bus not frequent (peak headway 60.0 > 15 min)
+m2060,270,270,Missouri City P&R,3,bus,68,7,17.1,am_peak,,bus,0,bus not frequent (peak headway 17.1 > 15 min)
+m2060,292,292,Southwest Freeway / TMC P&R,3,bus,45,7,17.1,am_peak,,bus,0,bus not frequent (peak headway 17.1 > 15 min)
+m2060,297,297,Gulf Freeway / TMC P&R,3,bus,50,8,15.0,am_peak,,bus,1,frequent bus
+m2060,298,298,Katy Freeway / TMC P&R,3,bus,66,6,20.0,am_peak,,bus,0,bus not frequent (peak headway 20.0 > 15 min)
+m2060,309,309,Gulfton Circulator,3,bus,33,4,30.0,am_peak,30.0,bus,0,bus not frequent (peak headway 30.0 > 15 min)
+m2060,310,310,Gulfton Circulator,3,bus,33,4,30.0,am_peak,30.0,bus,0,bus not frequent (peak headway 30.0 > 15 min)
+m2060,314,314,Hiram Clarke - curb2curb,3,bus,0,0,,,,,0,no trips on service date
+m2060,329,329,Sunnyside - curb2curb,3,bus,0,0,,,,,0,no trips on service date
+m2060,344,344,Acres Homes - curb2curb,3,bus,0,0,,,,,0,no trips on service date
+m2060,360,360,Peerless Shuttle,3,bus,76,5,24.0,am_peak,30.0,bus,0,bus not frequent (peak headway 24.0 > 15 min)
+m2060,363,363,Missouri City - curb2curb,3,bus,0,0,,,,,0,no trips on service date
+m2060,377,377,Kashmere / Maxey Road - curb2curb,3,bus,0,0,,,,,0,no trips on service date
+m2060,399,399,Kuykendahl Shuttle,3,bus,33,2,60.0,am_peak,60.0,bus,0,bus not frequent (peak headway 60.0 > 15 min)
+m2060,433,433,Silver Line,3,bus,119,6,20.0,am_peak,20.0,brt,1,brt
+m2060,500,500,DOWNTOWN DIRECT,3,bus,62,4,30.0,am_peak,30.0,bus,0,bus not frequent (peak headway 30.0 > 15 min)
+m2060,700,700,METRORAIL RED LINE,0,tram,398,20,6.0,am_peak,6.0,metro,1,rail
+m2060,800,800,METRORAIL GREEN LINE,0,tram,233,10,12.0,am_peak,12.0,metro,1,rail
+m2060,900,900,METRORAIL PURPLE LINE,0,tram,236,10,12.0,am_peak,12.0,metro,1,rail

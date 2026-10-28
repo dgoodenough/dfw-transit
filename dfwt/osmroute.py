@@ -22,6 +22,14 @@ KX = math.radians(1) * 6371008.8 * math.cos(math.radians(LAT0))
 KY = math.radians(1) * 6371008.8
 
 
+def set_origin(lat0, lon0):
+    """Re-centre the local projection (default: DFW). A metro elsewhere (metro/) calls this
+    before building a Graph so metres stay metres; it affects every later xy()/ll() call."""
+    global LAT0, LON0, KX
+    LAT0, LON0 = lat0, lon0
+    KX = math.radians(1) * 6371008.8 * math.cos(math.radians(LAT0))
+
+
 def xy(lon, lat):
     return ((lon - LON0) * KX, (lat - LAT0) * KY)
 
@@ -88,9 +96,10 @@ def _cut(P, f0, f1, total):
 
 
 class Graph:
-    def __init__(self, kind, classes=None, oneway=True):
+    def __init__(self, kind, classes=None, oneway=True, path=None):
+        """`path`: the parquet to read (default data/osm/rail.parquet or roads.parquet)."""
         import pyarrow.parquet as pq
-        path = config.path("data", "osm", "rail.parquet" if kind == "rail" else "roads.parquet")
+        path = path or config.path("data", "osm", "rail.parquet" if kind == "rail" else "roads.parquet")
         cols = ["geometry", "class", "connectors", "access_restrictions", "names"]
         rows = pq.read_table(path, columns=cols).to_pylist()
         self.node_xy, self.edges = {}, []      # edge: (u, v, pts, cls, fwd, bwd, length, name)
