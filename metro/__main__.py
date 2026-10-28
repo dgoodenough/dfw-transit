@@ -44,7 +44,15 @@ def main(argv=None):
     c = sub.add_parser("check-dfw", help="generate DFW at the 2M plan's capital and compare with it")
     c.add_argument("--no-model", action="store_true")
     c.add_argument("--reuse", action="store_true", help="compare generated/dfw/ as it is (no regeneration)")
+    w = sub.add_parser("webpage", help="map page of the generated networks (docs/generated.html)")
+    w.add_argument("ids", nargs="*", help="generated/<id> folders (default: all)")
     a = ap.parse_args(argv)
+
+    if a.cmd == "webpage":
+        from .webpage import write
+        path, data = write(a.ids or None)
+        print(f"wrote {path}: " + ", ".join(f"{n['id']} ({len(n['lines'])} lines)" for n in data))
+        return 0
 
     if a.cmd in ("generate", "check-dfw"):
         os.environ.setdefault("OMP_NUM_THREADS", "2")       # a shared machine: keep BLAS small
