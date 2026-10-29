@@ -155,7 +155,7 @@ sup a{text-decoration:none;font-size:.7em;padding:0 1px}
 .conn .why{font-size:.88rem;color:var(--muted);margin:0}
 .conn .mini{height:190px;position:relative;border-radius:8px;overflow:hidden;background:var(--bg)}
 .conn .mini canvas{position:absolute;inset:0;width:100%;height:100%}
-.conn .nums{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;font-size:.78rem;color:var(--muted)}
+.conn .nums{display:grid;grid-template-columns:repeat(auto-fit,minmax(88px,1fr));gap:8px;font-size:.78rem;color:var(--muted)}
 .conn .nums div:last-child{grid-column:1/-1}
 .conn .nums b{display:block;font-family:var(--f-display);font-size:1.45rem;color:var(--ink);line-height:1.05;font-variant-numeric:tabular-nums}
 
@@ -782,6 +782,7 @@ $('conns').innerHTML = D.connections.map((c, i) => {
   return `<article class="panel conn"><h3>${c.title}</h3><p class="why">${c.why}</p>
     <div class="mini"><canvas id="cm-${i}" role="img" aria-label="Map: ${c.from} to ${c.to}"></canvas></div>
     <div class="nums"><div><b style="color:var(--ct)">${now != null ? now + ' min' : 'no trip'}</b>by transit today</div><div><b style="color:var(--pr)">${ride != null ? ride + ' min' : '–'}</b>by transit, 2100</div><div><b>${drive} min</b>rush-hour drive, 2100</div>
+      ${now == null && c.first && c.first[0] < 2100 ? `<div><b style="color:var(--pr)">${c.first[1]} min</b>first possible, ${c.first[0]}</div>` : ''}
       <div><b style="color:var(--pr)">${fmt(j2)}</b>jobs in 45 min from ${c.from}, 2100 (${fmt(j1)} on the current track; ${fmt(j0)} today)</div></div>
     <p style="margin:6px 0 0"><a href="map.html#year=2100&amp;trip=${encodeURIComponent(c.from_id)}|${encodeURIComponent(c.to_id)}">Plan this trip&nbsp;&rarr;</a></p></article>`;
 }).join('');

@@ -27,9 +27,10 @@ class YearGraph:
         tcfg = cfg["transfer"]
         self.board_pen = tcfg["penalty_min"]
         wcap = cfg["wait"]["max_wait_min"]
+        board_extra = [0.0] * n_st   # per line node: what boarding it costs beyond the clock (wait weight, penalty)
         for ri, run in enumerate(self.runs):
-            wait = min(run.line.headway_at(year) * cfg["wait"]["fraction_of_headway"], wcap)
-            wait *= cfg["wait"].get("weight", 1.0)   # perceived wait (sensitivity; 1 = as before)
+            clock_wait = min(run.line.headway_at(year) * cfg["wait"]["fraction_of_headway"], wcap)
+            wait = clock_wait * cfg["wait"].get("weight", 1.0)   # perceived wait (sensitivity; 1 = as before)
             prev = first = None
             ring = len(run.stops) > 3 and run.stops[0] == run.stops[-1]   # a loop: ride on through its first stop
             for k, sid in enumerate(run.stops):
@@ -39,6 +40,7 @@ class YearGraph:
                     node = len(self.node_info)
                     self.node_info.append(("L", sid, ri))
                     adj.append([])
+                    board_extra.append(wait - clock_wait + self.board_pen)
                     p = self.sidx[sid]
                     adj[p].append((node, wait + self.board_pen, "board"))
                     adj[node].append((p, 0.0, "alight"))
@@ -71,6 +73,7 @@ class YearGraph:
                 adj[j].append((i, walk_min, "walk"))
         self.adj = adj
         self.n_st = n_st
+        self.board_extra = np.array(board_extra, dtype=np.float64)
 
     def dijkstra(self, src):
         n = len(self.adj)
@@ -92,9 +95,15 @@ class YearGraph:
         return dist, pred
 
     def skim(self):
-        """Station x station door-free travel minutes (inf if unreachable) and predecessor trees."""
+        """Station x station door-free travel minutes (inf if unreachable) and predecessor trees.
+        Minutes are perceived (waits weighted, the transfer penalty per change), as routing ranks
+        them; self.T_clock holds the same paths in clock minutes, for trips that ride (inf on the
+        diagonal and between walk-linked platforms)."""
         n = self.n_st
         T = np.full((n, n), np.inf, dtype=np.float32)
+        Tc = np.full((n, n), np.inf, dtype=np.float32)
+        idx = np.arange(len(self.adj))
+        on_line = idx >= n
         preds = []
         # stations joined by walking links: the only pairs a path can connect without riding
         group = list(range(n))
@@ -120,10 +129,25 @@ class YearGraph:
                     u = pred[u]
                 if u == a or u == -1:
                     row[b] = np.inf
+            P = np.array(pred, dtype=np.int32)
+            # perceived extra on each node's path: sum the boarding extras up the tree (pointer jumping)
+            acc = np.where(on_line & (P >= 0) & (P < n), self.board_extra, 0.0)
+            anc = P.copy()
+            while True:
+                m = anc >= 0
+                if not m.any():
+                    break
+                acc2 = acc.copy()
+                acc2[m] += acc[anc[m]]
+                anc2 = anc.copy()
+                anc2[m] = anc[anc[m]]
+                acc, anc = acc2, anc2
+            Tc[a] = np.where(np.isfinite(row), np.array(dist[:n]) - acc[:n], np.inf)
+            Tc[a, a] = np.inf
             row[a] = 0.0
             T[a] = row
-            preds.append(np.array(pred, dtype=np.int32))
-        self.T, self.preds = T, preds
+            preds.append(P)
+        self.T, self.T_clock, self.preds = T, Tc, preds
         return T
 
     def path_nodes(self, a, b):
