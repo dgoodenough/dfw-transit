@@ -60,7 +60,8 @@ def main():
             pkg[t] = [r for r in pkg[t] if r["line_id"] not in ids] + rows
     # bus stops a line doubles back to reach go on its street (tools/despur.py)
     import despur
-    despur.fix_tables(pkg["stations.csv"], pkg["lines.csv"], pkg["line_stops.csv"], pkg["line_segments.csv"])
+    despur.fix_tables(pkg["stations.csv"], pkg["lines.csv"], pkg["line_stops.csv"], pkg["line_segments.csv"],
+                      keep={r["station_id"] for r in base["stations.csv"]})   # the plan's stations move in network/
     used = {r["station_id"] for r in pkg["line_stops.csv"]} | {r["station_id"] for r in extra.get("stations.csv", [])}
     pkg["stations.csv"] = [r for r in pkg["stations.csv"] if r["station_id"] in used]
     pkg["transfers.csv"] = [r for r in pkg["transfers.csv"] if r["station_a"] in used and r["station_b"] in used]

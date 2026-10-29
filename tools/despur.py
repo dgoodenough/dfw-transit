@@ -53,8 +53,10 @@ def detour(A, B):
     return ia, jb
 
 
-def fix_tables(stations, lines, line_stops, line_segments, log=print):
-    """Move off-street bus stops onto their line (lists of row dicts, changed in place).
+def fix_tables(stations, lines, line_stops, line_segments, log=print, keep=()):
+    """Move off-street bus stops onto their line (lists of row dicts, changed in place). Only a
+    stop that one line serves moves (moving a shared stop onto one line's street would send the
+    other on a detour), and none in `keep` (stations an overlay can't move: the base network's).
     Returns the number of stops moved."""
     from dfwt import config
     hairpin_deg = config.load()["standards"]["hairpin_deg"]
@@ -65,10 +67,11 @@ def fix_tables(stations, lines, line_stops, line_segments, log=print):
         stops.setdefault(r["line_id"], []).append(r)
     for r in line_segments:
         segs.setdefault(r["line_id"], []).append(r)
-    served = {}
+    served, n_lines = {}, {}
     for lid, rs in stops.items():
         for r in rs:
             served.setdefault(r["station_id"], set()).add(mode.get(lid))
+            n_lines.setdefault(r["station_id"], set()).add(lid)
     moved = 0
     for lid in sorted(stops):
         if mode.get(lid) not in BUS:
@@ -79,7 +82,7 @@ def fix_tables(stations, lines, line_stops, line_segments, log=print):
             continue
         for i in range(1, len(sl) - 1):
             sid = sl[i]["station_id"]
-            if not served[sid] <= set(BUS) or sid not in st:
+            if not served[sid] <= set(BUS) or sid not in st or len(n_lines[sid]) > 1 or sid in keep:
                 continue
             if any(r.get("grade") == "freeway" for r in sg):   # an express bus leaves its freeway for a stop
                 break
