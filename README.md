@@ -122,7 +122,7 @@ led to thirteen steps, and v2 implements the ones the data supports
 | Daily transit trips, 2050 (each trip counted once) | 331k | 370k | **919k** |
 | Daily transit trips, 2100 | 654k | 778k | **1.99M** (1.73M if growth follows the county forecasts; 1.23M on the low growth path) |
 | Daily boardings, all modes, 2100 | 1.06M | 1.28M | **3.60M** |
-| Jobs the average resident reaches in 45 min, 2100 | 93k | 106k | **178k** |
+| Jobs the average resident reaches in 45 min by transit, 2100 (clock time) | 140k | 174k | **304k** |
 | Capital through 2100 (2025 $, lines, stations, garages) | $112.2B | $103.4B | **$135.2B** |
 | Operating cost, 2100 (per year: trains, buses, feeder buses, late-night service) | $2.6B | $2.7B | **$4.9B** |
 | Validation: errors / islands | 1 / 10 | 0 / 0 | 0 / 0 |
