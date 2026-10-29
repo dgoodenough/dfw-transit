@@ -17,6 +17,7 @@ from dfwt import geo  # noqa: E402
 
 NEAR_M = 30          # two legs within this run on the same street
 MAX_MOVE_M = 700     # the furthest a stop moves
+MIN_GAP_M = 400      # a moved stop stays at least this far from the stops either side
 BUS = ("brt", "streetcar")
 
 
@@ -99,6 +100,10 @@ def fix_tables(stations, lines, line_stops, line_segments, log=print, keep=()):
             s = st[sid]
             move = geo.hav_km(float(s["lat"]), float(s["lon"]), d[1], d[0]) * 1000
             if move > MAX_MOVE_M:
+                continue
+            # never onto a neighbouring stop (two off-street stops can share one turn-off)
+            nb = [st[sl[k]["station_id"]] for k in (i - 1, i + 1) if sl[k]["station_id"] in st]
+            if any(geo.hav_km(float(x["lat"]), float(x["lon"]), d[1], d[0]) * 1000 < MIN_GAP_M for x in nb):
                 continue
             sg[i - 1]["geometry_wkt"] = geo.to_wkt(A[:ia + 1])
             sg[i]["geometry_wkt"] = geo.to_wkt([d] + B[jb + 1:])
