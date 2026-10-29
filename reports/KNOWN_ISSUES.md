@@ -41,8 +41,11 @@ when is in `network/CHANGELOG.md`. Last reviewed after v2.15.
 - An I-35E Express branch to Love Field / the Medical District.
 
 ## Geometry and diagram
-- **Walnut Hill / Stemmons** (Stemmons-Brookhollow BRT) is reached by a detour longer than
-  `tools/despur.py` moves a stop (700 m); its stop should move or the route change.
+- **Bus detours to off-street stops** that `tools/despur.py` can't fix by moving the stop
+  (HAIRPIN): Forest Hill Drive / Horton (Riverside-Forest Hill BRT; it shares a turn-off with
+  the stop before it, so the line needs a re-route), SpringPark (Shiloh Road BRT; a plan
+  station the Beltline also serves), Beach / Basswood (two BRT lines share it) and Walnut
+  Hill / Stemmons (a detour longer than 700 m).
 - Train reversals flagged as HAIRPIN are real: TRE at Fort Worth T&P and Alvarado, the
   Mansfield-Denton-Carrollton through-route at Downtown Denton, SH-114 at Freeport.
   Buses pulling into rail stations (Mockingbird / John W Carpenter, Frisco Main St) are too.

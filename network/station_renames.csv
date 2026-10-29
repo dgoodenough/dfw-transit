@@ -2233,3 +2233,4 @@ X344,Addison Double East,Belt Line / Preston,32.954038,-96.803655,review 3: 'Add
 X347,Addison S Central,Belt Line / Midway,32.954423,-96.838661,review 3: 'Addison S Central'; cross streets Belt Line x Midway Road
 S011,Central Station,Fort Worth Central,32.752543,-97.326747,review 3: the metro platform at Fort Worth Central (120 m from the regional rail one) takes its name
 S012,T&P Station,Fort Worth T&P,32.745606,-97.327894,review 3: the metro platform at Fort Worth T&P (110 m from the regional rail one) takes its name
+X019,Mansfield Highway / Shackleford,Wichita / Mansfield Highway,32.680922,-97.280087,"moved onto the Riverside-Forest Hill BRT's street (tools/despur.py); cross streets Wichita x Mansfield Highway (254 m)"
