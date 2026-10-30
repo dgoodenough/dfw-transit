@@ -75,8 +75,8 @@ def run(net):
             s = st[sid]
             near = [o for o in st.values() if o.id != sid and abs(o.lat - s.lat) < 0.01
                     and geo.hav_km(s.lat, s.lon, o.lat, o.lon) <= r and by_station.get(o.id)]
-            if not near and ln.mode != "commuter":
-                add("warn", "DANGLING", ln.name, f"terminus {s.name} has no transfer within {std['orphan_terminus_m']} m")
+            if not near and ln.mode != "commuter":   # an outer end serving a neighbourhood is normal: a note
+                add("info", "DANGLING", ln.name, f"terminus {s.name} has no transfer within {std['orphan_terminus_m']} m")
 
     # explicit transfer links must point at real stations
     linked = set()
@@ -99,6 +99,24 @@ def run(net):
             d = geo.hav_km(A.lat, A.lon, B.lat, B.lon)
             if tr < d <= 1.2 and A.name.split(" ")[0] == B.name.split(" ")[0]:
                 add("info", "NEAR_MISS", "", f"{A.name} and {B.name} are {d * 1000:.0f} m apart with no transfer link")
+
+    # co-located platforms: two station ids of the same mode a few metres apart (two platforms
+    # paid for, and two of a zone's access slots) should be one station
+    co_m = std.get("co_located_m", 60) / 1000
+    by_mode = collections.defaultdict(set)
+    for ln in net.lines.values():
+        for sid in ln.stop_ids:
+            by_mode[sid].add(ln.mode)
+    ids = sorted(by_mode)
+    for i, a in enumerate(ids):
+        for b in ids[i + 1:]:
+            A, B = st[a], st[b]
+            if abs(A.lat - B.lat) > 0.001 or not (by_mode[a] & by_mode[b]):
+                continue
+            d = geo.hav_km(A.lat, A.lon, B.lat, B.lon)
+            if d <= co_m:
+                add("warn", "CO_LOCATED", "", f"{A.name} ({a}) and {B.name} ({b}) are {d * 1000:.0f} m apart, "
+                    f"both {'/'.join(sorted(by_mode[a] & by_mode[b]))}: merge them into one station")
 
     # every year's network should be one connected system
     for y, comps in _components(net):

@@ -1,3 +1,9 @@
 {
-  "_doc": "Current track: today's rail, streetcar and BRT (the DART Silver Line included) and today's service, with the region growing to 2100 around it as in the plan. No new lines, no infill stations, no frequency upgrades. The baseline the 2 million riders proposal is compared with in the story."
+  "_doc": "Current track: today's rail, streetcar and BRT (the DART Silver Line included) and today's service, with the region growing to 2100 around it as in the plan. No new lines, no infill stations, no frequency upgrades. The baseline the 2 million riders proposal is compared with in the story.",
+  "operating": {
+    "late_night": {
+      "_doc": "Today's service: no extended late-night service (the plan adds it from 2030).",
+      "lines": []
+    }
+  }
 }

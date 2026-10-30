@@ -38,7 +38,8 @@ def write_results(ctx, nets, evals):
          "(regional forecast plus development near new stations; `growth`), and peak drive times grow a "
          "little (`drive.congestion`). *Competitive commute* = transit door-to-door time no more than 1.3x the peak "
          "drive + 5 min (under 90 min, over 2 km). *Jobs in 45 min* = jobs reachable by transit in 45 "
-         "minutes, averaged over every resident of the nine counties. *Coverage* = residents within "
+         "minutes by the clock (walking or riding to a station, waiting and riding rail or BRT; local buses only "
+         "as feeders; no perceived extras), averaged over every resident of the nine counties. *Coverage* = residents within "
          "800 m of a metro/BRT stop or 1.6 km of a commuter rail station. Costs are 2025 USD; shared "
          "track is charged once. All assumptions live in `config.json`.", ""]
 
@@ -99,7 +100,8 @@ def write_validation(nets, findings):
     for key, fs in findings.items():
         c = collections.Counter((f[0], f[1]) for f in fs)
         L += [f"## `{key}`", "", ", ".join(f"{sev} {code}: {n}" for (sev, code), n in sorted(c.items())) or "clean", ""]
-        if key != "plan":
+        default = next(iter(nets.values())).cfg.get("default_scenario")
+        if key not in ("plan", default):   # the budget plan and the default scenario in detail
             continue
         for sev in ("error", "warn", "info"):
             items = [f for f in fs if f[0] == sev]

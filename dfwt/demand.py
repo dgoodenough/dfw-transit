@@ -543,7 +543,7 @@ def evaluate(zones, od, net, graph, cfg, want_loads=True):
     by_mode[PNR] = pnr_riders
     feeder_legs = s["feed_w"] + float((f * s["feed_p"]).sum())
     pop = zones.pop
-    jobs_reach = s["jobs_reach"]
+    jobs_reach = _reach_clock(zones, graph.T_clock, segs[0][1], cfg["accessibility"]["thresholds_min"])
     return {
         "competitive_commutes": comp_total,
         "transit_commuters": riders,
@@ -564,6 +564,26 @@ def evaluate(zones, od, net, graph, cfg, want_loads=True):
     }
 
 
+def _reach_clock(zones, Tc, acc, thresholds):
+    """Jobs each zone reaches by transit within each threshold (minutes), on the fastest trip
+    by the clock: actual access, waits and rides, no perceived extras, and only trips that ride
+    the network (Tc is inf for no ride). Rail and BRT, with local buses only as feeders."""
+    nz = zones.n
+    out = {t: np.zeros(nz) for t in thresholds}
+    k = acc.acc_st.shape[1]
+    for i0 in range(0, nz, CHUNK):
+        i1 = min(nz, i0 + CHUNK)
+        R = np.full((i1 - i0, Tc.shape[1]), np.inf, dtype=np.float32)
+        for j in range(k):
+            np.minimum(R, acc.acc_t[i0:i1, j, None] + Tc[acc.acc_st[i0:i1, j]], out=R)
+        TT = np.full((i1 - i0, nz), np.inf, dtype=np.float32)
+        for j in range(k):
+            np.minimum(TT, R[:, acc.egr_st[:, j]] + acc.egr_t[None, :, j], out=TT)
+        for t in thresholds:
+            out[t][i0:i1] = ((TT <= t) * zones.jobs[None, :]).sum(axis=1)
+    return out
+
+
 def _rows(w, i0, i1):
     """A segment weight: a scalar, or one value per origin zone."""
     return w[i0:i1, None] if isinstance(w, np.ndarray) else w
@@ -576,14 +596,12 @@ def _sweep(zones, od, T, segs, cfg, nz, ns, fixed, want_loads, light=False):
     those riders fall back to the segment's no-parking access. `light` tallies only
     garage demand."""
     cc, rc = cfg["competitive"], cfg["ridership"]
-    thresholds = cfg["accessibility"]["thresholds_min"]
     park = zones.paid_parking_utility()
     act = rc.get("active") or {}
     dcost = rc["b_per_dollar"] * rc.get("drive_usd_per_km", 0.0) * cfg["drive"]["circuity"]
     _, cash_usd, cash_cov = zones.parking_usd()
     cash_u = (rc["b_per_dollar"] * cash_usd / 2).astype(np.float32)
     has_cash = bool(cash_cov.any())
-    jobs_reach = {t: np.zeros(nz) for t in thresholds}
     # walk-access tallies, and per-garage park & ride tallies
     comp_w, rid_w, tt_w_sum, feed_w, act_w = 0.0, 0.0, 0.0, 0.0, 0.0
     mode_w = np.zeros(len(ACCESS_MODES))
@@ -664,9 +682,6 @@ def _sweep(zones, od, T, segs, cfg, nz, ns, fixed, want_loads, light=False):
                 if p.any():
                     rid_p += np.bincount(Ast[p], weights=rq[p], minlength=ns)
                 continue
-            if si == 0:
-                for t in thresholds:
-                    jobs_reach[t][i0:i1] = ((TT <= t) * zones.jobs[None, :]).sum(axis=1)
             if p.any():
                 rid_p += np.bincount(Ast[p], weights=rq[p], minlength=ns)
             if fixed is not None:
@@ -696,7 +711,7 @@ def _sweep(zones, od, T, segs, cfg, nz, ns, fixed, want_loads, light=False):
             "active_commuters": act_w,
             "comp_from_w": comp_from_w, "comp_to_w": comp_to_w, "comp_p": comp_p, "rid_p": rid_p,
             "tt_p_sum": tt_p_sum, "feed_p": feed_p, "comp_from_p": comp_from_p, "comp_to_p": comp_to_p,
-            "flows_w": flows_w, "flows_p": flows_p, "jobs_reach": jobs_reach}
+            "flows_w": flows_w, "flows_p": flows_p}
 
 
 def assign_loads(graph, flows):

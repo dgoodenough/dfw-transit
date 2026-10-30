@@ -140,6 +140,21 @@ def _existing_lots(net, base):
     return out
 
 
+def _first_trip(net, a, b, wait_weight):
+    """[year, clock minutes] of the first year a transit trip between two stations exists (after
+    today), or None: from the later of the two stations' opening years, a year at a time."""
+    from .graph import YearGraph
+    my = net.station_mode_years()
+    y = max(min(my[a].values()), min(my[b].values()), net.cfg["existing_year"] + 1)
+    for year in range(y, max(net.cfg["years"]) + 1):
+        g = YearGraph(net, year)
+        if a in g.sidx and b in g.sidx:
+            legs, _ = g.itinerary(g.sidx[a], g.sidx[b])
+            if any(k == "ride" for k, *_ in legs):
+                return [year, round(sum(m / wait_weight if k == "wait" else m for k, *_, m in legs))]
+    return None
+
+
 def _one_seat_year(net, a, b):
     """The first year one line serves both places (a station name, any of its platforms), else 9999."""
     out = 9999
@@ -315,6 +330,7 @@ def compute(log=print):
                 row["ride"][f"{sc}_{y}"] = t
                 row["jobs45"][f"{sc}_{y}"] = int(round(float(runs[(sc, y)]["jobs45"][oz]), -2))
         row["opens"] = min(net.station_mode_years()[names[o]].values())
+        row["first"] = _first_trip(net, names[o], names[d], ww)
         row["why"] = why.replace("{year}", str(_one_seat_year(net, o, d))).replace("{opens}", str(row["opens"]))
         conns.append(row)
 

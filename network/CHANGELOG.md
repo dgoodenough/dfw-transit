@@ -518,3 +518,47 @@ the growth cases).
 - **Recalibrated** after the access-slot fix: transit constant 0.3594 -> 0.4062.
 
 **Not done.** The one-seat Tollway - Las Colinas route and a Denton County corridor test.
+
+## v2.15 — A small backlog pass
+
+The small items left after the third review, done in one pass.
+
+- **Jobs within 45 minutes are now clock time.** This counts actual walks, waits and rides,
+  with no perceived extras (the doubled wait weight and the 5-minute penalty per change), and
+  only trips that ride rail or BRT; local buses count only as a way to reach them. The 2
+  million riders plan reaches about 304k jobs for the average resident in 2100 (178k in
+  perceived minutes); today it is about 27k. Ridership is unchanged.
+  - New: `YearGraph.skim()` also gives `T_clock`, the same paths in clock minutes.
+- **Validation.**
+  - New CO_LOCATED check: two platforms of one mode within 60 m.
+  - `VALIDATION.md` now lists the default scenario's findings in full.
+  - DANGLING is now a note: an outer end with no transfer is normal for a BRT or metro line.
+- **Six Points** is linked: FW Green and the Riverside-Forest Hill BRT, 420 m apart.
+- **The current track no longer carries the plan's late-night service** in its operating cost.
+- **Map.**
+  - Station popups say when a line runs on another line's track, e.g. "FW Pink runs here on
+    FW Orange's track (built once, opening 2035)".
+  - A planned trip scrolls into view on desktop.
+- **Story.** Connection cards with no transit trip today show the first year one is possible
+  and its time (Arlington to downtown Dallas: 2038, 67 min).
+- **Off-street bus stops.** `tools/despur.py` moves a stop that a bus line leaves its street to
+  reach, and comes straight back from, onto the street where the detour starts. It only moves
+  a stop if all of these hold:
+  - one line serves it;
+  - the move is 700 m or less;
+  - the stop stays at least 400 m from its neighbours.
+  It moved Custer / SH-121 (SH-121 BRT), Coppell Business Park (Coppell-Lewisville BRT), and
+  Mansfield Highway / Shackleford, now **Wichita / Mansfield Highway** (Riverside-Forest Hill
+  BRT). The detours it can't fix this way are listed in `reports/KNOWN_ISSUES.md`.
+- **`reports/KNOWN_ISSUES.md` is rewritten** as the current backlog: data limits, model items
+  (shared-track waits, the slow-trip term in route choice), the owner's open decisions,
+  geometry and diagram limits, and housekeeping.
+
+**Not done, and why.**
+- **Shared-track waits** (a rider takes whichever train comes first) need shared "trunk"
+  services in the routing graph, splitting their riders back to lines, the same change in the
+  trip planner, and a recalibration.
+- **The diagram's** two Fort Worth Central and two Fort Worth T&P nodes, the Gainesville
+  crossing and the Parker Road turn are layout limits; earlier attempts made other areas worse.
+- **Making the lever scenarios overlays** needs the rename tool and `make_two_million.py` to
+  read overlay files.

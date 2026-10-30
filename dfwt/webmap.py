@@ -76,6 +76,24 @@ def station_grades(net):
     return out
 
 
+def shared_track(net):
+    """station_id -> [[line name, owner line name, year the owner builds it]]: lines that run here on
+    track another line of the same mode builds (one construction period, not two), for popups."""
+    ex = net.cfg["existing_year"]
+    owner = net.track_owner()
+    out = {}
+    for ln in net.lines.values():
+        for i, s in enumerate(ln.segments):
+            y, oid = owner[(ln.mode, frozenset((ln.stop_ids[i], ln.stop_ids[i + 1])))]
+            if oid == ln.id or y <= ex or oid not in net.lines or s.year >= 9999:
+                continue
+            row = [ln.name, net.lines[oid].name, y]
+            for sid in ln.stop_ids[i:i + 2]:
+                if row not in out.setdefault(sid, []):
+                    out[sid].append(row)
+    return out
+
+
 def drawn(net):
     """The map's shared-track pieces (bundle.pieces) and where each station sits on them
     (bundle.station_pieces). A rerouted line draws its old track too, until the new one opens."""
@@ -155,6 +173,7 @@ def write(nets, evals, out_path):
                      "metrics": ev["years"],
                      "boardings": {r["station_id"]: r["boardings_final"] for r in ev["stations"]},
                      "grades": station_grades(net),
+                     "shared": shared_track(net),
                      # "What it means for you": the plan's capital budget ($B a year, 2025 dollars)
                      "budget": net.cfg["budget"]["musd_per_year"] / 1000,
                      # door-to-door trips: the model's access rules, garages and feeder zones by year

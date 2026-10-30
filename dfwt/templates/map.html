@@ -563,6 +563,8 @@ function stationHtml(sid) {
   if (sameGrade && modes.length) rows.push(cap(where(modes[0])) + ' platform' + (one ? '' : 's'));
   if (modes.some(md => op[md] > D.years[0])) rows.push('Step-free (assumed: every new station is)');
   const b = S.boardings[sid], last = D.years[D.years.length - 1];
+  for (const [ln, owner, y] of (S.shared || {})[sid] || [])   // one construction, not two
+    rows.push(`${esc(ln)} runs here on ${esc(owner)}'s track (built once, opening ${y})`);
   if (b) rows.push(`About ${roundAbout(b).toLocaleString()} daily boardings in ${last} (model: weekday commutes only)`);
   rows.push(`${fmt(st[3])} residents · ${fmt(st[4])} jobs within 1 km (today)`);
   return `<div class="pop"><b>${esc(stLabel(sid))}</b><div>${chips}</div><div class="m">${rows.join('<br>')}</div></div>`;
@@ -914,7 +916,7 @@ const pickMark = s => L.circleMarker([D.stations[s][1], D.stations[s][2]], {rend
 const pin = (p, letter) => L.marker([p.lat, p.lon], {keyboard: false, interactive: false, icon: L.divIcon({className: 'pinwrap', html: `<div class="pin"><b>${letter}</b></div>`,
   iconSize: [26, 26], iconAnchor: [13, 31]})}).addTo(tripLayer);
 const endMark = (e, letter) => e.sid ? pickMark(e.sid) : pin(e, letter);
-const showTrip = () => { $('trip').closest('details').open = true; if (touch) $('trip').scrollIntoView({block: 'nearest', behavior: 'smooth'}); };
+const showTrip = () => { $('trip').closest('details').open = true; $('trip').scrollIntoView({block: 'nearest', behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth'}); };
 const clearBtn = ' <button type="button" class="clear" onclick="clearTrip()">Clear</button>';
 const START_HINT = '<p class="hint">Click a station, or type a station or a street address. Right-click (long-press on a phone) the map to start or end anywhere.</p>';
 function syncInputs() { $('from').value = endLabel(ends[0]); $('to').value = endLabel(ends[1]); }
