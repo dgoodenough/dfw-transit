@@ -748,7 +748,11 @@ function clickAt(px, py) {
   const n = nearest(px, py, 14, true);
   if (!n) {
     const id = nearestLine(px, py, 12);
-    if (id) { highlight(id); showLinePop(id, (px - view.tx) / view.k, (py - view.ty) / view.k); }
+    if (id) {   // a line: highlighted, and its diagram in the panel
+      highlight(id); hidePop();
+      const li = S.lines.findIndex(l => l.id === id);
+      if (li >= 0 && window.openLine) openLine(li); else showLinePop(id, (px - view.tx) / view.k, (py - view.ty) / view.k);
+    }
     else { hidePop(); highlight(null); }
     return;
   }
@@ -987,6 +991,6 @@ const focus = (sid, z) => {
   userMoved = true; apply();
   return true;
 };
-window.Schem = {draw, trip: (legs, yd) => trip(legs, yd), setView, setVersion, version: () => setKey, locate, focus, zoomAt};
+window.Schem = {draw, trip: (legs, yd) => trip(legs, yd), setView, setVersion, version: () => setKey, locate, focus, zoomAt, sheet: setSheet};
 setView(initial === 'diagram' ? 'diagram' : 'map', false);
 })();
