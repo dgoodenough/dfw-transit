@@ -34,6 +34,10 @@ real population and jobs data, a [scrolling story](https://dgoodenough.github.io
 **trip planner**. Drag the slider and the network builds itself out year by year,
 with the plan's numbers alongside: commutes where transit beats driving, jobs
 reachable in 45 minutes, residents near a station, and capital spent.
+Tap a line (on the map, on the diagram, or its name in the Lines list) for its **line
+diagram**, Wikipedia style: every stop top to bottom with the lines you can change to,
+lines sharing its track as stripes alongside, and stops and re-routes still to come in the
+selected year drawn faint, with the year they open.
 
 A **Map / Diagram** toggle switches the same page to a Washington-Metro-style
 schematic: octilinear lines, bundled corridors and capsule interchanges, laid

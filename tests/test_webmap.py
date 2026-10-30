@@ -64,5 +64,24 @@ class PageDriveTests(unittest.TestCase):
         self.assertAlmostEqual(self.run_drive(export, 10.0), 10 * 1.35 / 38 * 60 * 1.12 + 8, places=6)
 
 
+@unittest.skipUnless(shutil.which("node"), "node is not installed")
+class PageLineDiagramTests(unittest.TestCase):
+    def align(self, B, F):
+        """alignStops from the page: the line diagram lines up the shown year's stops with the last year's."""
+        src = open(TEMPLATE, encoding="utf-8").read()
+        fn = re.search(r"function alignStops\(B, F\) \{.*?\n\}", src, re.S).group(0)
+        js = f"{fn}\nconsole.log(JSON.stringify(alignStops({json.dumps(B)}, {json.dumps(F)})));"
+        return json.loads(subprocess.run(["node", "-e", js], capture_output=True, text=True, check=True).stdout)
+
+    def test_reroute_is_a_gap_between_shared_stops(self):
+        ops, n = self.align(list("ABCDEF"), list("ABXYEFG"))
+        self.assertEqual(n, 4)
+        self.assertEqual([o for o, _ in ops], ["=", "=", "b", "b", "f", "f", "=", "=", "f"])
+
+    def test_infill_and_extension(self):
+        ops, n = self.align(list("ACD"), list("ABCDE"))
+        self.assertEqual(ops, [["=", "A"], ["f", "B"], ["=", "C"], ["=", "D"], ["f", "E"]])
+
+
 if __name__ == "__main__":
     unittest.main()

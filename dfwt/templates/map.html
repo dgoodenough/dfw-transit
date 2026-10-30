@@ -50,7 +50,8 @@ summary{cursor:pointer;font-weight:600;font-size:.9rem}
 .li{display:grid;grid-template-columns:16px 22px minmax(0,1fr) auto;gap:6px;align-items:center;font-size:.84rem;padding:2px 0}
 .li input,.grp input{margin:0}
 .sw{height:4px;border-radius:2px}
-.li .nm{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.li .nm{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font:inherit;color:inherit;background:none;border:0;padding:0;text-align:left;cursor:pointer}
+.li .nm:hover{text-decoration:underline}
 .li .yr{color:var(--muted);font-variant-numeric:tabular-nums;font-size:.76rem}
 .li.future{opacity:.62}
 .foryou{font-size:.84rem;line-height:1.45;margin-top:6px}.foryou p{margin:0 0 6px}.foryou b{font-weight:600}
@@ -110,6 +111,38 @@ a{color:var(--accent)}
     padding-left:max(16px,env(safe-area-inset-left));padding-right:max(16px,env(safe-area-inset-right));padding-bottom:max(16px,env(safe-area-inset-bottom))}
 }
 .goal{stroke:var(--muted,#888);stroke-dasharray:2 3;stroke-width:1;fill:var(--muted,#888);font-size:9px}
+/* line diagram (tap a line): replaces the panel's content, keeping the year slider */
+#lineHead,#lineBody{display:none}
+#panel.lineOpen>:not(.sheet-handle):not(.togs):not(.row):not(#lineHead):not(#lineBody){display:none}
+#panel.lineOpen>#lineHead{display:block;order:-1}
+#panel.lineOpen>.sheet-handle{order:-2}
+#panel.lineOpen>#lineBody{display:block}
+#lineHead .back{font-size:.85rem;padding:4px 10px}
+.lhd{display:flex;align-items:center;gap:10px;margin:10px 0 4px}
+.lhd .bar{width:8px;align-self:stretch;border-radius:3px}
+.lhd h2{font-family:var(--f-display);font-size:1.7rem;line-height:1;margin:0}
+.lhd .mode{font-size:.72rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.lfacts{font-size:.84rem;color:var(--sub);line-height:1.4}
+.lfacts b{color:var(--ink);font-weight:600}
+ol.strip{list-style:none;margin:0;padding:0}
+ol.strip li{display:grid;grid-template-columns:28px var(--dw) minmax(0,1fr);min-height:30px}
+.strip .t{font-size:.72rem;color:var(--muted);font-variant-numeric:tabular-nums;text-align:right;padding:8px 4px 0 0}
+.strip .d{position:relative}
+.strip .d svg{position:absolute;left:0;top:0;width:100%;height:calc(100% + 1px);overflow:visible}
+.strip .st{padding:5px 0 5px 4px;min-width:0}
+.strip .nm{font:inherit;font-weight:500;font-size:.9rem;line-height:1.25;color:var(--ink);background:none;border:0;padding:0;text-align:left;cursor:pointer}
+.strip .nm:hover{text-decoration:underline}
+.strip li.end .nm{font-weight:700;font-size:.98rem}
+.strip li.fut .nm{color:var(--muted);font-weight:400}
+.strip .op{font-size:.72rem;color:var(--accent);font-weight:600;margin-left:4px;white-space:nowrap}
+.strip .gone{font-size:.72rem;color:var(--muted);margin-left:4px;white-space:nowrap}
+.strip .pr{display:inline-block;font-size:.66rem;font-weight:700;color:#fff;background:var(--bus);border-radius:3px;padding:0 3px;margin-left:5px;vertical-align:1px}
+.strip .xs{display:flex;flex-wrap:wrap;gap:3px;margin-top:3px}
+.strip .b{font:inherit;font-size:.7rem;font-weight:600;border-radius:9px;padding:1px 7px;white-space:nowrap;line-height:1.35;cursor:pointer;border:1.5px solid transparent}
+.strip .b.later{background:transparent!important;color:var(--muted)!important;font-weight:500}
+.strip .walk{font-size:.74rem;color:var(--muted);margin-top:3px;display:flex;flex-wrap:wrap;gap:3px;align-items:center}
+.lkey{border-top:1px solid var(--rule);margin-top:10px;padding-top:8px;font-size:.74rem;color:var(--muted);display:grid;grid-template-columns:auto 1fr;gap:4px 8px;align-items:center}
+.lkey svg{width:34px;height:22px}
 </style>
 </head>
 <body>
@@ -157,6 +190,8 @@ a{color:var(--accent)}
     <div class="hint" style="margin-top:6px">Year it opens (“today” if it runs now) · daily trips it adds per $1M of its capital cost (the trips lost if it were removed, ÷ cost; higher is better value).</div>
     <div class="lines" id="lines"></div>
   </details>
+  <div id="lineHead"></div>
+  <div id="lineBody"></div>
   <div class="hint">Numbers from the model in <a href="https://github.com/dgoodenough/dfw-transit">the repository</a>; see reports/RESULTS.md for definitions. Demand is a gravity model from census population and LODES jobs. <a href="generated.html">Experimental: networks generated from scratch</a></div>
 </aside>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
@@ -468,10 +503,11 @@ function drawLines() {
     }
     for (const [ln, path] of strokes) {
       const w = weightOf(ln.mode), col = lineColor(ln.color, ln.mode);
-      if (pass === 'future') L.polyline(path, {...opts, lineCap: 'butt', color: col, weight: w, opacity: .18}).addTo(lineLayer);
-      else if (pass === 'building') L.polyline(path, {...opts, color: col, weight: w + 1.5, opacity: .7, dashArray: '1 8'}).addTo(lineLayer);
+      const open = () => openLine(S.lines.indexOf(ln));   // tap a line: its diagram
+      if (pass === 'future') L.polyline(path, {...opts, lineCap: 'butt', color: col, weight: w, opacity: .18, interactive: true}).on('click', open).addTo(lineLayer);
+      else if (pass === 'building') L.polyline(path, {...opts, color: col, weight: w + 1.5, opacity: .7, dashArray: '1 8', interactive: true}).on('click', open).addTo(lineLayer);
       else {
-        const pl = L.polyline(path, {...opts, color: col, weight: w, opacity: .95, interactive: true}).addTo(lineLayer);
+        const pl = L.polyline(path, {...opts, color: col, weight: w, opacity: .95, interactive: true}).on('click', open).addTo(lineLayer);
         pl.bindTooltip(ln.name, {sticky: true});   // which route is this (BRT routes share one colour)
         if (ln.mode === 'commuter')   // railroad style, as on the diagram: a dashed line down the middle
           L.polyline(path, {...opts, lineCap: 'butt', color: bgColor, weight: 1.3 * zf(), dashArray: '6 4'}).addTo(lineLayer);
@@ -575,6 +611,202 @@ function openStation(sid, ll) {
   popSid = sid;
   stPop.setLatLng(ll).setContent(stationHtml(sid)).openOn(map);
 }
+// ---- line diagram: tap a line (map, diagram) or its name in the Lines list. Its stops top to
+// bottom, Wikipedia style, in the selected year: stops it gains later are faint with their year,
+// stops it later drops say until when, and a later re-route is a branch beside the route it
+// replaces. Lines sharing its track run as thin stripes beside it and count as transfers only
+// where they join or leave. It replaces the panel's content, keeping the year slider.
+let lineOpenId = null, lineOpener = null;
+const LINE_WALK_MAX = 6;   // walks to another station listed as transfers, minutes
+const lineRun = (li, Y) => S.years[Y].runs.find(r => r[0] === li) || null;
+// per routing graph: station -> lines stopping there, stop pairs each line runs between, walks
+function graphIndex(Y) {
+  const g = S.years[Y];
+  if (g._ix) return g._ix;
+  const served = new Map(), pairs = new Set(), walks = new Map();
+  for (const [li, stops] of g.runs) stops.forEach((s, k) => {
+    if (!served.has(s)) served.set(s, new Set()); served.get(s).add(li);
+    if (k) { pairs.add(`${stops[k - 1]}|${s}|${li}`); pairs.add(`${s}|${stops[k - 1]}|${li}`); }
+  });
+  for (const [a, b, m] of g.walks) for (const [x, y] of [[a, b], [b, a]]) { if (!walks.has(x)) walks.set(x, []); walks.get(x).push([y, m]); }
+  return g._ix = {served, pairs, walks};
+}
+// the first year from Y on that line li stops at s (null: never again)
+function servedFrom(s, li, Y) {
+  for (let i = D.years.indexOf(Y); i < D.years.length; i++) { const l = graphIndex(D.years[i]).served.get(s); if (l && l.has(li)) return D.years[i]; }
+  return null;
+}
+// align two stop lists (longest common subsequence): [['=', s] | ['b', s] | ['f', s]]
+function alignStops(B, F) {
+  const n = B.length, m = F.length, T = Array.from({length: n + 1}, () => new Int16Array(m + 1));
+  for (let i = n - 1; i >= 0; i--) for (let j = m - 1; j >= 0; j--) T[i][j] = B[i] === F[j] ? T[i + 1][j + 1] + 1 : Math.max(T[i + 1][j], T[i][j + 1]);
+  const out = [];
+  let i = 0, j = 0;
+  while (i < n || j < m) {
+    if (i < n && j < m && B[i] === F[j]) { out.push(['=', B[i++]]); j++; }
+    else if (j >= m || (i < n && T[i + 1][j] >= T[i][j + 1])) out.push(['b', B[i++]]);
+    else out.push(['f', F[j++]]);
+  }
+  return [out, T[0][0]];
+}
+// rows of the diagram: {sid, col (0 the line, 1 its later route), open (the first year from the
+// shown year on that it stops here), until (the year it stops calling)}; forks: [row the branch
+// leaves (-1: it has its own first stop), its first and last rows, row it rejoins (-1: its own end)]
+function lineRows(li) {
+  const Y = D.years[yi], yrs = D.years.filter(y => lineRun(li, y));
+  if (!yrs.length) return null;
+  const at = lineRun(li, Y) ? Y : yrs.find(y => y > Y) || yrs[yrs.length - 1];   // not open yet: as it first runs; ended: as it last ran
+  const last = yrs[yrs.length - 1], B = lineRun(li, at)[1];
+  let F = lineRun(li, last)[1], [ops, n] = alignStops(B, F);
+  const [opsR, nR] = alignStops(B, [...F].reverse());
+  if (nR > n) ops = opsR;
+  const until = s => { for (const y of D.years) if (y > at && lineRun(li, y) && !lineRun(li, y)[1].includes(s)) return y; return null; };
+  const rows = [], forks = [];
+  for (let k = 0; k < ops.length;) {
+    if (ops[k][0] === '=') { rows.push({sid: ops[k][1], col: 0, open: servedFrom(ops[k][1], li, at)}); k++; continue; }
+    const bs = [], fs = [];
+    for (; k < ops.length && ops[k][0] !== '='; k++) (ops[k][0] === 'b' ? bs : fs).push(ops[k][1]);
+    const fork = bs.length && fs.length, a = rows.length - 1;
+    for (const s of bs) rows.push({sid: s, col: 0, open: at, until: until(s)});
+    const f0 = rows.length;
+    for (const s of fs) rows.push({sid: s, col: fork ? 1 : 0, open: servedFrom(s, li, at)});
+    if (fork) forks.push([a, f0, rows.length - 1, k < ops.length ? rows.length : -1]);
+  }
+  return {rows, forks, at, last, B};
+}
+function lineView() {
+  const li = S.lines.findIndex(l => l.id === lineOpenId);
+  const R = li >= 0 ? lineRows(li) : null;
+  if (!R) { closeLine(); return; }
+  const Y = D.years[yi], ln = S.lines[li], rows = R.rows, n = rows.length, now = !!lineRun(li, Y);
+  const fut = r => r.open == null || r.open > Y || !now, gIx = r => graphIndex(fut(r) ? R.last : Y);
+  // lines sharing its track: a stripe between two neighbouring stops of the line (not on a branch)
+  const c0 = rows.map((r, i) => r.col === 0 ? i : -1).filter(i => i >= 0), co = new Map(), lanes = [];
+  c0.forEach((i, k) => {
+    if (!k) return;
+    const a = rows[c0[k - 1]], b = rows[i], G = fut(a) || fut(b) ? graphIndex(R.last) : graphIndex(Y);
+    const along = [...(G.served.get(a.sid) || [])].filter(o => o !== li && G.pairs.has(`${a.sid}|${b.sid}|${o}`));
+    for (const o of along) if (!lanes.includes(o) && lanes.length < 4) lanes.push(o);
+    co.set(i, along.filter(o => lanes.includes(o)));
+  });
+  const upOf = new Map(), downOf = new Map();
+  c0.forEach((i, k) => { const s = co.get(i) || []; upOf.set(i, s); if (k) downOf.set(c0[k - 1], s); });
+  const hasFork = rows.some(r => r.col === 1);
+  const MY = 15, LANE = 7, MAIN = 10 + LANE * lanes.length, C1 = MAIN + 15, DW = (hasFork ? C1 : MAIN) + 18;
+  const laneX = o => MAIN - LANE * (lanes.indexOf(o) + 1);
+  // which strokes each row carries: the line (col 0) from its first stop to its last, the branch
+  // from where it leaves to where it rejoins; faint where it doesn't run yet
+  const span = col => { const ix = rows.map((r, i) => r.col === col ? i : -1).filter(i => i >= 0); return ix.length ? [ix[0], ix[ix.length - 1]] : null; };
+  // an infill stop opening later doesn't fade the track through it: only beyond the open ends
+  const s0 = span(0), seg0 = [], stripes = [], on0 = c0.filter(i => !fut(rows[i]));
+  for (let k = 1; k < c0.length; k++) for (let i = c0[k - 1]; i <= c0[k]; i++) {
+    const f = !on0.length || c0[k] > on0[on0.length - 1] || c0[k - 1] < on0[0], half = i === c0[k - 1] ? 'b' : i === c0[k] ? 't' : 'tb';
+    seg0[i] = (seg0[i] || '') + [...half].map(h => h + (f ? 'F' : 'O')).join('');
+    for (const o of co.get(c0[k])) stripes.push([i, half, o]);
+  }
+  const seg1 = [];   // branch strokes: [row, 'fork' | 'join' | halves, faint]
+  for (const [a, f0, f1, z] of R.forks) {
+    const ff = rows.slice(f0, f1 + 1).some(fut);
+    if (a >= 0) { seg1.push([a, 'fork', ff]); for (let r = a + 1; r < f0; r++) seg1.push([r, 'tb', ff]); }
+    for (let r = f0; r <= f1; r++) seg1.push([r, (r > f0 || a >= 0 ? 't' : '') + (r < f1 || z >= 0 ? 'b' : ''), ff]);
+    if (z >= 0) seg1.push([z, 'join', ff]);
+  }
+  const col = c => c === 0 ? MAIN : C1, stroke = (f, w = 6) => `stroke="${f ? css('--muted') : lineColor(ln.color, ln.mode)}" stroke-width="${w}"${f ? ' stroke-opacity=".45"' : ''}`;
+  const vline = (x, half, attr) => (half.includes('t') ? `<line x1="${x}" x2="${x}" y1="0" y2="${MY}" ${attr}/>` : '') + (half.includes('b') ? `<line x1="${x}" x2="${x}" y1="${MY}" y2="100%" ${attr}/>` : '');
+  const badge = ([o, y]) => { const l = S.lines[o], c = lineColor(l.color, l.mode), later = y > Y;
+    return `<button type="button" class="b${later ? ' later' : ''}" data-line="${esc(l.id)}" style="background:${c};color:${inkOn(c)};border-color:${c}" title="${esc(l.name)}${later ? ' (from ' + y + ')' : ''}">${esc(l.name.replace(/ Line$/, ''))}${later ? ' ' + y : ''}</button>`; };
+  // minutes from the first stop, in the shown year
+  const mins = new Map();
+  if (now) { const r = lineRun(li, Y); let t = 0; r[1].forEach((s, k) => { if (k) t += r[2][k - 1]; mins.set(s, Math.round(t)); }); }
+  const gar = (S.trip && S.trip.garages) || {};
+  let h = '<ol class="strip">';
+  rows.forEach((r, i) => {
+    const f = fut(r), up = upOf.get(i) || [], down = downOf.get(i) || [], G = gIx(r);
+    const other = new Set(); for (const Yk of [Y, R.last]) for (const o of graphIndex(Yk).served.get(r.sid) || []) if (o !== li) other.add(o);
+    const xs = [...other].filter(o => !(up.includes(o) && down.includes(o))).map(o => [o, servedFrom(r.sid, o, Y)]).filter(([, y]) => y)
+      .sort((a, b) => a[1] - b[1] || S.lines[a[0]].name.localeCompare(S.lines[b[0]].name));
+    const walk = (G.walks.get(r.sid) || []).filter(([t, m], k, a) => m <= LINE_WALK_MAX && a.findIndex(w => w[0] === t) === k).map(([t, m]) => {
+      const ls = [...(graphIndex(R.last).served.get(t) || [])].filter(o => o !== li && !other.has(o)).map(o => [o, servedFrom(t, o, Y)]).filter(([, y]) => y);
+      return ls.length ? `<div class="walk">Walk ${Math.round(m)} min to ${esc(D.stations[t][0])}: ${ls.map(badge).join('')}</div>` : '';
+    }).join('');
+    // the drawing: strokes, then the station on top
+    let g = '';
+    for (const [k, half, o] of stripes) if (k === i) { const l = S.lines[o]; g += vline(laneX(o), half, `stroke="${lineColor(l.color, l.mode)}" stroke-width="3.5"`); }
+    if (seg0[i] && i >= s0[0] && i <= s0[1]) for (const p of seg0[i].match(/[tb][FO]/g)) g += vline(MAIN, p[0], stroke(p[1] === 'F'));
+    for (const [k, how, ff] of seg1) if (k === i) {
+      if (how === 'fork') g += `<path d="M${MAIN} ${MY}C${MAIN} ${MY + 10} ${C1} ${MY + 4} ${C1} ${MY + 14}" fill="none" ${stroke(ff)}/><line x1="${C1}" x2="${C1}" y1="${MY + 14}" y2="100%" ${stroke(ff)}/>`;
+      else if (how === 'join') g += `<path d="M${C1} 0C${C1} ${MY * .6} ${MAIN} ${MY * .4} ${MAIN} ${MY}" fill="none" ${stroke(ff)}/>`;
+      else g += vline(C1, how, stroke(ff));
+    }
+    const x = col(r.col), end = r.col === 0 ? i === s0[0] || i === s0[1] : R.forks.some(([a, f0, f1, z]) => (i === f0 && a < 0) || (i === f1 && z < 0));
+    const ink = f ? css('--muted') : css('--ink'), dash = f ? ' stroke-dasharray="2 2"' : '';
+    const shared = r.col === 0 ? [...new Set([...up, ...down])] : [];
+    if (shared.length) { const x0 = Math.min(...shared.map(laneX)) - 4;
+      g += `<rect x="${x0}" y="${MY - 5}" width="${MAIN + 5 - x0}" height="10" rx="5" fill="${css('--panel')}" stroke="${ink}" stroke-width="2"${dash}/>`; }
+    else if (xs.length || walk || end) g += `<circle cx="${x}" cy="${MY}" r="${end ? 6.5 : 5.5}" fill="${css('--panel')}" stroke="${ink}" stroke-width="2.2"${dash}/>`;
+    else g += `<line x1="${x}" x2="${x + 9}" y1="${MY}" y2="${MY}" ${stroke(f, 3)}/>`;
+    const p = gar[r.sid] && onAt(gar[r.sid], Y);
+    h += `<li class="${f ? 'fut' : ''}${end ? ' end' : ''}"><span class="t">${mins.has(r.sid) && !f ? mins.get(r.sid) : ''}</span><span class="d"><svg aria-hidden="true">${g}</svg></span><div class="st">` +
+      `<button type="button" class="nm" data-sid="${esc(r.sid)}">${esc(D.stations[r.sid][0])}</button>${p ? '<span class="pr" title="Park and ride garage">P</span>' : ''}` +
+      (f && r.open ? `<span class="op">opens ${r.open}</span>` : '') + (r.until && !f ? `<span class="gone">until ${r.until}</span>` : '') +
+      (xs.length ? `<div class="xs">${xs.map(badge).join('')}</div>` : '') + walk + '</div></li>';
+  });
+  h += '</ol>';
+  const k = (svg, t) => `<svg aria-hidden="true">${svg}</svg><span>${t}</span>`, lc = lineColor(ln.color, ln.mode), pv = css('--panel');
+  h += '<div class="lkey">' +
+    k(`<line x1="17" x2="17" y1="0" y2="22" stroke="${lc}" stroke-width="6"/><line x1="17" x2="26" y1="11" y2="11" stroke="${lc}" stroke-width="3"/>`, 'Station') +
+    k(`<line x1="17" x2="17" y1="0" y2="22" stroke="${lc}" stroke-width="6"/><circle cx="17" cy="11" r="5.5" fill="${pv}" stroke="${css('--ink')}" stroke-width="2.2"/>`, 'Change to other lines') +
+    (lanes.length ? k(`<line x1="10" x2="10" y1="0" y2="22" stroke="${lineColor(S.lines[lanes[0]].color, S.lines[lanes[0]].mode)}" stroke-width="3.5"/><line x1="17" x2="17" y1="0" y2="22" stroke="${lc}" stroke-width="6"/><rect x="6" y="6" width="16" height="10" rx="5" fill="${pv}" stroke="${css('--ink')}" stroke-width="2"/>`, 'Another line shares the track and stops here') : '') +
+    k(`<line x1="17" x2="17" y1="0" y2="22" stroke="${css('--muted')}" stroke-opacity=".45" stroke-width="6"/><circle cx="17" cy="11" r="5.5" fill="${pv}" stroke="${css('--muted')}" stroke-width="2.2" stroke-dasharray="2 2"/>`, now ? `Opens after ${Y}` : 'Not running in ' + Y) +
+    (hasFork ? k(`<path d="M8 0C8 8 22 6 22 14L22 22" fill="none" stroke="${lc}" stroke-width="4"/><line x1="8" x2="8" y1="0" y2="22" stroke="${lc}" stroke-width="4"/>`, 'Branch: the route it takes later') : '') +
+    `<span></span><span>Minutes from the first stop on the left. P: park and ride.</span></div>`;
+  // header: what it is, where it runs, how often
+  const ends = [R.B[0], R.B[R.B.length - 1]].map(s => esc(D.stations[s][0])), run = lineRun(li, Y);
+  const endMin = run ? Math.round(run[2].reduce((a, b) => a + b, 0)) : null, nFinal = lineRun(li, R.last)[1].length;
+  const facts = now ? `${R.B.length} stations${nFinal !== R.B.length ? ` (${nFinal} by ${R.last})` : ''} · ${ln.km} km · ${endMin} min end to end · every ${fmtMin(run[4])} min in ${Y}`
+    : R.at > Y ? `Opens in ${R.at}${D.build[ln.mode] && R.at - D.build[ln.mode] <= Y ? ' (under construction)' : ''} · ${nFinal} stations · ${ln.km} km`
+    : `Ran until ${D.years[D.years.indexOf(R.last) + 1] || R.last}`;
+  $('lineHead').innerHTML = `<button type="button" class="back">← Lines</button>` +
+    `<div class="lhd"><span class="bar" style="background:${lc}"></span><div><div class="mode">${esc(D.modes[ln.mode] || ln.mode)}</div><h2>${esc(ln.name)}</h2></div></div>` +
+    `<div class="lfacts"><b>${ends[0]} – ${ends[1]}</b><br>${facts}</div>` + (ln.notes ? `<div class="hint" style="margin-top:4px">${esc(ln.notes)}</div>` : '');
+  const body = $('lineBody');
+  body.style.setProperty('--dw', DW + 'px');
+  body.innerHTML = h;
+  $('lineHead').querySelector('.back').onclick = closeLine;
+}
+const fmtMin = m => Number.isInteger(m) ? m : m.toFixed(1);
+function openLine(li) {
+  const kb = document.activeElement && document.activeElement.matches(':focus-visible');   // opened from the keyboard
+  if (lineOpenId === null) lineOpener = document.activeElement;
+  lineOpenId = S.lines[li].id;
+  $('panel').classList.add('lineOpen');
+  if ($('panel').classList.contains('min') && window.Schem && Schem.sheet) Schem.sheet(false);   // a collapsed phone sheet opens
+  lineView();
+  $('panel').scrollTop = 0;
+  if (kb) $('lineHead').querySelector('.back').focus({preventScroll: true});
+}
+function closeLine() {
+  if (lineOpenId === null) return;
+  lineOpenId = null;
+  $('panel').classList.remove('lineOpen');
+  $('lineHead').innerHTML = $('lineBody').innerHTML = '';
+  if (lineOpener && document.contains(lineOpener)) lineOpener.focus({preventScroll: true});
+  lineOpener = null;
+}
+window.openLine = openLine;
+// a stop: show it (map or diagram view); a transfer badge: that line's diagram
+$('lineBody').addEventListener('click', e => {
+  const b = e.target.closest('button[data-line]');
+  if (b) { const li = S.lines.findIndex(l => l.id === b.dataset.line); if (li >= 0) openLine(li); return; }
+  const st = e.target.closest('button[data-sid]');
+  if (!st) return;
+  const sid = st.dataset.sid;
+  if (document.body.classList.contains('diagram') && window.Schem) { Schem.focus(sid, 4); return; }
+  const ll = L.latLng(D.stations[sid][1], D.stations[sid][2]);
+  map.setView(ll, Math.max(map.getZoom(), 14));
+  openStation(sid, shownAt.get(sid) || ll);
+});
+document.addEventListener('keydown', e => { if (e.key === 'Escape' && lineOpenId !== null && !e.target.closest('.leaflet-popup')) closeLine(); });
 map.on('zoomend', () => { drawLines(); drawStations(); });   // offsets and weights are in screen pixels
 function draw() {
   const Y = D.years[yi], prevY = yi ? D.years[yi - 1] : -Infinity;
@@ -584,6 +816,7 @@ function draw() {
   drawStations();
   intervalSummary(Y, prevY, stateFn());
   metrics(); forYou(); lineList(); if (ends[0] && ends[1]) replan(false);
+  if (lineOpenId !== null) lineView();
   if (window.Schem) Schem.draw();  // schematic: redraw the diagram view
 }
 function intervalSummary(Y, prevY, state) {
@@ -681,14 +914,15 @@ function lineList() {
     if (kind === 'mode') return;
     for (const l of g) {
       const v = l.value !== '' && l.value != null ? ` · ${l.value}` : '';
-      h += `<label class="li${l.first > Y ? ' future' : ''}" title="${(l.notes || '').replace(/"/g, '&quot;')}"><input type="checkbox" data-id="${l.id}" ${hidden.has(l.id) ? '' : 'checked'}>` +
-        `<span class="sw" style="background:${l.color}"></span><span class="nm">${l.name}</span><span class="yr">${l.status === 'existing' ? 'today' : l.first}${v}</span></label>`;
+      h += `<div class="li${l.first > Y ? ' future' : ''}"><input type="checkbox" data-id="${l.id}" aria-label="Show ${esc(l.name)}" ${hidden.has(l.id) ? '' : 'checked'}>` +
+        `<span class="sw" style="background:${l.color}"></span><button type="button" class="nm" data-open="${l.id}" title="${esc(l.notes ? l.notes + ' (open its diagram)' : 'Open its diagram')}">${esc(l.name)}</button><span class="yr">${l.status === 'existing' ? 'today' : l.first}${v}</span></div>`;
     }
   });
   const f = document.activeElement, refocus = f && $('lines').contains(f) ? (f.dataset.id ? `[data-id="${f.dataset.id}"]` : `[data-grp="${f.dataset.grp}"]`) : null;
   $('lines').innerHTML = h;
   if (refocus) { const e = $('lines').querySelector('input' + refocus); if (e) e.focus(); }   // keyboard users keep their place
   $('lines').querySelectorAll('input[data-id]').forEach(i => i.onchange = () => { i.checked ? hidden.delete(i.dataset.id) : hidden.add(i.dataset.id); draw(); });
+  $('lines').querySelectorAll('button[data-open]').forEach(b => b.onclick = () => openLine(S.lines.findIndex(l => l.id === b.dataset.open)));
   $('lines').querySelectorAll('input[data-grp]').forEach(i => {
     const g = groups[+i.dataset.grp][1], on = g.filter(l => !hidden.has(l.id)).length;
     i.indeterminate = on > 0 && on < g.length;
