@@ -904,6 +904,7 @@ function legendDraw() {
     h += sample(`<line x1="1" y1="6" x2="37" y2="6" stroke="${grey}" stroke-width="6" stroke-dasharray="1 8" stroke-linecap="round" opacity=".7"/>`, 'Under construction');
     h += sample(`<line x1="1" y1="6" x2="37" y2="6" stroke="${grey}" stroke-width="4.5" stroke-linecap="round" opacity=".2"/>`, 'Not yet open');
     h += sample(`<line x1="1" y1="6" x2="37" y2="6" stroke="var(--water)" stroke-width="4" stroke-linecap="round"/>`, 'Waterways');
+    if (window.layerKey) h += layerKey();   // the data layer's colour key (map.html)
   }
   legend.lastElementChild.innerHTML = h;
 }
@@ -991,6 +992,6 @@ const focus = (sid, z) => {
   userMoved = true; apply();
   return true;
 };
-window.Schem = {draw, trip: (legs, yd) => trip(legs, yd), setView, setVersion, version: () => setKey, locate, focus, zoomAt, sheet: setSheet};
+window.Schem = {draw, trip: (legs, yd) => trip(legs, yd), setView, setVersion, version: () => setKey, locate, focus, zoomAt, sheet: setSheet, legend: legendDraw};
 setView(initial === 'diagram' ? 'diagram' : 'map', false);
 })();

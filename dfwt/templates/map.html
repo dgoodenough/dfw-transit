@@ -143,6 +143,10 @@ ol.strip li{display:grid;grid-template-columns:28px var(--dw) minmax(0,1fr);min-
 .strip .walk{font-size:.74rem;color:var(--muted);margin-top:3px;display:flex;flex-wrap:wrap;gap:3px;align-items:center}
 .lkey{border-top:1px solid var(--rule);margin-top:10px;padding-top:8px;font-size:.74rem;color:var(--muted);display:grid;grid-template-columns:auto 1fr;gap:4px 8px;align-items:center}
 .lkey svg{width:34px;height:22px}
+.layerOpts{display:flex;flex-direction:column;gap:6px;margin-top:8px}
+.lo{display:grid;grid-template-columns:18px minmax(0,1fr);gap:6px;align-items:start;font-size:.86rem;cursor:pointer}
+.lo input{margin:2px 0 0}.lo b{font-weight:600}.lo .hint{display:block;font-size:.76rem;line-height:1.35}
+.lo:has(input:disabled){opacity:.5;cursor:default}
 </style>
 </head>
 <body>
@@ -172,6 +176,12 @@ ol.strip li{display:grid;grid-template-columns:28px var(--dw) minmax(0,1fr);min-
   <details id="foryou">
     <summary>What it means for you</summary>
     <div id="foryouBody" class="foryou"></div>
+  </details>
+  <details id="layersBox">
+    <summary>Data layers</summary>
+    <div class="hint" style="margin-top:6px">The model’s numbers for each area (2020 census block groups), for the year and plan selected. Tap an area on the map for its numbers.</div>
+    <div id="layerOpts" class="layerOpts"></div>
+    <div id="layerNote" class="hint" aria-live="polite"></div>
   </details>
   <details open>
     <summary>Trip planner</summary>
@@ -503,7 +513,7 @@ function drawLines() {
     }
     for (const [ln, path] of strokes) {
       const w = weightOf(ln.mode), col = lineColor(ln.color, ln.mode);
-      const open = () => openLine(S.lines.indexOf(ln));   // tap a line: its diagram
+      const open = ev => { ev.originalEvent._dfwtHit = 1; openLine(S.lines.indexOf(ln)); };   // tap a line: its diagram
       if (pass === 'future') L.polyline(path, {...opts, lineCap: 'butt', color: col, weight: w, opacity: .18, interactive: true}).on('click', open).addTo(lineLayer);
       else if (pass === 'building') L.polyline(path, {...opts, color: col, weight: w + 1.5, opacity: .7, dashArray: '1 8', interactive: true}).on('click', open).addTo(lineLayer);
       else {
@@ -559,7 +569,7 @@ function drawStations() {
       : {radius: 3.3 * zf(), color: lineColor(ln.color, ln.mode), weight: z < 12 ? 1.5 : 2, fillColor: paper, fillOpacity: 1}).addTo(stLayer);
     const at0 = L.latLng(ll.lat, ll.lng);
     shownAt.set(sid, at0);
-    m.on('click', () => { choose(sid); openStation(sid, at0); });
+    m.on('click', ev => { ev.originalEvent._dfwtHit = 1; choose(sid); openStation(sid, at0); });
     m.bindTooltip(stLabel(sid));
   }
   // the open station popup stays open (refreshed) while its station is still drawn
@@ -807,6 +817,149 @@ $('lineBody').addEventListener('click', e => {
   openStation(sid, shownAt.get(sid) || ll);
 });
 document.addEventListener('keydown', e => { if (e.key === 'Escape' && lineOpenId !== null && !e.target.closest('.leaflet-popup')) closeLine(); });
+// ---- data layers: the model's numbers for each area (2020 block groups, drawn as the land
+// nearest each one's centre: dfwt/layers.py), year by year for the selected plan. Kept every
+// few model years; the map interpolates between. Loaded on first use from docs/layers/.
+const LAYERS = D.layers || {years: [], plans: []};
+const DL = window.DFWT_LAYERS = window.DFWT_LAYERS || {};
+const SEQ = dark ? ['#0d366b', '#104281', '#184f95', '#256abf', '#3987e5', '#6da7ec', '#9ec5f4']
+                 : ['#cde2fb', '#9ec5f4', '#6da7ec', '#3987e5', '#256abf', '#184f95', '#0d366b'];
+const DIV = dark ? ['#b52f2f', '#e06664', '#f0a6a4', '#383835', '#9ec5f4', '#5598e7', '#2a78d6']
+                 : ['#b52f2f', '#e87472', '#f4c5c3', '#f0efec', '#b7d3f6', '#5598e7', '#1c5cab'];
+const kfmt = v => Math.abs(v) >= 1e6 ? +(v / 1e6).toFixed(1) + 'M' : Math.abs(v) >= 1000 ? +(v / 1000).toFixed(Math.abs(v) < 1e4 ? 1 : 0) + 'k' : String(Math.round(v));
+const sgn = v => (v > 0 ? '+' : v < 0 ? '−' : '') + kfmt(Math.abs(v));
+// each layer: its name, a line on what it is, its breaks and colours, and its value per area
+const LAYER_DEFS = {
+  pop: {name: 'Residents', unit: 'per km²', about: 'Residents per km², with the model’s growth: regional, plus development near new stations.',
+    breaks: [250, 500, 1000, 2000, 4000, 8000], colors: SEQ, val: (v, i) => v.pop[i] / A.area[i]},
+  jobs: {name: 'Jobs', unit: 'per km²', about: 'Jobs per km², with the model’s growth.',
+    breaks: [250, 500, 1000, 2500, 5000, 10000], colors: SEQ, val: (v, i) => v.jobs[i] / A.area[i]},
+  popGrow: {name: 'Residents gained since 2025', unit: 'per km²', about: 'Change in residents per km² since 2025. Development near new stations draws some growth from elsewhere, so a few areas lose.',
+    breaks: [-250, -50, -10, 10, 50, 250], colors: DIV, signed: true, val: (v, i, v0) => (v.pop[i] - v0.pop[i]) / A.area[i]},
+  jobsGrow: {name: 'Jobs gained since 2025', unit: 'per km²', about: 'Change in jobs per km² since 2025.',
+    breaks: [-250, -50, -10, 10, 50, 250], colors: DIV, signed: true, val: (v, i, v0) => (v.jobs[i] - v0.jobs[i]) / A.area[i]},
+  reach: {name: `Jobs reachable in ${LAYERS.reachMin || 45} min by transit`, unit: 'jobs', about: `Jobs a resident reaches by rail or BRT in ${LAYERS.reachMin || 45} minutes door to door (walk, feeder bus or park and ride, waits and rides by the clock).`,
+    breaks: [10000, 50000, 100000, 250000, 500000, 1000000], colors: SEQ, val: (v, i) => v.reach[i]},
+  beats: {name: 'Commutes where transit beats driving', unit: '% of commutes', about: 'Share of residents’ commutes where transit is the better trip in the model (faster all in, or close enough with the cost of driving and parking).',
+    breaks: [1, 5, 10, 20, 35, 50], colors: SEQ, pct: true, val: (v, i) => v.beats[i]},
+};
+let layerKey0 = null, A = null, zonePolys = null, areaPop = null, areaSel = null;   // areaSel: the tapped area
+try { const k = localStorage.getItem('dfwt.layer'); if (LAYER_DEFS[k]) layerKey0 = k; } catch (e) { /* no storage */ }
+map.createPane('data').style.cssText = 'z-index:330;pointer-events:none';
+const dataR = L.canvas({pane: 'data', padding: .3}), dataLayer = L.layerGroup().addTo(map);
+function loadScript(src) {
+  return new Promise((ok, fail) => { const s = document.createElement('script'); s.src = src; s.onload = ok; s.onerror = fail; document.head.appendChild(s); });
+}
+async function layerData(key) {
+  if (!DL._zones) await loadScript('layers/zones.js');
+  if (!DL[key]) await loadScript(`layers/${key}.js`);
+  if (!A) {   // shapes: integers (lat, lon x 1e4), the first point then differences
+    A = DL._zones;
+    zonePolys = A.poly.map(p => { const pts = []; let a = 0, b = 0;
+      for (let k = 0; k < p.length; k += 2) { a += p[k]; b += p[k + 1]; pts.push([a / 1e4, b / 1e4]); } return pts; });
+  }
+  const P = DL[key];
+  if (!P._v) {   // values: each year after the first as a change from the one before; scaled back
+    const scale = {pop: 10, jobs: 10, reach: 100, beats: 1};
+    P._v = P.years.map(() => ({}));
+    for (const [k, f] of Object.entries(scale)) {
+      let acc = null;
+      P[k].forEach((row, t) => { acc = acc ? acc.map((x, i) => x + row[i]) : row.slice(); P._v[t][k] = Float32Array.from(acc, x => x * f); });
+    }
+  }
+  return P;
+}
+// the selected year's values, between the two nearest kept years
+function layerAt(P, Y) {
+  const ys = P.years; let t = ys.findIndex(y => y >= Y);
+  if (t < 0) t = ys.length - 1;
+  if (ys[t] === Y || t === 0) return P._v[t];
+  const a = P._v[t - 1], b = P._v[t], w = (Y - ys[t - 1]) / (ys[t] - ys[t - 1]), out = {};
+  for (const k of Object.keys(a)) out[k] = a[k].map((x, i) => x + (b[k][i] - x) * w);
+  return out;
+}
+const classOf = (def, x) => { let c = 0; while (c < def.breaks.length && x >= def.breaks[c]) c++; return c; };
+let layerDrawn = null, layerBusy = false;
+async function drawLayer() {
+  const key = scenKey, def = LAYER_DEFS[layerKey0], Y = D.years[yi];
+  if (!def || !LAYERS.plans.includes(key)) {
+    dataLayer.clearLayers(); layerDrawn = null; closeArea(); legendRedraw(); return;
+  }
+  let P;
+  try { P = await layerData(key); } catch (e) { layerNote('The data layers didn’t load (they sit beside the map, in layers/).'); return; }
+  if (key !== scenKey || def !== LAYER_DEFS[layerKey0] || Y !== D.years[yi]) return;   // changed while loading
+  const v = layerAt(P, Y), v0 = P._v[0];
+  if (layerDrawn === null) zonePolys.forEach((pts, i) => L.polygon(pts, {renderer: dataR, pane: 'data', interactive: false, stroke: false, fillOpacity: dark ? .55 : .6}).addTo(dataLayer));
+  const ls = dataLayer.getLayers();
+  for (let i = 0; i < ls.length; i++) { const c = def.colors[classOf(def, def.val(v, i, v0))]; ls[i].setStyle({fillColor: c}); }
+  layerDrawn = layerKey0;
+  if (areaSel !== null) openArea(areaSel);
+  legendRedraw();
+}
+const legendRedraw = () => { if (window.Schem && Schem.legend) Schem.legend(); };
+const layerNote = t => { const n = $('layerNote'); if (n) n.textContent = t; };
+// the colour key, in the map legend (schematic.js legendDraw)
+window.layerKey = () => {
+  const def = LAYER_DEFS[layerDrawn];
+  if (!def) return '';
+  const lab = x => def.pct ? x + '%' : def.signed ? sgn(x) : kfmt(x), b = def.breaks;
+  const rows = def.colors.map((c, k) => [c, k === 0 ? (def.signed ? `${lab(b[0])} or less` : `under ${lab(b[0])}`)
+    : k === b.length ? `${lab(b[k - 1])} or more` : def.signed && k === 3 ? 'about the same' : `${lab(b[k - 1])} to ${lab(b[k])}`]);
+  return `<div class="lk"><b>${esc(def.name)}</b> <span>${esc(def.unit)}, ${D.years[yi]}</span></div>` +
+    rows.map(([c, t]) => `<div class="r"><svg aria-hidden="true"><rect x="1" y="1" width="27" height="10" rx="2" fill="${c}" fill-opacity="${dark ? .75 : .8}"/></svg><span>${t}</span></div>`).join('') +
+    '<div class="lk"><span>Tap an area for its numbers</span></div>';
+};
+// the panel's chooser
+function layerChooser() {
+  const ok = LAYERS.plans.includes(scenKey);
+  $('layerOpts').innerHTML = [['', 'None', ''], ...Object.entries(LAYER_DEFS).map(([k, d]) => [k, d.name, d.about])]
+    .map(([k, n, about]) => `<label class="lo"><input type="radio" name="layer" value="${k}" ${(layerKey0 || '') === k ? 'checked' : ''} ${ok || !k ? '' : 'disabled'}><span><b>${esc(n)}</b>${about ? `<span class="hint">${esc(about)}</span>` : ''}</span></label>`).join('');
+  layerNote(ok ? '' : 'No data layers for this plan.');
+  $('layerOpts').querySelectorAll('input').forEach(i => i.onchange = () => {
+    layerKey0 = i.value || null;
+    try { localStorage.setItem('dfwt.layer', layerKey0 || ''); } catch (e) { /* no storage */ }
+    drawLayer();
+  });
+}
+// tap an area: its numbers in the selected year
+const inPoly = (pts, lat, lon) => { let c = false;
+  for (let i = 0, j = pts.length - 1; i < pts.length; j = i++) {
+    const [ai, bi] = pts[i], [aj, bj] = pts[j];
+    if ((ai > lat) !== (aj > lat) && lon < (bj - bi) * (lat - ai) / (aj - ai) + bi) c = !c;
+  } return c; };
+let areaAt = null, areaRing = null;
+function openArea(i) {
+  const P = DL[scenKey]; if (!P || !P._v) return;
+  const Y = D.years[yi], v = layerAt(P, Y), v0 = P._v[0], ar = A.area[i], n = x => Math.round(x).toLocaleString();
+  const dens = x => Math.round(x / ar).toLocaleString();
+  const ch = (x, x0) => Y > P.years[0] ? ` (${x - x0 >= 0 ? '+' : '−'}${n(Math.abs(x - x0))} since ${P.years[0]})` : '';
+  const between = P.years.includes(Y) ? '' : `; between the model’s ${P.years.filter(y => y < Y).pop()} and ${P.years.find(y => y > Y)} numbers`;
+  if (!areaPop) {
+    areaPop = L.popup({...panelPad(), className: 'areaPop'});
+    areaPop.on('remove', () => { areaSel = null; if (areaRing) { map.removeLayer(areaRing); areaRing = null; } });
+  }
+  if (areaSel !== i) {
+    if (areaRing) map.removeLayer(areaRing);
+    areaRing = L.polygon(zonePolys[i], {pane: 'data', renderer: dataR, interactive: false, fill: false, color: css('--ink'), weight: 2}).addTo(map);
+  }
+  areaPop.setContent(`<div class="pop"><b>This area in ${Y}</b><div class="m">` +
+    `${n(v.pop[i])} residents${ch(v.pop[i], v0.pop[i])}, ${dens(v.pop[i])} per km²<br>` +
+    `${n(v.jobs[i])} jobs${ch(v.jobs[i], v0.jobs[i])}, ${dens(v.jobs[i])} per km²<br>` +
+    `${n(v.reach[i])} jobs within ${LAYERS.reachMin || 45} min by transit<br>` +
+    `Transit beats driving for ${Math.round(v.beats[i])}% of its commutes</div>` +
+    `<div class="hint" style="margin-top:4px">${esc(S.label)} · a 2020 census block group, ${ar < 1 ? ar.toFixed(2) : ar.toFixed(1)} km²${between}</div></div>`);
+  if (!map.hasLayer(areaPop)) areaPop.setLatLng(areaAt).openOn(map);
+  areaSel = i;
+}
+const closeArea = () => { if (areaPop && map.hasLayer(areaPop)) map.closePopup(areaPop); };
+map.on('click', e => {
+  if (!layerDrawn || e.originalEvent._dfwtHit || !A) return;   // a line or a station took the tap
+  const i = zonePolys.findIndex(pts => inPoly(pts, e.latlng.lat, e.latlng.lng));
+  if (i < 0) return;
+  closeArea();
+  areaAt = e.latlng;
+  openArea(i);
+});
 map.on('zoomend', () => { drawLines(); drawStations(); });   // offsets and weights are in screen pixels
 function draw() {
   const Y = D.years[yi], prevY = yi ? D.years[yi - 1] : -Infinity;
@@ -817,6 +970,7 @@ function draw() {
   intervalSummary(Y, prevY, stateFn());
   metrics(); forYou(); lineList(); if (ends[0] && ends[1]) replan(false);
   if (lineOpenId !== null) lineView();
+  drawLayer();
   if (window.Schem) Schem.draw();  // schematic: redraw the diagram view
 }
 function intervalSummary(Y, prevY, state) {
@@ -1626,8 +1780,9 @@ function stationList() {
   S._byName = byName; S._label = label;
 }
 stationList();
+layerChooser();
 $('slider').oninput = e => { yi = +e.target.value; draw(); };
-$('scen').onchange = e => { scenKey = e.target.value; S = D.scen[scenKey]; stationList(); draw(); };   // hidden lines stay hidden
+$('scen').onchange = e => { scenKey = e.target.value; S = D.scen[scenKey]; stationList(); layerChooser(); draw(); };   // hidden lines stay hidden
 $('allOn').onclick = () => { hidden.clear(); draw(); };
 $('allOff').onclick = () => { S.lines.forEach(l => hidden.add(l.id)); draw(); };
 let timer = null;

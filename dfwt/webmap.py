@@ -8,7 +8,7 @@ are the access rules its door-to-door trips use (dfwt/tripplan.py).
 import json
 import os
 
-from . import bundle, config, demand, schematic, tripplan
+from . import bundle, config, demand, layers, schematic, tripplan
 from .graph import YearGraph
 
 TEMPLATE = os.path.join(os.path.dirname(__file__), "templates", "map.html")
@@ -194,6 +194,8 @@ def write(nets, evals, out_path):
     # diagram view (dfwt/schematic.py): one layout per version (schematic.VERSIONS): Rail, BRT
     # (every BRT line, the 2M arterial grid too) and All (rail and the plan's BRT corridors).
     data["schem"] = schematic.build(nets)
+    # data layers (dfwt/layers.py): per-area numbers by year, in scripts the page loads on demand
+    data["layers"] = layers.write(zones, evals, os.path.join(os.path.dirname(out_path), "layers"))
     with open(TEMPLATE, encoding="utf-8") as f:
         html = f.read()
     css, js = (open(p, encoding="utf-8").read() for p in SCHEM_FILES)

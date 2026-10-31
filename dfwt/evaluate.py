@@ -15,7 +15,7 @@ import os
 
 import numpy as np
 
-from . import config, demand, growth
+from . import config, demand, growth, layers
 from .geo import Projector
 from .graph import YearGraph
 from .network import Network
@@ -88,6 +88,8 @@ def run_year(ctx, net, year, want_loads=True, inputs=None):
     near = growth.near_stations(z, net, year, 800)
     res["pop_800m"], res["jobs_800m"] = float(z.pop[near].sum()), float(z.jobs[near].sum())
     res["capture"] = getattr(z, "capture", {})
+    if layers.keep(ctx.cfg, year):   # the map's data layers: this year's numbers for each area
+        res["zone"] = layers.zone_values(z, od, res)
     rc = ctx.cfg["ridership"]
     res["daily_trips"] = res["transit_commuters"] * rc["round_trip"] / rc["work_share_of_transit_trips"]
     if want_loads:
