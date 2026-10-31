@@ -1,6 +1,6 @@
 """Map data layers: the model's numbers for each area, year by year, for the map's Data layers
 toggle (docs/map.html): residents, jobs, jobs reachable by transit in 45 minutes, and the
-share of residents' commutes where transit beats driving.
+share of residents' commutes made by transit.
 
 The areas are the 2020 block groups the model runs on (demand.Zones). Their boundaries aren't
 in the repository, only their centroids, so each is drawn as its Voronoi cell (the land nearer
@@ -33,14 +33,14 @@ def keep(cfg, year):
 
 def zone_values(z, od, res):
     """This year's per-area numbers (float32 arrays): residents, jobs, jobs reachable by transit
-    within REACH_MIN clock minutes, and the share of commutes from the area where transit beats
-    driving (the model's competitive commutes)."""
+    within REACH_MIN clock minutes, and the share of commutes from the area made by transit (the
+    mode choice's expected riders over all commutes from it)."""
     reach = res["jobs_reach"]
     t = REACH_MIN if REACH_MIN in reach else max(reach)
     out = od.sum(axis=1)
-    beats = np.divide(res["comp_from"], out, out=np.zeros_like(out, dtype=float), where=out > 0)
+    share = np.divide(res["rid_from"], out, out=np.zeros_like(out, dtype=float), where=out > 0)
     return {"pop": z.pop.astype(np.float32), "jobs": z.jobs.astype(np.float32),
-            "reach": reach[t].astype(np.float32), "beats": beats.astype(np.float32)}
+            "reach": reach[t].astype(np.float32), "transit": share.astype(np.float32)}
 
 
 def _clip(poly, nx, ny, c):
@@ -119,10 +119,10 @@ def write(zones, evals, out_dir):
             continue
         years = years or kept
         rs = [ev["results"][y]["zone"] for y in kept]
-        # residents and jobs to the nearest 10 (as tens), jobs reached in hundreds, shares in %;
+        # residents and jobs to the nearest 10 (as tens), jobs reached in hundreds, shares in 0.1%;
         # each year after the first as the change from the one before
         q = {"pop": lambda a: np.rint(a / 10), "jobs": lambda a: np.rint(a / 10),
-             "reach": lambda a: np.rint(a / 100), "beats": lambda a: np.rint(a * 100)}
+             "reach": lambda a: np.rint(a / 100), "transit": lambda a: np.rint(a * 1000)}
         obj = {"years": kept}
         for k, fq in q.items():
             m = np.array([fq(r[k]) for r in rs], dtype=np.int64)

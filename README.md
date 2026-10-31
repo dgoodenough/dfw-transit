@@ -41,7 +41,7 @@ selected year drawn faint, with the year they open.
 **Data layers** colour the map with the model's numbers for each area (2020 census block
 groups, drawn as the land nearest each one's centre), for the selected year and plan:
 residents and jobs per km² and how many each has gained since 2025, jobs reachable by
-transit in 45 minutes, and the share of commutes where transit beats driving. Tap an area
+transit in 45 minutes, and the share of commutes made by transit. Tap an area
 for its numbers. The build keeps them every five model years
 ([`dfwt/layers.py`](dfwt/layers.py)); the map interpolates between.
 

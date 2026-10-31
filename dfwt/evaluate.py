@@ -172,7 +172,7 @@ _POOL = {}
 
 def _slim(r, keep_loads):
     """What the reports and the map need from a run_year result (no matrices)."""
-    out = {k: v for k, v in r.items() if k not in ("graph", "flows", "comp_from", "comp_to", "jobs_reach",
+    out = {k: v for k, v in r.items() if k not in ("graph", "flows", "comp_from", "comp_to", "rid_from", "jobs_reach",
                                                       "walk_min_dist", "hop_load", "boardings")}
     out["n_st"] = r["graph"].n_st
     out["n_lines"] = len({run.line.id for run in r["graph"].runs})

@@ -51,7 +51,7 @@ class WriteTests(unittest.TestCase):
         res = {}
         for y in (2025, 2030, 2035):
             res[y] = {"zone": {"pop": rng.uniform(0, 5000, z.n), "jobs": rng.uniform(0, 3000, z.n),
-                               "reach": rng.uniform(0, 4e5, z.n), "beats": rng.uniform(0, .6, z.n)}}
+                               "reach": rng.uniform(0, 4e5, z.n), "transit": rng.uniform(0, .6, z.n)}}
         res[2026] = {}   # a year the layers don't keep
         with tempfile.TemporaryDirectory() as d:
             meta = layers.write(z, {"plan": {"results": res}}, d)
@@ -62,8 +62,8 @@ class WriteTests(unittest.TestCase):
         obj = json.loads(src[src.index("] = ") + 4:src.rindex(";")])
         pop = np.cumsum(np.array(obj["pop"]), axis=0) * 10   # changes from the year before, in tens
         self.assertTrue(np.allclose(pop[2], res[2035]["zone"]["pop"], atol=5))
-        beats = np.cumsum(np.array(obj["beats"]), axis=0)
-        self.assertTrue(np.allclose(beats[1], res[2030]["zone"]["beats"] * 100, atol=0.5))
+        share = np.cumsum(np.array(obj["transit"]), axis=0) / 10   # in 0.1%
+        self.assertTrue(np.allclose(share[1], res[2030]["zone"]["transit"] * 100, atol=0.05))
 
     def test_kept_years(self):
         cfg = {"years": list(range(2025, 2101))}

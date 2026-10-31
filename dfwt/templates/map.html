@@ -840,8 +840,8 @@ const LAYER_DEFS = {
     breaks: [-250, -50, -10, 10, 50, 250], colors: DIV, signed: true, val: (v, i, v0) => (v.jobs[i] - v0.jobs[i]) / A.area[i]},
   reach: {name: `Jobs reachable in ${LAYERS.reachMin || 45} min by transit`, unit: 'jobs', about: `Jobs a resident reaches by rail or BRT in ${LAYERS.reachMin || 45} minutes door to door (walk, feeder bus or park and ride, waits and rides by the clock).`,
     breaks: [10000, 50000, 100000, 250000, 500000, 1000000], colors: SEQ, val: (v, i) => v.reach[i]},
-  beats: {name: 'Commutes where transit beats driving', unit: '% of commutes', about: 'Share of residents’ commutes where transit is the better trip in the model (faster all in, or close enough with the cost of driving and parking).',
-    breaks: [1, 5, 10, 20, 35, 50], colors: SEQ, pct: true, val: (v, i) => v.beats[i]},
+  transit: {name: 'Commutes by transit', unit: '% of commutes', about: 'Share of residents’ commutes made by rail or BRT, as the model’s mode choice expects (time, waits and changes against driving).',
+    breaks: [2, 5, 10, 15, 25, 40], colors: SEQ, pct: true, val: (v, i) => v.transit[i]},
 };
 let layerKey0 = null, A = null, zonePolys = null, areaPop = null, areaSel = null;   // areaSel: the tapped area
 try { const k = localStorage.getItem('dfwt.layer'); if (LAYER_DEFS[k]) layerKey0 = k; } catch (e) { /* no storage */ }
@@ -860,7 +860,7 @@ async function layerData(key) {
   }
   const P = DL[key];
   if (!P._v) {   // values: each year after the first as a change from the one before; scaled back
-    const scale = {pop: 10, jobs: 10, reach: 100, beats: 1};
+    const scale = {pop: 10, jobs: 10, reach: 100, transit: .1};
     P._v = P.years.map(() => ({}));
     for (const [k, f] of Object.entries(scale)) {
       let acc = null;
@@ -946,7 +946,7 @@ function openArea(i) {
     `${n(v.pop[i])} residents${ch(v.pop[i], v0.pop[i])}, ${dens(v.pop[i])} per km²<br>` +
     `${n(v.jobs[i])} jobs${ch(v.jobs[i], v0.jobs[i])}, ${dens(v.jobs[i])} per km²<br>` +
     `${n(v.reach[i])} jobs within ${LAYERS.reachMin || 45} min by transit<br>` +
-    `Transit beats driving for ${Math.round(v.beats[i])}% of its commutes</div>` +
+    `${v.transit[i] < 10 ? v.transit[i].toFixed(1) : Math.round(v.transit[i])}% of its residents’ commutes by transit</div>` +
     `<div class="hint" style="margin-top:4px">${esc(S.label)} · a 2020 census block group, ${ar < 1 ? ar.toFixed(2) : ar.toFixed(1)} km²${between}</div></div>`);
   if (!map.hasLayer(areaPop)) areaPop.setLatLng(areaAt).openOn(map);
   areaSel = i;
