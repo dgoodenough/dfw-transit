@@ -38,6 +38,12 @@ Tap a line (on the map, on the diagram, or its name in the Lines list) for its *
 diagram**, Wikipedia style: every stop top to bottom with the lines you can change to,
 lines sharing its track as stripes alongside, and stops and re-routes still to come in the
 selected year drawn faint, with the year they open.
+**Data layers** colour the map with the model's numbers for each area (2020 census block
+groups, drawn as the land nearest each one's centre), for the selected year and plan:
+residents and jobs per km² and how many each has gained since 2025, jobs reachable by
+transit in 45 minutes, and the share of commutes made by transit. Tap an area
+for its numbers. The build keeps them every five model years
+([`dfwt/layers.py`](dfwt/layers.py)); the map interpolates between.
 
 A **Map / Diagram** toggle switches the same page to a Washington-Metro-style
 schematic: octilinear lines, bundled corridors and capsule interchanges, laid
@@ -226,7 +232,7 @@ dfwt/       the Python model, CLI, map template
 data/       census/LODES zones and OSM extracts (inputs)
 results/    per-scenario CSV outputs (generated)
 reports/    RESULTS + VALIDATION (generated), panel review, design standards, known issues
-docs/       the story (index.html) and the interactive map (map.html), generated; published on GitHub Pages
+docs/       the story (index.html), the interactive map (map.html) and its data layers (layers/), generated; published on GitHub Pages
 index.html  redirect so the Pages site root opens docs/
 tools/      migrate_v1.py and apply_v2_changes.py (how v2 was derived), fetch_waterways.py
 tests/      unit tests

@@ -536,6 +536,7 @@ def evaluate(zones, od, net, graph, cfg, want_loads=True):
     riders = s["rid_w"] + float((f * rid_p).sum())
     comp_from = s["comp_from_w"] + (f[:, None] * s["comp_from_p"].reshape(ns, nz)).sum(axis=0)
     comp_to = s["comp_to_w"] + (f[:, None] * s["comp_to_p"].reshape(ns, nz)).sum(axis=0)
+    rid_from = s["rid_from_w"] + (f[:, None] * s["rid_from_p"].reshape(ns, nz)).sum(axis=0)
     tt_sum = s["tt_w_sum"] + float((f * s["tt_p_sum"]).sum())
     flows = s["flows_w"] + f[:, None] * s["flows_p"] if want_loads else None
     by_mode = s["mode_w"]
@@ -556,6 +557,7 @@ def evaluate(zones, od, net, graph, cfg, want_loads=True):
         "active_commuters": s["active_commuters"],
         "comp_from": comp_from,
         "comp_to": comp_to,
+        "rid_from": rid_from,
         "jobs_reach": jobs_reach,
         "access_jobs": {t: float((jobs_reach[t] * pop).sum() / pop.sum()) for t in jobs_reach},
         "avg_transit_min": tt_sum / comp_total if comp_total else 0.0,
@@ -606,8 +608,10 @@ def _sweep(zones, od, T, segs, cfg, nz, ns, fixed, want_loads, light=False):
     comp_w, rid_w, tt_w_sum, feed_w, act_w = 0.0, 0.0, 0.0, 0.0, 0.0
     mode_w = np.zeros(len(ACCESS_MODES))
     comp_from_w, comp_to_w = np.zeros(nz), np.zeros(nz)
+    rid_from_w = np.zeros(nz)   # riders by home zone (the map's transit share layer)
     comp_p, rid_p, tt_p_sum, feed_p = np.zeros(ns), np.zeros(ns), np.zeros(ns), np.zeros(ns)
     comp_from_p, comp_to_p = np.zeros(ns * nz), np.zeros(ns * nz)
+    rid_from_p = np.zeros(ns * nz)
     flows_w = np.zeros((ns, ns)) if want_loads else None
     flows_p = np.zeros((ns, ns)) if want_loads else None
 
@@ -620,6 +624,7 @@ def _sweep(zones, od, T, segs, cfg, nz, ns, fixed, want_loads, light=False):
         feed_w += float((rq * ((Am == FEEDER).astype(np.float32) + (Em == FEEDER))).sum())
         mode_w[:] += np.bincount(Am.ravel(), weights=rq.ravel(), minlength=len(ACCESS_MODES))
         comp_from_w[i0:i1] += q.sum(axis=1)
+        rid_from_w[i0:i1] += rq.sum(axis=1)
         comp_to_w[:] += q.sum(axis=0)
         if want_loads:
             sel = rq > 0
@@ -702,6 +707,7 @@ def _sweep(zones, od, T, segs, cfg, nz, ns, fixed, want_loads, light=False):
                 zi = np.broadcast_to(np.arange(i0, i1)[:, None], (m, nz))[p]
                 zj = np.broadcast_to(np.arange(nz)[None, :], (m, nz))[p]
                 comp_from_p += np.bincount(ap * nz + zi, weights=q[p], minlength=ns * nz)
+                rid_from_p += np.bincount(ap * nz + zi, weights=rq[p], minlength=ns * nz)
                 comp_to_p += np.bincount(ap * nz + zj, weights=q[p], minlength=ns * nz)
                 if want_loads:
                     sel = p & (rq > 0)
@@ -710,6 +716,7 @@ def _sweep(zones, od, T, segs, cfg, nz, ns, fixed, want_loads, light=False):
     return {"comp_w": comp_w, "rid_w": rid_w, "tt_w_sum": tt_w_sum, "feed_w": feed_w, "mode_w": mode_w,
             "active_commuters": act_w,
             "comp_from_w": comp_from_w, "comp_to_w": comp_to_w, "comp_p": comp_p, "rid_p": rid_p,
+            "rid_from_w": rid_from_w, "rid_from_p": rid_from_p,
             "tt_p_sum": tt_p_sum, "feed_p": feed_p, "comp_from_p": comp_from_p, "comp_to_p": comp_to_p,
             "flows_w": flows_w, "flows_p": flows_p}
 

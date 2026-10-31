@@ -15,7 +15,7 @@ import os
 
 import numpy as np
 
-from . import config, demand, growth
+from . import config, demand, growth, layers
 from .geo import Projector
 from .graph import YearGraph
 from .network import Network
@@ -88,6 +88,8 @@ def run_year(ctx, net, year, want_loads=True, inputs=None):
     near = growth.near_stations(z, net, year, 800)
     res["pop_800m"], res["jobs_800m"] = float(z.pop[near].sum()), float(z.jobs[near].sum())
     res["capture"] = getattr(z, "capture", {})
+    if layers.keep(ctx.cfg, year):   # the map's data layers: this year's numbers for each area
+        res["zone"] = layers.zone_values(z, od, res)
     rc = ctx.cfg["ridership"]
     res["daily_trips"] = res["transit_commuters"] * rc["round_trip"] / rc["work_share_of_transit_trips"]
     if want_loads:
@@ -170,7 +172,7 @@ _POOL = {}
 
 def _slim(r, keep_loads):
     """What the reports and the map need from a run_year result (no matrices)."""
-    out = {k: v for k, v in r.items() if k not in ("graph", "flows", "comp_from", "comp_to", "jobs_reach",
+    out = {k: v for k, v in r.items() if k not in ("graph", "flows", "comp_from", "comp_to", "rid_from", "jobs_reach",
                                                       "walk_min_dist", "hop_load", "boardings")}
     out["n_st"] = r["graph"].n_st
     out["n_lines"] = len({run.line.id for run in r["graph"].runs})
