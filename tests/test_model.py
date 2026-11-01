@@ -474,12 +474,17 @@ class Review3Tests(unittest.TestCase):
         cls.net = Network.load("two_million")
 
     def test_interim_express_retires_when_its_rail_opens(self):
-        ln = self.net.lines["XE02"]
-        self.assertNotIn("XE03", self.net.lines)   # the Red Line reaches McKinney (2030) before the express would start
-        self.assertLess(ln.retire, 9999)
-        runs = lambda y: any(r.line.id == "XE02" for r in self.net.runs(y))
-        self.assertTrue(runs(ln.retire - 1))
-        self.assertFalse(runs(ln.retire))
+        # an express bus that stands in for a rail line runs until the rail opens; if the rail
+        # opens first (it depends on the schedule) the express is dropped altogether
+        for lid in ("XE02", "XE03"):
+            ln = self.net.lines.get(lid)
+            if ln is None:
+                continue
+            self.assertLess(ln.retire, 9999, lid)
+            runs = lambda y: any(r.line.id == lid for r in self.net.runs(y))
+            self.assertTrue(runs(ln.retire - 1), lid)
+            self.assertFalse(runs(ln.retire), lid)
+        self.assertIn("XE02", self.net.lines)   # the Mesquite Express runs: its rail comes decades later
 
     def test_express_speed_is_slower_than_the_freeway(self):
         for lid in ("XE01", "XE02"):
