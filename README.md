@@ -217,9 +217,8 @@ The model: 4,276 census block groups (2020 population, 2022 LODES jobs) as
 zones. Walk or park-and-ride to stations, wait half the headway, and ride at
 speeds that depend on stop spacing. A transfer costs 5 minutes. Each trip is
 compared with a peak-hour drive whose speed rises with distance (local streets, then
-freeway). Commute flows come from LODES when the raw
-file is present ([`data/README.md`](data/README.md)); otherwise they come from a
-gravity model, so trust the comparisons more than the absolute counts. Limits
+freeway). Commute flows are the Census's LEHD LODES home-to-work pairs for 2022,
+summed to tract pairs ([`data/README.md`](data/README.md)). Limits
 and backlog: [`reports/KNOWN_ISSUES.md`](reports/KNOWN_ISSUES.md).
 
 ## Repository layout

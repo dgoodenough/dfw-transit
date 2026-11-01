@@ -30,7 +30,7 @@ def write_results(ctx, nets, evals):
          f"Demand source: **{ctx.od_source}** "
          + ("(LODES home-work flows)." if ctx.od_source == "lodes" else
             "(gravity model from 2020 census population and 2022 LODES jobs, fitted to a ~17 km mean "
-            "commute; drop LODES OD into `data/raw/od_tracts.csv` to use real flows). Trust comparisons "
+            "commute; `python tools/fetch_lodes.py` fetches the real flows). Trust comparisons "
             "between plans and lines more than absolute counts."),
          "", "Definitions: *daily boardings* = weekday boardings on the modeled rail and BRT network "
          "(local buses are not modeled), estimated from the commute model with a mode-choice logit calibrated "

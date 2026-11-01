@@ -10,11 +10,11 @@
 | `fw_rivers.json`, `dfw_yards.json`, `dfw_poi.json`, `dfw_hoods.json`, `dfw_gazetteer.json`, `dfw_route_stops.json` | OpenStreetMap extracts (© OpenStreetMap contributors, ODbL) | v1 audits and naming (archived); kept for the v2 backlog |
 | `metros/<id>/` | inputs for any US metro gathered by `python -m metro fetch <id>`: block-group zones, LODES OD, existing transit from GTFS, Overture roads/rail, `meta.json` (see `metro/README.md`) | the metro-agnostic planner |
 
-## Optional: real commute flows
+## Commute flows
 
-The model synthesizes commute flows with a gravity model unless it finds
-`data/raw/od_tracts.csv` (columns `h_tract,w_tract,jobs`). To use real flows,
-download `tx_od_main_JT00_2022.csv.gz` from the LEHD LODES 8 site, aggregate it
-to tract pairs for counties 113, 439, 085, 121, 397, 251, 139, 367, 257
-(the v1 script `archive/v1/data/build_od.ps1` does exactly this), and save it
-there. `python -m dfwt build` then reports `Demand source: lodes`.
+`lodes_od_tracts_2022.csv.gz` holds the real commute flows: LEHD LODES 8 home-to-work pairs
+(all jobs, 2022, both ends in Texas), summed to tract pairs within counties 113, 439, 085,
+121, 397, 251, 139, 367 and 257. It has 827,288 pairs and 3,318,762 commutes, in columns
+`h_tract,w_tract,jobs`. `python tools/fetch_lodes.py` downloads and rebuilds it. If the file
+(`config.json` -> `demand.lodes_od_path`) is missing, the model falls back to a gravity model,
+and `python -m dfwt build` reports `Demand source: gravity` instead of `lodes`.
