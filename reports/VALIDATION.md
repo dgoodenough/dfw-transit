@@ -311,8 +311,8 @@ info DANGLING: 8, info LONG_STUB: 3, info NEAR_MISS: 9, info SPACING: 255, info 
 - **DANGLING** FW Red: terminus Benbrook has no transfer within 600 m
 - **DANGLING** White Settlement BRT: terminus Lockheed Gate has no transfer within 600 m
 - **DANGLING** Riverside-Forest Hill BRT: terminus Melinda / California has no transfer within 600 m
-- **DANGLING** DNT West: terminus Frankford / Vail has no transfer within 600 m
 - **DANGLING** DNT West: terminus Elsie Faye Heggins / M Wright has no transfer within 600 m
+- **DANGLING** DNT West: terminus Frankford / Vail has no transfer within 600 m
 - **DANGLING** SH-360 Line: terminus Lake Port Village has no transfer within 600 m
 - **NEAR_MISS** Fort Worth Central and Fort Worth T&P are 832 m apart with no transfer link
 - **NEAR_MISS** Pennsylvania / Main and Pennsylvania / Henderson are 780 m apart with no transfer link
@@ -368,7 +368,7 @@ info DANGLING: 8, info LONG_STUB: 3, info NEAR_MISS: 9, info SPACING: 330, info 
 
 ## `two_million`
 
-info DANGLING: 50, info LONG_STUB: 5, info NEAR_MISS: 20, info SPACING: 432, info STAGE_DRIFT: 74, warn CURVE_RADIUS: 22, warn HAIRPIN: 10, warn INTERVAL_TOO_BIG: 8, warn STAGE_TOO_BIG: 17
+info DANGLING: 50, info LONG_STUB: 5, info NEAR_MISS: 20, info SPACING: 434, info STAGE_DRIFT: 72, warn CURVE_RADIUS: 22, warn HAIRPIN: 10, warn INTERVAL_TOO_BIG: 8, warn STAGE_TOO_BIG: 17
 
 ### warn
 
@@ -415,19 +415,19 @@ info DANGLING: 50, info LONG_STUB: 5, info NEAR_MISS: 20, info SPACING: 432, inf
 - **STAGE_TOO_BIG** Silver Line: stage 1 is 44.5 km (limit 15 km for metro)
 - **STAGE_TOO_BIG** Beltline Line: stage 8 is 27.4 km (limit 25 km for brt)
 - **STAGE_TOO_BIG** Beltline Line: stage 9 is 25.1 km (limit 25 km for brt)
-- **INTERVAL_TOO_BIG** Beltline Line: 2070: 78.0 km opens in one interval (limit 40 km for brt)
 - **INTERVAL_TOO_BIG** I-30 / FW Blue Line: 2038: 29.9 km opens in one interval (limit 25 km for metro)
 - **STAGE_TOO_BIG** SH-360 Line: stage 2 is 17.8 km (limit 15 km for metro)
+- **INTERVAL_TOO_BIG** SH-360 Line: 2075: 34.3 km opens in one interval (limit 25 km for metro)
 - **STAGE_TOO_BIG** FW Crosstown Loop: stage 5 is 29.1 km (limit 25 km for brt)
 - **STAGE_TOO_BIG** Legacy Line: stage 1 is 44.7 km (limit 15 km for metro)
 - **INTERVAL_TOO_BIG** Legacy Line: 2046: 44.7 km opens in one interval (limit 25 km for metro)
 - **STAGE_TOO_BIG** Gainesville Line: stage 2 is 89.7 km (limit 50 km for commuter)
 - **INTERVAL_TOO_BIG** Gainesville Line: 2083: 107.4 km opens in one interval (limit 80 km for commuter)
 - **STAGE_TOO_BIG** Sherman Line: stage 2 is 58.5 km (limit 50 km for commuter)
-- **INTERVAL_TOO_BIG** Sherman Line: 2079: 85.4 km opens in one interval (limit 80 km for commuter)
+- **INTERVAL_TOO_BIG** Sherman Line: 2078: 85.4 km opens in one interval (limit 80 km for commuter)
 - **STAGE_TOO_BIG** SH-121 BRT: stage 1 is 25.4 km (limit 25 km for brt)
 - **STAGE_TOO_BIG** Greenville Line: stage 1 is 54.7 km (limit 50 km for commuter)
-- **INTERVAL_TOO_BIG** SH-114 Line: 2066: 35.1 km opens in one interval (limit 25 km for metro)
+- **INTERVAL_TOO_BIG** SH-114 Line: 2065: 35.1 km opens in one interval (limit 25 km for metro)
 - **STAGE_TOO_BIG** Stemmons-Brookhollow BRT: stage 1 is 28.3 km (limit 25 km for brt)
 
 ### info
@@ -864,33 +864,35 @@ info DANGLING: 50, info LONG_STUB: 5, info NEAR_MISS: 20, info SPACING: 432, inf
 - **SPACING** I-35E Express: long 7.9 km gap Zang / Illinois -> Union Station (band 0.3-1.6)
 - **SPACING** Mesquite Express: long 7.1 km gap Main / Galloway -> Emporium / Town East (band 0.3-1.6)
 - **SPACING** Mesquite Express: long 19.0 km gap Emporium / Town East -> Pearl/Arts District (band 0.3-1.6)
+- **SPACING** McKinney Express: long 13.4 km gap McKinney -> Allen (band 0.3-1.6)
+- **SPACING** McKinney Express: long 8.9 km gap Allen -> Parker Road (band 0.3-1.6)
 - **DANGLING** FW Green: terminus Woodhaven has no transfer within 600 m
 - **DANGLING** FW Pink: terminus Everman has no transfer within 600 m
 - **DANGLING** FW Red: terminus Benbrook has no transfer within 600 m
 - **DANGLING** White Settlement BRT: terminus Lockheed Gate has no transfer within 600 m
 - **DANGLING** Riverside-Forest Hill BRT: terminus Melinda / California has no transfer within 600 m
-- **DANGLING** DNT West: terminus Frankford / Vail has no transfer within 600 m
 - **DANGLING** DNT West: terminus Elsie Faye Heggins / M Wright has no transfer within 600 m
+- **DANGLING** DNT West: terminus Frankford / Vail has no transfer within 600 m
 - **DANGLING** SH-360 Line: terminus Lake Port Village has no transfer within 600 m
 - **DANGLING** Buckner Boulevard BRT: terminus Murdock Road has no transfer within 600 m
 - **DANGLING** Illinois-Lake June BRT: terminus Lake June / Peachtree has no transfer within 600 m
 - **DANGLING** Illinois-Lake June BRT: terminus Cockrell Hill Road / Illinois has no transfer within 600 m
-- **DANGLING** Hampton-Westmoreland BRT: terminus Camp Wisdom / Chaucer has no transfer within 600 m
 - **DANGLING** Hampton-Westmoreland BRT: terminus Bickers / Hampton has no transfer within 600 m
+- **DANGLING** Hampton-Westmoreland BRT: terminus Camp Wisdom / Chaucer has no transfer within 600 m
 - **DANGLING** Kiest-Ledbetter BRT: terminus Kiest / Walton Walker has no transfer within 600 m
 - **DANGLING** Kiest-Ledbetter BRT: terminus Julius Schepps / Simpson Stuart has no transfer within 600 m
 - **DANGLING** Garland Broadway BRT: terminus Galloway / Ridgeview has no transfer within 600 m
-- **DANGLING** Park Boulevard BRT: terminus Hebron Parkway / Midway Road has no transfer within 600 m
 - **DANGLING** Park Boulevard BRT: terminus Park / Shiloh has no transfer within 600 m
+- **DANGLING** Park Boulevard BRT: terminus Hebron Parkway / Midway Road has no transfer within 600 m
 - **DANGLING** Coit Road BRT: terminus Coit / Kit has no transfer within 600 m
 - **DANGLING** Coit Road BRT: terminus Coit / Canoe has no transfer within 600 m
 - **DANGLING** Preston Road BRT: terminus Preston / Alpha has no transfer within 600 m
-- **DANGLING** Spring Creek-Legacy BRT: terminus Spring Creek / Tennyson has no transfer within 600 m
 - **DANGLING** Spring Creek-Legacy BRT: terminus Greenville Avenue / Ridgemont has no transfer within 600 m
+- **DANGLING** Spring Creek-Legacy BRT: terminus Spring Creek / Tennyson has no transfer within 600 m
 - **DANGLING** McKinney Lake Forest BRT: terminus Wilmeth Road has no transfer within 600 m
 - **DANGLING** Flower Mound-Lewisville BRT: terminus Flower Mound Road has no transfer within 600 m
-- **DANGLING** Denton UNT-TWU BRT: terminus Spencer / Loop 288 has no transfer within 600 m
 - **DANGLING** Denton UNT-TWU BRT: terminus Bonnie Brae Street has no transfer within 600 m
+- **DANGLING** Denton UNT-TWU BRT: terminus Spencer / Loop 288 has no transfer within 600 m
 - **DANGLING** Hurst-Euless-Bedford BRT: terminus Bedford Euless / Strummer has no transfer within 600 m
 - **DANGLING** Hurst-Euless-Bedford BRT: terminus Amon Carter / FAA has no transfer within 600 m
 - **DANGLING** Cooper Street BRT: terminus Cooper / Beady has no transfer within 600 m
@@ -945,7 +947,7 @@ info DANGLING: 50, info LONG_STUB: 5, info NEAR_MISS: 20, info SPACING: 432, inf
 - **STAGE_DRIFT** E18: 26 segment years in line_segments.csv differ from stages.csv (stages win; update or ignore the stored years)
 - **STAGE_DRIFT** E19: 38 segment years in line_segments.csv differ from stages.csv (stages win; update or ignore the stored years)
 - **STAGE_DRIFT** E21: 66 segment years in line_segments.csv differ from stages.csv (stages win; update or ignore the stored years)
-- **STAGE_DRIFT** E22: 33 segment years in line_segments.csv differ from stages.csv (stages win; update or ignore the stored years)
+- **STAGE_DRIFT** E22: 30 segment years in line_segments.csv differ from stages.csv (stages win; update or ignore the stored years)
 - **STAGE_DRIFT** E23: 35 segment years in line_segments.csv differ from stages.csv (stages win; update or ignore the stored years)
 - **STAGE_DRIFT** E24: 30 segment years in line_segments.csv differ from stages.csv (stages win; update or ignore the stored years)
 - **STAGE_DRIFT** E25: 4 segment years in line_segments.csv differ from stages.csv (stages win; update or ignore the stored years)
@@ -982,13 +984,11 @@ info DANGLING: 50, info LONG_STUB: 5, info NEAR_MISS: 20, info SPACING: 432, inf
 - **STAGE_DRIFT** XB17: 18 segment years in line_segments.csv differ from stages.csv (stages win; update or ignore the stored years)
 - **STAGE_DRIFT** XB19: 10 segment years in line_segments.csv differ from stages.csv (stages win; update or ignore the stored years)
 - **STAGE_DRIFT** XB20: 13 segment years in line_segments.csv differ from stages.csv (stages win; update or ignore the stored years)
-- **STAGE_DRIFT** XB21: 11 segment years in line_segments.csv differ from stages.csv (stages win; update or ignore the stored years)
 - **STAGE_DRIFT** XB24: 12 segment years in line_segments.csv differ from stages.csv (stages win; update or ignore the stored years)
 - **STAGE_DRIFT** XB25: 13 segment years in line_segments.csv differ from stages.csv (stages win; update or ignore the stored years)
 - **STAGE_DRIFT** XB26: 11 segment years in line_segments.csv differ from stages.csv (stages win; update or ignore the stored years)
+- **STAGE_DRIFT** XB27: 11 segment years in line_segments.csv differ from stages.csv (stages win; update or ignore the stored years)
 - **STAGE_DRIFT** XB28: 15 segment years in line_segments.csv differ from stages.csv (stages win; update or ignore the stored years)
-- **STAGE_DRIFT** XB29: 14 segment years in line_segments.csv differ from stages.csv (stages win; update or ignore the stored years)
-- **STAGE_DRIFT** XB31: 14 segment years in line_segments.csv differ from stages.csv (stages win; update or ignore the stored years)
 - **STAGE_DRIFT** XB32: 13 segment years in line_segments.csv differ from stages.csv (stages win; update or ignore the stored years)
 - **STAGE_DRIFT** XB33: 6 segment years in line_segments.csv differ from stages.csv (stages win; update or ignore the stored years)
 - **STAGE_DRIFT** XB34: 15 segment years in line_segments.csv differ from stages.csv (stages win; update or ignore the stored years)
@@ -1004,7 +1004,7 @@ info DANGLING: 50, info LONG_STUB: 5, info NEAR_MISS: 20, info SPACING: 432, inf
 - **STAGE_DRIFT** XE01: 4 segment years in line_segments.csv differ from stages.csv (stages win; update or ignore the stored years)
 - **STAGE_DRIFT** XE02: 2 segment years in line_segments.csv differ from stages.csv (stages win; update or ignore the stored years)
 - **STAGE_DRIFT** XE03: 2 segment years in line_segments.csv differ from stages.csv (stages win; update or ignore the stored years)
-- **STAGE_DRIFT** XP01: 24 segment years in line_segments.csv differ from stages.csv (stages win; update or ignore the stored years)
+- **STAGE_DRIFT** XP01: 19 segment years in line_segments.csv differ from stages.csv (stages win; update or ignore the stored years)
 - **STAGE_DRIFT** XP02: 16 segment years in line_segments.csv differ from stages.csv (stages win; update or ignore the stored years)
 - **STAGE_DRIFT** XP05: 21 segment years in line_segments.csv differ from stages.csv (stages win; update or ignore the stored years)
 - **STAGE_DRIFT** XP06: 12 segment years in line_segments.csv differ from stages.csv (stages win; update or ignore the stored years)

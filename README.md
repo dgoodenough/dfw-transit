@@ -129,11 +129,11 @@ led to thirteen steps, and v2 implements the ones the data supports
 
 | | v1 plan | v2 plan (budget-constrained) | **2 million riders (default)** |
 |---|---|---|---|
-| Daily transit trips, 2050 (each trip counted once) | 331k | 370k | **919k** |
-| Daily transit trips, 2100 | 654k | 778k | **1.99M** (1.73M if growth follows the county forecasts; 1.23M on the low growth path) |
-| Daily boardings, all modes, 2100 | 1.06M | 1.28M | **3.60M** |
-| Jobs the average resident reaches in 45 min by transit, 2100 (clock time) | 140k | 174k | **304k** |
-| Capital through 2100 (2025 $, lines, stations, garages) | $112.2B | $103.4B | **$135.2B** |
+| Daily transit trips, 2050 (each trip counted once) | 326k | 370k | **890k** |
+| Daily transit trips, 2100 | 628k | 740k | **1.90M** (1.65M if growth follows the county forecasts; 1.18M on the low growth path) |
+| Daily boardings, all modes, 2100 | 1.01M | 1.21M | **3.42M** |
+| Jobs the average resident reaches in 45 min by transit, 2100 (clock time) | 140k | 174k | **302k** |
+| Capital through 2100 (2025 $, lines, stations, garages) | $112.2B | $103.3B | **$135.0B** |
 | Operating cost, 2100 (per year: trains, buses, feeder buses, late-night service) | $2.6B | $2.7B | **$4.9B** |
 | Validation: errors / islands | 1 / 10 | 0 / 0 | 0 / 0 |
 
@@ -142,9 +142,9 @@ infill stations, the D2 subway downtown, the Red Line on to McKinney, regional r
 2090s, through-running regional rail, frequent service, 15-minute feeder buses, bike and walk access, moderate upzoning with 20% of
 growth steered to station areas, and parking pricing (downtown prices double by 2050, $5/day at the densest job centers). With the
 2026 review's more realistic model (a 5-minute transfer penalty, faster driving on long trips, slower BRT, operating cost per
-train-hour) it falls just short of 2 million: **about 2.0M daily trips in 2100 on the mid growth path, 1.7M if growth follows
+train-hour) and the real 2022 commute flows (LODES), it falls short of 2 million: **about 1.9M daily trips in 2100 on the mid growth path, 1.65M if growth follows
 the county forecasts out to Collin and Denton, 1.2M on the low path**, so read the headline as a range. Today's network with
-no expansion (the current track) carries about 185k in 2100, or 327k with the plan's parking and access policies: the network
+no expansion (the current track) carries about 177k in 2100, or 311k with the plan's parking and access policies: the network
 itself multiplies ridership about 6 times, the network and policies together about 11. It stays within the flat $2.3B/yr budget for lines, stations and garages at 2025 peer unit costs that fall 25% by
 2055 as a steady program matures; feeder buses and operations are extra (see `scenarios/two_million/config.json`).
 Ridership is a model estimate calibrated to today's ~80k rail
@@ -217,9 +217,8 @@ The model: 4,276 census block groups (2020 population, 2022 LODES jobs) as
 zones. Walk or park-and-ride to stations, wait half the headway, and ride at
 speeds that depend on stop spacing. A transfer costs 5 minutes. Each trip is
 compared with a peak-hour drive whose speed rises with distance (local streets, then
-freeway). Commute flows come from LODES when the raw
-file is present ([`data/README.md`](data/README.md)); otherwise they come from a
-gravity model, so trust the comparisons more than the absolute counts. Limits
+freeway). Commute flows are the Census's LEHD LODES home-to-work pairs for 2022,
+summed to tract pairs ([`data/README.md`](data/README.md)). Limits
 and backlog: [`reports/KNOWN_ISSUES.md`](reports/KNOWN_ISSUES.md).
 
 ## Repository layout

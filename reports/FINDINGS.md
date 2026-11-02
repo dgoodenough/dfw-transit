@@ -2,80 +2,75 @@
 
 Analyses run outside the build, kept for reference. Not shown on the map or the story page.
 
-## Transit commute mode share against peer metros (2026-11-01)
+## Transit commute mode share against peer metros (2026-11-01, revised for real commute flows)
 
 **Question:** where would DFW's transit share of commutes rank against other US metros,
 with and without the plan?
 
-**The model's share** is transit commuters (rail and BRT, with feeder buses) as a share of
-all commutes, from `results/<plan>/years.csv`. Commutes are `demand.total_commutes` (3.32M)
-scaled with jobs. Riders already allow for working from home (`ridership.telework` 0.85), so
-the denominator is all workers, as in the Census figures.
+**Peers, 2023:** ACS 1-year table B08301, from the Census bulk file
+`www2.census.gov/programs-surveys/acs/summary_file/2023/table-based-SF/data/1YRData/acsdt1y2023-b08301.dat`.
+The share is public transportation (excluding taxi) over all workers, including those who work
+from home. Rank is among the 39 largest metros found (Cleveland's code didn't match).
+
+| Rank | Metro | Transit share |
+|---|---|---|
+| 1 | New York | 26.6% |
+| 2 | San Francisco-Oakland | 10.1% |
+| 3 | Boston | 9.3% |
+| 4 | Chicago | 8.5% |
+| 5 | Washington DC | 8.2% |
+| 6 | Philadelphia | 6.4% |
+| 7 | Seattle | 5.7% |
+| 8 | Honolulu | 5.3% |
+| 9 | Pittsburgh | 3.6% |
+| 10 | Baltimore | 3.4% |
+| 11 | Los Angeles | 3.3% |
+| 12 | Portland | 3.0% |
+| 14 | Miami | 2.8% |
+| 16 | Denver | 2.3% |
+| 19 | Minneapolis-St Paul | 2.1% |
+| 21 | Atlanta | 1.5% |
+| 22 | Houston | 1.4% |
+| 25 | Phoenix | 1.2% |
+| 31 | Charlotte | 0.9% |
+| 32 | Austin | 0.9% |
+| **36** | **Dallas-Fort Worth** | **0.71%** |
+| 39 | Kansas City | 0.56% |
+
+**The model's share** is transit commuters (rail and BRT, with feeder buses) over all commutes,
+after the switch to LODES flows (v2.16). Commutes are 3.32M scaled with jobs. Riders already
+allow for working from home (`ridership.telework` 0.85), so the denominator matches the Census.
 
 | Plan | 2025 | 2050 | 2100 |
 |---|---|---|---|
-| Current track (no plan) | 0.58% | 0.66% | 0.72% |
-| Budget plan (v2) | 0.58% | 1.88% | 3.04% |
-| 2 million riders | 0.58% | 4.63% | 7.61% |
+| Current track (no plan) | 0.57% | 0.65% | 0.70% |
+| Budget plan | 0.57% | 1.88% | 2.90% |
+| 2 million riders | 0.57% | 4.48% | 7.28% |
 
-**Local buses aren't in the model.** It is calibrated to today's 80k rail boardings, so its 0.58%
-for 2025 is rail only. The Census puts all transit at about 1.0% of DFW workers in 2023,
-which leaves roughly 0.4 points on local buses. Adding that back, assuming it holds:
-- the current track stays about 1.1% in 2100;
-- the budget plan reaches about 3.4%;
-- the 2 million plan reaches about 5.0% by 2050 and 8.0% by 2100.
+The model's 0.57% for 2025 is rail only, calibrated to today's 80k rail boardings. The Census
+puts all transit at 0.71%, so local buses carry about another 0.14 points. Adding that:
 
-**Peers in 2023** (share of workers commuting by public transit):
-
-| Metro | Share | Source |
-|---|---|---|
-| New York | 23.8% | ACS 2023 1-year, via Cox (New Geography) |
-| San Francisco-Oakland | 10.3% | ACS 2019-2023 5-year, via censusdepth.com |
-| Boston | 9.0% | 5-year, as above |
-| Chicago | 8.2% | 5-year, as above |
-| Washington DC | 7.9% | 5-year, as above |
-| Philadelphia | 6.5% | 5-year, as above |
-| Seattle | 5.8% | 5-year, as above |
-| *United States* | *3.5%* | ACS 2023, via Cox |
-| Denver | 2.6% | 5-year, as above |
-| Milwaukee | 2.2% | 5-year, as above |
-| Houston | about 2% | ACS 2024, rounded, via autoinsurance.com (less reliable) |
-| Atlanta | about 1% | as above |
-| **Dallas-Fort Worth** | **1.0% or less** | ACS 2023 1-year, via Cox: with Austin, Charlotte and Virginia Beach-Norfolk, despite their rail spending |
-
-APTA's 2026 Fact Book gives slightly higher figures for the top group: San Francisco 10.9%,
-Boston 9.8%, Chicago 9.0%, Washington 9.0%, Philadelphia 7.3%, Seattle 6.3%. The order is the
-same.
-
-**Where DFW would rank, against today's peers:**
-- **Without the plan (current track):** about 1% in 2100. Still near the bottom of the large
-  metros, with Atlanta, Austin and Charlotte.
-- **Budget plan:** about 3.4% by 2100. Above Denver and Houston, about today's national
-  average, well short of Seattle.
-- **2 million plan:** about 5% by 2050, between Denver and Seattle. About 8% by 2100, level with
-  Washington DC and Chicago today, behind only New York, San Francisco and Boston. In other
-  words, roughly 5th among US metros.
+- **No plan:** about 0.85% in 2100. Still about 36th of the 40 largest; the region grows
+  around a network that barely grows.
+- **Budget plan:** about 3.0% by 2100, around 12th today: Portland, Los Angeles (3.3%),
+  Baltimore (3.4%).
+- **2 million plan:** about 4.6% by 2050, between Seattle (5.7%) and Pittsburgh (3.6%), about
+  9th. About 7.4% by 2100, between Philadelphia (6.4%) and Washington (8.2%), about 6th.
 
 **Caveats:**
-- Peers move too. These compare DFW's future with other metros' present, and most of them
-  are still below their 2019 shares (Washington and Chicago were over 12%).
+- Peers move too. This compares DFW's future with other metros' 2023, and most of them are
+  still below their 2019 shares (Washington and Chicago were over 12%).
 - The model counts commutes only, scaled to all trips. Mode share here is commute share, the
   same measure the Census uses.
 - The model covers nine counties; the Census metro has eleven.
-- The 5-year figures average 2019-2023, so they include pandemic years. They run below
-  2019 levels and probably above 2023.
-- Search-snippet sources; the Census API and the pages behind them are blocked from this
-  environment. Check against ACS table B08301 before quoting.
-
-Sources: [New Geography, Work Access 2023](https://www.newgeography.com/content/008325-work-access-major-metropolitan-areas-2023);
-[censusdepth.com metro ranking](https://censusdepth.com/transit-commuters/metros);
-[APTA 2026 Public Transportation Fact Book](https://www.apta.com/wp-content/uploads/2026/04/APTA-2026-Public-Transportation-Fact-Book.pdf);
-[autoinsurance.com commuting statistics](https://www.autoinsurance.com/research/us-commuting-statistics/).
+- An earlier version of this entry used search-snippet figures, some from 5-year estimates.
+  The table above replaces them.
 
 ## Denser station areas: what more residents near the densest stations add (2026-10-31)
 
 **Question:** downtown growth looks anemic. What would 2100 ridership be if the densest
-station areas got a bigger population boost?
+station areas got a bigger population boost? (Run on the gravity-model flows, before v2.16;
+the comparisons hold, but the absolute numbers are about 4-5% high.)
 
 **Why downtowns grow slowly in the model:**
 - Growth multiplies each area's 2020 population, so downtowns, which have few residents today,

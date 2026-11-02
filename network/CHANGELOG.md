@@ -562,3 +562,36 @@ The small items left after the third review, done in one pass.
   crossing and the Parker Road turn are layout limits; earlier attempts made other areas worse.
 - **Making the lever scenarios overlays** needs the rename tool and `make_two_million.py` to
   read overlay files.
+
+## v2.16 — Real commute flows
+
+**Commute flows are now the Census's 2022 LODES home-to-work pairs.** They replace the gravity
+model, now that the build environment can reach lehd.ces.census.gov.
+- `data/lodes_od_tracts_2022.csv.gz` holds 827,288 tract pairs and 3,318,762 commutes within
+  the nine counties. `tools/fetch_lodes.py` downloads and rebuilds it.
+- The overall shape barely changes. The mean straight-line commute is 24 km in both. The real
+  flows have more short commutes (10.6% under 5 km, against 6.6%), and their corridors differ.
+- **Recalibrated** so that 2025 still carries 80k rail boardings and 2% of commuters walk or
+  bike:
+  - transit ASC 0.4062 -> 0.4296;
+  - walk/bike ASC -0.6953 -> -1.3203.
+- **The 2 million plan's line values and schedule were redone.** The median line went from
+  4.8 to 4.6 trips per $1M. 75 stages moved, mostly BRT trading places; Stemmons-Brookhollow
+  BRT moved from 2029 to 2055. The budget plan's schedule is unchanged.
+- **The McKinney Express runs again, 2032-2036.** The Red Line to McKinney moved from 2030 to
+  2036, so it no longer opens before the express bus would start. The bus serves McKinney until
+  the rail opens, as the interim-express rule intends. The test now checks the rule rather than
+  the old dates.
+
+**Headline numbers.**
+- **2 million riders:** about 890k daily trips in 2050 and **1.90M in 2100** (was 919k and
+  1.99M). That is 1.65M if growth follows the county forecasts and 1.18M on the low growth path.
+  It reaches about 302k jobs in 45 minutes.
+- **Budget plan:** about 370k in 2050 and 740k in 2100 (was 778k).
+- **Current track:** about 177k in 2100 (was 185k).
+
+Every plan is 4-5% lower in 2100. The real flows send fewer commutes along the corridors the
+lines serve than the gravity model did.
+
+**Not changed:** jobs reachable in 45 minutes, for plans whose schedule didn't change (it
+doesn't depend on commute flows); population and jobs growth; costs.

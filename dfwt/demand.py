@@ -7,6 +7,7 @@ is synthesized from zone population and jobs (see `gravity`). Either way the
 flows are expressed at block-group level.
 """
 import csv
+import gzip
 import os
 
 import numpy as np
@@ -160,7 +161,7 @@ def lodes_or_gravity(zones, cfg):
     pop_t = np.bincount(inv, weights=zones.pop, minlength=len(tracts))
     jobs_t = np.bincount(inv, weights=zones.jobs, minlength=len(tracts))
     flows = np.zeros((len(tracts), len(tracts)))
-    with open(p) as f:
+    with (gzip.open(p, "rt", encoding="utf-8") if p.endswith(".gz") else open(p, encoding="utf-8")) as f:
         for r in csv.DictReader(f):
             h, w = tix.get(r["h_tract"]), tix.get(r["w_tract"])
             if h is not None and w is not None:
