@@ -3,6 +3,7 @@
 | File | What it is | Used by |
 |---|---|---|
 | `metroplex_density.csv` | 4,276 block groups in the nine core counties: 2020 Census population + 2022 LODES WAC jobs, with centroids | demand zones (`dfwt/demand.py`) |
+| `lodes_wac_sectors_bg_2022.csv` | the same block groups' 2022 LODES WAC jobs by sector: retail (NAICS 44-45 and 72, CNS07 + CNS18), service (CNS09-17, CNS19-20), basic (the rest), plus arts, food, education and health detail. Built by `python tools/fetch_wac.py` from [tx_wac_S000_JT00_2022.csv.gz](https://lehd.ces.census.gov/data/lodes/LODES8/tx/wac/tx_wac_S000_JT00_2022.csv.gz); its job totals match `metroplex_density.csv` exactly | non-commute trip attractions (`config.json` -> `ridership.nonwork`, off by default) |
 | `tract_centroids.csv` | the same aggregated to 1,667 tracts | reference |
 | `CenPop2020_BG_TX.txt` | Census 2020 block-group centers of population (Texas) | source of the centroids |
 | `existing_geom.json`, `existing_stops.json` | today's DART/TRE/TEXRail/A-train alignments and stops (OSM) | v1 network build (archived) |

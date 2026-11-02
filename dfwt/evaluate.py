@@ -30,6 +30,23 @@ class Context:
         self.od, self.od_source = demand.lodes_or_gravity(self.zones, self.cfg)
         self._seed = (None, None)     # (congestion, gravity seed) for the last year asked
         self._year = {}               # tod_key -> (zones, od), a couple of recent entries
+        self._nw = {}                 # tod_key -> (off-peak zones, non-commute trips), likewise
+        self._nw_seed = (None, None)  # (off-peak congestion, non-commute gravity seed)
+
+    def nonwork_inputs(self, z):
+        """Off-peak zones and daily non-commute trips (demand.nonwork_od) for grown zones `z`
+        (config ridership.nonwork)."""
+        hit = self._nw.get(z.tod_key)
+        if hit:
+            return hit
+        zo = demand.nonwork_zones(z, self.cfg)
+        if self._nw_seed[0] != zo.cong:
+            self._nw_seed = (zo.cong, demand.nonwork_seed(zo, self.cfg))
+        od = demand.nonwork_od(zo, self.cfg, self._nw_seed[1])
+        if len(self._nw) >= 2:
+            self._nw.pop(next(iter(self._nw)))
+        self._nw[z.tod_key] = (zo, od)
+        return zo, od
 
     def year_inputs(self, net, year):
         """Zones grown to `year` (regional growth + TOD near this network's new
@@ -78,11 +95,23 @@ def coverage(ctx, net, year):
     return float(z.pop[near].sum() / z.pop.sum()), float(z.jobs[near].sum() / z.jobs.sum())
 
 
+def commute_cfg(cfg):
+    """The config commutes are evaluated with: as is, but with the non-commute trips modelled on
+    their own (ridership.nonwork.enabled) the commute constant is nonwork.commute_asc, calibrated
+    with them (calibrate_nonwork), so ridership.asc stays today's method's."""
+    nw = cfg["ridership"].get("nonwork") or {}
+    if not nw.get("enabled") or "commute_asc" not in nw:
+        return cfg
+    out = dict(cfg)
+    out["ridership"] = dict(cfg["ridership"], asc=nw["commute_asc"])
+    return out
+
+
 def run_year(ctx, net, year, want_loads=True, inputs=None):
     g = YearGraph(net, year)
     g.skim()
     z, od = inputs or ctx.year_inputs(net, year)
-    res = demand.evaluate(z, od, net, g, ctx.cfg, want_loads=want_loads)
+    res = demand.evaluate(z, od, net, g, commute_cfg(ctx.cfg), want_loads=want_loads)
     res["graph"] = g
     res["pop"], res["jobs"] = float(z.pop.sum()), float(z.jobs.sum())
     near = growth.near_stations(z, net, year, 800)
@@ -91,6 +120,9 @@ def run_year(ctx, net, year, want_loads=True, inputs=None):
     if layers.keep(ctx.cfg, year):   # the map's data layers: this year's numbers for each area
         res["zone"] = layers.zone_values(z, od, res)
     rc = ctx.cfg["ridership"]
+    nw = rc.get("nonwork") or {}
+    if nw.get("enabled"):
+        return _with_nonwork(ctx, net, year, g, z, res, want_loads)
     res["daily_trips"] = res["transit_commuters"] * rc["round_trip"] / rc["work_share_of_transit_trips"]
     if want_loads:
         res["hop_load"], res["boardings"], run_board = demand.assign_loads(g, res["flows"])
@@ -116,6 +148,80 @@ def run_year(ctx, net, year, want_loads=True, inputs=None):
     return res
 
 
+def _with_nonwork(ctx, net, year, g, z, res, want_loads):
+    """run_year with the non-commute trips modelled on their own (config ridership.nonwork):
+    daily trips = transit commuters x round_trip (the work trips) + non-commute transit trips
+    from their own trip table, off-peak network (headways x offpeak_headway_factor) and
+    constant. Rail boardings, feeder legs and boardings by mode add the two; hop loads and
+    station boardings stay in commuter-equivalents (non-commute riders x work share / round
+    trip), so the lines table's daily-rider conversion still holds."""
+    rc = ctx.cfg["ridership"]
+    nw = rc["nonwork"]
+    rt, ws = rc["round_trip"], rc["work_share_of_transit_trips"]
+    zo, od_n = ctx.nonwork_inputs(z)
+    hf = {k: v for k, v in (nw.get("offpeak_headway_factor") or {}).items() if k in ctx.cfg["modes"]}
+    go = YearGraph(net, year, headway_factor=hf)
+    go.skim()
+    rn = demand.evaluate(zo, od_n, net, go, demand.nonwork_cfg(ctx.cfg), want_loads=want_loads, reach=False)
+    work, other = res["transit_commuters"] * rt, rn["transit_commuters"]
+    res["work_trips"], res["nonwork_trips"] = work, other
+    res["daily_trips"] = work + other
+    res["work_share"] = work / max(work + other, 1e-9)
+    res["nonwork_from"], res["nonwork_to"] = rn["rid_from"], rn["rid_to"]
+    res["nonwork_pnr_full_garages"] = rn["pnr_full_garages"]
+    if want_loads:
+        hc, bc, rbc = demand.assign_loads(g, res["flows"])
+        hn, bn, rbn = demand.assign_loads(go, rn["flows"])
+        bpt_c = float(bc.sum()) / max(float(res["flows"].sum()), 1e-9)
+        bpt_n = float(bn.sum()) / max(float(rn["flows"].sum()), 1e-9)
+        k = ws / rt
+        res["hop_load"] = [a + b * k for a, b in zip(hc, hn)]
+        res["boardings"] = bc + bn * k
+        share = {}
+        for run, a, b in zip(g.runs, rbc, rbn):
+            share[run.line.mode] = share.get(run.line.mode, 0.0) + float(a) * rt + float(b)
+        tot = sum(share.values()) or 1.0
+        share = {m: v / tot for m, v in share.items()}
+        res["work_boardings"], res["nonwork_boardings"] = work * bpt_c, other * bpt_n
+        res["daily_boardings"] = res["work_boardings"] + res["nonwork_boardings"]
+        res["boardings_per_trip"] = res["daily_boardings"] / max(res["daily_trips"], 1e-9)
+        res["boardings_per_trip_nonwork"] = bpt_n
+    else:
+        share = None
+        res["daily_boardings"] = res["daily_trips"] * rc["boardings_per_trip"]
+    res["feeder_boardings"] = res["feeder_legs"] * rt + rn["feeder_legs"]
+    res["boardings_by_mode"] = {m: res["daily_boardings"] * share.get(m, 0.0) for m in ctx.cfg["modes"]} \
+        if share is not None else {}
+    res["boardings_by_mode"]["feeder_bus"] = res["feeder_boardings"]
+    res["all_boardings"] = res["daily_boardings"] + res["feeder_boardings"]
+    return res
+
+
+def calibrate_nonwork(ctx, net, log=None, tol=0.005):
+    """Constants with the non-commute trips on (config ridership.nonwork), for the calibration
+    year: the commute constant (nonwork.commute_asc, see commute_cfg) so work trips carry
+    nonwork.calibration.work_share of the calibration rail boardings, and the non-commute
+    constant (nonwork.asc) so non-commute trips carry the rest. Each pass's trips depend only on
+    its own constant, so the two are found one after the other, by bisection.
+    Returns (commute asc, nonwork asc)."""
+    rc = ctx.cfg["ridership"]
+    nw, cal = rc["nonwork"], rc["calibration"]
+    ws = nw["calibration"]["work_share"]
+    nw.setdefault("commute_asc", rc["asc"])
+    for key, kind, share, lo, hi in (("commute_asc", "work_boardings", ws, -4.0, 2.0),
+                                     ("asc", "nonwork_boardings", 1 - ws, -6.0, 4.0)):
+        want = cal["rail_boardings"] * share
+        for _ in range(40):
+            nw[key] = round((lo + hi) / 2, 4)
+            b = run_year(ctx, net, cal["year"])[kind]
+            if log:
+                log(f"  nonwork.{key} {nw[key]:+.4f}: {b:,.0f} {kind.replace('_', ' ')} in {cal['year']} (want {want:,.0f})")
+            if abs(b / want - 1) < tol:
+                break
+            lo, hi = (nw[key], hi) if b < want else (lo, nw[key])
+    return nw["commute_asc"], nw["asc"]
+
+
 def feeder_opex_musd(cfg, r, year):
     """Feeder buses' operating cost ($M/yr): their daily boardings x cost per boarding x days,
     plus late-night feeders (operating.late_night) as a share of that."""
@@ -132,15 +238,17 @@ def calibrate_asc(ctx, net, lo=-4.0, hi=2.0, tol=0.01, log=None):
     (e.g. a feeder bus table that starts in 2025). Returns the asc."""
     rc = ctx.cfg["ridership"]
     cal = rc["calibration"]
+    nw = rc.get("nonwork") or {}
+    own, key = (nw, "commute_asc") if nw.get("enabled") else (rc, "asc")   # see commute_cfg
     for _ in range(40):
-        rc["asc"] = round((lo + hi) / 2, 4)
+        own[key] = round((lo + hi) / 2, 4)
         b = run_year(ctx, net, cal["year"])["daily_boardings"]
         if log:
-            log(f"  asc {rc['asc']:+.4f}: {b:,.0f} boardings in {cal['year']}")
+            log(f"  asc {own[key]:+.4f}: {b:,.0f} boardings in {cal['year']}")
         if abs(b / cal["rail_boardings"] - 1) < tol:
             break
-        lo, hi = (rc["asc"], hi) if b < cal["rail_boardings"] else (lo, rc["asc"])
-    return rc["asc"]
+        lo, hi = (own[key], hi) if b < cal["rail_boardings"] else (lo, own[key])
+    return own[key]
 
 
 def calibrate(ctx, net, log=None):
@@ -172,8 +280,8 @@ _POOL = {}
 
 def _slim(r, keep_loads):
     """What the reports and the map need from a run_year result (no matrices)."""
-    out = {k: v for k, v in r.items() if k not in ("graph", "flows", "comp_from", "comp_to", "rid_from", "jobs_reach",
-                                                      "walk_min_dist", "hop_load", "boardings")}
+    out = {k: v for k, v in r.items() if k not in ("graph", "flows", "comp_from", "comp_to", "rid_from", "rid_to", "jobs_reach",
+                                                      "walk_min_dist", "hop_load", "boardings", "nonwork_from", "nonwork_to")}
     out["n_st"] = r["graph"].n_st
     out["n_lines"] = len({run.line.id for run in r["graph"].runs})
     if keep_loads:
@@ -257,6 +365,8 @@ def final_values(ctx, net, procs=None, log=print, only=None):
     measured = [l for l in cands if not only or l in only]
     jobs = [(None, "full"), (None, "none")] + [(l, m) for l in measured for m in ("without", "alone")]
     inputs = ctx.year_inputs(_all_open(net), final)
+    if (ctx.cfg["ridership"].get("nonwork") or {}).get("enabled"):
+        ctx.nonwork_inputs(inputs[0])   # once, before the workers fork
     _POOL.update(ctx=ctx, rows=rows, cands=set(cands), final=final, inputs=inputs,
                  scenario=None if net.name == "plan" else net.name)
     if procs <= 1:
