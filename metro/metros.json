@@ -41,6 +41,36 @@
         }
       ],
       "brt_name_pattern": "\\bBRT\\b|Silver Line|Rapid"
+    },
+    {
+      "id": "eugene",
+      "name": "Eugene-Springfield, OR",
+      "cbsa": "21660",
+      "state_fips": [
+        "41"
+      ],
+      "state_abbr": {
+        "41": "or"
+      },
+      "county_fips": [
+        "41039"
+      ],
+      "county_names": {
+        "41039": "Lane"
+      },
+      "downtowns": [
+        {
+          "name": "Downtown Eugene",
+          "lat": 44.0521,
+          "lon": -123.0868
+        },
+        {
+          "name": "Downtown Springfield",
+          "lat": 44.0462,
+          "lon": -123.022
+        }
+      ],
+      "brt_name_pattern": "\\bEmX\\b|\\bBRT\\b"
     }
   ]
 }
