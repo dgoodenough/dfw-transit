@@ -18,6 +18,7 @@
       "48201",
       "48291",
       "48339",
+      "48407",
       "48473"
     ],
     "county_names": {
@@ -29,6 +30,7 @@
       "48201": "Harris",
       "48291": "Liberty",
       "48339": "Montgomery",
+      "48407": "San Jacinto",
       "48473": "Waller"
     },
     "downtowns": [
@@ -42,13 +44,14 @@
   },
   "sources": {
     "cbsa_delineation": {
-      "registry_matches": null,
-      "note": "county list in metros.json not verified against the delineation file",
-      "status": "blocked",
-      "host": "www2.census.gov",
+      "status": "ok",
       "url": "https://www2.census.gov/programs-surveys/metro-micro/geographies/reference-files/2023/delineation-files/list1_2023.xlsx",
-      "error": "blocked: Tunnel connection failed: 403 Forbidden",
-      "checked_at": "2026-10-25T01:55:56+00:00"
+      "vintage": "2023 (OMB Bulletin 23-01)",
+      "cbsa_title": "Houston-Pasadena-The Woodlands, TX",
+      "registry_matches": true,
+      "missing_from_registry": [],
+      "not_in_cbsa": [],
+      "checked_at": "2026-11-02T00:42:37+00:00"
     },
     "cenpop2020": {
       "vintage": "2020 Census (P.L. 94-171), centres of population by block group",
@@ -60,55 +63,46 @@
           "status": "ok",
           "read_from": "repo copy",
           "path": "data/CenPop2020_BG_TX.txt",
-          "rows": 4154
+          "rows": 4176
         }
       ],
-      "checked_at": "2026-10-25T01:55:56+00:00"
+      "checked_at": "2026-11-02T00:42:37+00:00"
     },
     "tiger2020_bg": {
       "vintage": "TIGER/Line 2020 block groups (ALAND)",
-      "status": "blocked",
+      "status": "ok",
       "files": [
         {
           "state": "48",
           "url": "https://www2.census.gov/geo/tiger/TIGER2020/BG/tl_2020_48_bg.zip",
-          "status": "blocked",
-          "host": "www2.census.gov",
-          "error": "blocked: Tunnel connection failed: 403 Forbidden"
+          "status": "ok",
+          "rows": 4176
         }
       ],
-      "checked_at": "2026-10-25T01:55:56+00:00"
+      "checked_at": "2026-11-02T00:42:38+00:00"
     },
     "lodes_wac": {
-      "vintage": null,
-      "year": null,
-      "status": "blocked",
+      "vintage": "LODES 8, 2023, all jobs (S000/JT00, C000)",
+      "year": 2023,
+      "status": "ok",
       "files": [
         {
           "state": "48",
-          "url": "https://lehd.ces.census.gov/data/lodes/LODES8/tx/wac/tx_wac_S000_JT00_2024.csv.gz",
-          "tried": [
-            "https://lehd.ces.census.gov/data/lodes/LODES8/tx/wac/tx_wac_S000_JT00_2024.csv.gz",
-            "https://lehd.ces.census.gov/data/lodes/LODES8/tx/wac/tx_wac_S000_JT00_2023.csv.gz",
-            "https://lehd.ces.census.gov/data/lodes/LODES8/tx/wac/tx_wac_S000_JT00_2022.csv.gz",
-            "https://lehd.ces.census.gov/data/lodes/LODES8/tx/wac/tx_wac_S000_JT00_2021.csv.gz"
-          ],
-          "status": "blocked",
-          "host": "lehd.ces.census.gov",
-          "error": "blocked: Tunnel connection failed: 403 Forbidden"
+          "url": "https://lehd.ces.census.gov/data/lodes/LODES8/tx/wac/tx_wac_S000_JT00_2023.csv.gz",
+          "status": "ok"
         }
       ],
-      "checked_at": "2026-10-25T01:55:57+00:00"
+      "checked_at": "2026-11-02T00:42:39+00:00"
     },
     "mobility_database": {
       "status": "ok",
       "url": "https://storage.googleapis.com/mdb-csv/sources.csv",
-      "catalog_rows": 3613,
+      "catalog_rows": 3617,
       "selected": [
         "625",
         "2060"
       ],
-      "checked_at": "2026-10-25T01:55:57+00:00"
+      "checked_at": "2026-11-02T00:43:14+00:00"
     },
     "gtfs": {
       "status": "ok",
@@ -166,7 +160,7 @@
           "warning": "short validity window (34 days, version 'FIFA2026IVOMS_20260526'): may be a special-event or seasonal schedule rather than regular service"
         }
       ],
-      "checked_at": "2026-10-25T01:56:02+00:00"
+      "checked_at": "2026-11-02T00:43:21+00:00"
     },
     "overture_transportation": {
       "status": "ok",
@@ -177,7 +171,7 @@
         -96.6374,
         28.8123,
         -94.2623,
-        30.5882
+        30.9386
       ],
       "files": {
         "roads.parquet": {
@@ -189,51 +183,35 @@
             "secondary",
             "tertiary"
           ],
-          "rows": 143792,
-          "sha256": "b9ebf929a04c24c4710fb808358831e7ec107bc25d0ff41184b1837e69846404"
+          "rows": 151092,
+          "sha256": "79635e1c0c0f774a97cfe92d1d1ecc7a3780114563d83a4448386fdee6009ca1"
         },
         "rail.parquet": {
           "subtype": "rail",
           "classes": null,
-          "rows": 8843,
-          "sha256": "37fe3eeb424c1ca4b706b87f9229245551764826e790ce077c58f1ff4917c052"
+          "rows": 9113,
+          "sha256": "a4de155be900d110c5021ce2543b597fcc5d13a07be68b82ffa6fb41fb7e045e"
         }
       },
-      "checked_at": "2026-10-25T01:55:02+00:00"
+      "checked_at": "2026-11-02T00:43:53+00:00"
     },
     "lodes_od": {
-      "vintage": null,
-      "year": null,
-      "status": "blocked",
+      "vintage": "LODES 8, 2023, all jobs (S000)",
+      "year": 2023,
+      "status": "ok",
       "files": [
         {
           "state": "48",
-          "url": "https://lehd.ces.census.gov/data/lodes/LODES8/tx/od/tx_od_main_JT00_2024.csv.gz",
-          "tried": [
-            "https://lehd.ces.census.gov/data/lodes/LODES8/tx/od/tx_od_main_JT00_2024.csv.gz",
-            "https://lehd.ces.census.gov/data/lodes/LODES8/tx/od/tx_od_main_JT00_2023.csv.gz",
-            "https://lehd.ces.census.gov/data/lodes/LODES8/tx/od/tx_od_main_JT00_2022.csv.gz",
-            "https://lehd.ces.census.gov/data/lodes/LODES8/tx/od/tx_od_main_JT00_2021.csv.gz"
-          ],
-          "status": "blocked",
-          "host": "lehd.ces.census.gov",
-          "error": "blocked: Tunnel connection failed: 403 Forbidden"
+          "url": "https://lehd.ces.census.gov/data/lodes/LODES8/tx/od/tx_od_main_JT00_2023.csv.gz",
+          "status": "ok"
         },
         {
           "state": "48",
-          "url": "https://lehd.ces.census.gov/data/lodes/LODES8/tx/od/tx_od_aux_JT00_2024.csv.gz",
-          "tried": [
-            "https://lehd.ces.census.gov/data/lodes/LODES8/tx/od/tx_od_aux_JT00_2024.csv.gz",
-            "https://lehd.ces.census.gov/data/lodes/LODES8/tx/od/tx_od_aux_JT00_2023.csv.gz",
-            "https://lehd.ces.census.gov/data/lodes/LODES8/tx/od/tx_od_aux_JT00_2022.csv.gz",
-            "https://lehd.ces.census.gov/data/lodes/LODES8/tx/od/tx_od_aux_JT00_2021.csv.gz"
-          ],
-          "status": "blocked",
-          "host": "lehd.ces.census.gov",
-          "error": "blocked: Tunnel connection failed: 403 Forbidden"
+          "url": "https://lehd.ces.census.gov/data/lodes/LODES8/tx/od/tx_od_aux_JT00_2023.csv.gz",
+          "status": "ok"
         }
       ],
-      "checked_at": "2026-10-25T01:54:12+00:00"
+      "checked_at": "2026-11-02T00:42:39+00:00"
     },
     "overture_places": {
       "status": "ok",
@@ -249,9 +227,9 @@
   },
   "outputs": {
     "zones.csv": {
-      "rows": 4154,
-      "pop": 7122240,
-      "jobs": null,
+      "rows": 4176,
+      "pop": 7149642,
+      "jobs": 3347878,
       "jobs_in_unknown_block_groups": 0,
       "by_county": {
         "48015": 21,
@@ -262,76 +240,57 @@
         "48201": 2830,
         "48291": 53,
         "48339": 328,
+        "48407": 22,
         "48473": 27
       },
-      "empty_columns": [
-        "jobs",
-        "area_km2"
-      ],
-      "written_at": "2026-10-25T01:55:57+00:00"
+      "empty_columns": [],
+      "written_at": "2026-11-02T00:42:39+00:00"
     },
     "existing/lines.csv": {
       "rows": 44,
-      "written_at": "2026-10-25T01:56:02+00:00"
+      "written_at": "2026-11-02T00:43:21+00:00"
     },
     "existing/stations.csv": {
       "rows": 1961,
-      "written_at": "2026-10-25T01:56:02+00:00"
+      "written_at": "2026-11-02T00:43:21+00:00"
     },
     "existing/line_stops.csv": {
       "rows": 2152,
-      "written_at": "2026-10-25T01:56:02+00:00"
+      "written_at": "2026-11-02T00:43:21+00:00"
     },
     "existing/line_segments.csv": {
       "rows": 2108,
-      "written_at": "2026-10-25T01:56:02+00:00"
+      "written_at": "2026-11-02T00:43:21+00:00"
     },
     "existing/routes.csv": {
       "rows": 128,
-      "written_at": "2026-10-25T01:56:02+00:00"
+      "written_at": "2026-11-02T00:43:21+00:00"
     },
     "osm/roads.parquet": {
-      "rows": 143792,
-      "written_at": "2026-10-25T01:55:02+00:00"
+      "rows": 151092,
+      "written_at": "2026-11-02T00:43:39+00:00"
     },
     "osm/rail.parquet": {
-      "rows": 8843,
-      "written_at": "2026-10-25T01:55:02+00:00"
+      "rows": 9113,
+      "written_at": "2026-11-02T00:43:53+00:00"
     },
     "zones_places_proxy.csv": {
       "rows": 4154,
       "places": 333880,
       "proxy": true,
       "written_at": "2026-10-25T01:56:27+00:00"
+    },
+    "od_tracts.csv": {
+      "rows": 778530,
+      "written_at": "2026-11-02T00:43:14+00:00"
     }
   },
   "bbox": [
     -96.6374,
     28.8123,
     -94.2623,
-    30.5882
+    30.9386
   ],
-  "fetched_at": "2026-10-25T01:56:27+00:00",
-  "missing": [
-    {
-      "item": "zones.csv jobs",
-      "source": "lodes_wac",
-      "why": "host blocked by network policy: lehd.ces.census.gov"
-    },
-    {
-      "item": "zones.csv area_km2",
-      "source": "tiger2020_bg",
-      "why": "host blocked by network policy: www2.census.gov"
-    },
-    {
-      "item": "od_tracts.csv",
-      "source": "lodes_od",
-      "why": "host blocked by network policy: lehd.ces.census.gov"
-    },
-    {
-      "item": "CBSA county list verification",
-      "source": "cbsa_delineation",
-      "why": "host blocked by network policy: www2.census.gov"
-    }
-  ]
+  "fetched_at": "2026-11-02T00:43:53+00:00",
+  "missing": []
 }

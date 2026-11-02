@@ -345,7 +345,7 @@ class FetchPlumbingTests(unittest.TestCase):
         reg = fetch.registry()
         h = reg["houston"]
         self.assertEqual(h["cbsa"], "26420")
-        self.assertEqual(len(h["county_fips"]), 9)
+        self.assertEqual(len(h["county_fips"]), 10)   # 2023 OMB delineation, San Jacinto included
         self.assertTrue(all(len(c) == 5 and c[:2] in h["state_fips"] for c in h["county_fips"]))
 
     def test_cached_file_needs_no_network(self):

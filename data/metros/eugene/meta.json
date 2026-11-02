@@ -1,0 +1,308 @@
+{
+  "metro": {
+    "id": "eugene",
+    "name": "Eugene-Springfield, OR",
+    "cbsa": "21660",
+    "state_fips": [
+      "41"
+    ],
+    "state_abbr": {
+      "41": "or"
+    },
+    "county_fips": [
+      "41039"
+    ],
+    "county_names": {
+      "41039": "Lane"
+    },
+    "downtowns": [
+      {
+        "name": "Downtown Eugene",
+        "lat": 44.0521,
+        "lon": -123.0868
+      },
+      {
+        "name": "Downtown Springfield",
+        "lat": 44.0462,
+        "lon": -123.022
+      }
+    ],
+    "brt_name_pattern": "\\bEmX\\b|\\bBRT\\b"
+  },
+  "sources": {
+    "cbsa_delineation": {
+      "status": "ok",
+      "url": "https://www2.census.gov/programs-surveys/metro-micro/geographies/reference-files/2023/delineation-files/list1_2023.xlsx",
+      "vintage": "2023 (OMB Bulletin 23-01)",
+      "cbsa_title": "Eugene-Springfield, OR",
+      "registry_matches": true,
+      "missing_from_registry": [],
+      "not_in_cbsa": [],
+      "checked_at": "2026-11-02T00:41:26+00:00"
+    },
+    "cenpop2020": {
+      "vintage": "2020 Census (P.L. 94-171), centres of population by block group",
+      "status": "ok",
+      "files": [
+        {
+          "state": "41",
+          "url": "https://www2.census.gov/geo/docs/reference/cenpop2020/blkgrp/CenPop2020_Mean_BG41.txt",
+          "status": "ok",
+          "read_from": "download",
+          "path": "data/metros/eugene/raw/CenPop2020_Mean_BG41.txt",
+          "rows": 271
+        }
+      ],
+      "checked_at": "2026-11-02T00:41:27+00:00"
+    },
+    "tiger2020_bg": {
+      "vintage": "TIGER/Line 2020 block groups (ALAND)",
+      "status": "ok",
+      "files": [
+        {
+          "state": "41",
+          "url": "https://www2.census.gov/geo/tiger/TIGER2020/BG/tl_2020_41_bg.zip",
+          "status": "ok",
+          "rows": 271
+        }
+      ],
+      "checked_at": "2026-11-02T00:41:28+00:00"
+    },
+    "lodes_wac": {
+      "vintage": "LODES 8, 2023, all jobs (S000/JT00, C000)",
+      "year": 2023,
+      "status": "ok",
+      "files": [
+        {
+          "state": "41",
+          "url": "https://lehd.ces.census.gov/data/lodes/LODES8/or/wac/or_wac_S000_JT00_2023.csv.gz",
+          "status": "ok"
+        }
+      ],
+      "checked_at": "2026-11-02T00:41:29+00:00"
+    },
+    "lodes_od": {
+      "vintage": "LODES 8, 2023, all jobs (S000)",
+      "year": 2023,
+      "status": "ok",
+      "files": [
+        {
+          "state": "41",
+          "url": "https://lehd.ces.census.gov/data/lodes/LODES8/or/od/or_od_main_JT00_2023.csv.gz",
+          "status": "ok"
+        },
+        {
+          "state": "41",
+          "url": "https://lehd.ces.census.gov/data/lodes/LODES8/or/od/or_od_aux_JT00_2023.csv.gz",
+          "status": "ok"
+        }
+      ],
+      "checked_at": "2026-11-02T00:41:33+00:00"
+    },
+    "mobility_database": {
+      "status": "ok",
+      "url": "https://storage.googleapis.com/mdb-csv/sources.csv",
+      "catalog_rows": 3617,
+      "selected": [
+        "24",
+        "130",
+        "131",
+        "932"
+      ],
+      "checked_at": "2026-11-02T00:41:38+00:00"
+    },
+    "gtfs": {
+      "status": "ok",
+      "feeds": [
+        {
+          "mdb_source_id": "24",
+          "provider": "Rhody Express",
+          "tag": "m24",
+          "status": "ok",
+          "url": "https://storage.googleapis.com/storage/v1/b/mdb-latest/o/us-oregon-rhody-express-gtfs-24.zip?alt=media",
+          "sha256": "60619e903f530346b4af3778ef8291e8f6653923babe0c8c4dc33719c7a3ada7",
+          "feed_info": {
+            "feed_publisher_name": "Trillium Solutions, Inc.",
+            "feed_version": "UTC: 27-Feb-2026 23:03",
+            "feed_start_date": "20260227",
+            "feed_end_date": "20260901"
+          },
+          "label": "Rhody Express",
+          "service_date": "2026-03-03",
+          "trips_on_date": 30,
+          "am_window": [
+            7.0,
+            9.0
+          ],
+          "frequent_headway_min": 15.0,
+          "lines": 0,
+          "stations": 0,
+          "routes_considered": 2
+        },
+        {
+          "mdb_source_id": "130",
+          "provider": "Diamond Express",
+          "tag": "m130",
+          "status": "ok",
+          "url": "https://storage.googleapis.com/storage/v1/b/mdb-latest/o/us-oregon-diamond-express-gtfs-130.zip?alt=media",
+          "sha256": "41221e5b2f691a67c1c199247b11628be63d4af5a4521a4a01143a4b5a56b22b",
+          "feed_info": {
+            "feed_publisher_name": "Trillium Solutions, Inc.",
+            "feed_version": "UTC: 17-Feb-2026 12:34",
+            "feed_start_date": "20260216",
+            "feed_end_date": "20260831"
+          },
+          "label": "Diamond Express",
+          "service_date": "2026-02-17",
+          "trips_on_date": 8,
+          "am_window": [
+            7.0,
+            9.0
+          ],
+          "frequent_headway_min": 15.0,
+          "lines": 0,
+          "stations": 0,
+          "routes_considered": 1
+        },
+        {
+          "mdb_source_id": "131",
+          "provider": "Lane Transit District (LTD)",
+          "tag": "m131",
+          "status": "ok",
+          "url": "https://storage.googleapis.com/storage/v1/b/mdb-latest/o/us-oregon-lane-transit-district-ltd-gtfs-131.zip?alt=media",
+          "sha256": "84ccd5ec5befb0c244b1ec253894f5c68203594ff24b6afa3c56be296fc76104",
+          "feed_info": {
+            "feed_publisher_name": "Lane Transit District",
+            "feed_version": "",
+            "feed_start_date": "20250911",
+            "feed_end_date": "20260131"
+          },
+          "label": "Lane Transit District (LTD)",
+          "service_date": "2025-09-16",
+          "trips_on_date": 1338,
+          "am_window": [
+            7.0,
+            9.0
+          ],
+          "frequent_headway_min": 15.0,
+          "lines": 2,
+          "stations": 62,
+          "routes_considered": 28,
+          "warning": "stale: the feed's weekday service is over a year old; it may not match today's service"
+        },
+        {
+          "mdb_source_id": "932",
+          "provider": "Link Lane",
+          "tag": "m932",
+          "status": "ok",
+          "url": "https://storage.googleapis.com/storage/v1/b/mdb-latest/o/us-oregon-link-lane-gtfs-932.zip?alt=media",
+          "sha256": "3d6536039f851d366fd68cd913f0c831db539d8d28d593b0b35d0eb9fcf0c0cf",
+          "feed_info": {
+            "feed_publisher_name": "Trillium Solutions, Inc.",
+            "feed_version": "UTC: 21-May-2026 18:33",
+            "feed_start_date": "20260521",
+            "feed_end_date": "20261101"
+          },
+          "label": "Link Lane",
+          "service_date": "2026-05-21",
+          "trips_on_date": 14,
+          "am_window": [
+            7.0,
+            9.0
+          ],
+          "frequent_headway_min": 15.0,
+          "lines": 0,
+          "stations": 0,
+          "routes_considered": 2
+        }
+      ],
+      "checked_at": "2026-11-02T00:41:40+00:00"
+    },
+    "overture_transportation": {
+      "status": "ok",
+      "release": "2026-09-23.1",
+      "url": "s3://overturemaps-us-west-2/release/2026-09-23.1/theme=transportation/type=segment/",
+      "license": "\u00a9 OpenStreetMap contributors, ODbL 1.0 (via Overture Maps Foundation)",
+      "bbox": [
+        -124.2714,
+        43.5937,
+        -122.073,
+        44.3439
+      ],
+      "files": {
+        "roads.parquet": {
+          "subtype": "road",
+          "classes": [
+            "motorway",
+            "trunk",
+            "primary",
+            "secondary",
+            "tertiary"
+          ],
+          "rows": 7421,
+          "sha256": "b862ddb58cd9ea5dc3f28934d24ba0d7f4aab223dfd92f4f0c91e247c957102f"
+        },
+        "rail.parquet": {
+          "subtype": "rail",
+          "classes": null,
+          "rows": 470,
+          "sha256": "ed36ba8c09e77cd183c4e5b30df7a02720c0bd4789694aa6af38a6bf089ee6d6"
+        }
+      },
+      "checked_at": "2026-11-02T00:42:12+00:00"
+    }
+  },
+  "outputs": {
+    "zones.csv": {
+      "rows": 271,
+      "pop": 382971,
+      "jobs": 156880,
+      "jobs_in_unknown_block_groups": 0,
+      "by_county": {
+        "41039": 271
+      },
+      "empty_columns": [],
+      "written_at": "2026-11-02T00:41:29+00:00"
+    },
+    "od_tracts.csv": {
+      "rows": 7365,
+      "written_at": "2026-11-02T00:41:37+00:00"
+    },
+    "existing/lines.csv": {
+      "rows": 2,
+      "written_at": "2026-11-02T00:41:40+00:00"
+    },
+    "existing/stations.csv": {
+      "rows": 62,
+      "written_at": "2026-11-02T00:41:40+00:00"
+    },
+    "existing/line_stops.csv": {
+      "rows": 62,
+      "written_at": "2026-11-02T00:41:40+00:00"
+    },
+    "existing/line_segments.csv": {
+      "rows": 60,
+      "written_at": "2026-11-02T00:41:40+00:00"
+    },
+    "existing/routes.csv": {
+      "rows": 33,
+      "written_at": "2026-11-02T00:41:40+00:00"
+    },
+    "osm/roads.parquet": {
+      "rows": 7421,
+      "written_at": "2026-11-02T00:41:57+00:00"
+    },
+    "osm/rail.parquet": {
+      "rows": 470,
+      "written_at": "2026-11-02T00:42:12+00:00"
+    }
+  },
+  "bbox": [
+    -124.2714,
+    43.5937,
+    -122.073,
+    44.3439
+  ],
+  "fetched_at": "2026-11-02T00:42:12+00:00",
+  "missing": []
+}

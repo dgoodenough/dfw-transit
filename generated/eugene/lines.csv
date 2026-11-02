@@ -1,0 +1,3 @@
+line_id,name,mode,status,color,headway_min,notes
+m131_103,103 EmX,brt,existing,#7b1fa2,10.0,"GTFS Lane Transit District (LTD) route 103; 12 AM-peak trips (07:00-09:00, busier direction) on 2025-09-16; headway basis am_peak; midday headway 10.0 min"
+G01,Barger / Terry - Main Street BRT,brt,proposed,#8e24aa,,"generated (R003): 5,336 per route-km >= BRT 3,000 (< metro 7,000); 2,290 new daily trips for $0.72B capital (2.16 per $M incl. opex)"
