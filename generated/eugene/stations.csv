@@ -1,0 +1,48 @@
+station_id,name,lat,lon
+m131_02121,"Eugene Station, Bay U",44.047774,-123.093231
+m131_02506,"Springfield Station, Bay F",44.045187,-123.021662
+m131_02601,Willow Creek Facility,44.047752,-123.172165
+m131_09906,EmX Glenwood Station inbound,44.045300,-123.043249
+m131_09908,EmX Lexington Station inbound,44.045004,-123.036588
+m131_09912,F Street Station,44.051184,-123.023222
+m131_09917,RiverBend Station_clockwise,44.077884,-123.030777
+m131_09918,Sacred Heart Station_clockwise,44.079838,-123.028953
+m131_09924,Kruse Way Station_clockwise,44.081801,-123.041491
+m131_09926,Postal Way Station_clockwise,44.077522,-123.041907
+m131_09928,Gateway Sta.-Bay D (EmX to RB),44.073724,-123.042747
+m131_09933,Q Street Station inbound,44.062770,-123.026156
+m131_09934,High Street Station inbound,44.047774,-123.088698
+m131_09938,Charnelton Station Inbound,44.052491,-123.095733
+m131_09939,Monroe/6th Station Inbound,44.053208,-123.105334
+m131_09941,Polk/6th Station Inbound,44.053214,-123.112968
+m131_09943,Chambers/6th Station Inbound,44.053236,-123.119013
+m131_09945,Garfield/6th Station Inbound,44.053275,-123.122527
+m131_09947,Garfield/11th Station Inbound,44.048031,-123.123113
+m131_09950,McKinley Station Inbound,44.047948,-123.130509
+m131_09952,Oak Patch Station Inbound,44.047995,-123.135860
+m131_09954,Seneca Station Inbound,44.048045,-123.141435
+m131_09956,Bailey Hill Station Inbound,44.048144,-123.149071
+m131_09958,Sam Reynolds Station Inbound,44.048155,-123.156365
+m131_09960,Bertelsen Station Inbound,44.048131,-123.162986
+m131_09962,Commerce Station Inbound,44.048204,-123.170537
+m131_09963,EmX Hilyard Station Inbound,44.047714,-123.082545
+m131_09964,EmX Dads' Gates Station Inbound,44.047766,-123.077749
+m131_09965,EmX Agate Station Inbound,44.046519,-123.069442
+m131_09966,EmX Walnut Station Inbound,44.044832,-123.061329
+m131_09967,EmX McVay Station Inbound,44.044617,-123.030958
+m131_09968,Centennial Station Inbound,44.056919,-123.024106
+m131_09969,Hayden Bridge Station Inbound,44.070028,-123.028675
+m131_09970,International Way East Station Inbound,44.088362,-123.030268
+m131_09971,International Center Station Inbound,44.088469,-123.036294
+m131_09972,International Way Station West Inbound,44.088487,-123.042024
+m131_09973,Pavilion Station Inbound,44.082890,-123.028051
+m131_ss_arr_a,Spfld Sta South A St arrival zone,44.045268,-123.021265
+N0001,Barger Drive,44.084627,-123.188062
+N0002,Randy Papé Beltline,44.084592,-123.173267
+N0003,Barger / Taney,44.084505,-123.158492
+N0004,Highway 99N / Fairfield,44.074631,-123.147040
+N0005,Highway 99N / Roosevelt,44.062871,-123.136125
+N0006,Main / 14th Street,44.045897,-123.006714
+N0007,Main / 28th Street,44.045837,-122.986762
+N0008,Main / 42nd Street,44.045795,-122.966808
+N0009,Main / 48th Street,44.045730,-122.946854

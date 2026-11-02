@@ -1,0 +1,4 @@
+center_id,name,kind,lat,lon,activity,pop,jobs,peak_density_per_km2,peak_job_density_per_km2
+C01,11th Avenue / Pearl,downtown,44.047373,-123.090264,66986,35015,31971,11373,6995
+T01,Barger / Terry,town,44.083078,-123.192171,23290,18393,4897,3627,477
+T02,Main Street,town,44.045097,-122.943993,14222,11730,2492,3150,530

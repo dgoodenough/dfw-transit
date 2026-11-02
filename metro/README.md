@@ -187,5 +187,9 @@ Overture places as where jobs are, scaled to 0.53 jobs per resident, flagged the
 `existing/` (mode `bus`) are left out of the network, as in DFW (they are the model's feeder grid). The
 model's behavioural constants are DFW's calibration; elsewhere they are a transfer, not a fit.
 
-Results: `reports/generator_dfw_check.md` (DFW against the hand-built 2M plan), `generated/houston/report.md`
-(population only) and `generated/houston_places_proxy/report.md`.
+Results:
+- `reports/generator_dfw_check.md`: DFW against the hand-built 2M plan.
+- `generated/houston/report.md`: full Census inputs, budget scaled to DFW's per resident, $66B.
+- `generated/eugene/report.md`: a small metro (383k people), budget $3.5B, scaled the same way.
+
+The earlier population-only and places-proxy Houston runs predate Census access and were removed.

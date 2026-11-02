@@ -1,0 +1,4 @@
+cand_id,name,kind,centers,mode,km,stops,density_per_route_km,capital_musd,opex_musd_yr,trips_standalone,new_trips,trips_per_musd,peak_hour_load,status,order,mode_reason,reason
+R003,Barger / Terry - Main Street,road,T01 C01 T02,brt,21.9,21,5336,717,17.3,3215,2290,2.16,83,chosen,1,"5,336 per route-km >= BRT 3,000 (< metro 7,000)","2,290 new daily trips for $0.72B capital (2.16 per $M incl. opex)"
+R002,11th Avenue / Pearl - Main Street,road,C01 T02,brt,11.6,12,6336,375,9.2,1218,963,1.72,52,rejected,,"6,336 per route-km >= BRT 3,000 (< metro 7,000)",duplicate of existing transit
+R001,11th Avenue / Pearl - Barger / Terry,road,C01 T01,metro,10.6,10,7123,3767,30.3,2249,904,0.21,115,rejected,,"7,123 people+jobs per route-km >= metro 7,000",below 0.5 new trips per $M when its turn came (0.21)
