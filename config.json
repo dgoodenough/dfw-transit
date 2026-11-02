@@ -687,18 +687,27 @@
     },
     "pnr_asc_offset": -1.0,
     "nonwork": {
-      "_doc": "Non-commute trips modelled on their own (dfwt/demand.py nonwork_od, evaluate._with_nonwork), off by default. When enabled, daily trips = transit commuters x round_trip (work trips) + non-commute transit trips, and work_share_of_transit_trips is no longer a scale factor (only the commuter-equivalent loads use it). Purposes as in the NCTCOG regional model: home-based other (HBO: shopping, errands, meals, visits, recreation, school) and non-home-based (NHB), each a doubly-constrained gravity model on off-peak drive times, exp(-beta_per_min x minutes) (shorter reach than commutes: NHTS non-work trips are about 0.6x the length of work trips). Productions: trips_per_person x population (HBO), NHB at its attractions. Attractions per household and per retail (NAICS 44-45, 72), service and basic job (LODES WAC 2022 by block group, tools/fetch_wac.py), at NCHRP Report 365 rates. Special generators (generators): airports, the Arlington entertainment district, the Stockyards, arenas, Fair Park and universities, daily_trips on an average day (annual visitors x 2 / 365; airports: local origin-destination passengers; universities: ~1 trip per enrolled student), from homes by population x exp(-beta_per_min x drive), grown with the region's population; `pin` moves the generator's zone onto the venue for these trips; parking_usd is what parking there costs a visit (today's prices, a paid-parking district of radius_km or 1 km for these trips only). Mode choice: the commute logit with its own constant (asc, calibrated by evaluate.calibrate_nonwork so non-commute trips are 1 - calibration.work_share of 2025 transit trips; NCTCOG on-board surveys: ~43-49% home-based work), no telework, off-peak headways (x offpeak_headway_factor by mode, feeder buses too), off-peak congestion (offpeak_congestion_share of the peak's extra delay), short-stay parking (x parking_factor, no cash-out) and pnr_space_share of each garage.",
+      "_doc": "Non-commute trips modelled on their own (dfwt/demand.py nonwork_od, evaluate._with_nonwork), off by default. When enabled, daily trips = transit commuters x round_trip (work trips) + non-commute transit trips, and work_share_of_transit_trips is no longer a scale factor (only the commuter-equivalent loads use it). Purposes as in NCTCOG's TAFT model: home-based non-work (hbo: shopping, errands, meals, visits, recreation, school) and non-home-based (nhb), each a doubly-constrained gravity model on off-peak drive times, exp(-beta_per_min x minutes). Productions: trips_per_person x population (hbo), nhb at its attractions. Attractions per household and per retail (NAICS 44-45, 72), service and basic job (LODES WAC 2022 by block group, tools/fetch_wac.py). Special generators (generators): daily_trips on an average day (annual visitors x 2 / 365; airports: originating passengers; universities: ~1 trip per enrolled student), from homes by population x exp(-beta_per_min x drive), grown with the region's population; `pin` moves the generator's zone onto the venue for these trips; parking_usd is what parking there costs a visit (today's prices, a paid-parking district of radius_km or 1 km for these trips only). Mode choice: the commute logit with its own constant (asc) and time coefficients x value_of_time_ratio, calibrated by evaluate.calibrate_nonwork (work trips carry calibration.work_share of 2025 rail boardings, commute_asc; non-commute trips the rest, asc); no telework, off-peak headways (x offpeak_headway_factor by mode, feeder buses too), off-peak congestion (offpeak_congestion_share of the peak's extra delay), short-stay parking (x parking_factor, no cash-out) and pnr_space_share of each garage. Sources in _sources.",
+      "_sources": {
+        "trips_per_person": "NCTCOG, Review and Analysis of the 2009 NHTS, Tables 4 and 8: 3.67 weekday trips per person in the NCTCOG region, 56.1% home-based non-work (shopping 17.7, social/recreational 10.4, other 28.0), 30.1% non-home-based, 13.6% home-based work (https://nctcog.org/getmedia/a7bc583e-4e1f-4dd6-81a3-9a6940605146/2009NCTCOGNHTS-Review-Analysis-Final-Report.pdf)",
+        "beta_per_min": "set so mean off-peak drive minutes are 0.55x (hbo) and 0.65x (nhb) the LODES commutes' peak minutes: NCTCOG 2009 NHTS review, Table 17, mean reported duration home-based non-work 14.8 min, non-home-based 17.8, home-based work 27.2",
+        "calibration.work_share": "NCTCOG 2022-23 Regional Transit Onboard Origin-Destination Survey, Tables 46D and 46E: home-based work 55.9% of light rail and 54.1% of commuter rail trips (55.7% of rail together; 48.6% of all transit) (https://nctcog.org/getContentAsset/fa685fde-cf5c-46ff-a57d-740880d3905d/dfc3d011-8f63-43f6-9ed8-4b444333a1d0/NCT_Regional_2023Survey_FinalReport_Nov2123.pdf)",
+        "value_of_time_ratio": "NCTCOG, 2023 Transportation Conformity Appendix 12.7 (TAFT validation), section 2.6: home-based non-work value of time 50% of the hourly rate, home-based work 100% (https://nctcog.org/getmedia/b146d629-4942-4680-b584-74158bab180e/2023_Appendix_12-7.pdf). TAFT uses it in route choice; how it enters mode choice isn't published. value_of_time_on 'time' halves the time coefficients (2 million plan 2100: +4% trips over today's method), 'cost' doubles the price of money (+10%); see reports/FINDINGS.md",
+        "attraction_rates": "NCHRP Report 365 rates; TAFT uses a cross-classification by area type and basic/retail/service employment (Appendix 12.7, section 4.4) but doesn't publish its rates",
+        "generators": "TAFT treats airport passengers as their own purpose (2015 airport surveys) and hospitals, universities and K-12 with special models (ADSIP 2019-2026 report, https://nctcog.org/getContentAsset/0ebf9114-29b3-40f9-b5f5-9538d142d2fc/dfc3d011-8f63-43f6-9ed8-4b444333a1d0/ADSIP_2019_2023_and_2026_Project_Report.pdf); airport originating shares from NCTCOG's 2015 DFW and Love Field passenger surveys; venue figures are approximate",
+        "check": "2022-23 on-board survey Tables 48 and 49: airline passengers going to or from an airport make ~1,580 weekday rail boardings (light rail 471 + 597, commuter rail 240 + 275)"
+      },
       "enabled": false,
-      "asc": -0.9317,
-      "commute_asc": 0.4296,
+      "asc": -2.0547,
+      "commute_asc": 0.5821,
       "calibration": {
-        "work_share": 0.5
+        "work_share": 0.557
       },
       "sectors_path": "data/lodes_wac_sectors_bg_2022.csv",
       "persons_per_household": 2.7,
       "trips_per_person": {
-        "hbo": 1.85,
-        "nhb": 1.0
+        "hbo": 2.06,
+        "nhb": 1.1
       },
       "attraction_rates": {
         "hbo": {
@@ -714,7 +723,12 @@
           "basic": 0.5
         }
       },
-      "beta_per_min": 0.12,
+      "beta_per_min": {
+        "hbo": 0.21,
+        "nhb": 0.11
+      },
+      "value_of_time_ratio": 0.5,
+      "value_of_time_on": "time",
       "gravity_iterations": 15,
       "offpeak_congestion_share": 0.3,
       "offpeak_headway_factor": {
@@ -731,21 +745,21 @@
           "name": "DFW Airport",
           "lat": 32.8998,
           "lon": -97.0403,
-          "daily_trips": 110000,
+          "daily_trips": 145000,
           "beta_per_min": 0.02,
           "parking_usd": 20,
           "pin": true,
-          "note": "~88M passengers (2024), ~45% local origin-destination: ~108k ground trips a day; terminal garages ~$27/day, Express lots ~$12-17/day, many dropped off"
+          "note": "~88M passengers (2024), ~60% originating (NCTCOG 2015 DFW survey: 63% of 15,696 departing passengers surveyed; 1% came by DART): ~145k ground trips a day; parkers paid ~$15/day (survey), terminal garages ~$27/day"
         },
         {
           "name": "Love Field",
           "lat": 32.8471,
           "lon": -96.8518,
-          "daily_trips": 40000,
+          "daily_trips": 28000,
           "beta_per_min": 0.025,
           "parking_usd": 15,
           "pin": true,
-          "note": "~18M passengers, mostly origin-destination"
+          "note": "~18M passengers, ~56% originating (NCTCOG 2015 Love Field survey: 56% of 4,770 surveyed)"
         },
         {
           "name": "Arlington entertainment district",
