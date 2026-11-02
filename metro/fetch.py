@@ -376,8 +376,15 @@ def missing(meta):
     if g.get("status") != "ok":
         bad = [f"{f.get('provider')}: {f.get('error') or f.get('status')}" for f in g.get("feeds", []) if f.get("status") != "ok"]
         out.append({"item": "existing/", "source": "gtfs", "why": "; ".join(bad) or why("mobility_database")})
-    if src.get("cbsa_delineation", {}).get("registry_matches") is not True:
-        out.append({"item": "CBSA county list verification", "source": "cbsa_delineation", "why": why("cbsa_delineation")})
+    cb = src.get("cbsa_delineation", {})
+    if cb.get("registry_matches") is not True:
+        if cb.get("status") == "ok":   # checked, and the registry's counties differ from OMB's
+            diff = [f"not in the registry: {', '.join(cb['missing_from_registry'])}"] if cb.get("missing_from_registry") else []
+            diff += [f"not in the CBSA: {', '.join(cb['not_in_cbsa'])}"] if cb.get("not_in_cbsa") else []
+            reason = "county list differs from the OMB delineation (" + "; ".join(diff) + ")"
+        else:
+            reason = why("cbsa_delineation")
+        out.append({"item": "CBSA county list verification", "source": "cbsa_delineation", "why": reason})
     for k in ("roads.parquet", "rail.parquet"):
         if f"osm/{k}" not in outs:
             out.append({"item": f"osm/{k}", "source": "overture_transportation", "why": why("overture_transportation")})
