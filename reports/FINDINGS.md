@@ -63,6 +63,10 @@ way: +88.0k with today's method, +88.6k with non-commute trips (half work, half 
 Non-work trips don't make density matter more here: the extra residents' trip total is taken
 from elsewhere, and their many short trips (under 2 km) are walked, not ridden.
 
+**Sensitivity** (2 million plan, 2100, each recalibrated): longer non-commute trips
+(exp(-0.08 x minutes), mean 18.3 km) give 2.09M (+10%); leaving out venue parking gives 2.15M
+(+13%). The gain holds at about +10-13%.
+
 **Caveats:** trip rates, attraction rates and venue figures are national defaults or
 approximate (NCTCOG's own rates weren't reachable); the 2025 airport count (about 1,400 trip
 ends) is still below today's airport stations; one average weekday, no event peaks.
