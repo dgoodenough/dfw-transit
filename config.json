@@ -685,7 +685,172 @@
       ],
       "ride_bonus": 3.0
     },
-    "pnr_asc_offset": -1.0
+    "pnr_asc_offset": -1.0,
+    "nonwork": {
+      "_doc": "Non-commute trips modelled on their own (dfwt/demand.py nonwork_od, evaluate._with_nonwork), off by default. When enabled, daily trips = transit commuters x round_trip (work trips) + non-commute transit trips, and work_share_of_transit_trips is no longer a scale factor (only the commuter-equivalent loads use it). Purposes as in the NCTCOG regional model: home-based other (HBO: shopping, errands, meals, visits, recreation, school) and non-home-based (NHB), each a doubly-constrained gravity model on off-peak drive times, exp(-beta_per_min x minutes) (shorter reach than commutes: NHTS non-work trips are about 0.6x the length of work trips). Productions: trips_per_person x population (HBO), NHB at its attractions. Attractions per household and per retail (NAICS 44-45, 72), service and basic job (LODES WAC 2022 by block group, tools/fetch_wac.py), at NCHRP Report 365 rates. Special generators (generators): airports, the Arlington entertainment district, the Stockyards, arenas, Fair Park and universities, daily_trips on an average day (annual visitors x 2 / 365; airports: local origin-destination passengers; universities: ~1 trip per enrolled student), from homes by population x exp(-beta_per_min x drive), grown with the region's population; `pin` moves the generator's zone onto the venue for these trips; parking_usd is what parking there costs a visit (today's prices, a paid-parking district of radius_km or 1 km for these trips only). Mode choice: the commute logit with its own constant (asc, calibrated by evaluate.calibrate_nonwork so non-commute trips are 1 - calibration.work_share of 2025 transit trips; NCTCOG on-board surveys: ~43-49% home-based work), no telework, off-peak headways (x offpeak_headway_factor by mode, feeder buses too), off-peak congestion (offpeak_congestion_share of the peak's extra delay), short-stay parking (x parking_factor, no cash-out) and pnr_space_share of each garage.",
+      "enabled": false,
+      "asc": -0.9317,
+      "commute_asc": 0.4296,
+      "calibration": {
+        "work_share": 0.5
+      },
+      "sectors_path": "data/lodes_wac_sectors_bg_2022.csv",
+      "persons_per_household": 2.7,
+      "trips_per_person": {
+        "hbo": 1.85,
+        "nhb": 1.0
+      },
+      "attraction_rates": {
+        "hbo": {
+          "households": 0.7,
+          "retail": 8.4,
+          "service": 3.5,
+          "basic": 0.5
+        },
+        "nhb": {
+          "households": 0.6,
+          "retail": 4.7,
+          "service": 1.4,
+          "basic": 0.5
+        }
+      },
+      "beta_per_min": 0.12,
+      "gravity_iterations": 15,
+      "offpeak_congestion_share": 0.3,
+      "offpeak_headway_factor": {
+        "metro": 1.5,
+        "brt": 1.5,
+        "commuter": 2.0,
+        "streetcar": 1.0,
+        "feeder": 1.5
+      },
+      "parking_factor": 0.5,
+      "pnr_space_share": 0.5,
+      "generators": [
+        {
+          "name": "DFW Airport",
+          "lat": 32.8998,
+          "lon": -97.0403,
+          "daily_trips": 110000,
+          "beta_per_min": 0.02,
+          "parking_usd": 20,
+          "pin": true,
+          "note": "~88M passengers (2024), ~45% local origin-destination: ~108k ground trips a day; terminal garages ~$27/day, Express lots ~$12-17/day, many dropped off"
+        },
+        {
+          "name": "Love Field",
+          "lat": 32.8471,
+          "lon": -96.8518,
+          "daily_trips": 40000,
+          "beta_per_min": 0.025,
+          "parking_usd": 15,
+          "pin": true,
+          "note": "~18M passengers, mostly origin-destination"
+        },
+        {
+          "name": "Arlington entertainment district",
+          "lat": 32.7515,
+          "lon": -97.083,
+          "daily_trips": 55000,
+          "beta_per_min": 0.03,
+          "parking_usd": 25,
+          "radius_km": 1.3,
+          "note": "AT&T Stadium, Globe Life Field, Choctaw Stadium, Texas Live!, Six Flags, Hurricane Harbor: ~10M visits a year; event and park lots $25-60"
+        },
+        {
+          "name": "Fort Worth Stockyards",
+          "lat": 32.789,
+          "lon": -97.3468,
+          "daily_trips": 33000,
+          "beta_per_min": 0.03,
+          "parking_usd": 10,
+          "note": "~6M visits a year (claims range 3-9M); paid lots ~$10-20"
+        },
+        {
+          "name": "Fair Park",
+          "lat": 32.7793,
+          "lon": -96.7598,
+          "daily_trips": 20000,
+          "beta_per_min": 0.035,
+          "parking_usd": 20,
+          "note": "State Fair ~2.4M plus other events: ~3.6M a year; fair parking ~$30"
+        },
+        {
+          "name": "Victory Park / American Airlines Center",
+          "lat": 32.7905,
+          "lon": -96.8103,
+          "daily_trips": 11000,
+          "beta_per_min": 0.035,
+          "parking_usd": 25,
+          "note": "~2M a year; event parking $25+"
+        },
+        {
+          "name": "Fort Worth Cultural District / Dickies Arena",
+          "lat": 32.7469,
+          "lon": -97.3681,
+          "daily_trips": 16000,
+          "beta_per_min": 0.035,
+          "parking_usd": 15,
+          "note": "Stock Show, Dickies Arena, museums: ~3M a year"
+        },
+        {
+          "name": "UT Arlington",
+          "lat": 32.7299,
+          "lon": -97.114,
+          "daily_trips": 41000,
+          "beta_per_min": 0.05,
+          "note": "enrollment ~41k"
+        },
+        {
+          "name": "UNT Denton",
+          "lat": 33.2107,
+          "lon": -97.1503,
+          "daily_trips": 46000,
+          "beta_per_min": 0.05,
+          "note": "enrollment ~46k"
+        },
+        {
+          "name": "UT Dallas",
+          "lat": 32.9857,
+          "lon": -96.7502,
+          "daily_trips": 31000,
+          "beta_per_min": 0.05,
+          "note": "enrollment ~31k"
+        },
+        {
+          "name": "SMU",
+          "lat": 32.8412,
+          "lon": -96.7845,
+          "daily_trips": 12000,
+          "beta_per_min": 0.05,
+          "note": "enrollment ~12k"
+        },
+        {
+          "name": "TCU",
+          "lat": 32.7096,
+          "lon": -97.3628,
+          "daily_trips": 12500,
+          "beta_per_min": 0.05,
+          "note": "enrollment ~12.5k"
+        },
+        {
+          "name": "TWU Denton",
+          "lat": 33.2264,
+          "lon": -97.1281,
+          "daily_trips": 10000,
+          "beta_per_min": 0.05,
+          "note": "Denton campus ~10k"
+        },
+        {
+          "name": "UNT Dallas",
+          "lat": 32.6489,
+          "lon": -96.7836,
+          "daily_trips": 4500,
+          "beta_per_min": 0.05,
+          "note": "enrollment ~4.5k"
+        }
+      ]
+    }
   },
   "default_scenario": "two_million",
   "garage_musd_per_space": 0.03,
