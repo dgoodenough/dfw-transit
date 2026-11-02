@@ -16,8 +16,11 @@ from . import geo
 
 
 class YearGraph:
-    def __init__(self, net, year):
+    def __init__(self, net, year, headway_factor=None):
+        """`headway_factor` stretches every line's headway ({mode: factor}, or one number for all
+        modes): the off-peak service the non-commute trips see (config ridership.nonwork)."""
         self.net, self.year, cfg = net, year, net.cfg
+        self.headway_factor = headway_factor
         self.runs = net.runs(year)
         self.station_ids = sorted({s for r in self.runs for s in r.stops})
         self.sidx = {s: i for i, s in enumerate(self.station_ids)}
@@ -29,7 +32,8 @@ class YearGraph:
         wcap = cfg["wait"]["max_wait_min"]
         board_extra = [0.0] * n_st   # per line node: what boarding it costs beyond the clock (wait weight, penalty)
         for ri, run in enumerate(self.runs):
-            clock_wait = min(run.line.headway_at(year) * cfg["wait"]["fraction_of_headway"], wcap)
+            hf = headway_factor.get(run.line.mode, 1.0) if isinstance(headway_factor, dict) else (headway_factor or 1.0)
+            clock_wait = min(run.line.headway_at(year) * hf * cfg["wait"]["fraction_of_headway"], wcap)
             wait = clock_wait * cfg["wait"].get("weight", 1.0)   # perceived wait (sensitivity; 1 = as before)
             prev = first = None
             ring = len(run.stops) > 3 and run.stops[0] == run.stops[-1]   # a loop: ride on through its first stop

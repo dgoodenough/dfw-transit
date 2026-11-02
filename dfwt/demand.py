@@ -6,6 +6,7 @@ data/raw/od_tracts.csv is present; otherwise a doubly-constrained gravity model
 is synthesized from zone population and jobs (see `gravity`). Either way the
 flows are expressed at block-group level.
 """
+import copy
 import csv
 import gzip
 import os
@@ -69,7 +70,7 @@ class Zones:
                 continue
             px, py = pj.xy(p["lat"], p["lon"])
             d = np.sqrt((self.x - px) ** 2 + (self.y - py) ** 2)
-            usd = np.maximum(usd, np.where(d <= p["radius_km"], p["usd_per_day"] * mult, 0.0))
+            usd = np.maximum(usd, np.where(d <= p["radius_km"], p["usd_per_day"] * (1.0 if p.get("fixed") else mult), 0.0))
         cash, cov = np.zeros(self.n), np.zeros(self.n)
         pc, co = pol.get("priced_centers"), pol.get("cashout")
         if ramp > 0 and (pc or co):
@@ -173,6 +174,151 @@ def lodes_or_gravity(zones, cfg):
         i1 = min(zones.n, i0 + CHUNK)
         od[i0:i1] = flows[inv[i0:i1]][:, inv] * hs[i0:i1, None] * ws[None, :]
     return od, "lodes"
+
+
+# Non-commute trips (config ridership.nonwork; off by default). Shopping, errands, eating out,
+# visits, recreation, school and university, airport and event trips: home-based other (HBO,
+# produced by residents, attracted by retail, service and households) and non-home-based (NHB,
+# both ends at attractions), each a doubly-constrained gravity model on off-peak drive times with
+# a shorter reach than commutes, plus special generators (airports, stadiums, the Stockyards,
+# universities) whose visitors come from across the region. The NCTCOG regional model has the
+# same purposes (HBW, home-based non-work, NHB) and special generators.
+
+def sector_shares(zones, cfg):
+    """Per zone: retail, service and basic shares of its jobs (config ridership.nonwork.sectors_path,
+    LODES WAC; tools/fetch_wac.py), from the base-year data; zones without base-year jobs get
+    the regional mix. Cached on the base zones."""
+    base = getattr(zones, "base", zones)
+    hit = base.__dict__.get("_sector_shares")
+    if hit is not None:
+        return hit
+    p = config.path(cfg["ridership"]["nonwork"]["sectors_path"])
+    with open(p, encoding="utf-8") as f:
+        rows = {r["geoid"]: r for r in csv.DictReader(f)}
+    cnt = np.array([[float(rows[g][k]) if g in rows else 0.0 for g in base.ids] for k in ("retail", "service", "basic")])
+    tot = cnt.sum(axis=0)
+    mix = cnt.sum(axis=1) / max(cnt.sum(), 1.0)
+    out = np.where(tot > 0, cnt / np.maximum(tot, 1.0), mix[:, None])
+    base.__dict__["_sector_shares"] = out
+    return out
+
+
+def nonwork_attractions(zones, cfg):
+    """{purpose: attractions per zone} for "hbo" and "nhb": rates per household and per retail,
+    service and basic job (config ridership.nonwork.attraction_rates)."""
+    nc = cfg["ridership"]["nonwork"]
+    sh = sector_shares(zones, cfg)
+    var = {"households": zones.pop / nc["persons_per_household"],
+           "retail": zones.jobs * sh[0], "service": zones.jobs * sh[1], "basic": zones.jobs * sh[2]}
+    return {p: sum(r.get(k, 0.0) * v for k, v in var.items()) for p, r in nc["attraction_rates"].items()}
+
+
+def generator_zones(zones, g):
+    """Zone indices of a special generator and each one's share of its trips: the zones within
+    radius_km of it, by jobs (where the venues are), or the nearest zone."""
+    x, y = geo.Projector().xy(g["lat"], g["lon"])
+    d = np.sqrt((zones.x - x) ** 2 + (zones.y - y) ** 2)
+    idx = np.nonzero(d <= g.get("radius_km", 0.0))[0]
+    if not len(idx):
+        idx = np.array([int(np.argmin(d))])
+    w = zones.jobs[idx] + 1.0
+    return idx, w / w.sum()
+
+
+def nonwork_seed(zones, cfg):
+    """exp(-beta * drive) for every zone pair at these zones' (off-peak) congestion."""
+    beta = cfg["ridership"]["nonwork"]["beta_per_min"]
+    K = np.empty((zones.n, zones.n), dtype=np.float32)
+    for i0 in range(0, zones.n, CHUNK):
+        i1 = min(zones.n, i0 + CHUNK)
+        K[i0:i1] = np.exp(-beta * zones.drive_min(zones.dist_rows(i0, i1)))
+    return K
+
+
+def nonwork_od(zones, cfg, seed=None):
+    """Daily non-commute person trips by zone pair (float32), production -> attraction: HBO from
+    residents (trips_per_person.hbo) to HBO attractions, NHB among NHB attractions (both ends;
+    trips_per_person.nhb x population in all), and each special generator's daily_trips (grown
+    with the region's population) from homes by population x exp(-its beta x drive). A trip
+    matrix counts trips, not people: a round trip is two."""
+    nc = cfg["ridership"]["nonwork"]
+    K = nonwork_seed(zones, cfg) if seed is None else seed
+    it = nc.get("gravity_iterations", 15)
+    att = nonwork_attractions(zones, cfg)
+    rate = nc["trips_per_person"]
+    P = zones.pop * rate["hbo"]
+    od = balance(K, P, att["hbo"] / att["hbo"].sum() * P.sum(), it)
+    N = att["nhb"] / att["nhb"].sum() * zones.pop.sum() * rate["nhb"]
+    od += balance(K, N, N, it)
+    base = getattr(zones, "base", zones)
+    grow = zones.pop.sum() / base.pop.sum()
+    for g in nc.get("generators") or []:
+        if not isinstance(g, dict):
+            continue
+        idx, share = generator_zones(base, g)
+        d = zones.dist_rows(0, zones.n)[:, idx[0]]
+        w = zones.pop * np.exp(-g["beta_per_min"] * zones.drive_min(d))
+        trips = g["daily_trips"] * (grow if g.get("grows", True) else 1.0)
+        od[:, idx] += (trips * w / w.sum())[:, None].astype(np.float32) * share[None, :].astype(np.float32)
+    return od
+
+
+def nonwork_cfg(cfg):
+    """The config the non-commute trips are evaluated with: the purpose's own transit constant
+    (ridership.nonwork.asc), no telework, short-stay parking (paid_parking and priced-center
+    prices x parking_factor, no cash-out: that is a commuter benefit; special generators with
+    parking_usd charge that a visit, at today's prices), off-peak feeder buses
+    (headways x offpeak_headway_factor.feeder) and part of each park & ride garage
+    (pnr_space_share: midday the commuters' cars hold the rest)."""
+    c = copy.deepcopy(cfg)
+    rc = c["ridership"]
+    nc = rc["nonwork"]
+    rc["asc"] = nc["asc"]
+    rc["telework"] = 1.0
+    pf = nc.get("parking_factor", 1.0)
+    for k, v in rc["paid_parking"].items():
+        if isinstance(v, dict):
+            v["usd_per_day"] *= pf
+    for g in nc.get("generators") or []:   # a venue's own parking, per visit, at today's prices
+        if isinstance(g, dict) and g.get("parking_usd"):
+            rc["paid_parking"]["generator: " + g["name"]] = {"lat": g["lat"], "lon": g["lon"], "fixed": True,
+                                                             "radius_km": g.get("radius_km") or 1.0,
+                                                             "usd_per_day": g["parking_usd"]}
+    pol = rc.get("parking_policy") or {}
+    if pol.get("priced_centers"):
+        pol["priced_centers"]["usd_per_day"] *= pf
+    if pol:
+        pol["cashout"] = None
+    fd = c["access"].get("feeder") or {}
+    hf = (nc.get("offpeak_headway_factor") or {}).get("feeder", 1.0)
+    if fd.get("headway_min") is not None:
+        h = fd["headway_min"]
+        fd["headway_min"] = {k: (v * hf if not str(k).startswith("_") else v) for k, v in h.items()} \
+            if isinstance(h, dict) else h * hf
+    c["access"]["pnr_people_per_space"] *= nc.get("pnr_space_share", 1.0)
+    return c
+
+
+def nonwork_zones(zones, cfg):
+    """Off-peak copy of grown zones for the non-commute trips: congestion x offpeak_congestion_share
+    of the peak's extra delay, the non-commute config (nonwork_cfg; its own parking cache) and the
+    generators marked `pin` moved onto their venue (an airport's block-group centroid sits
+    kilometres from the terminals and their stations)."""
+    nc = cfg["ridership"]["nonwork"]
+    zones.dist_rows(0, 1)   # the distance table is computed once and shared, from the data's centroids
+    z = copy.copy(zones)
+    z.cong = 1.0 + (zones.cong - 1.0) * nc.get("offpeak_congestion_share", 1.0)
+    z.cfg = nonwork_cfg(cfg)
+    z._park_cache = {}
+    pins = [g for g in nc.get("generators") or [] if isinstance(g, dict) and g.get("pin")]
+    if pins:
+        z.x, z.y = zones.x.copy(), zones.y.copy()
+        pj = geo.Projector()
+        base = getattr(zones, "base", zones)
+        for g in pins:
+            idx, _ = generator_zones(base, g)
+            z.x[idx[0]], z.y[idx[0]] = pj.xy(g["lat"], g["lon"])
+    return z
 
 
 # Access modes. Walk and park & ride are the base model; feeder bus, micromobility
@@ -497,7 +643,7 @@ def _paths(acc, T, i0, i1, nz, ns):
     return TT, Ra[rows, Bst], Bst, Rm[rows, Bst], Em, OVT
 
 
-def evaluate(zones, od, net, graph, cfg, want_loads=True):
+def evaluate(zones, od, net, graph, cfg, want_loads=True, reach=True):
     """Run the year: transit times for every zone pair, competitive commutes,
     expected transit riders, accessibility, and (optionally) station-pair rider
     flows for load assignment.
@@ -508,6 +654,8 @@ def evaluate(zones, od, net, graph, cfg, want_loads=True):
     access.pnr_overflow_fallback the riders a full garage turns away instead take
     their best access without parking (walk, feeder bus, ...); that needs a first
     pass to find the full garages.
+
+    `reach=False` skips the jobs-within-minutes accessibility (the non-commute pass needs none).
     """
     T = graph.T
     ac = cfg["access"]
@@ -538,6 +686,7 @@ def evaluate(zones, od, net, graph, cfg, want_loads=True):
     comp_from = s["comp_from_w"] + (f[:, None] * s["comp_from_p"].reshape(ns, nz)).sum(axis=0)
     comp_to = s["comp_to_w"] + (f[:, None] * s["comp_to_p"].reshape(ns, nz)).sum(axis=0)
     rid_from = s["rid_from_w"] + (f[:, None] * s["rid_from_p"].reshape(ns, nz)).sum(axis=0)
+    rid_to = s["rid_to_w"] + (f[:, None] * s["rid_to_p"].reshape(ns, nz)).sum(axis=0)
     tt_sum = s["tt_w_sum"] + float((f * s["tt_p_sum"]).sum())
     flows = s["flows_w"] + f[:, None] * s["flows_p"] if want_loads else None
     by_mode = s["mode_w"]
@@ -545,7 +694,7 @@ def evaluate(zones, od, net, graph, cfg, want_loads=True):
     by_mode[PNR] = pnr_riders
     feeder_legs = s["feed_w"] + float((f * s["feed_p"]).sum())
     pop = zones.pop
-    jobs_reach = _reach_clock(zones, graph.T_clock, segs[0][1], cfg["accessibility"]["thresholds_min"])
+    jobs_reach = _reach_clock(zones, graph.T_clock, segs[0][1], cfg["accessibility"]["thresholds_min"]) if reach else {}
     return {
         "competitive_commutes": comp_total,
         "transit_commuters": riders,
@@ -559,6 +708,7 @@ def evaluate(zones, od, net, graph, cfg, want_loads=True):
         "comp_from": comp_from,
         "comp_to": comp_to,
         "rid_from": rid_from,
+        "rid_to": rid_to,
         "jobs_reach": jobs_reach,
         "access_jobs": {t: float((jobs_reach[t] * pop).sum() / pop.sum()) for t in jobs_reach},
         "avg_transit_min": tt_sum / comp_total if comp_total else 0.0,
@@ -610,9 +760,11 @@ def _sweep(zones, od, T, segs, cfg, nz, ns, fixed, want_loads, light=False):
     mode_w = np.zeros(len(ACCESS_MODES))
     comp_from_w, comp_to_w = np.zeros(nz), np.zeros(nz)
     rid_from_w = np.zeros(nz)   # riders by home zone (the map's transit share layer)
+    rid_to_w = np.zeros(nz)     # riders by destination zone
     comp_p, rid_p, tt_p_sum, feed_p = np.zeros(ns), np.zeros(ns), np.zeros(ns), np.zeros(ns)
     comp_from_p, comp_to_p = np.zeros(ns * nz), np.zeros(ns * nz)
     rid_from_p = np.zeros(ns * nz)
+    rid_to_p = np.zeros(ns * nz)
     flows_w = np.zeros((ns, ns)) if want_loads else None
     flows_p = np.zeros((ns, ns)) if want_loads else None
 
@@ -626,6 +778,7 @@ def _sweep(zones, od, T, segs, cfg, nz, ns, fixed, want_loads, light=False):
         mode_w[:] += np.bincount(Am.ravel(), weights=rq.ravel(), minlength=len(ACCESS_MODES))
         comp_from_w[i0:i1] += q.sum(axis=1)
         rid_from_w[i0:i1] += rq.sum(axis=1)
+        rid_to_w[:] += rq.sum(axis=0)
         comp_to_w[:] += q.sum(axis=0)
         if want_loads:
             sel = rq > 0
@@ -710,6 +863,7 @@ def _sweep(zones, od, T, segs, cfg, nz, ns, fixed, want_loads, light=False):
                 comp_from_p += np.bincount(ap * nz + zi, weights=q[p], minlength=ns * nz)
                 rid_from_p += np.bincount(ap * nz + zi, weights=rq[p], minlength=ns * nz)
                 comp_to_p += np.bincount(ap * nz + zj, weights=q[p], minlength=ns * nz)
+                rid_to_p += np.bincount(ap * nz + zj, weights=rq[p], minlength=ns * nz)
                 if want_loads:
                     sel = p & (rq > 0)
                     np.add.at(flows_p, (Ast[sel], Bst[sel]), rq[sel])
@@ -717,7 +871,7 @@ def _sweep(zones, od, T, segs, cfg, nz, ns, fixed, want_loads, light=False):
     return {"comp_w": comp_w, "rid_w": rid_w, "tt_w_sum": tt_w_sum, "feed_w": feed_w, "mode_w": mode_w,
             "active_commuters": act_w,
             "comp_from_w": comp_from_w, "comp_to_w": comp_to_w, "comp_p": comp_p, "rid_p": rid_p,
-            "rid_from_w": rid_from_w, "rid_from_p": rid_from_p,
+            "rid_from_w": rid_from_w, "rid_from_p": rid_from_p, "rid_to_w": rid_to_w, "rid_to_p": rid_to_p,
             "tt_p_sum": tt_p_sum, "feed_p": feed_p, "comp_from_p": comp_from_p, "comp_to_p": comp_to_p,
             "flows_w": flows_w, "flows_p": flows_p}
 
