@@ -73,6 +73,15 @@ class NonworkTripTests(unittest.TestCase):
         nc = cfg["ridership"]["nonwork"]
         self.assertEqual(c["ridership"]["asc"], nc["asc"])
         self.assertEqual(c["ridership"]["telework"], 1.0)
+        vr = nc["value_of_time_ratio"]   # time against money: in-vehicle and out-of-vehicle alike
+        self.assertAlmostEqual(c["ridership"]["b_ivt_per_min"], cfg["ridership"]["b_ivt_per_min"] * vr)
+        self.assertAlmostEqual(c["ridership"]["b_ovt_extra_per_min"] / c["ridership"]["b_ivt_per_min"],
+                               cfg["ridership"]["b_ovt_extra_per_min"] / cfg["ridership"]["b_ivt_per_min"])
+        nc["value_of_time_on"] = "cost"   # the other reading: money weighs more, time as for commutes
+        c2 = demand.nonwork_cfg(cfg)
+        self.assertAlmostEqual(c2["ridership"]["b_ivt_per_min"], cfg["ridership"]["b_ivt_per_min"])
+        self.assertAlmostEqual(c2["ridership"]["b_per_dollar"], cfg["ridership"]["b_per_dollar"] / vr)
+        nc["value_of_time_on"] = "time"
         self.assertIsNone(c["ridership"]["parking_policy"]["cashout"])
         hf = nc["offpeak_headway_factor"]["feeder"]
         self.assertAlmostEqual(demand.feeder_headway(c, 2040), demand.feeder_headway(cfg, 2040) * hf)

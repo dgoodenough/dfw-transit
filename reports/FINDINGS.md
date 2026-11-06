@@ -2,74 +2,100 @@
 
 Analyses run outside the build, kept for reference. Not shown on the map or the story page.
 
-## Non-commute trips modelled on their own (2026-11-02, prototype, off by default)
+## Non-commute trips modelled on their own (2026-11-02, revised 2026-11-03 with NCTCOG inputs; off by default)
 
 **Question:** the model scales commutes to all trips (x 1.9 round trip / 0.5 work share), so
 shopping, errand, school, airport and event trips go where commuters go. What changes if they
 get their own trip table, destinations and service levels?
 
 **Prototype** (`config.json` -> `ridership.nonwork`, `enabled: false`; `demand.nonwork_od`,
-`evaluate._with_nonwork`, `evaluate.calibrate_nonwork`, `tests/test_nonwork.py`):
-- Purposes as in NCTCOG's regional model: home-based other (1.85 trips per resident) and
-  non-home-based (1.0 per resident), 24M trips a day in 2025 against 6.7M work trips. Each is a
-  doubly-constrained gravity model on off-peak drive times (exp(-0.12 x minutes): a mean trip
-  of 13.7 km straight-line against 24.3 km for LODES commutes).
-- Attractions: households and retail, service and basic jobs at NCHRP 365 rates (retail weighs
-  most), from LODES WAC 2022 jobs by sector (`data/lodes_wac_sectors_bg_2022.csv`,
-  `tools/fetch_wac.py`).
-- Special generators with their own regional reach and venue parking: DFW Airport and Love
-  Field (local passengers), the Arlington entertainment district, the Stockyards, Fair Park,
-  Victory, the Fort Worth Cultural District and six universities. The airport's block group is
-  moved onto the terminals for these trips: its population centroid sits 2.5 km away, out of
-  walking range of both airport stations.
-- Mode choice: the commute logit with its own constant, no telework, off-peak headways (x1.5,
-  regional rail x2, feeder buses x1.5), 30% of the peak's extra road delay, short-stay parking
-  and half of each garage.
-- Calibration: today's network still carries 80k rail boardings in 2025, now 50% from work
-  trips and 50% from non-commute trips. The commute constant comes out unchanged (+0.43); the
-  non-commute constant is -0.93.
+`evaluate._with_nonwork`, `evaluate.calibrate_nonwork`, `tests/test_nonwork.py`; each input's
+source is in `ridership.nonwork._sources`):
+- Purposes as in NCTCOG's TAFT model: home-based non-work (2.06 trips per resident) and
+  non-home-based (1.10), from NCTCOG's review of the 2009 NHTS (3.67 weekday trips per person:
+  56.1% home-based non-work, 30.1% non-home-based, 13.6% home-based work). That is 26M trips a
+  day in 2025, against 6.7M work trips.
+- Each purpose is a doubly-constrained gravity model on off-peak drive times. The decay is set
+  so trips average 0.55x (home-based) and 0.65x (non-home-based) the length of commutes, as in
+  NCTCOG's NHTS trip durations (14.8, 17.8 and 27.2 minutes): exp(-0.21 x minutes) and
+  exp(-0.11 x minutes).
+- Attractions: households and retail, service and basic jobs at NCHRP 365 rates (TAFT uses the
+  same three employment types but doesn't publish its rates), from LODES WAC 2022 jobs by sector
+  (`data/lodes_wac_sectors_bg_2022.csv`, `tools/fetch_wac.py`).
+- Special generators, as TAFT has for airports, universities and hospitals: DFW Airport (145k
+  ground trips a day; NCTCOG's 2015 airport survey found 63% of departing passengers
+  originating), Love Field (28k; 56% originating), the Arlington entertainment district, the
+  Stockyards, Fair Park, Victory, the Fort Worth Cultural District and six universities. Each
+  has its own reach and venue parking. The airport's block group is moved onto the terminals
+  for these trips: its population centroid sits 2.5 km away, out of walking range of both
+  airport stations.
+- Mode choice: the commute logit with its own constant and half the value of time (TAFT:
+  home-based non-work 50% of work), no telework, off-peak headways (x1.5, regional rail x2,
+  feeder buses x1.5), 30% of the peak's extra road delay, short-stay parking and half of each
+  garage.
+- Calibration: today's network still carries 80k rail boardings in 2025, 55.7% of them work
+  trips (NCTCOG's 2022-23 on-board survey: home-based work is 55.9% of light rail and 54.1% of
+  commuter rail trips). Commute constant +0.58, non-commute constant -2.05.
 
 **Daily trips (each counted once):**
 
-| Plan | Year | Today's method | With non-commute trips | Change | Work share |
-|---|---|---|---|---|---|
-| both | 2025 | 77,118 | 77,749 | +0.8% | 50% |
-| Budget plan | 2050 | 370,456 | 410,547 | +10.8% | 45% |
-| Budget plan | 2100 | 740,278 | 866,920 | +17.1% | 43% |
-| 2 million plan | 2050 | 890,075 | 979,356 | +10.0% | 45% |
-| 2 million plan | 2100 | 1,899,808 | 2,130,008 | +12.1% | 45% |
+| Plan | Year | Today's method | With non-commute trips | Change | Work share | First version (Nov 2) |
+|---|---|---|---|---|---|---|
+| both | 2025 | 77,118 | 77,697 | +0.7% | 55% | 77,749 |
+| Budget plan | 2050 | 370,456 | 396,632 | +7.1% | 51% | 410,547 (+10.8%) |
+| Budget plan | 2100 | 740,278 | 836,041 | +12.9% | 48% | 866,920 (+17.1%) |
+| 2 million plan | 2050 | 890,075 | 921,134 | +3.5% | 52% | 979,356 (+10.0%) |
+| 2 million plan | 2100 | 1,899,808 | 1,983,757 | +4.4% | 52% | 2,130,008 (+12.1%) |
 
-Rail and BRT boardings rise less (2 million plan 2100: 2.75M -> 2.90M), and feeder bus
-boardings fall (non-commute trips are shorter and the off-peak buses less frequent), so all
-boardings stay at 3.41M.
+The first version used national trip rates, one decay for both purposes, a 50% work share and
+the commutes' value of time. Rail and BRT boardings barely move (2 million plan 2100: 2.75M ->
+2.73M). Feeder bus boardings fall (non-commute trips are shorter and the off-peak buses less
+frequent), so all boardings drop from 3.42M to 3.29M.
 
 **Where it lands** (2 million plan, 2100; daily transit trip ends, two per trip):
 
 | Area | Today's method | With non-commute trips | Change |
 |---|---|---|---|
-| Downtown Dallas | 411,700 | 488,489 | +19% |
-| Downtown Fort Worth | 87,596 | 93,452 | +7% |
-| Arlington entertainment district | 20,733 | 55,355 | +167% |
-| DFW Airport | 2,280 | 11,152 | +389% |
-| Love Field | 11,448 | 21,113 | +84% |
-| Stockyards | 1,800 | 3,888 | +116% |
-| Fair Park | 4,646 | 11,846 | +155% |
-| Six universities | 50,628 | 66,768 | +32% |
-| Rest of the region | 3,208,784 | 3,507,953 | +9% |
+| Downtown Dallas | 411,700 | 430,499 | +5% |
+| Downtown Fort Worth | 87,596 | 84,411 | -4% |
+| Arlington entertainment district | 20,733 | 48,364 | +133% |
+| DFW Airport | 2,280 | 12,266 | +438% |
+| Love Field | 11,448 | 18,172 | +59% |
+| Stockyards | 1,800 | 3,316 | +84% |
+| Fair Park | 4,646 | 10,008 | +115% |
+| Six universities | 50,628 | 58,756 | +16% |
+| Rest of the region | 3,208,784 | 3,301,722 | +3% |
+
+**Airport check:** in 2025 the model has about 1,470 non-commute transit trip ends at DFW
+Airport and 690 at Love Field. NCTCOG's 2022-23 on-board survey (Tables 48-49) counts about
+1,580 weekday rail boardings by airline passengers going to or from an airport, and the model's
+airport ends also include other visits to the airports. The airports are not undercounted; the
+first version compared them with TEXRail's total ridership, the wrong yardstick.
 
 **Density:** residents within 800 m of the 45 stations within 2.5 km of either downtown raised
-to 25,000/km² (+0.62M, taken from the rest of the region) add the same number of trips either
-way: +88.0k with today's method, +88.6k with non-commute trips (half work, half non-commute).
-Non-work trips don't make density matter more here: the extra residents' trip total is taken
-from elsewhere, and their many short trips (under 2 km) are walked, not ridden.
+to 25,000/km² (+0.62M, taken from the rest of the region) add +88.0k trips with today's method
+and +43.7k with non-commute trips (+46.4k work, -2.7k non-commute). Non-work trips make density
+matter less here, not more. Downtown residents' errands are short (the home-based decay is
+steep), so most are walked or under the 2 km minimum for a transit trip. The residents moved
+downtown also stop making the longer trips elsewhere that transit could serve.
 
-**Sensitivity** (2 million plan, 2100, each recalibrated): longer non-commute trips
-(exp(-0.08 x minutes), mean 18.3 km) give 2.09M (+10%); leaving out venue parking gives 2.15M
-(+13%). The gain holds at about +10-13%.
+**Sensitivity** (2 million plan, 2100, each recalibrated):
 
-**Caveats:** trip rates, attraction rates and venue figures are national defaults or
-approximate (NCTCOG's own rates weren't reachable); the 2025 airport count (about 1,400 trip
-ends) is still below today's airport stations; one average weekday, no event peaks.
+| Variant | Daily trips | Change against today's method |
+|---|---|---|
+| As above (half the value of time, on the time coefficients) | 1,983,757 | +4.4% |
+| Half the value of time, on the cost coefficient instead | 2,083,644 | +9.7% |
+| Same value of time as commutes | 2,111,559 | +11.1% |
+| First version (national inputs) | 2,130,008 | +12.1% |
+
+The value of time decides the size of the gain. TAFT gives non-work trips half the value of
+time in route choice, but how that carries into mode choice (weaker time sensitivity, or
+stronger cost sensitivity) isn't published. The config keeps the cautious reading
+(`value_of_time_on: "time"`).
+
+**Caveats:** attraction rates are national defaults (TAFT's aren't published) and venue figures
+approximate; universities and hospitals use simple generators where TAFT has special models;
+one average weekday, no event peaks.
 
 ## Transit commute mode share against peer metros (2026-11-01, revised for real commute flows)
 
