@@ -238,7 +238,10 @@ def generate(metro_id, budget_musd=None, years=None, out=None, run_model=True, o
     output.write_csv(os.path.join(out, "candidates.csv"), [c.row() for c in sorted(cands, key=_cand_key)])
     stats = output.network_stats(out, m, cfg, tables, ex.tables)
     res = None
-    if run_model:
+    if run_model and not chosen:
+        log("  no line chosen: demand model skipped")
+        flags.append("no candidate corridor reached a mode's density threshold, so no line was chosen")
+    elif run_model:
         log("  demand model (dfwt, today's land use, every line open) ...")
         res = output.model_runs(m, cfg, ctx, tables, ex)
     output.report(out, m, gp, cfg, urban, towns, links, cands, chosen, budget, spent, stats, res, flags,
