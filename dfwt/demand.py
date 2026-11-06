@@ -226,13 +226,22 @@ def generator_zones(zones, g):
 
 
 def nonwork_seed(zones, cfg):
-    """exp(-beta * drive) for every zone pair at these zones' (off-peak) congestion."""
+    """{purpose: exp(-beta * drive)} for every zone pair at these zones' (off-peak) congestion.
+    beta_per_min is one number, or one per purpose ("hbo", "nhb"); purposes with the same beta
+    share one matrix."""
     beta = cfg["ridership"]["nonwork"]["beta_per_min"]
-    K = np.empty((zones.n, zones.n), dtype=np.float32)
-    for i0 in range(0, zones.n, CHUNK):
-        i1 = min(zones.n, i0 + CHUNK)
-        K[i0:i1] = np.exp(-beta * zones.drive_min(zones.dist_rows(i0, i1)))
-    return K
+    betas = beta if isinstance(beta, dict) else {"hbo": beta, "nhb": beta}
+    out, done = {}, {}
+    for p in ("hbo", "nhb"):
+        b = betas[p]
+        if b not in done:
+            K = np.empty((zones.n, zones.n), dtype=np.float32)
+            for i0 in range(0, zones.n, CHUNK):
+                i1 = min(zones.n, i0 + CHUNK)
+                K[i0:i1] = np.exp(-b * zones.drive_min(zones.dist_rows(i0, i1)))
+            done[b] = K
+        out[p] = done[b]
+    return out
 
 
 def nonwork_od(zones, cfg, seed=None):
@@ -247,9 +256,9 @@ def nonwork_od(zones, cfg, seed=None):
     att = nonwork_attractions(zones, cfg)
     rate = nc["trips_per_person"]
     P = zones.pop * rate["hbo"]
-    od = balance(K, P, att["hbo"] / att["hbo"].sum() * P.sum(), it)
+    od = balance(K["hbo"], P, att["hbo"] / att["hbo"].sum() * P.sum(), it)
     N = att["nhb"] / att["nhb"].sum() * zones.pop.sum() * rate["nhb"]
-    od += balance(K, N, N, it)
+    od += balance(K["nhb"], N, N, it)
     base = getattr(zones, "base", zones)
     grow = zones.pop.sum() / base.pop.sum()
     for g in nc.get("generators") or []:
@@ -265,7 +274,8 @@ def nonwork_od(zones, cfg, seed=None):
 
 def nonwork_cfg(cfg):
     """The config the non-commute trips are evaluated with: the purpose's own transit constant
-    (ridership.nonwork.asc), no telework, short-stay parking (paid_parking and priced-center
+    (ridership.nonwork.asc), time coefficients x value_of_time_ratio (time against money), no
+    telework, short-stay parking (paid_parking and priced-center
     prices x parking_factor, no cash-out: that is a commuter benefit; special generators with
     parking_usd charge that a visit, at today's prices), off-peak feeder buses
     (headways x offpeak_headway_factor.feeder) and part of each park & ride garage
@@ -275,6 +285,14 @@ def nonwork_cfg(cfg):
     nc = rc["nonwork"]
     rc["asc"] = nc["asc"]
     rc["telework"] = 1.0
+    # non-work time is worth less against money (TAFT: home-based non-work value of time 50% of work)
+    # (on the time coefficients, or with value_of_time_on "cost" on the price of money instead)
+    vr = nc.get("value_of_time_ratio", 1.0)
+    if nc.get("value_of_time_on", "time") == "cost":
+        rc["b_per_dollar"] /= vr
+    else:
+        rc["b_ivt_per_min"] *= vr
+        rc["b_ovt_extra_per_min"] *= vr
     pf = nc.get("parking_factor", 1.0)
     for k, v in rc["paid_parking"].items():
         if isinstance(v, dict):

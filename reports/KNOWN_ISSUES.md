@@ -12,8 +12,9 @@ when is in `network/CHANGELOG.md`. Last reviewed after v2.15.
   Evening, weekend, event, airport and visitor travel isn't modelled on its own, so the
   Stockyards, stadiums and DFW Airport are undercounted. A prototype that models non-commute
   trips on their own is in `config.json` -> `ridership.nonwork` (off by default; see FINDINGS,
-  2026-11-02): +10-17% daily trips by 2050-2100, spread across the region, with the largest
-  relative gains at the airport, the Arlington stadiums, Fair Park and the Stockyards.
+  2026-11-02, revised with NCTCOG inputs): +4-13% daily trips by 2050-2100 (2 million plan
+  +4%, budget plan +13% in 2100), with the largest relative gains at the airport, the Arlington
+  stadiums, Fair Park and the Stockyards.
 - **County-led growth uses assumed weights**, not NCTCOG's county forecasts (Dallas 0.5,
   Tarrant 1.0, Collin/Denton 1.8, other counties 2.0; `growth.alt.county_weights`).
 - **Mobility 2050's $57.9B** for rail and bus very likely includes running today's systems;
