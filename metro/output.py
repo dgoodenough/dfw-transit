@@ -225,7 +225,7 @@ def _f(x, unit=""):
 
 
 def report(out, m, gp, cfg, urban, towns, links, cands, chosen, budget, spent, st, res, flags, secs, metro_id,
-           rail_why=None, skipped=None):
+           rail_why=None, skipped=None, asc_note=None):
     L = []
     w = L.append
     w(f"# Generated network: {metro_name(m)}")
@@ -269,7 +269,10 @@ def report(out, m, gp, cfg, urban, towns, links, cands, chosen, budget, spent, s
           f"({r1['daily_boardings']:,.0f} rail + BRT boardings) vs {base:,.0f} on today's lines; "
           f"{r1['access_jobs_45']:,.0f} jobs within 45 min for the average resident"
           + (f" ({r0['access_jobs_45']:,.0f} today)." if r0 else "."))
-        if metro_id != "dfw":
+        if asc_note:
+            w(f"  Ridership constant: {asc_note}. The other behavioural parameters (time and cost weights, access) "
+              "are DFW's.")
+        elif metro_id != "dfw":
             w("  The model's behaviour (logit constants, access) is DFW's calibration transferred, not fitted here.")
     f = st["findings"]
     w(f"- `dfwt validate`: {sum(v for (s, _), v in f.items() if s == 'error')} errors, "

@@ -20,7 +20,7 @@ import os
 
 from dfwt import config
 
-from . import census, gtfs, lodes, mobilitydb, net, overture
+from . import census, gtfs, inputs, lodes, mobilitydb, net, overture
 
 STAGES = ("zones", "od", "gtfs", "overture", "places")
 DEFAULT_STAGES = ("zones", "od", "gtfs", "overture")
@@ -28,12 +28,16 @@ ZONE_COLUMNS = ["geoid", "lat", "lon", "pop", "jobs", "area_km2", "county_fips"]
 
 
 def registry(path=None):
-    with open(path or os.path.join(os.path.dirname(__file__), "metros.json"), encoding="utf-8") as f:
+    """The metro registry: `path`, else $METRO_HOME/metros.json when METRO_HOME is set, else metro/metros.json."""
+    if path is None:
+        path = inputs.home("metros.json") if os.environ.get("METRO_HOME") else \
+            os.path.join(os.path.dirname(__file__), "metros.json")
+    with open(path, encoding="utf-8") as f:
         return {m["id"]: m for m in json.load(f)["metros"]}
 
 
 def metro_dir(mid):
-    return config.path("data", "metros", mid)
+    return inputs.metro_dir(mid)
 
 
 def now():

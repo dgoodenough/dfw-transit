@@ -32,6 +32,17 @@ Add an entry to `metro/metros.json` with these fields: `id`, `name`, `cbsa`, `st
   bounding-box search.
 - `brt_name_pattern`: a regex on route names that marks a bus route as BRT.
 - `bbox_margin_deg`: padding around the block-group centres. The default is 0.1.
+- `calibration`: `{"weekday_boardings": N, "source": "..."}`. The generator fits the ridership
+  constant (`config.json` `ridership.asc`) so today's lines, the modes dfwt models with local buses
+  as the feeder grid, carry N weekday boardings, the way DFW's constant is fitted to DFW's rail
+  boardings. Run it alone with `python -m metro calibrate <id>`.
+- `ridership_asc`: `{"asc": x, "source": "..."}`. Use x as the constant, derived elsewhere.
+
+Without either key the generator uses DFW's constant, a transfer, and the report says so.
+
+**Another repo driving the generator.** Set `METRO_HOME` to a folder and the registry
+(`$METRO_HOME/metros.json`), the inputs (`$METRO_HOME/data/metros/<id>/`) and the output
+(`$METRO_HOME/generated/<id>/`) all live there instead of in this repo. texas-transit does this.
 
 The zones stage checks the county list against the OMB delineation file (`list1_2023.xlsx`)
 and records the result in `meta.json` → `sources.cbsa_delineation`.
@@ -146,6 +157,7 @@ count**. It is never written into `zones.jobs`.
 python -m metro generate houston                      # budget: config budget.musd_per_year x 30 years
 python -m metro generate houston --budget-musd 100000 --no-model
 python -m metro generate houston --jobs-proxy places  # no jobs data: places proxy, flagged (generated/houston_places_proxy/)
+python -m metro calibrate houston                     # the ridership constant alone (registry `calibration`)
 python -m metro check-dfw [--reuse]                   # DFW cross-check against the hand plan
 ```
 
@@ -185,7 +197,8 @@ Data gaps are never filled silently: without jobs (Houston today) every people +
 (`meta.json` `metro.downtowns`), and `report.md` says so at the top. `--jobs-proxy places` (opt-in) uses
 Overture places as where jobs are, scaled to 0.53 jobs per resident, flagged the same way. Local buses in
 `existing/` (mode `bus`) are left out of the network, as in DFW (they are the model's feeder grid). The
-model's behavioural constants are DFW's calibration; elsewhere they are a transfer, not a fit.
+model's behavioural constants are DFW's calibration. Elsewhere they are a transfer, not a fit, except the
+ridership constant when the registry gives a `calibration` target or a `ridership_asc`.
 
 Results:
 - `reports/generator_dfw_check.md`: DFW against the hand-built 2M plan.

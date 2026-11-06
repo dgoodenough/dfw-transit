@@ -8,6 +8,7 @@
 
   python -m metro generate houston [--budget-musd N | --years N] [--no-model] [--out DIR]
                                                       build a potential network (generated/<id>/)
+  python -m metro calibrate houston                   fit the ridership constant (registry `calibration`)
   python -m metro adapt-dfw                           write DFW's inputs in the contract shape
   python -m metro check-dfw [--no-model] [--reuse]     generate DFW, compare with the hand plan
                                                       (reports/generator_dfw_check.md)
@@ -40,6 +41,8 @@ def main(argv=None):
     g.add_argument("--no-model", action="store_true", help="skip the dfwt demand-model run")
     g.add_argument("--jobs-proxy", choices=["places"], help="metros without jobs data: use the Overture places proxy "
                    "(zones_places_proxy.csv) as where jobs are, flagged; output in generated/<id>_places_proxy/")
+    k = sub.add_parser("calibrate", help="fit the ridership constant to the registry's calibration boardings")
+    k.add_argument("metro")
     sub.add_parser("adapt-dfw", help="write data/metros/dfw/ from the repo's DFW inputs")
     c = sub.add_parser("check-dfw", help="generate DFW at the 2M plan's capital and compare with it")
     c.add_argument("--no-model", action="store_true")
@@ -54,13 +57,18 @@ def main(argv=None):
         print(f"wrote {path}: " + ", ".join(f"{n['id']} ({len(n['lines'])} lines)" for n in data))
         return 0
 
-    if a.cmd in ("generate", "check-dfw"):
+    if a.cmd in ("generate", "check-dfw", "calibrate"):
         os.environ.setdefault("OMP_NUM_THREADS", "2")       # a shared machine: keep BLAS small
         os.environ.setdefault("OPENBLAS_NUM_THREADS", "2")
     if a.cmd == "generate":
         from .generate import generate
         generate(a.metro, budget_musd=a.budget_musd, years=a.years, out=a.out and os.path.abspath(a.out),
                  run_model=not a.no_model, jobs_proxy=a.jobs_proxy)
+        return 0
+    if a.cmd == "calibrate":
+        import json
+        from .generate import calibrate
+        print(json.dumps(calibrate(a.metro), indent=1))
         return 0
     if a.cmd == "adapt-dfw":
         from .inputs import adapt_dfw

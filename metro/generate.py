@@ -25,7 +25,7 @@ import time
 
 import numpy as np
 
-from dfwt import config, geo
+from dfwt import config, evaluate, geo
 
 from . import candidates, centers, geom, inputs, model, output, routing, select, sketch
 
@@ -150,7 +150,7 @@ def generate(metro_id, budget_musd=None, years=None, out=None, run_model=True, o
     gp = params(metro_id, override)
     cfg0 = config.load()
     m = metro or inputs.load(metro_id, jobs_proxy)
-    out = out or config.path("generated", metro_id + ("_places_proxy" if m.jobs_proxy else ""))
+    out = out or inputs.home("generated", metro_id + ("_places_proxy" if m.jobs_proxy else ""))
     os.makedirs(out, exist_ok=True)
     log(f"{metro_id}: " + "; ".join(m.status()))
     if not m.osm.get("roads"):
@@ -200,6 +200,7 @@ def generate(metro_id, budget_musd=None, years=None, out=None, run_model=True, o
 
     # 3. mode, stations, cost, sketch value per candidate ---------------------------
     ctx, od = model.gravity_od(m, cfg)
+    asc_note = ridership_constant(metro_id, m, cfg, ctx, ex, log)   # before the sketch: it uses the constant too
     sk = sketch.Sketch(m, cfg, od, gp["sketch"]["walk_km"])
     for ln in ex.lines:   # today's lines set the bar every candidate must beat
         n = len(ln["stations"])
@@ -241,11 +242,77 @@ def generate(metro_id, budget_musd=None, years=None, out=None, run_model=True, o
         log("  demand model (dfwt, today's land use, every line open) ...")
         res = output.model_runs(m, cfg, ctx, tables, ex)
     output.report(out, m, gp, cfg, urban, towns, links, cands, chosen, budget, spent, stats, res, flags,
-                  time.time() - t0, metro_id, rail_why=rail_why, skipped=ex.skipped)
+                  time.time() - t0, metro_id, rail_why=rail_why, skipped=ex.skipped, asc_note=asc_note)
     output.preview(out, m, surf, urban, towns, ex, chosen, tables)
     log(f"  wrote {os.path.relpath(out, config.ROOT)}/ in {time.time() - t0:.0f}s")
-    return {"out": out, "chosen": chosen, "cands": cands, "centers": urban, "towns": towns, "stats": stats,
+    return {"out": out, "asc": cfg["ridership"]["asc"], "asc_note": asc_note, "chosen": chosen, "cands": cands, "centers": urban, "towns": towns, "stats": stats,
             "model": res, "budget": budget, "spent": spent, "tables": tables, "ex_tables": ex.tables, "m": m, "cfg": cfg}
+
+
+def registry_entry(metro_id, m):
+    """The metro's registry entry as it is now (the registry may have changed since step 1), else
+    the copy step 1 saved in meta.json."""
+    from . import fetch
+    try:
+        entry = fetch.registry().get(metro_id)
+    except FileNotFoundError:
+        entry = None
+    return entry or (m.meta or {}).get("metro") or {}
+
+
+def ridership_constant(metro_id, m, cfg, ctx, ex, log=print):
+    """Set config ridership.asc for metro m (in place, before anything uses it) and say where it
+    came from. Registry keys:
+      calibration    {"weekday_boardings": N, "source": "..."}: fit the constant so today's lines (the
+                     modes dfwt models, buses as the feeder grid) carry N boardings on a weekday in
+                     existing_year, as DFW's constant is fitted to DFW's rail boardings
+                     (evaluate.calibrate_asc).
+      ridership_asc  {"asc": x, "source": "..."}: use x (a constant derived elsewhere).
+    Neither: DFW's constant, a transfer."""
+    rc = cfg["ridership"]
+    if metro_id == "dfw":
+        return f"DFW's own calibration (asc {rc['asc']:+.3f})"
+    entry = registry_entry(metro_id, m)
+    cal, fixed = entry.get("calibration"), entry.get("ridership_asc")
+    if cal:
+        if not ex.tables["lines.csv"]:
+            raise SystemExit(f"{metro_id}: calibration needs today's lines, and existing/ has none dfwt models")
+        target = float(cal["weekday_boardings"])
+        rc["calibration"] = dict(rc["calibration"], year=cfg["existing_year"], rail_boardings=target)
+        log(f"  calibrating the ridership constant to {target:,.0f} weekday boardings on today's lines ...")
+        with model.projection(m):
+            base = output.load_net(ex.tables, cfg, "existing")
+            evaluate.calibrate_asc(ctx, base, lo=-6.0, hi=4.0, tol=0.01,
+                                   log=lambda t: log("  " + t.strip()))
+        return (f"calibrated here (asc {rc['asc']:+.3f}; DFW {config.load()['ridership']['asc']:+.3f}): today's lines "
+                f"carry {target:,.0f} weekday boardings ({cal.get('source', 'registry')})")
+    if fixed:
+        rc["asc"] = float(fixed["asc"])
+        return (f"set from the registry (asc {rc['asc']:+.3f}; DFW {config.load()['ridership']['asc']:+.3f}): "
+                f"{fixed.get('source', 'no source given')}")
+    return f"DFW's calibration transferred, not fitted here (asc {rc['asc']:+.3f})"
+
+
+def calibrate(metro_id, log=print):
+    """The ridership constant alone (registry `calibration`), without generating: centers (for the
+    downtown parking the model prices), today's lines, the commute flows, then the fit.
+    Returns {"asc", "note", "today": the model on today's lines}."""
+    gp = params(metro_id)
+    m = inputs.load(metro_id)
+    cp = gp["centers"]
+    urban = centers.find(m, centers.Surface(m, cp["grid_km"], cp["kernel_km"]), cp)
+    centers.classify(m, urban, cp)
+    cfg = model.metro_cfg(m, urban, config.load())
+    ex = Existing(m, cfg["modes"])
+    ctx, _ = model.gravity_od(m, cfg)
+    note = ridership_constant(metro_id, m, cfg, ctx, ex, log)
+    today = None
+    if ex.tables["lines.csv"]:
+        with model.projection(m):
+            base = output.load_net(ex.tables, cfg, "existing")
+            today = model.run_today(ctx, base, base)
+        today = {k: float(v) for k, v in today.items() if isinstance(v, (int, float, np.floating))}
+    return {"asc": cfg["ridership"]["asc"], "note": note, "today": today}
 
 
 def _cand_key(c):

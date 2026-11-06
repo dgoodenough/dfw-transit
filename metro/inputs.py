@@ -34,8 +34,15 @@ TABLES = {
 }
 
 
+def home(*parts):
+    """Where metro inputs, outputs and the registry live: $METRO_HOME when another repo drives the
+    generator (texas-transit sets it to its own folder), otherwise this repo."""
+    h = os.environ.get("METRO_HOME")
+    return os.path.join(os.path.abspath(h), *parts) if h else config.path(*parts)
+
+
 def metro_dir(metro_id, *parts):
-    return config.path("data", "metros", metro_id, *parts)
+    return home("data", "metros", metro_id, *parts)
 
 
 def read_csv(path):
