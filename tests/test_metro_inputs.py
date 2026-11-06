@@ -379,3 +379,38 @@ class FetchPlumbingTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class HomeAndConstantTests(unittest.TestCase):
+    """METRO_HOME (another repo driving the generator) and the per-metro ridership constant."""
+
+    def setUp(self):
+        self.tmp = tempfile.mkdtemp()
+        self.old = os.environ.get("METRO_HOME")
+        os.environ["METRO_HOME"] = self.tmp
+
+    def tearDown(self):
+        if self.old is None:
+            os.environ.pop("METRO_HOME", None)
+        else:
+            os.environ["METRO_HOME"] = self.old
+
+    def test_paths_and_registry_follow_metro_home(self):
+        from metro import inputs
+        self.assertEqual(inputs.metro_dir("x"), os.path.join(self.tmp, "data", "metros", "x"))
+        self.assertEqual(fetch.metro_dir("x"), os.path.join(self.tmp, "data", "metros", "x"))
+        write(os.path.join(self.tmp, "metros.json"), '{"metros": [{"id": "x", "name": "X"}]}')
+        self.assertEqual(list(fetch.registry()), ["x"])
+
+    def test_registry_constant_is_used_and_dfw_keeps_its_own(self):
+        import copy
+        from dfwt import config
+        from metro import generate
+        write(os.path.join(self.tmp, "metros.json"),
+              '{"metros": [{"id": "x", "ridership_asc": {"asc": 0.9, "source": "test"}}, {"id": "y"}]}')
+        cfg = config.load()
+        for mid, want in (("x", 0.9), ("y", cfg["ridership"]["asc"]), ("dfw", cfg["ridership"]["asc"])):
+            c = copy.deepcopy(cfg)
+            note = generate.ridership_constant(mid, type("M", (), {"meta": {}})(), c, None, None, log=None)
+            self.assertAlmostEqual(c["ridership"]["asc"], want)
+            self.assertIn({"x": "test", "y": "transferred", "dfw": "own"}[mid], note)
