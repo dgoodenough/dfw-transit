@@ -20,6 +20,7 @@ the metro (osmroute.set_origin). Routes are cached in the generator's output fol
 """
 import json
 import math
+import re
 import os
 import sys
 
@@ -30,6 +31,9 @@ import gen_expansion as ge  # noqa: E402
 
 ROAD_CLASSES = {"motorway", "trunk", "primary", "secondary"}
 BRT_CLASSES = ROAD_CLASSES | {"tertiary"}
+# a highway's frontage roads (Texas "feeder" roads): classed as ordinary streets in the map data, but a
+# bus on one runs beside the highway, with its walk catchment cut in half and no frontage to develop
+FRONTAGE_ROAD = re.compile(r"frontage|service r(oa)?d|access r(oa)?d|feeder", re.I)
 RAIL_CLASSES = {"standard_gauge"}
 
 
@@ -76,7 +80,10 @@ class Router:
             x, y = (float(v) for v in self.m.xy(lat, lon))
             d = max(float(self.frontage(x, y)), 0.0)
             lo, ref = self.brt.get("frontage_min", 0.6), self.brt.get("frontage_ref", 6000.0)
-            self._front[k] = lo + (1 - lo) * math.exp(-d / ref)
+            w = lo + (1 - lo) * math.exp(-d / ref)
+            if FRONTAGE_ROAD.search(ed[7] or ""):
+                w *= self.brt.get("frontage_road", 2.0)
+            self._front[k] = w
         return self._front[k]
 
     def brt_path(self, stops):
@@ -111,7 +118,7 @@ class Router:
 
     def route_multi(self, kind, stops, snap_km=2.0):
         """(lat, lon) polyline through `stops` [(lat, lon)] in order, or None."""
-        tag = "brt-street" if kind == "brt" else kind   # the street profile's routes aren't the old BRT ones
+        tag = "brt-street-v2" if kind == "brt" else kind   # bump when the street profile changes: cached routes are keyed by it
         key = f"{tag}:" + ":".join(f"{a[0]:.5f},{a[1]:.5f}" for a in stops)
         if key in self.cache:
             return self.cache[key]

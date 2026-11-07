@@ -59,9 +59,9 @@
     "walk_km": 0.8
   },
   "routing": {
-    "_doc": "Street profile for generated BRT (metro/routing.py brt_path): cost per km by road class (freeways and highways dear: a BRT station beside a freeway has no walk-up catchment and no frontage to develop), times a frontage factor that falls from 1 where nobody lives or works along the street toward frontage_min as people + jobs within walking distance (800 m) approach frontage_ref per km2. So the bus takes the arterial lined with homes and shops over the parallel highway.",
+    "_doc": "Street profile for generated BRT (metro/routing.py brt_path): cost per km by road class (freeways and highways dear: a BRT station beside a freeway has no walk-up catchment and no frontage to develop), times a frontage factor that falls from 1 where nobody lives or works along the street toward frontage_min as people + jobs within walking distance (800 m) approach frontage_ref per km2; a highway's frontage roads (by name) cost frontage_road times more, like the highway beside them. So the bus takes the arterial lined with homes and shops over the parallel highway.",
     "brt": {"w_cls": {"primary": 1.0, "secondary": 1.0, "tertiary": 1.2, "trunk": 2.0, "motorway": 5.0},
-            "frontage_ref": 6000, "frontage_min": 0.6}
+            "frontage_ref": 6000, "frontage_min": 0.6, "frontage_road": 2.0}
   },
   "selection": {
     "_doc": "Greedy selection: the candidate with the most new daily trips per $M of (capital + value_opex_years x operating cost) is chosen, again and again, until the budget (capital, 2025 $) is spent or no candidate reaches min_trips_per_musd. A candidate within duplicate_m of chosen or existing lines for more than duplicate_share of its length is a duplicate, unless it extends a chosen line of the same mode (that line is replaced by the longer one and only the extra cost is charged). Default budget: config budget.musd_per_year x years.",
