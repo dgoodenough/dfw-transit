@@ -67,5 +67,11 @@
     "max_lines": 80
   },
   "existing_year": null,
-  "opens_after_years": 5
+  "opens_after_years": 5,
+  "buildout": {
+    "_doc": "Build-out mode (python -m metro generate <id> --buildout, or registry key buildout: true): for a metro whose layout can carry a network as big as DFW Transit's 2 million riders plan, and a budget to match. Merged over the parameters above. Smaller and closer activity centers make the Gabriel graph a web along the arterials (the generator's version of the hand plan's arterial BRT grid); BRT down to the hand plan's thinnest BRT corridors (about 1,900 people + jobs per route-km); a lower stopping rule and more lines. Calibrated on DFW: build-out at DFW Transit's budget spends about what the hand plan does and carries about as many riders (reports/generator_dfw_check.md).",
+    "centers": {"min_density": 3000, "min_activity": 12000, "merge_km": 2.0},
+    "modes": {"brt": 2000},
+    "selection": {"min_trips_per_musd": 0.25, "max_lines": 250}
+  }
 }
