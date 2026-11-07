@@ -451,3 +451,11 @@ class StreetProfileTests(unittest.TestCase):
         self.assertGreaterEqual(busy, 0.6)
         w = json.load(open(os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "metro", "generate.json")))["routing"]["brt"]["w_cls"]
         self.assertGreater(w["motorway"] * 0.6, w["primary"])   # even a busy freeway frontage costs more than an empty arterial
+
+
+class FrontageRoadTests(unittest.TestCase):
+    def test_frontage_roads_cost_like_the_highway(self):
+        from metro import routing
+        self.assertTrue(routing.FRONTAGE_ROAD.search("South Earl Rudder Freeway Frontage Road"))
+        self.assertTrue(routing.FRONTAGE_ROAD.search("IH 35 Service Rd"))
+        self.assertFalse(routing.FRONTAGE_ROAD.search("Wellborn Road"))

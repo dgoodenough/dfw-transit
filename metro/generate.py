@@ -398,6 +398,10 @@ def _decide(c, m, cfg, gp, zidx, by, ex, sk, downtowns, core_r, dens_fn, urban_d
             P = c.routes["metro"]
         elif mode == "metro":
             mode, why = None, why + "; but no freeway/arterial corridor route for metro"
+        elif mode in ("brt", "streetcar") and not c.routes.get("brt"):
+            # a bus or streetcar runs on the street route or not at all: the metro-profile route
+            # follows freeways (light rail in a median), which a BRT station can't use
+            mode, why = None, why + "; but no street route for it (the street profile found none)"
     c.mode_reason = why
     if mode is None:
         c.status, c.reason, c.P = "no mode", why, P
