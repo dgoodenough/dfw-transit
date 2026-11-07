@@ -32,11 +32,20 @@ def projection(m):
         geo.Projector.__init__.__defaults__ = old
 
 
-def metro_cfg(m, centers, base=None):
-    """config.json adapted to metro m (unchanged for DFW, the model's home)."""
+def metro_cfg(m, centers, base=None, growth=None):
+    """config.json adapted to metro m (unchanged for DFW, the model's home). `growth`: the metro's own
+    regional multipliers ({"regional_pop": {year: x}, "regional_jobs": {year: x}}, relative to the
+    zones' base data), replacing DFW's forecast; without it DFW's are used, as before."""
     cfg = copy.deepcopy(base or config.load())
     if m.id == "dfw":
         return cfg
+    if growth:
+        g = cfg["growth"]
+        for k in ("regional_pop", "regional_jobs"):
+            if growth.get(k):
+                g[k] = {str(y): float(v) for y, v in growth[k].items() if not str(y).startswith("_")}
+        g["case"], g["spatial"] = "mid", "even"
+        g.setdefault("capture", {})["job_centers"] = {"jobs_share": 0.0}   # DFW's job centers mean nothing here
     downtowns = [c for c in centers if c.kind == "downtown"]
     dfw_jobs_per_commute = cfg["demand"]["total_commutes"] / 3963000.0   # DFW: 3.32M commutes, 3.96M LODES jobs
     jobs = m.jobs.sum() if m.jobs_ok else m.pop.sum() * 0.53   # US: ~0.53 jobs per resident (flagged when used)
@@ -100,6 +109,16 @@ def run_today(ctx, net, base_net, want_loads=True):
     out["boardings_by_mode"] = r.get("boardings_by_mode", {})
     out["access_jobs_45"] = r["access_jobs"].get(45, 0.0)
     out["stations"] = r["graph"].n_st
+    return out
+
+
+def run_future(ctx, net, year, want_loads=False):
+    """run_year with every line of `net` open in `year`: zones grown by the regional multipliers and,
+    around stations opened after existing_year, by the TOD uplift and the capture policy (config
+    growth), as DFW's own years are."""
+    r = evaluate.run_year(ctx, all_open(net), year, want_loads=want_loads)
+    out = {k: r[k] for k in ("daily_trips", "daily_boardings", "transit_commuters", "pop", "jobs")}
+    out["access_jobs_45"] = r["access_jobs"].get(45, 0.0)
     return out
 
 

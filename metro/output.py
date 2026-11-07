@@ -274,6 +274,11 @@ def report(out, m, gp, cfg, urban, towns, links, cands, chosen, budget, spent, s
           f"({r1['daily_boardings']:,.0f} rail + BRT boardings) vs {base:,.0f} on today's lines; "
           f"{r1['access_jobs_45']:,.0f} jobs within 45 min for the average resident"
           + (f" ({r0['access_jobs_45']:,.0f} today)." if r0 else "."))
+        for y, fr in sorted((res.get("future") or {}).items()):
+            g0 = (fr["existing"] or {}).get("daily_trips", 0.0)
+            w(f"  {y}, every line open, the metro's growth and station-area development: "
+              f"{fr['generated']['daily_trips']:,.0f} daily transit trips ({g0:,.0f} on today's lines alone), "
+              f"{fr['generated']['pop'] / 1e6:.2f}M people.")
         if asc_note:
             w(f"  Ridership constant: {asc_note}. The other behavioural parameters (time and cost weights, access) "
               "are DFW's.")
