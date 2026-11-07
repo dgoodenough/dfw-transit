@@ -414,3 +414,13 @@ class HomeAndConstantTests(unittest.TestCase):
             note = generate.ridership_constant(mid, type("M", (), {"meta": {}})(), c, None, None, log=None)
             self.assertAlmostEqual(c["ridership"]["asc"], want)
             self.assertIn({"x": "test", "y": "transferred", "dfw": "own"}[mid], note)
+
+
+class PoliciesAfterCalibrationTests(unittest.TestCase):
+    def test_generate_takes_a_policy_package(self):
+        import inspect
+        from metro import generate
+        self.assertIn("policies", inspect.signature(generate.generate).parameters)
+        src = inspect.getsource(generate.generate)
+        # the constant is fitted before the policies are merged, and kept after
+        self.assertLess(src.index("ridership_constant("), src.index("config.merge(cfg, copy.deepcopy(policies))"))
