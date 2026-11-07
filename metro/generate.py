@@ -263,8 +263,10 @@ def generate(metro_id, budget_musd=None, years=None, out=None, run_model=True, o
     if full_model:   # a wider pool for the full model to prune (metro/modelselect.py)
         gsel = copy.deepcopy(gp)
         gsel["selection"]["min_trips_per_musd"] *= mc["pool_floor_factor"]
+        gsel["selection"]["max_lines"] = max(gsel["selection"]["max_lines"], mc.get("pool_max_lines", 0))
         log(f"  sketch pool (floor {gsel['selection']['min_trips_per_musd']} per $M) for the full model:")
-    chosen, spent = select.run(cands, sk, budget, gsel, cfg, exist_P, [v[:2] for v in ex.stations.values()], log)
+    chosen, spent = select.run(cands, sk, budget * (mc.get("pool_budget_factor", 1.0) if full_model else 1.0), gsel, cfg,
+                               exist_P, [v[:2] for v in ex.stations.values()], log)
     y_open = cfg["existing_year"] + gp["opens_after_years"]
     model_rounds = None
     if full_model and chosen:

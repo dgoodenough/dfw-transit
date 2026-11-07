@@ -221,10 +221,13 @@ class FullModelSelectionTests(unittest.TestCase):
         a, b, c = C("A", 1000), C("B", 1000), C("C", 1000)
         trips = {"A": 5000, "B": 2000, "C": 500}   # per $M: 5, 2, 0.5
 
-        def fake_values(ctx, net, ids, year, procs=None):
+        def fake_values(ctx, net, ids, year, procs=None, inputs=None, alone=None):
+            for l in ids:
+                alone[l] = trips[l]
+            alone[None] = 0.0
             return {l: (trips[l], trips[l]) for l in ids}, 0.0, 0.0
-        old = modelselect.values
-        modelselect.values = fake_values
+        old, old_lu = modelselect.values, modelselect.land_use
+        modelselect.values, modelselect.land_use = fake_values, lambda *a: None
         try:
             gp = {"selection": {"model": {"min_trips_per_musd": 1.0}}}
             cfg = {"staging": {"value_opex_years": 20}}
@@ -236,7 +239,7 @@ class FullModelSelectionTests(unittest.TestCase):
                                         gp, cfg, 2050, log=lambda *x: None)
             self.assertEqual([x.uid for x in kept], ["A"])   # over budget: the lower value goes
         finally:
-            modelselect.values = old
+            modelselect.values, modelselect.land_use = old, old_lu
 
     def test_generate_with_full_model(self):
         try:

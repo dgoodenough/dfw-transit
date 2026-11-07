@@ -4,7 +4,7 @@ The sketch (metro/sketch.py) values a candidate by commutes between its own stat
 transfers, no feeder buses, no network. Here the greedy sketch selection runs with a lower floor
 (selection.model.pool_floor_factor) to give a wider pool, and the full model (dfwt) prunes it:
 
-  value of a line = mean of two measures, on one land use (every pool line open, in judge_year,
+  value of a line = mean of two measures, on one land use (every line of the first pool open, in judge_year,
                     with the metro's growth and station-area development: dfwt evaluate._all_open,
                     as DFW Transit's final_values):
                       without  daily trips the pool network loses without the line
@@ -40,12 +40,17 @@ def _job(args):
     return lid, mode, r["daily_trips"]
 
 
-def values(ctx, net, gen_ids, year, procs=None):
-    """{line_id: (without, alone)} daily trips for each line in gen_ids."""
+def values(ctx, net, gen_ids, year, procs=None, inputs=None, alone=None):
+    """{line_id: (without, alone)} daily trips for each line in gen_ids, and the trips with all and with
+    none of them. `inputs`: the land use (default: this network's, every line open); `alone`: a cache
+    {line_id: trips with only that line added}, filled here (on a fixed land use it doesn't depend on
+    which other lines are in the pool)."""
     net = evaluate._all_open(net)
     gen = set(gen_ids)
-    jobs = [(None, "full"), (None, "none")] + [(l, m) for l in sorted(gen) for m in ("without", "alone")]
-    _POOL.update(ctx=ctx, net=net, gen=gen, year=year, inputs=ctx.year_inputs(net, year))
+    alone = {} if alone is None else alone
+    jobs = [(None, "full")] + ([] if None in alone else [(None, "none")]) + [(l, "without") for l in sorted(gen)] + \
+        [(l, "alone") for l in sorted(gen) if l not in alone]
+    _POOL.update(ctx=ctx, net=net, gen=gen, year=year, inputs=inputs or ctx.year_inputs(net, year))
     procs = procs or max(1, min(3, (os.cpu_count() or 2) - 1))
     if procs <= 1 or len(jobs) <= 4:
         res = [_job(j) for j in jobs]
@@ -54,8 +59,16 @@ def values(ctx, net, gen_ids, year, procs=None):
         with mp.get_context("fork").Pool(procs) as pool:
             res = pool.map(_job, jobs, chunksize=1)
     out = {(lid, mode): t for lid, mode, t in res}
-    full, none = out[(None, "full")], out[(None, "none")]
-    return {l: (full - out[(l, "without")], out[(l, "alone")] - none) for l in gen}, full, none
+    for (lid, mode), t in out.items():
+        if mode in ("alone", "none"):
+            alone[lid] = t
+    full, none = out[(None, "full")], alone[None]
+    return {l: (full - out[(l, "without")], alone[l] - none) for l in gen}, full, none
+
+
+def land_use(ctx, net, year):
+    """Zones and commutes in `year` with every line of `net` open."""
+    return ctx.year_inputs(evaluate._all_open(net), year)
 
 
 def prune(pool, build_net, ctx, budget, gp, cfg, year, log=print):
@@ -66,10 +79,20 @@ def prune(pool, build_net, ctx, budget, gp, cfg, year, log=print):
     years = cfg["staging"].get("value_opex_years", 20)
     pool = list(pool)
     rounds = []
+    fixed = {}   # land use of the whole first pool, every line open; trips with each line alone (by cand uid)
 
     def value_all():
         net, uid_of = build_net(pool)
-        v, full, none = values(ctx, net, uid_of.keys(), year, mc.get("procs"))
+        if "inputs" not in fixed:
+            fixed["inputs"] = land_use(ctx, net, year)
+        # line ids change as the pool shrinks; the alone cache is kept by cand uid
+        alone = {lid: fixed[uid] for lid, uid in uid_of.items() if uid in fixed}
+        if "none" in fixed:
+            alone[None] = fixed["none"]
+        v, full, none = values(ctx, net, uid_of.keys(), year, mc.get("procs"), fixed["inputs"], alone)
+        fixed["none"] = none
+        for lid, uid in uid_of.items():
+            fixed[uid] = alone[lid]
         by = {c.uid: c for c in pool}
         for lid, (w, a) in v.items():
             c = by[uid_of[lid]]
