@@ -18,6 +18,7 @@ Steps (each module's docstring has the details and every threshold is in metro/g
 The output folder loads in the existing tools: python -m dfwt validate --scenario <abs path>.
 """
 import collections
+import copy
 import json
 import math
 import os
@@ -150,7 +151,7 @@ class Existing:
 
 
 def generate(metro_id, budget_musd=None, years=None, out=None, run_model=True, override=None, log=print, metro=None,
-             jobs_proxy=None, buildout=None):
+             jobs_proxy=None, buildout=None, policies=None):
     """Run every step for one metro; `metro` (an inputs.Metro) replaces reading data/metros/<id>/ (tests)."""
     t0 = time.time()
     if buildout is None:   # the registry can ask for it (metros.json buildout: true)
@@ -200,7 +201,7 @@ def generate(metro_id, budget_musd=None, years=None, out=None, run_model=True, o
         return float(dens800.density_at(x, y))
 
     # 2. links and candidate paths -----------------------------------------------
-    router = routing.Router(m, os.path.join(out, "cache", "routes.json"))
+    router = routing.Router(m, os.path.join(out, "cache", "routes.json"), frontage=dens_fn, brt=gp.get("routing", {}).get("brt"))
     links = candidates.build_links(m, router, urban, towns, gp, log)
     by = {c.id: c for c in urban + towns}
     ex = Existing(m, cfg["modes"])
@@ -213,6 +214,16 @@ def generate(metro_id, budget_musd=None, years=None, out=None, run_model=True, o
     # 3. mode, stations, cost, sketch value per candidate ---------------------------
     ctx, od = model.gravity_od(m, cfg)
     asc_note = ridership_constant(metro_id, m, cfg, ctx, ex, log)   # before the sketch: it uses the constant too
+    if policies:
+        # A policy package (config.json keys, e.g. a scenario's access and parking levers) goes on top of the
+        # constant fitted to today's riders under today's conditions. Fitting it with the policies already on
+        # would make today's lines carry today's riders despite them, cancelling them on every line.
+        asc = cfg["ridership"]["asc"]
+        config.merge(cfg, copy.deepcopy(policies))
+        cfg["ridership"]["asc"] = asc
+        ctx, od = model.gravity_od(m, cfg)   # a fresh context: zones cache parking prices
+        asc_note += "; with a policy package on top (" + ", ".join(
+            f"{k}.{kk}" for k, v in policies.items() if not k.startswith("_") for kk in (v if isinstance(v, dict) else [k])) + ")"
     sk = sketch.Sketch(m, cfg, od, gp["sketch"]["walk_km"])
     for ln in ex.lines:   # today's lines set the bar every candidate must beat
         n = len(ln["stations"])

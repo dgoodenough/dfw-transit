@@ -207,14 +207,15 @@ class Graph:
         return out
 
 
-def route(G, stops_xy, max_turn, snap_r=400, w_cls=None, turn_pen=0.0, detour=3.0, snap_w=3.0, prefer=None):
-    """Polyline through the stations in order, or (None, reason)."""
+def route(G, stops_xy, max_turn, snap_r=400, w_cls=None, turn_pen=0.0, detour=3.0, snap_w=3.0, prefer=None, w_fn=None):
+    """Polyline through the stations in order, or (None, reason). `w_fn(edge)`, optional, multiplies an
+    edge's cost (e.g. cheaper where people and jobs line the street)."""
     w_cls = w_cls or {}
     rx = re.compile(prefer) if prefer else None
 
     def W(e):
         ed = G.edges[e]
-        return ed[6] * w_cls.get(ed[3], 1.0) * (0.6 if rx and rx.search(ed[7]) else 1.0)
+        return ed[6] * w_cls.get(ed[3], 1.0) * (0.6 if rx and rx.search(ed[7]) else 1.0) * (w_fn(ed) if w_fn else 1.0)
 
     legs, cur = [], None
     for k in range(len(stops_xy) - 1):
