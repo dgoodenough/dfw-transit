@@ -201,7 +201,7 @@ def generate(metro_id, budget_musd=None, years=None, out=None, run_model=True, o
         return float(dens800.density_at(x, y))
 
     # 2. links and candidate paths -----------------------------------------------
-    router = routing.Router(m, os.path.join(out, "cache", "routes.json"))
+    router = routing.Router(m, os.path.join(out, "cache", "routes.json"), frontage=dens_fn, brt=gp.get("routing", {}).get("brt"))
     links = candidates.build_links(m, router, urban, towns, gp, log)
     by = {c.id: c for c in urban + towns}
     ex = Existing(m, cfg["modes"])

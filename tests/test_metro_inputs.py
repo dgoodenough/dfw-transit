@@ -424,3 +424,30 @@ class PoliciesAfterCalibrationTests(unittest.TestCase):
         src = inspect.getsource(generate.generate)
         # the constant is fitted before the policies are merged, and kept after
         self.assertLess(src.index("ridership_constant("), src.index("config.merge(cfg, copy.deepcopy(policies))"))
+
+
+class StreetProfileTests(unittest.TestCase):
+    def test_frontage_makes_busy_streets_cheaper_and_highways_stay_dear(self):
+        import json
+        from metro import routing
+
+        class M:
+            lat0, lon0, osm = 30.6, -96.3, {}
+
+            def xy(self, lat, lon):
+                return (lon - self.lon0) * 96.0, (lat - self.lat0) * 111.0
+        dens = {"busy": 12000.0, "empty": 0.0}
+        which = {"v": "empty"}
+        r = routing.Router(M(), frontage=lambda x, y: dens[which["v"]], brt={"frontage_ref": 6000, "frontage_min": 0.6})
+        from dfwt import osmroute
+        ed_a = (0, 1, [osmroute.xy(-96.30, 30.60), osmroute.xy(-96.29, 30.60)], "primary", True, True, 1000.0, "")
+        ed_b = (0, 1, [osmroute.xy(-96.30, 30.61), osmroute.xy(-96.29, 30.61)], "primary", True, True, 1000.0, "")
+        which["v"] = "empty"
+        empty = r._frontage_w(ed_a)
+        which["v"] = "busy"
+        busy = r._frontage_w(ed_b)
+        self.assertAlmostEqual(empty, 1.0)
+        self.assertLess(busy, 0.75)
+        self.assertGreaterEqual(busy, 0.6)
+        w = json.load(open(os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "metro", "generate.json")))["routing"]["brt"]["w_cls"]
+        self.assertGreater(w["motorway"] * 0.6, w["primary"])   # even a busy freeway frontage costs more than an empty arterial
