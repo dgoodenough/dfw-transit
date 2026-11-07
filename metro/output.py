@@ -235,6 +235,11 @@ def report(out, m, gp, cfg, urban, towns, links, cands, chosen, budget, spent, s
       "headways and the ridership logit: `config.json`. Load it in the DFW tools with "
       f"`python -m dfwt validate --scenario $PWD/generated/{metro_id}`.")
     w("")
+    if gp.get("buildout_mode"):
+        w("**Build-out mode** (`metro/generate.json` buildout): smaller activity centers, BRT down to "
+          f"{gp['modes']['brt']:,} people + jobs per route-km, and a stopping rule of {gp['selection']['min_trips_per_musd']} "
+          "new daily trips per $M.")
+        w("")
     if flags:
         w("**Data warnings:** " + "; ".join(flags) + ".")
         w("")

@@ -67,5 +67,11 @@
     "max_lines": 80
   },
   "existing_year": null,
-  "opens_after_years": 5
+  "opens_after_years": 5,
+  "buildout": {
+    "_doc": "Build-out mode (python -m metro generate <id> --buildout, or registry key buildout: true): for a metro whose layout can carry a network as big as DFW Transit's 2 million riders plan, and a budget to match. Merged over the parameters above. Smaller and closer activity centers make the Gabriel graph a web along the arterials (the generator's version of the hand plan's arterial BRT grid); BRT down to the hand plan's thinnest BRT corridors (about 1,900 people + jobs per route-km); a lower stopping rule and more lines. Use it per metro, not by default. Tested at DFW Transit's 75-year rate per resident, on today's land use: in Austin with the 2 million plan's policies it builds $28B instead of $17B and carries 5.2% of commutes instead of 3.9%, and in San Antonio $27B and 4.2% instead of $15B and 3.2%; in DFW it adds $17B of BRT ($86B against $69B) for the same riders, and in El Paso the smaller centers split its few strong corridors and it does worse. Neither mode reaches the DFW hand plan's 315,000 trips on today's land use: the hand plan has pieces a corridor generator doesn't draw (the downtown subway, through-running regional rail).",
+    "centers": {"min_density": 3000, "min_activity": 12000, "merge_km": 2.0},
+    "modes": {"brt": 2000},
+    "selection": {"min_trips_per_musd": 0.25, "max_lines": 250}
+  }
 }

@@ -154,3 +154,16 @@ class GeneratorTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class BuildoutParamsTests(unittest.TestCase):
+    def test_buildout_block_merges_only_when_asked(self):
+        from metro import generate
+        base, bo = generate.params(), generate.params(buildout=True)
+        self.assertNotIn("buildout", base)
+        self.assertFalse(base["buildout_mode"])
+        self.assertTrue(bo["buildout_mode"])
+        self.assertLess(bo["centers"]["min_activity"], base["centers"]["min_activity"])
+        self.assertLess(bo["modes"]["brt"], base["modes"]["brt"])
+        self.assertLess(bo["selection"]["min_trips_per_musd"], base["selection"]["min_trips_per_musd"])
+        self.assertEqual(bo["modes"]["metro"], base["modes"]["metro"])   # untouched keys stay

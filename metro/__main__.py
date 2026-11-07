@@ -39,6 +39,8 @@ def main(argv=None):
     g.add_argument("--years", type=int, help="years of the flat budget (default metro/generate.json selection.years)")
     g.add_argument("--out", help="output folder (default generated/<id>)")
     g.add_argument("--no-model", action="store_true", help="skip the dfwt demand-model run")
+    g.add_argument("--buildout", action="store_true", default=None,
+                   help="build-out mode (metro/generate.json buildout): smaller centers, thinner BRT, a lower stopping rule")
     g.add_argument("--jobs-proxy", choices=["places"], help="metros without jobs data: use the Overture places proxy "
                    "(zones_places_proxy.csv) as where jobs are, flagged; output in generated/<id>_places_proxy/")
     k = sub.add_parser("calibrate", help="fit the ridership constant to the registry's calibration boardings")
@@ -63,7 +65,7 @@ def main(argv=None):
     if a.cmd == "generate":
         from .generate import generate
         generate(a.metro, budget_musd=a.budget_musd, years=a.years, out=a.out and os.path.abspath(a.out),
-                 run_model=not a.no_model, jobs_proxy=a.jobs_proxy)
+                 run_model=not a.no_model, jobs_proxy=a.jobs_proxy, buildout=a.buildout)
         return 0
     if a.cmd == "calibrate":
         import json

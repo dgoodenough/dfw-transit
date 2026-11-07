@@ -32,9 +32,15 @@ from . import candidates, centers, geom, inputs, model, output, routing, select,
 PARAMS = os.path.join(os.path.dirname(os.path.abspath(__file__)), "generate.json")
 
 
-def params(metro_id=None, override=None):
+def params(metro_id=None, override=None, buildout=False):
+    """Generator parameters: metro/generate.json, the build-out block merged over it when `buildout`,
+    then the metro's own data/metros/<id>/generate.json, then `override`."""
     with open(PARAMS, encoding="utf-8") as f:
         gp = json.load(f)
+    bo = gp.pop("buildout", None)
+    if buildout and bo:
+        config.merge(gp, {k: v for k, v in bo.items() if not k.startswith("_")})
+    gp["buildout_mode"] = bool(buildout)
     if metro_id:
         p = inputs.metro_dir(metro_id, "generate.json")
         if os.path.exists(p):
@@ -144,10 +150,16 @@ class Existing:
 
 
 def generate(metro_id, budget_musd=None, years=None, out=None, run_model=True, override=None, log=print, metro=None,
-             jobs_proxy=None):
+             jobs_proxy=None, buildout=None):
     """Run every step for one metro; `metro` (an inputs.Metro) replaces reading data/metros/<id>/ (tests)."""
     t0 = time.time()
-    gp = params(metro_id, override)
+    if buildout is None:   # the registry can ask for it (metros.json buildout: true)
+        from . import fetch
+        try:
+            buildout = bool((fetch.registry().get(metro_id) or {}).get("buildout"))
+        except FileNotFoundError:
+            buildout = False
+    gp = params(metro_id, override, buildout)
     cfg0 = config.load()
     m = metro or inputs.load(metro_id, jobs_proxy)
     out = out or inputs.home("generated", metro_id + ("_places_proxy" if m.jobs_proxy else ""))
