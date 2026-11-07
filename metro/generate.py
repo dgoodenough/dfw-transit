@@ -28,7 +28,7 @@ import numpy as np
 
 from dfwt import config, evaluate, geo
 
-from . import candidates, centers, geom, inputs, model, output, routing, select, sketch
+from . import candidates, centers, geom, inputs, model, output, modelselect, routing, select, sketch
 
 PARAMS = os.path.join(os.path.dirname(os.path.abspath(__file__)), "generate.json")
 
@@ -89,7 +89,10 @@ class Cand:
                 "trips_standalone": round(self.trips), "new_trips": round(self.new_trips),
                 "trips_per_musd": round(self.ratio, 2), "peak_hour_load": round(self.peak_hour_load),
                 "status": self.status, "order": self.order or "", "mode_reason": self.mode_reason,
-                "reason": self.reason}
+                "reason": self.reason,
+                # full-model selection (metro/modelselect.py), when it ran
+                "model_trips": round(self.model_trips) if getattr(self, "model_trips", None) is not None else "",
+                "model_trips_per_musd": round(self.model_ratio, 2) if getattr(self, "model_ratio", None) is not None else ""}
 
 
 class Existing:
@@ -151,7 +154,7 @@ class Existing:
 
 
 def generate(metro_id, budget_musd=None, years=None, out=None, run_model=True, override=None, log=print, metro=None,
-             jobs_proxy=None, buildout=None, policies=None, future_years=None):
+             jobs_proxy=None, buildout=None, policies=None, future_years=None, full_model=None):
     """Run every step for one metro; `metro` (an inputs.Metro) replaces reading data/metros/<id>/ (tests)."""
     t0 = time.time()
     if buildout is None:   # the registry can ask for it (metros.json buildout: true)
@@ -252,10 +255,32 @@ def generate(metro_id, budget_musd=None, years=None, out=None, run_model=True, o
     years = years or gp["selection"]["years"]
     budget = budget_musd or cfg0["budget"]["musd_per_year"] * years
     log(f"  budget ${budget / 1e3:.1f}B (capital, 2025 $)")
-    chosen, spent = select.run(cands, sk, budget, gp, cfg, exist_P, [v[:2] for v in ex.stations.values()], log)
+    mc = gp["selection"]["model"]
+    if full_model is None:
+        full_model = mc.get("enabled", False)
+    full_model = bool(full_model and run_model)
+    gsel = gp
+    if full_model:   # a wider pool for the full model to prune (metro/modelselect.py)
+        gsel = copy.deepcopy(gp)
+        gsel["selection"]["min_trips_per_musd"] *= mc["pool_floor_factor"]
+        log(f"  sketch pool (floor {gsel['selection']['min_trips_per_musd']} per $M) for the full model:")
+    chosen, spent = select.run(cands, sk, budget, gsel, cfg, exist_P, [v[:2] for v in ex.stations.values()], log)
+    y_open = cfg["existing_year"] + gp["opens_after_years"]
+    model_rounds = None
+    if full_model and chosen:
+        judge = mc.get("judge_year") or (min(future_years) if future_years else cfg["existing_year"] + 1)
+
+        def build_net(cs):
+            t = output.tables(m, ex, cs, by, gp, cfg, y_open, namer, set(used_names), downtowns, core_r)
+            return output.load_net(t, cfg, "generated"), modelselect.line_cands(t)
+        with model.projection(m):
+            chosen, model_rounds = modelselect.prune(chosen, build_net, ctx, budget, gp, cfg, judge, log)
+        spent = sum(c.capital for c in chosen)
+        model_rounds = {"year": judge, "floor": mc["min_trips_per_musd"], "pool_floor": gsel["selection"]["min_trips_per_musd"],
+                        "rounds": model_rounds}
+        log(f"  full model kept {len(chosen)} lines, ${spent / 1e3:.1f}B")
 
     # 5. output ---------------------------------------------------------------------
-    y_open = cfg["existing_year"] + gp["opens_after_years"]
     tables = output.tables(m, ex, chosen, by, gp, cfg, y_open, namer, used_names, downtowns, core_r)
     output.write_tables(out, tables)
     output.write_csv(os.path.join(out, "centers.csv"), [c.as_row() for c in urban + towns])
@@ -280,11 +305,12 @@ def generate(metro_id, budget_musd=None, years=None, out=None, run_model=True, o
                     res["future"][y] = {"generated": model.run_future(ctx, gen, y),
                                         "existing": model.run_future(ctx, base, y) if base.lines else None}
     output.report(out, m, gp, cfg, urban, towns, links, cands, chosen, budget, spent, stats, res, flags,
-                  time.time() - t0, metro_id, rail_why=rail_why, skipped=ex.skipped, asc_note=asc_note)
+                  time.time() - t0, metro_id, rail_why=rail_why, skipped=ex.skipped, asc_note=asc_note,
+                  model_select=model_rounds)
     output.preview(out, m, surf, urban, towns, ex, chosen, tables)
     log(f"  wrote {os.path.relpath(out, config.ROOT)}/ in {time.time() - t0:.0f}s")
     return {"out": out, "asc": cfg["ridership"]["asc"], "asc_note": asc_note, "chosen": chosen, "cands": cands, "centers": urban, "towns": towns, "stats": stats,
-            "model": res, "budget": budget, "spent": spent, "tables": tables, "ex_tables": ex.tables, "m": m, "cfg": cfg}
+            "model": res, "model_select": model_rounds, "budget": budget, "spent": spent, "tables": tables, "ex_tables": ex.tables, "m": m, "cfg": cfg}
 
 
 def registry_entry(metro_id, m):

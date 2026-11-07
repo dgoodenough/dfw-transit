@@ -207,3 +207,52 @@ class MetroGrowthTests(unittest.TestCase):
         self.assertGreater(f["daily_trips"], r["model"]["generated"]["daily_trips"])   # the region grows
         with open(os.path.join(out, "report.md"), encoding="utf-8") as fh:
             self.assertIn("2050, every line open", fh.read())
+
+
+class FullModelSelectionTests(unittest.TestCase):
+    """metro/modelselect.py: the full model prunes the sketch's pool."""
+
+    def test_prune_drops_lines_below_the_floor_and_orders_by_value(self):
+        from metro import modelselect
+
+        class C:
+            def __init__(self, uid, capital):
+                self.uid, self.capital, self.opex, self.status, self.reason, self.order = uid, capital, 0.0, "chosen", "", 0
+        a, b, c = C("A", 1000), C("B", 1000), C("C", 1000)
+        trips = {"A": 5000, "B": 2000, "C": 500}   # per $M: 5, 2, 0.5
+
+        def fake_values(ctx, net, ids, year, procs=None):
+            return {l: (trips[l], trips[l]) for l in ids}, 0.0, 0.0
+        old = modelselect.values
+        modelselect.values = fake_values
+        try:
+            gp = {"selection": {"model": {"min_trips_per_musd": 1.0}}}
+            cfg = {"staging": {"value_opex_years": 20}}
+            kept, rounds = modelselect.prune([c, b, a], lambda cs: (None, {x.uid: x.uid for x in cs}), None, 1e9,
+                                             gp, cfg, 2050, log=lambda *x: None)
+            self.assertEqual([x.uid for x in kept], ["A", "B"])
+            self.assertEqual((c.status, a.order, b.order), ("rejected", 1, 2))
+            kept, _ = modelselect.prune([a, b], lambda cs: (None, {x.uid: x.uid for x in cs}), None, 1500,
+                                        gp, cfg, 2050, log=lambda *x: None)
+            self.assertEqual([x.uid for x in kept], ["A"])   # over budget: the lower value goes
+        finally:
+            modelselect.values = old
+
+    def test_generate_with_full_model(self):
+        try:
+            import pyarrow  # noqa: F401
+        except ImportError:
+            raise unittest.SkipTest("pyarrow not installed")
+        from metro import generate
+        tmp = tempfile.mkdtemp()
+        try:
+            r = generate.generate("synthetic", out=os.path.join(tmp, "o"), metro=synthetic_metro(tmp),
+                                  log=lambda *a: None, future_years=[2050], full_model=True)
+            self.assertEqual(r["model_select"]["year"], 2050)
+            self.assertGreater(r["chosen"][0].model_trips, 0)
+            with open(os.path.join(tmp, "o", "report.md"), encoding="utf-8") as f:
+                self.assertIn("Chosen by the full model", f.read())
+        finally:
+            shutil.rmtree(tmp, ignore_errors=True)
+            from dfwt import osmroute
+            osmroute.set_origin(32.8, -97.0)
