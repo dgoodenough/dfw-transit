@@ -167,3 +167,43 @@ class BuildoutParamsTests(unittest.TestCase):
         self.assertLess(bo["modes"]["brt"], base["modes"]["brt"])
         self.assertLess(bo["selection"]["min_trips_per_musd"], base["selection"]["min_trips_per_musd"])
         self.assertEqual(bo["modes"]["metro"], base["modes"]["metro"])   # untouched keys stay
+
+
+class MetroGrowthTests(unittest.TestCase):
+    """A metro's own growth (registry `growth`) replaces DFW's forecast, and future years run."""
+
+    @classmethod
+    def setUpClass(cls):
+        try:
+            import pyarrow  # noqa: F401
+        except ImportError:
+            raise unittest.SkipTest("pyarrow not installed")
+        cls.tmp = tempfile.mkdtemp()
+
+    @classmethod
+    def tearDownClass(cls):
+        shutil.rmtree(cls.tmp, ignore_errors=True)
+        from dfwt import osmroute
+        osmroute.set_origin(32.8, -97.0)
+
+    def test_registry_growth_replaces_dfw_forecast(self):
+        from dfwt import config, growth
+        from metro import model
+        m, base = synthetic_metro(self.tmp), config.load()
+        own = {"regional_pop": {"2020": 1.0, "2050": 1.3, "_doc": "x"}, "regional_jobs": {"2023": 1.0, "2050": 1.25}}
+        cfg = model.metro_cfg(m, [], base, growth=own)
+        self.assertAlmostEqual(growth.regional(cfg, "pop", 2050), 1.3)
+        self.assertAlmostEqual(growth.regional(cfg, "jobs", 2050), 1.25)
+        self.assertEqual(cfg["growth"]["capture"]["job_centers"]["jobs_share"], 0.0)
+        cfg0 = model.metro_cfg(m, [], base)   # no registry growth: DFW's, as before
+        self.assertEqual(cfg0["growth"]["regional_pop"], base["growth"]["regional_pop"])
+
+    def test_future_years_run(self):
+        from metro import generate
+        out = os.path.join(self.tmp, "o")
+        r = generate.generate("synthetic", out=out, metro=synthetic_metro(self.tmp), log=lambda *a: None,
+                              future_years=[2050])
+        f = r["model"]["future"][2050]["generated"]
+        self.assertGreater(f["daily_trips"], r["model"]["generated"]["daily_trips"])   # the region grows
+        with open(os.path.join(out, "report.md"), encoding="utf-8") as fh:
+            self.assertIn("2050, every line open", fh.read())

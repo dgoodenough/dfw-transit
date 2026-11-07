@@ -151,7 +151,7 @@ class Existing:
 
 
 def generate(metro_id, budget_musd=None, years=None, out=None, run_model=True, override=None, log=print, metro=None,
-             jobs_proxy=None, buildout=None, policies=None):
+             jobs_proxy=None, buildout=None, policies=None, future_years=None):
     """Run every step for one metro; `metro` (an inputs.Metro) replaces reading data/metros/<id>/ (tests)."""
     t0 = time.time()
     if buildout is None:   # the registry can ask for it (metros.json buildout: true)
@@ -191,7 +191,8 @@ def generate(metro_id, budget_musd=None, years=None, out=None, run_model=True, o
         c.name = output.place_name(namer, c.lat, c.lon, used_names, c.id)
     log(f"  centers: {sum(c.kind == 'downtown' for c in urban)} downtown, {sum(c.kind == 'major' for c in urban)} major, "
         f"{sum(c.kind == 'minor' for c in urban)} minor; {len(towns)} towns")
-    cfg = model.metro_cfg(m, urban, cfg0)
+    entry = registry_entry(metro_id, m)
+    cfg = model.metro_cfg(m, urban, cfg0, growth=entry.get("growth"))   # the metro's own growth, if the registry gives it
     downtowns = [(c.x, c.y) for c in urban if c.kind == "downtown"]
     core_r = gp["grade"]["core_radius_km"]
     urban_density = cfg["growth"]["tod"]["setting_density_per_km2"]["urban"]
@@ -267,6 +268,17 @@ def generate(metro_id, budget_musd=None, years=None, out=None, run_model=True, o
     elif run_model:
         log("  demand model (dfwt, today's land use, every line open) ...")
         res = output.model_runs(m, cfg, ctx, tables, ex)
+        if future_years:
+            # every line open in later years: the metro's growth plus station-area development (config growth),
+            # today's network under the same growth for comparison
+            res["future"] = {}
+            with model.projection(m):
+                base = output.load_net(ex.tables, cfg, "existing")
+                gen = output.load_net(tables, cfg, "generated")
+                for y in future_years:
+                    log(f"  demand model, {y} ...")
+                    res["future"][y] = {"generated": model.run_future(ctx, gen, y),
+                                        "existing": model.run_future(ctx, base, y) if base.lines else None}
     output.report(out, m, gp, cfg, urban, towns, links, cands, chosen, budget, spent, stats, res, flags,
                   time.time() - t0, metro_id, rail_why=rail_why, skipped=ex.skipped, asc_note=asc_note)
     output.preview(out, m, surf, urban, towns, ex, chosen, tables)
@@ -328,7 +340,7 @@ def calibrate(metro_id, log=print):
     cp = gp["centers"]
     urban = centers.find(m, centers.Surface(m, cp["grid_km"], cp["kernel_km"]), cp)
     centers.classify(m, urban, cp)
-    cfg = model.metro_cfg(m, urban, config.load())
+    cfg = model.metro_cfg(m, urban, config.load(), growth=registry_entry(metro_id, m).get("growth"))
     ex = Existing(m, cfg["modes"])
     ctx, _ = model.gravity_od(m, cfg)
     note = ridership_constant(metro_id, m, cfg, ctx, ex, log)
