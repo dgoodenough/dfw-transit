@@ -117,7 +117,7 @@ def run_future(ctx, net, year, want_loads=False):
     around stations opened after existing_year, by the TOD uplift and the capture policy (config
     growth), as DFW's own years are."""
     r = evaluate.run_year(ctx, all_open(net), year, want_loads=want_loads)
-    out = {k: r[k] for k in ("daily_trips", "daily_boardings", "transit_commuters", "pop", "jobs")}
+    out = {k: r[k] for k in ("daily_trips", "daily_boardings", "transit_commuters", "pop", "jobs", "feeder_boardings")}
     out["access_jobs_45"] = r["access_jobs"].get(45, 0.0)
     return out
 
