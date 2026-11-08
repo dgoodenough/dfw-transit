@@ -41,6 +41,8 @@ def main(argv=None):
     g.add_argument("--no-model", action="store_true", help="skip the dfwt demand-model run")
     g.add_argument("--future-years", type=lambda v: [int(x) for x in v.split(",")],
                    help="also run the model in these years, every line open (e.g. 2050,2100)")
+    g.add_argument("--full-model", action="store_true", default=None,
+                   help="full-model selection (metro/generate.json selection.model): the demand model prunes a wider sketch pool")
     g.add_argument("--buildout", action="store_true", default=None,
                    help="build-out mode (metro/generate.json buildout): smaller centers, thinner BRT, a lower stopping rule")
     g.add_argument("--jobs-proxy", choices=["places"], help="metros without jobs data: use the Overture places proxy "
@@ -68,7 +70,7 @@ def main(argv=None):
         from .generate import generate
         generate(a.metro, budget_musd=a.budget_musd, years=a.years, out=a.out and os.path.abspath(a.out),
                  run_model=not a.no_model, jobs_proxy=a.jobs_proxy, buildout=a.buildout,
-                 future_years=a.future_years)
+                 future_years=a.future_years, full_model=a.full_model)
         return 0
     if a.cmd == "calibrate":
         import json

@@ -69,7 +69,17 @@
     "min_trips_per_musd": 0.5,
     "duplicate_m": 400,
     "duplicate_share": 0.5,
-    "max_lines": 80
+    "max_lines": 80,
+    "model": {
+      "_doc": "Full-model selection (metro/modelselect.py), off unless enabled (or generate(full_model=True), CLI --full-model). The sketch selection runs with its floor x pool_floor_factor (0: every candidate its other rules allow: no duplicates or islands), up to pool_max_lines lines and pool_budget_factor x the budget, to give a wider pool, then the dfwt demand model prunes it: each line's value is the mean of the daily trips the pool network loses without it and the trips it adds alone to today's network, in judge_year (default: the first of generate's future_years, else the year after existing_year) on the land use of the whole first pool open (fixed through the rounds), per $M of capital + value_opex_years x opex. Rounds drop the worse half of the lines below min_trips_per_musd until none is, then the lowest-valued lines until the pool fits the budget. The model's trips are several times the sketch's (transfers, feeder buses, growth), so the floor is its own: 1.0, about the 10th percentile of DFW Transit's 2 million plan's lines on the same measure (results/two_million/line_values.csv: 0.25 to 57, median 4.6, in 2100).",
+      "enabled": false,
+      "pool_floor_factor": 0.0,
+      "pool_max_lines": 150,
+      "pool_budget_factor": 1.5,
+      "min_trips_per_musd": 1.0,
+      "judge_year": null,
+      "procs": null
+    }
   },
   "existing_year": null,
   "opens_after_years": 5,

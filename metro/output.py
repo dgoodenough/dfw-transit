@@ -225,7 +225,7 @@ def _f(x, unit=""):
 
 
 def report(out, m, gp, cfg, urban, towns, links, cands, chosen, budget, spent, st, res, flags, secs, metro_id,
-           rail_why=None, skipped=None, asc_note=None):
+           rail_why=None, skipped=None, asc_note=None, model_select=None):
     L = []
     w = L.append
     w(f"# Generated network: {metro_name(m)}")
@@ -330,7 +330,17 @@ def report(out, m, gp, cfg, urban, towns, links, cands, chosen, budget, spent, s
     w("")
     w("## 3. Chosen lines")
     w("")
-    w("In the order chosen (most new daily trips per $M first; sketch demand, single-line trips).")
+    if model_select:
+        ms = model_select
+        r0, r1 = ms["rounds"][0], ms["rounds"][-1]
+        w(f"Chosen by the full model (metro/modelselect.py): the sketch drew a pool of {r0['lines']} lines (floor "
+          f"{ms['pool_floor']} new trips per $M), carrying {r0['trips']:,.0f} new daily trips in {ms['year']} in the "
+          f"full model; {len(ms['rounds'])} rounds of pruning lines under {ms['floor']} per $M (each line valued by the "
+          f"mean of the trips lost without it and the trips it adds alone) kept {r1['lines']}, carrying "
+          f"{r1['trips']:,.0f}. In order of that value; the table's trips are the sketch's, the full model's are in "
+          "`candidates.csv` (model_trips).")
+    else:
+        w("In the order chosen (most new daily trips per $M first; sketch demand, single-line trips).")
     w("")
     w("| # | line | mode | km | stops | density /route-km | capital $B | new trips/day | trips per $M | "
       "peak-hour load | why this mode |")
