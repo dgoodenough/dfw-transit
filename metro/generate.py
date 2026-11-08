@@ -277,7 +277,7 @@ def generate(metro_id, budget_musd=None, years=None, out=None, run_model=True, o
             return output.load_net(t, cfg, "generated"), modelselect.line_cands(t)
         with model.projection(m):
             chosen, model_rounds = modelselect.prune(chosen, build_net, ctx, budget, gp, cfg, judge, log)
-        spent = sum(c.capital for c in chosen)
+        spent = sum(getattr(c, "model_capital", c.capital) for c in chosen)
         model_rounds = {"year": judge, "floor": mc["min_trips_per_musd"], "pool_floor": gsel["selection"]["min_trips_per_musd"],
                         "rounds": model_rounds}
         log(f"  full model kept {len(chosen)} lines, ${spent / 1e3:.1f}B")

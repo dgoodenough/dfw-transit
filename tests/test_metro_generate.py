@@ -259,3 +259,34 @@ class FullModelSelectionTests(unittest.TestCase):
             shutil.rmtree(tmp, ignore_errors=True)
             from dfwt import osmroute
             osmroute.set_origin(32.8, -97.0)
+
+
+class BranchRuleTests(unittest.TestCase):
+    """metro/select.py: a candidate sharing a trunk is a branch if it runs branch_min_km on its own."""
+
+    def test_branch_allowed_parallel_copy_rejected(self):
+        from metro import select
+
+        class Sk:   # the trunk carries the most
+            def line(self, mode, st, *a, **k):
+                return {"new_trips": 20000.0 if st[-1] == (20, 0) else 10000.0}
+
+        class C:
+            def __init__(self, uid, P, seq):
+                self.uid, self.P, self.seq, self.kind, self.mode = uid, P, seq, "road", "brt"
+                self.km = sum(math.dist(a, b) for a, b in zip(P, P[1:]))
+                self.capital, self.opex, self.status, self.ratio = 1000.0, 0.0, "pool", 10.0
+                self.station_xy = [P[0], P[-1]]
+                self.along, self.pnr, self.pnr_cap, self.name, self.order = [], [], [], uid, None
+        trunk = C("A", [(0, 0), (20, 0)], ("a", "b"))
+        branch = C("B", [(0, 0), (12, 0), (12, 8)], ("a", "c"))          # 12 km on the trunk, 8 of its own
+        copy_ = C("D", [(0, 0.3), (20, 0.3)], ("d", "e"))                 # 300 m beside the trunk all the way
+        trunk.ratio, branch.ratio, copy_.ratio = 12.0, 11.0, 10.0
+        gp = {"selection": {"min_trips_per_musd": 0.5, "max_lines": 10, "duplicate_m": 400, "duplicate_share": 0.5,
+                            "branch_min_km": 5, "branch_share_m": 250}, "stations": {"transfer_m": 800}}
+        chosen, spent = select.run([trunk, branch, copy_], Sk(), 1e9, gp, {"staging": {"value_opex_years": 20}}, [], [],
+                                   log=lambda *a: None)
+        self.assertEqual([c.uid for c in chosen], ["A", "B"])
+        self.assertIn("a branch", branch.reason)
+        self.assertTrue(copy_.reason.startswith("duplicate"))
+        self.assertAlmostEqual(branch.cost_charged, 1000 * 8 / 20, delta=80)   # its own 8 of 20 km

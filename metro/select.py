@@ -11,7 +11,9 @@ of the queue needs re-evaluating. Each pick:
   * a pick running within duplicate_m of chosen or existing lines for more than
     duplicate_share of its length is rejected as a duplicate, unless it extends a chosen
     line of its mode (that line's centers are the start or end of the candidate's): then the
-    chosen line is replaced and only the extra cost is charged.
+    chosen line is replaced and only the extra cost is charged; or unless it runs at least
+    branch_min_km on its own (a branch off a shared trunk): then the share of it within
+    branch_share_m of chosen lines of its mode isn't charged.
 """
 import heapq
 import math
@@ -74,11 +76,24 @@ def run(cands, sketch, budget, gp, cfg, existing_lines, existing_stations, log=p
             break
         others = [d.P for d in chosen if d is not ext] + exist_P
         dup = geom.share_near(c.P, others, sel["duplicate_m"] / 1000) if others else 0.0
+        branch = None
         if dup > sel["duplicate_share"]:
-            near = _nearest_name(c, [d for d in chosen if d is not ext], sel["duplicate_m"] / 1000)
-            c.status, c.reason = "rejected", f"duplicate: {dup:.0%} of it within {sel['duplicate_m']} m of " + (
-                f"chosen line {near}" if near else "existing transit")
-            continue
+            own_km = c.km * (1 - dup)
+            if own_km < (sel.get("branch_min_km") or float("inf")):
+                near = _nearest_name(c, [d for d in chosen if d is not ext], sel["duplicate_m"] / 1000)
+                c.status, c.reason = "rejected", f"duplicate: {dup:.0%} of it within {sel['duplicate_m']} m of " + (
+                    f"chosen line {near}" if near else "existing transit") + (
+                    f", {own_km:.1f} km of its own" if sel.get("branch_min_km") else "")
+                continue
+            # a branch: shares a trunk but runs at least branch_min_km on its own. Track it shares with a chosen
+            # line of its mode (stations within the tables' snap distance, so the same station pairs) isn't built
+            # twice: charge only its own share (the network's costs split shared track the same way)
+            same = [d.P for d in chosen if d is not ext and d.mode == c.mode]
+            shared = geom.share_near(c.P, same, sel.get("branch_share_m", 250) / 1000) if same else 0.0
+            cap *= 1 - shared
+            cost = max(cap + years * opx, 1.0)
+            c.ratio = c.new_trips / cost
+            branch = (dup, own_km, shared)
         if spent + cap > budget:
             c.status, c.reason = "rejected", f"over budget (needs ${cap / 1e3:.1f}B, ${(budget - spent) / 1e3:.1f}B left)"
             continue
@@ -91,6 +106,9 @@ def run(cands, sketch, budget, gp, cfg, existing_lines, existing_stations, log=p
         spent += cap
         c.status, c.order, c.cost_charged = "chosen", order, cap
         c.reason = f"{c.new_trips:,.0f} new daily trips for ${cap / 1e3:.2f}B capital ({c.ratio:.2f} per $M incl. opex)"
+        if branch:
+            c.reason += (f"; a branch: {branch[0]:.0%} within {sel['duplicate_m']} m of other lines, {branch[1]:.1f} km "
+                         f"of its own, {branch[2]:.0%} on a same-mode trunk (not charged)")
         if ext:
             ext.status, ext.reason = "replaced", f"extended by {c.uid}"
             chosen.remove(ext)
