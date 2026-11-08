@@ -9,8 +9,8 @@ transfers, no feeder buses, no network. Here the greedy sketch selection runs wi
                     as DFW Transit's final_values):
                       without  daily trips the pool network loses without the line
                       alone    daily trips the line adds alone to today's network
-                    per $M of capital + staging.value_opex_years x operating cost (the sketch's
-                    measure, now in the model's trips)
+                    per $M of its share of the network's capital (shared track split among the lines
+                    of its mode on it) + staging.value_opex_years x operating cost
 
 Each round drops the worse half of the lines below selection.model.min_trips_per_musd (at least
 one) and values the rest again, since a dropped line's riders may move to its neighbours; then,
@@ -98,7 +98,10 @@ def prune(pool, build_net, ctx, budget, gp, cfg, year, log=print):
             c = by[uid_of[lid]]
             c.model_without, c.model_alone = w, a
             c.model_trips = (w + a) / 2
-            c.model_ratio = c.model_trips / max(c.capital + years * c.opex, 1.0)
+            # its share of the network's capital: track and platforms shared with other lines of its mode
+            # (a branch's trunk) split evenly among them (dfwt Network.shared_cost_musd)
+            c.model_capital = net.shared_cost_musd(net.lines[lid]) if net is not None else c.capital
+            c.model_ratio = c.model_trips / max(c.model_capital + years * c.opex, 1.0)
         return full, none
 
     while pool:
@@ -114,7 +117,7 @@ def prune(pool, build_net, ctx, budget, gp, cfg, year, log=print):
                         f"({c.model_ratio:.2f} per $M incl. opex, below {floor})")
             pool.remove(c)
     over = False
-    while pool and sum(c.capital for c in pool) > budget:
+    while pool and sum(getattr(c, "model_capital", c.capital) for c in pool) > budget:
         c = min(pool, key=lambda c: c.model_ratio)
         c.status, c.reason = "rejected", f"full model: over budget, lowest value ({c.model_ratio:.2f} per $M)"
         pool.remove(c)

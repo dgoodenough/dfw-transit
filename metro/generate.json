@@ -64,11 +64,13 @@
             "frontage_ref": 6000, "frontage_min": 0.6, "frontage_road": 2.0}
   },
   "selection": {
-    "_doc": "Greedy selection: the candidate with the most new daily trips per $M of (capital + value_opex_years x operating cost) is chosen, again and again, until the budget (capital, 2025 $) is spent or no candidate reaches min_trips_per_musd. A candidate within duplicate_m of chosen or existing lines for more than duplicate_share of its length is a duplicate, unless it extends a chosen line of the same mode (that line is replaced by the longer one and only the extra cost is charged). Default budget: config budget.musd_per_year x years.",
+    "_doc": "Greedy selection: the candidate with the most new daily trips per $M of (capital + value_opex_years x operating cost) is chosen, again and again, until the budget (capital, 2025 $) is spent or no candidate reaches min_trips_per_musd. A candidate within duplicate_m of chosen or existing lines for more than duplicate_share of its length is a duplicate, unless it extends a chosen line of the same mode (that line is replaced by the longer one and only the extra cost is charged), or unless it runs at least branch_min_km on its own (null: never): a branch off a shared trunk, charged only for what isn't within branch_share_m of chosen lines of its mode (the output tables snap stops within 250 m, so those stretches share station pairs and the network splits their cost). Default budget: config budget.musd_per_year x years.",
     "years": 30,
     "min_trips_per_musd": 0.5,
     "duplicate_m": 400,
     "duplicate_share": 0.5,
+    "branch_min_km": 5,
+    "branch_share_m": 250,
     "max_lines": 80,
     "model": {
       "_doc": "Full-model selection (metro/modelselect.py), off unless enabled (or generate(full_model=True), CLI --full-model). The sketch selection runs with its floor x pool_floor_factor (0: every candidate its other rules allow: no duplicates or islands), up to pool_max_lines lines and pool_budget_factor x the budget, to give a wider pool, then the dfwt demand model prunes it: each line's value is the mean of the daily trips the pool network loses without it and the trips it adds alone to today's network, in judge_year (default: the first of generate's future_years, else the year after existing_year) on the land use of the whole first pool open (fixed through the rounds), per $M of capital + value_opex_years x opex. Rounds drop the worse half of the lines below min_trips_per_musd until none is, then the lowest-valued lines until the pool fits the budget. The model's trips are several times the sketch's (transfers, feeder buses, growth), so the floor is its own: 1.0, about the 10th percentile of DFW Transit's 2 million plan's lines on the same measure (results/two_million/line_values.csv: 0.25 to 57, median 4.6, in 2100).",
