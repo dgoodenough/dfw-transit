@@ -315,6 +315,7 @@ def generate(metro_id, budget_musd=None, years=None, out=None, run_model=True, o
                                            anchor_pts, [v[:2] for v in ex.stations.values()],
                                            modelselect.land_use(ctx, net0, judge), log)
                 chosen = planner.run(chosen)
+                chosen = modelselect.revalue(chosen, build_net, ctx, gp, cfg, judge, log)   # values and order of the final network
             spent = planner.end["capital"]
             plan_result = {"start": planner.start, "end": planner.end, "history": planner.history, "floor": planner.floor,
                            "anchor_trips": planner.anchor_trips}

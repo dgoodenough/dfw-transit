@@ -133,6 +133,31 @@ def prune(pool, build_net, ctx, budget, gp, cfg, year, log=print):
     return pool, rounds
 
 
+def revalue(pool, build_net, ctx, gp, cfg, year, log=print):
+    """Value every line of a finished network (after metro/lineplan.py has changed it) as prune() does, on
+    its own land use (every line open): model_without, model_alone, model_trips, model_capital and
+    model_ratio, and the opening order by model_ratio. Lines the planner added have no value from the
+    pruning, and the order must follow the network that is actually built. Returns the pool, ordered."""
+    mc = gp["selection"]["model"]
+    years = cfg["staging"].get("value_opex_years", 20)
+    net, uid_of = build_net(pool)
+    if net is None or not uid_of:
+        return pool
+    v, full, none = values(ctx, net, uid_of.keys(), year, mc.get("procs"), land_use(ctx, net, year))
+    by = {c.uid: c for c in pool}
+    for lid, (w, a) in v.items():
+        c = by[uid_of[lid]]
+        c.model_without, c.model_alone = w, a
+        c.model_trips = (w + a) / 2
+        c.model_capital = net.shared_cost_musd(net.lines[lid])
+        c.model_ratio = c.model_trips / max(c.model_capital + years * c.opex, 1.0)
+    pool = sorted(pool, key=lambda c: -getattr(c, "model_ratio", 0.0))
+    for k, c in enumerate(pool, 1):
+        c.order = k
+    log(f"  full model, {year}, the planned network: {len(pool)} lines, {full - none:,.0f} new daily trips")
+    return pool
+
+
 def line_cands(tables):
     """{line_id: cand uid} for the generated lines of `tables` (output.tables notes)."""
     out = {}
