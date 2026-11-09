@@ -4,8 +4,12 @@ stadiums, transit centers, and the downtown itself.
 
 The registry entry's `anchors` ([{name, lat, lon, kind, weight}], kind one of downtown, airport,
 university, medical, stadium, hub) are added to the centers the generator links and routes between:
-an anchor within merge_km of a center marks that center (a downtown anchor makes it the downtown
-and demotes any other downtown within downtown_sep_km); otherwise it becomes a center of its own,
+an anchor within MERGE_KM of a center marks that center (a downtown anchor moves it onto the
+anchor, makes it the downtown and demotes any other downtown within downtown_sep_km). Other anchors
+don't move their center: an airport terminal or a campus can sit off the road graph the routes
+snap to (moving El Paso's airport center there lost half its routed links), and a node of their
+own so near splits the corridors into stubs too short for rail (UT Austin beside downtown). Those
+are listed on the center and reported as served or not. Otherwise it becomes a center of its own,
 kind "major", its activity the people and jobs around it plus its weight (riders a day it draws
 beyond them: an airport's passengers, a campus's students). Without registry anchors nothing
 changes.
@@ -26,8 +30,11 @@ def apply(m, centers, anchors, p, log=print):
     for k, a in enumerate(anchors):
         x, y = (float(v) for v in m.xy(a["lat"], a["lon"]))
         near = min(centers, key=lambda c: math.hypot(c.x - x, c.y - y), default=None)
-        if near is not None and math.hypot(near.x - x, near.y - y) <= MERGE_KM:
+        dist = math.hypot(near.x - x, near.y - y) if near is not None else float("inf")
+        if dist <= MERGE_KM:
             c = near
+            if a.get("kind") == "downtown":   # the downtown is where the registry says (job density, the transit hub)
+                c.x, c.y, c.lat, c.lon = x, y, a["lat"], a["lon"]
         else:
             inside = (m.x - x) ** 2 + (m.y - y) ** 2 <= r_act ** 2
             pop, jobs = float(m.pop[inside].sum()), float(m.jobs[inside].sum()) if m.jobs_ok else 0.0

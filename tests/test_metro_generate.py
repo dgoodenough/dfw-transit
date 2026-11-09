@@ -305,6 +305,15 @@ class RouterTests(unittest.TestCase):
         self.assertLess(through.max_winding(straight), 1.01)
         self.assertGreater(through.max_winding(stairs), 1.5)
 
+    def test_a_street_holds_two_brt_lines(self):
+        from metro import select
+        trunk = [(0, 0), (10, 0)]
+        on_it = [[(0, 0.1), (6, 0.1)], [(2, -0.1), (10, -0.1)]]
+        self.assertAlmostEqual(select.stacked_km(trunk, on_it, 0.25, 2), 4.0, delta=0.3)   # both share x 2..6
+        self.assertEqual(select.stacked_km(trunk, on_it[:1], 0.25, 2), 0.0)               # one line: room for another
+        apart = [[(0, 3), (10, 3)], [(0, -3), (10, -3)]]
+        self.assertEqual(select.stacked_km(trunk, apart, 0.25, 2), 0.0)
+
     def test_angle_at_a_downtown(self):
         from metro import through
 
