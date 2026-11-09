@@ -4,8 +4,8 @@ stadiums, transit centers, and the downtown itself.
 
 The registry entry's `anchors` ([{name, lat, lon, kind, weight}], kind one of downtown, airport,
 university, medical, stadium, hub) are added to the centers the generator links and routes between:
-an anchor within MERGE_KM of a center marks that center (a downtown anchor moves it onto the
-anchor, makes it the downtown and demotes any other downtown within downtown_sep_km). Other anchors
+an anchor within MERGE_KM of a center marks that center (a downtown anchor more than SERVE_KM away
+moves it onto the anchor; it makes it the downtown and demotes any other downtown within downtown_sep_km). Other anchors
 don't move their center: an airport terminal or a campus can sit off the road graph the routes
 snap to (moving El Paso's airport center there lost half its routed links), and a node of their
 own so near splits the corridors into stubs too short for rail (UT Austin beside downtown). Those
@@ -19,6 +19,8 @@ import math
 from .centers import Center
 
 MERGE_KM = 3.0   # an anchor this close to a center marks it: a new node so near would split corridors
+SERVE_KM = 0.6   # a downtown center farther than this from its anchor (a station's walk) moves onto it: the generator
+                 # is sensitive enough that moving one already within a walk reshuffles the corridors for nothing
 
 
 def apply(m, centers, anchors, p, log=print):
@@ -33,7 +35,7 @@ def apply(m, centers, anchors, p, log=print):
         dist = math.hypot(near.x - x, near.y - y) if near is not None else float("inf")
         if dist <= MERGE_KM:
             c = near
-            if a.get("kind") == "downtown":   # the downtown is where the registry says (job density, the transit hub)
+            if a.get("kind") == "downtown" and dist > SERVE_KM:   # the downtown is where the registry says
                 c.x, c.y, c.lat, c.lon = x, y, a["lat"], a["lon"]
         else:
             inside = (m.x - x) ** 2 + (m.y - y) ** 2 <= r_act ** 2
