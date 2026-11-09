@@ -187,8 +187,15 @@ def paths(centers, links, kind, profile, gp, ends_ok=None):
             for k, lk in enumerate(lks):
                 Q = lk.oriented(profile, seq[k])
                 P = geom.join(P, Q)
+            if Lc.get("max_winding") and _winding(P) > Lc["max_winding"]:
+                continue   # a staircase: some 3 km of it wanders more than max_winding x the straight line
             out[tuple(seq)] = P
     return list(out.items())
+
+
+def _winding(P):
+    from .through import max_winding
+    return max_winding(P)
 
 
 # ------------------------------------------------------------------ stations

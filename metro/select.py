@@ -13,7 +13,13 @@ of the queue needs re-evaluating. Each pick:
     line of its mode (that line's centers are the start or end of the candidate's): then the
     chosen line is replaced and only the extra cost is charged; or unless it runs at least
     branch_min_km on its own (a branch off a shared trunk): then the share of it within
-    branch_share_m of chosen lines of its mode isn't charged.
+    branch_share_m of chosen lines of its mode isn't charged;
+  * a pick that would put more than max_per_segment[mode] lines of its mode on the same street
+    for more than stack_km (lines within branch_share_m of each other) is rejected: the corridor
+    is full (texas-transit study/hsr_buildout.md, Phase 3: at most 2 BRT or 3 metro lines a street).
+    Off by default (null): on Austin a cap of 2 BRT lines cost 6% of the network's riders and left the
+    median BRT line's overlap where it was (75%), since that overlap is branches sharing a trunk and
+    BRT alongside rail, not duplicates.
 """
 import heapq
 import math
@@ -34,6 +40,25 @@ def connected(c, stations, r_km):
     """Does a station of c lie within r_km of one of `stations` [(x, y)]?"""
     return any(math.dist(p, q) <= r_km for p in c.station_xy for q in stations
                if abs(p[0] - q[0]) <= r_km and abs(p[1] - q[1]) <= r_km)
+
+
+def stacked_km(P, same, r_km, limit, step_km=0.25):
+    """The longest stretch of P (km) along which `limit` or more of the routes `same` already run
+    within r_km: adding P there would make limit + 1."""
+    if len(same) < limit:
+        return 0.0
+    grid = {}
+    for k, Q in enumerate(same):
+        for q in geom.resample(Q, step_km):
+            grid.setdefault((int(q[0] // r_km), int(q[1] // r_km)), []).append((k, q))
+    run_, best = 0, 0
+    for p in geom.resample(P, step_km):
+        cx, cy = int(p[0] // r_km), int(p[1] // r_km)
+        near = {k for i in (cx - 1, cx, cx + 1) for j in (cy - 1, cy, cy + 1)
+                for k, q in grid.get((i, j), ()) if math.dist(p, q) <= r_km}
+        run_ = run_ + 1 if len(near) >= limit else 0
+        best = max(best, run_)
+    return best * step_km
 
 
 def run(cands, sketch, budget, gp, cfg, existing_lines, existing_stations, log=print):
@@ -94,6 +119,14 @@ def run(cands, sketch, budget, gp, cfg, existing_lines, existing_stations, log=p
             cost = max(cap + years * opx, 1.0)
             c.ratio = c.new_trips / cost
             branch = (dup, own_km, shared)
+        lim = (sel.get("max_per_segment") or {}).get(c.mode)
+        if lim:
+            same_all = [d.P for d in chosen if d is not ext and d.mode == c.mode]
+            km_full = stacked_km(c.P, same_all, sel.get("branch_share_m", 250) / 1000, lim)
+            if km_full > sel.get("stack_km", 1.0):
+                c.status, c.reason = "rejected", (f"corridor full: {km_full:.1f} km of it on a street that already "
+                                                  f"has {lim} chosen {c.mode} lines")
+                continue
         if spent + cap > budget:
             c.status, c.reason = "rejected", f"over budget (needs ${cap / 1e3:.1f}B, ${(budget - spent) / 1e3:.1f}B left)"
             continue

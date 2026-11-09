@@ -28,7 +28,7 @@ import numpy as np
 
 from dfwt import config, evaluate, geo
 
-from . import candidates, centers, geom, inputs, model, output, modelselect, routing, select, sketch
+from . import anchors as anchors_mod, candidates, centers, geom, inputs, model, output, modelselect, routing, select, sketch, through
 
 PARAMS = os.path.join(os.path.dirname(os.path.abspath(__file__)), "generate.json")
 
@@ -187,6 +187,8 @@ def generate(metro_id, budget_musd=None, years=None, out=None, run_model=True, o
         note = centers.registry_downtowns(m, surf, urban, cp)
         if note:
             flags.append(note)
+    entry = registry_entry(metro_id, m)
+    anchor_centers = anchors_mod.apply(m, urban, entry.get("anchors"), cp, log)   # airports, campuses, the downtown
     towns = centers.towns(m, surf, cp, urban)
     namer = output.make_namer(m)
     used_names = set()
@@ -194,7 +196,8 @@ def generate(metro_id, budget_musd=None, years=None, out=None, run_model=True, o
         c.name = output.place_name(namer, c.lat, c.lon, used_names, c.id)
     log(f"  centers: {sum(c.kind == 'downtown' for c in urban)} downtown, {sum(c.kind == 'major' for c in urban)} major, "
         f"{sum(c.kind == 'minor' for c in urban)} minor; {len(towns)} towns")
-    entry = registry_entry(metro_id, m)
+    for c in anchor_centers:   # an anchor keeps its own name
+        c.name = c.anchor_name
     cfg = model.metro_cfg(m, urban, cfg0, growth=entry.get("growth"))   # the metro's own growth, if the registry gives it
     downtowns = [(c.x, c.y) for c in urban if c.kind == "downtown"]
     core_r = gp["grade"]["core_radius_km"]
@@ -268,6 +271,21 @@ def generate(metro_id, budget_musd=None, years=None, out=None, run_model=True, o
     chosen, spent = select.run(cands, sk, budget * (mc.get("pool_budget_factor", 1.0) if full_model else 1.0), gsel, cfg,
                                exist_P, [v[:2] for v in ex.stations.values()], log)
     y_open = cfg["existing_year"] + gp["opens_after_years"]
+    joined = []
+    if gsel["selection"].get("through", {}).get("enabled") and chosen:
+        gpt = copy.deepcopy(gp)
+        gpt["lines"]["max_km"].update(gp["lines"].get("through_max_km", {}))
+
+        def make(seq, routes):
+            c = Cand(f"T{len(cands) + 1:03d}", "road", seq, None)
+            c.routes = routes
+            _decide(c, m, cfg, gpt, zidx, by, ex, sk, downtowns, core_r, dens_fn, urban_density, exist_P)
+            cands.append(c)
+            return c
+        chosen, joined = through.pair(chosen, by, [c.id for c in urban if c.kind == "downtown"], make,
+                                      gsel["selection"]["through"].get("min_angle_deg", 135), log, links=links,
+                                      core_km=gsel["selection"]["through"].get("core_km", 3.0))
+        spent = sum(c.capital for c in chosen)
     model_rounds = None
     if full_model and chosen:
         judge = mc.get("judge_year") or (min(future_years) if future_years else cfg["existing_year"] + 1)
@@ -306,13 +324,14 @@ def generate(metro_id, budget_musd=None, years=None, out=None, run_model=True, o
                     log(f"  demand model, {y} ...")
                     res["future"][y] = {"generated": model.run_future(ctx, gen, y),
                                         "existing": model.run_future(ctx, base, y) if base.lines else None}
+    sense = through.metrics(chosen, by, [c.id for c in urban if c.kind == "downtown"], anchor_centers)
     output.report(out, m, gp, cfg, urban, towns, links, cands, chosen, budget, spent, stats, res, flags,
                   time.time() - t0, metro_id, rail_why=rail_why, skipped=ex.skipped, asc_note=asc_note,
-                  model_select=model_rounds)
+                  model_select=model_rounds, sense=sense)
     output.preview(out, m, surf, urban, towns, ex, chosen, tables)
     log(f"  wrote {os.path.relpath(out, config.ROOT)}/ in {time.time() - t0:.0f}s")
     return {"out": out, "asc": cfg["ridership"]["asc"], "asc_note": asc_note, "chosen": chosen, "cands": cands, "centers": urban, "towns": towns, "stats": stats,
-            "model": res, "model_select": model_rounds, "budget": budget, "spent": spent, "tables": tables, "ex_tables": ex.tables, "m": m, "cfg": cfg}
+            "model": res, "model_select": model_rounds, "sense": sense, "through": joined, "budget": budget, "spent": spent, "tables": tables, "ex_tables": ex.tables, "m": m, "cfg": cfg}
 
 
 def registry_entry(metro_id, m):
