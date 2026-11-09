@@ -283,7 +283,8 @@ def generate(metro_id, budget_musd=None, years=None, out=None, run_model=True, o
             cands.append(c)
             return c
         chosen, joined = through.pair(chosen, by, [c.id for c in urban if c.kind == "downtown"], make,
-                                      gsel["selection"]["through"].get("min_angle_deg", 135), log)
+                                      gsel["selection"]["through"].get("min_angle_deg", 135), log, links=links,
+                                      core_km=gsel["selection"]["through"].get("core_km", 3.0))
         spent = sum(c.capital for c in chosen)
     model_rounds = None
     if full_model and chosen:

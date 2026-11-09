@@ -29,7 +29,7 @@
     "min_km": {"metro": 6, "brt": 5, "streetcar": 2, "commuter": 20},
     "max_km": {"metro": 45, "brt": 35, "streetcar": 8, "commuter": 100},
     "max_circuity": 1.5,
-    "max_winding": 1.45,
+    "max_winding": 2.2,
     "through_max_km": {"metro": 70, "brt": 50},
     "max_turn_deg": 75
   },
@@ -72,7 +72,7 @@
     "duplicate_m": 400,
     "duplicate_share": 0.5,
     "branch_min_km": 5,
-    "through": {"enabled": true, "min_angle_deg": 135},
+    "through": {"enabled": true, "min_angle_deg": 135, "core_km": 3.0},
     "branch_share_m": 250,
     "max_lines": 80,
     "model": {

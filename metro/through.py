@@ -36,39 +36,62 @@ def angle_at(by, d, a_next, b_next):
     return math.degrees(math.acos(cos))
 
 
-def pair(chosen, by, downtown_ids, make, min_angle=135.0, log=print):
-    """Join chosen road lines that end at the same downtown from opposite sides (the angle between
-    them at downtown >= min_angle) into through lines, best-aligned pairs first. `make(seq, routes)`
+def pair(chosen, by, downtown_ids, make, min_angle=135.0, log=print, links=(), core_km=3.0):
+    """Join chosen road lines that end in the same downtown core (the downtown center or a center
+    within core_km of it) from opposite sides (the angle between them at downtown >= min_angle) into
+    through lines, best-aligned pairs first. Two lines ending at different core centers are joined
+    along the road link between those centers (`links`, metro/candidates.Link). `make(seq, routes)`
     builds and decides a candidate (a Cand with mode and status set). A pair is joined only if the
     through line gets the stubs' mode and passes the generator's tests. Returns (lines, joined
     [(through, a, b)])."""
     out = list(chosen)
     joined = []
+    link_by = {}
+    for lk in links:
+        if lk.kind == "road":
+            link_by[(lk.a, lk.b)] = lk
+            link_by[(lk.b, lk.a)] = lk
     for d in downtown_ids:
-        stubs = [c for c in out if c.kind == "road" and c.mode and d in (c.seq[0], c.seq[-1])]
+        core = {c for c in by if math.hypot(by[c].x - by[d].x, by[c].y - by[d].y) <= core_km}
+
+        def end_in_core(c):
+            return [e for e in (c.seq[0], c.seq[-1]) if e in core]
+        stubs = [c for c in out if c.kind == "road" and c.mode and end_in_core(c)]
         pairs = []
         for i, a in enumerate(stubs):
             for b in stubs[i + 1:]:
                 if a.mode != b.mode:
                     continue
-                _, sa = _oriented(a, a.mode if a.mode in a.routes else "brt", d)
-                _, sb = _oriented(b, b.mode if b.mode in b.routes else "brt", d)
-                if not sa or not sb or len(sa) < 2 or len(sb) < 2:
-                    continue
-                ang = angle_at(by, d, sa[-2], sb[-2])
-                if ang >= min_angle:
-                    pairs.append((ang, a, b))
+                for ea in end_in_core(a):
+                    for eb in end_in_core(b):
+                        if ea != eb and (ea, eb) not in link_by:
+                            continue
+                        _, sa = _oriented(a, next(iter(a.routes)), ea)
+                        _, sb = _oriented(b, next(iter(b.routes)), eb)
+                        if not sa or not sb or len(sa) < 2 or len(sb) < 2 or set(sa) & set(sb) - {ea, eb}:
+                            continue
+                        ang = angle_at(by, d, sa[-2], sb[-2]) if d not in (sa[-2], sb[-2]) else 180.0
+                        if ang >= min_angle:
+                            pairs.append((ang, a, b, ea, eb))
         used = set()
-        for ang, a, b in sorted(pairs, key=lambda x: -x[0]):
+        for ang, a, b, ea, eb in sorted(pairs, key=lambda x: -x[0]):
             if a.uid in used or b.uid in used:
                 continue
             routes, seq = {}, None
             for prof in ("metro", "brt"):
-                Pa, sa = _oriented(a, prof, d)
-                Pb, sb = _oriented(b, prof, d)
-                if Pa and Pb:
+                Pa, sa = _oriented(a, prof, ea)
+                Pb, sb = _oriented(b, prof, eb)
+                if not (Pa and Pb):
+                    continue
+                if ea == eb:
                     routes[prof] = geom.join(Pa, Pb[::-1])
                     seq = sa + sb[::-1][1:]
+                else:
+                    mid = link_by[(ea, eb)].oriented(prof, ea)
+                    if not mid:
+                        continue
+                    routes[prof] = geom.join(geom.join(Pa, mid), Pb[::-1])
+                    seq = sa + sb[::-1]
             if not routes or len(set(seq)) != len(seq):
                 continue
             t = make(tuple(seq), routes)
@@ -77,9 +100,9 @@ def pair(chosen, by, downtown_ids, make, min_angle=135.0, log=print):
             used |= {a.uid, b.uid}
             t.status, t.order = "chosen", min(a.order or 9999, b.order or 9999)
             t.reason = f"through line joining {a.uid} and {b.uid} across downtown ({ang:.0f} degrees)"
-            for s in (a, b):
-                s.status, s.reason = "replaced", f"joined into through line {t.uid}"
-                out.remove(s)
+            for s_ in (a, b):
+                s_.status, s_.reason = "replaced", f"joined into through line {t.uid}"
+                out.remove(s_)
             out.append(t)
             joined.append((t, a, b))
             if log:
@@ -108,16 +131,18 @@ def metrics(chosen, by, downtown_ids, anchor_centers, station_m=600):
     within station_m, the least straight line (chord over length) and the worst winding."""
     lines = [c for c in chosen if c.mode]
     metro = [c for c in lines if c.mode == "metro"]
-    through = sum(1 for c in metro if any(d in c.seq[1:-1] for d in downtown_ids))
+    core = {c for d in downtown_ids for c in by if math.hypot(by[c].x - by[d].x, by[c].y - by[d].y) <= 3.0}
+    through = sum(1 for c in metro if any(x in core for x in c.seq[1:-1]) and not (c.seq[0] in core and c.seq[-1] in core))
     brt = [c for c in lines if c.mode == "brt"]
     overlaps = sorted(geom.share_near(c.P, [o.P for o in lines if o is not c], 0.4) for c in brt) if len(lines) > 1 else []
     served = []
     for a in anchor_centers:
-        ok = any(math.dist((a.x, a.y), s) <= station_m / 1000 for c in lines for s in c.station_xy)
-        served.append((a, ok))
+        for name, kind, ax, ay in getattr(a, "anchor_list", [(a.anchor_name, a.anchor, a.x, a.y)]):
+            ok = any(math.dist((ax, ay), s) <= station_m / 1000 for c in lines for s in c.station_xy)
+            served.append((name, kind, ok))
     straight = [math.dist(c.P[0], c.P[-1]) / max(geom.length(c.P), 0.1) for c in lines if c.P]
     return {"metro": len(metro), "metro_through": through, "brt": len(brt),
             "brt_overlap_median": overlaps[len(overlaps) // 2] if overlaps else 0.0,
-            "anchors": [(a.anchor_name, a.anchor, ok) for a, ok in served],
+            "anchors": served,
             "min_straightness": min(straight) if straight else 1.0,
             "max_winding": max((max_winding(c.P) for c in lines if c.P), default=1.0)}

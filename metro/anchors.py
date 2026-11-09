@@ -14,7 +14,7 @@ import math
 
 from .centers import Center
 
-MERGE_KM = 1.5
+MERGE_KM = 3.0   # an anchor this close to a center marks it: a new node so near would split corridors
 
 
 def apply(m, centers, anchors, p, log=print):
@@ -35,14 +35,16 @@ def apply(m, centers, anchors, p, log=print):
                        0.0, 0.0, "major", [])
             c.near_jobs = jobs
             centers.append(c)
-        c.anchor = a.get("kind", "hub")
-        c.anchor_name = a["name"]
-        if c.anchor == "downtown":
+        if getattr(c, "anchor", None) is None or a.get("kind") == "downtown":   # a downtown anchor names its center
+            c.anchor, c.anchor_name = a.get("kind", "hub"), a["name"]
+        c.anchor_list = getattr(c, "anchor_list", []) + [(a["name"], a.get("kind", "hub"), float(x), float(y))]
+        if a.get("kind") == "downtown":
             for o in centers:
                 if o is not c and o.kind == "downtown" and math.hypot(o.x - c.x, o.y - c.y) <= p["downtown_sep_km"]:
                     o.kind = "major"
             c.kind = "downtown"
-        out.append(c)
+        if c not in out:
+            out.append(c)
     if log:
-        log(f"  anchors: {', '.join(f'{c.anchor_name} ({c.anchor})' for c in out)}")
+        log(f"  anchors: {', '.join(f'{n} ({k})' for c in out for n, k, *_ in c.anchor_list)}")
     return out
