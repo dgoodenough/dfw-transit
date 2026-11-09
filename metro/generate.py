@@ -9,7 +9,9 @@ Steps (each module's docstring has the details and every threshold is in metro/g
   3. mode        metro / streetcar / BRT / regional rail from corridor density and length;
                  stations at spacing by mode and setting, shared with today's stations
   4. value       sketch demand (metro/sketch.py): new daily trips per $M; greedy selection
-                 within the budget, duplicates of existing / chosen lines rejected (metro/select.py)
+                 within the budget, duplicates of existing / chosen lines rejected (metro/select.py);
+                 with the full model, it prunes the greedy's pool (metro/modelselect.py) and a local
+                 search improves the whole network on it (metro/lineplan.py)
   5. output      generated/<id>/: dfwt tables (lines, stations, line_stops, line_segments,
                  transfers + empty stages/service/infill so nothing falls back to DFW's plan),
                  centers.csv, candidates.csv, report.md, preview.png; then (unless --no-model)
@@ -28,7 +30,7 @@ import numpy as np
 
 from dfwt import config, evaluate, geo
 
-from . import anchors as anchors_mod, candidates, centers, geom, inputs, model, output, modelselect, routing, select, sketch, through
+from . import anchors as anchors_mod, candidates, centers, geom, inputs, lineplan, model, output, modelselect, routing, select, sketch, through
 
 PARAMS = os.path.join(os.path.dirname(os.path.abspath(__file__)), "generate.json")
 
@@ -74,6 +76,7 @@ class Cand:
         self.order, self.cost_charged = None, 0.0
         self.new_trips = self.trips = self.ratio = self.capital = self.opex = 0.0
         self.peak_hour_load = 0.0
+        self.headway = None   # minutes; None: the mode's default (metro/lineplan.py may set it)
         self.name = ""
         self.stops = []
 
@@ -209,7 +212,11 @@ def generate(metro_id, budget_musd=None, years=None, out=None, run_model=True, o
 
     # 2. links and candidate paths -----------------------------------------------
     router = routing.Router(m, os.path.join(out, "cache", "routes.json"), frontage=dens_fn, brt=gp.get("routing", {}).get("brt"))
-    links = candidates.build_links(m, router, urban, towns, gp, log)
+    # anchors listed on a center but more than a station's walk from it: routes between centers may pass them
+    vias = [(n, x, y) for c in anchor_centers for n, k, x, y in getattr(c, "anchor_list", [])
+            if math.hypot(c.x - x, c.y - y) > anchors_mod.SERVE_KM and k != "airport"]
+    gp["_vias"] = [(x, y) for _, x, y in vias]
+    links = candidates.build_links(m, router, urban, towns, gp, log, vias=vias)
     by = {c.id: c for c in urban + towns}
     ex = Existing(m, cfg["modes"])
     zidx = geom.ZoneIndex(m, 1.0)
@@ -272,21 +279,22 @@ def generate(metro_id, budget_musd=None, years=None, out=None, run_model=True, o
                                exist_P, [v[:2] for v in ex.stations.values()], log)
     y_open = cfg["existing_year"] + gp["opens_after_years"]
     joined = []
-    if gsel["selection"].get("through", {}).get("enabled") and chosen:
-        gpt = copy.deepcopy(gp)
-        gpt["lines"]["max_km"].update(gp["lines"].get("through_max_km", {}))
+    gpt = copy.deepcopy(gp)
+    gpt["lines"]["max_km"].update(gp["lines"].get("through_max_km", {}))
 
-        def make(seq, routes):
-            c = Cand(f"T{len(cands) + 1:03d}", "road", seq, None)
-            c.routes = routes
-            _decide(c, m, cfg, gpt, zidx, by, ex, sk, downtowns, core_r, dens_fn, urban_density, exist_P)
-            cands.append(c)
-            return c
+    def make(seq, routes):   # a through line across downtown (metro/through.py, metro/lineplan.py)
+        c = Cand(f"T{len(cands) + 1:03d}", "road", seq, None)
+        c.routes = routes
+        _decide(c, m, cfg, gpt, zidx, by, ex, sk, downtowns, core_r, dens_fn, urban_density, exist_P)
+        cands.append(c)
+        return c
+    downtown_ids = [c.id for c in urban if c.kind == "downtown"]
+    if gsel["selection"].get("through", {}).get("enabled") and chosen:
         chosen, joined = through.pair(chosen, by, [c.id for c in urban if c.kind == "downtown"], make,
                                       gsel["selection"]["through"].get("min_angle_deg", 135), log, links=links,
                                       core_km=gsel["selection"]["through"].get("core_km", 3.0))
         spent = sum(c.capital for c in chosen)
-    model_rounds = None
+    model_rounds = plan_result = None
     if full_model and chosen:
         judge = mc.get("judge_year") or (min(future_years) if future_years else cfg["existing_year"] + 1)
 
@@ -299,6 +307,18 @@ def generate(metro_id, budget_musd=None, years=None, out=None, run_model=True, o
         model_rounds = {"year": judge, "floor": mc["min_trips_per_musd"], "pool_floor": gsel["selection"]["min_trips_per_musd"],
                         "rounds": model_rounds}
         log(f"  full model kept {len(chosen)} lines, ${spent / 1e3:.1f}B")
+        if gp["selection"].get("plan", {}).get("enabled") and chosen:
+            anchor_pts = [a for c in anchor_centers for a in getattr(c, "anchor_list", [])]
+            with model.projection(m):
+                net0, _ = build_net(chosen)
+                planner = lineplan.Planner(cands, build_net, ctx, cfg, gp, budget, judge, make, by, downtown_ids, links,
+                                           anchor_pts, [v[:2] for v in ex.stations.values()],
+                                           modelselect.land_use(ctx, net0, judge), log)
+                chosen = planner.run(chosen)
+                chosen = modelselect.revalue(chosen, build_net, ctx, gp, cfg, judge, log)   # values and order of the final network
+            spent = planner.end["capital"]
+            plan_result = {"start": planner.start, "end": planner.end, "history": planner.history, "floor": planner.floor,
+                           "anchor_trips": planner.anchor_trips}
 
     # 5. output ---------------------------------------------------------------------
     tables = output.tables(m, ex, chosen, by, gp, cfg, y_open, namer, used_names, downtowns, core_r)
@@ -324,14 +344,14 @@ def generate(metro_id, budget_musd=None, years=None, out=None, run_model=True, o
                     log(f"  demand model, {y} ...")
                     res["future"][y] = {"generated": model.run_future(ctx, gen, y),
                                         "existing": model.run_future(ctx, base, y) if base.lines else None}
-    sense = through.metrics(chosen, by, [c.id for c in urban if c.kind == "downtown"], anchor_centers)
+    sense = through.metrics(chosen, by, downtown_ids, anchor_centers)
     output.report(out, m, gp, cfg, urban, towns, links, cands, chosen, budget, spent, stats, res, flags,
                   time.time() - t0, metro_id, rail_why=rail_why, skipped=ex.skipped, asc_note=asc_note,
-                  model_select=model_rounds, sense=sense)
+                  model_select=model_rounds, sense=sense, plan=plan_result)
     output.preview(out, m, surf, urban, towns, ex, chosen, tables)
     log(f"  wrote {os.path.relpath(out, config.ROOT)}/ in {time.time() - t0:.0f}s")
     return {"out": out, "asc": cfg["ridership"]["asc"], "asc_note": asc_note, "chosen": chosen, "cands": cands, "centers": urban, "towns": towns, "stats": stats,
-            "model": res, "model_select": model_rounds, "sense": sense, "through": joined, "budget": budget, "spent": spent, "tables": tables, "ex_tables": ex.tables, "m": m, "cfg": cfg}
+            "model": res, "model_select": model_rounds, "plan": plan_result, "sense": sense, "through": joined, "budget": budget, "spent": spent, "tables": tables, "ex_tables": ex.tables, "m": m, "cfg": cfg}
 
 
 def registry_entry(metro_id, m):
@@ -416,6 +436,10 @@ def _setup(c, mode, P, m, cfg, gp, by, ex, sk, downtowns, core_r, dens_fn, urban
         anchors.append((s, 2, ("C", cid)))
     for s, sid in ex.near(P, gp["stations"]["snap_existing_m"] / 1000):
         anchors.append((s, 3, ("E", sid)))
+    for vx, vy in gp.get("_vias", ()):   # a campus or medical district a route passes: a stop there
+        s, d = geom.project(P, cum, (vx, vy))
+        if d <= 0.3:
+            anchors.append((s, 2, None))
     c.stops = candidates.place_stations(P, mode, anchors, gp, dens_fn, urban_density)
     c.station_xy = [p for _, p, _ in c.stops]
     c.along = [s for s, _, _ in c.stops]
@@ -456,7 +480,13 @@ def _decide(c, m, cfg, gp, zidx, by, ex, sk, downtowns, core_r, dens_fn, urban_d
         if mode == "metro" and c.routes.get("metro"):
             P = c.routes["metro"]
         elif mode == "metro":
-            mode, why = None, why + "; but no freeway/arterial corridor route for metro"
+            Lb = geom.length(c.routes["brt"]) if c.routes.get("brt") else 0.0
+            if c.routes.get("brt") and gp["lines"]["min_km"]["brt"] <= Lb <= gp["lines"]["max_km"]["brt"]:
+                # dense enough for metro, but the freeways and major arterials don't run there (a street
+                # through a campus): BRT on the street route rather than nothing
+                mode, P, why = "brt", c.routes["brt"], why + "; no freeway/arterial route for metro: BRT on the street route"
+            else:
+                mode, why = None, why + "; but no freeway/arterial corridor route for metro"
         elif mode in ("brt", "streetcar") and not c.routes.get("brt"):
             # a bus or streetcar runs on the street route or not at all: the metro-profile route
             # follows freeways (light rail in a median), which a BRT station can't use

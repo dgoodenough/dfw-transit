@@ -36,28 +36,24 @@ def angle_at(by, d, a_next, b_next):
     return math.degrees(math.acos(cos))
 
 
-def pair(chosen, by, downtown_ids, make, min_angle=135.0, log=print, links=(), core_km=3.0):
-    """Join chosen road lines that end in the same downtown core (the downtown center or a center
-    within core_km of it) from opposite sides (the angle between them at downtown >= min_angle) into
-    through lines, best-aligned pairs first. Two lines ending at different core centers are joined
-    along the road link between those centers (`links`, metro/candidates.Link). `make(seq, routes)`
-    builds and decides a candidate (a Cand with mode and status set). A pair is joined only if the
-    through line gets the stubs' mode and passes the generator's tests. Returns (lines, joined
-    [(through, a, b)])."""
-    out = list(chosen)
-    joined = []
+def options(chosen, by, downtown_ids, min_angle=135.0, links=(), core_km=3.0):
+    """Every way to join two chosen road lines of a mode that end in the same downtown core (the
+    downtown center or a center within core_km of it) from opposite sides (the angle between them at
+    downtown >= min_angle) into one through line: [(angle, a, b, seq, routes)], best-aligned first.
+    Two lines ending at different core centers are joined along the road link between those centers
+    (`links`, metro/candidates.Link)."""
     link_by = {}
     for lk in links:
         if lk.kind == "road":
             link_by[(lk.a, lk.b)] = lk
             link_by[(lk.b, lk.a)] = lk
+    out = []
     for d in downtown_ids:
         core = {c for c in by if math.hypot(by[c].x - by[d].x, by[c].y - by[d].y) <= core_km}
 
         def end_in_core(c):
             return [e for e in (c.seq[0], c.seq[-1]) if e in core]
-        stubs = [c for c in out if c.kind == "road" and c.mode and end_in_core(c)]
-        pairs = []
+        stubs = [c for c in chosen if c.kind == "road" and c.mode and end_in_core(c)]
         for i, a in enumerate(stubs):
             for b in stubs[i + 1:]:
                 if a.mode != b.mode:
@@ -71,42 +67,53 @@ def pair(chosen, by, downtown_ids, make, min_angle=135.0, log=print, links=(), c
                         if not sa or not sb or len(sa) < 2 or len(sb) < 2 or set(sa) & set(sb) - {ea, eb}:
                             continue
                         ang = angle_at(by, d, sa[-2], sb[-2]) if d not in (sa[-2], sb[-2]) else 180.0
-                        if ang >= min_angle:
-                            pairs.append((ang, a, b, ea, eb))
-        used = set()
-        for ang, a, b, ea, eb in sorted(pairs, key=lambda x: -x[0]):
-            if a.uid in used or b.uid in used:
-                continue
-            routes, seq = {}, None
-            for prof in ("metro", "brt"):
-                Pa, sa = _oriented(a, prof, ea)
-                Pb, sb = _oriented(b, prof, eb)
-                if not (Pa and Pb):
-                    continue
-                if ea == eb:
-                    routes[prof] = geom.join(Pa, Pb[::-1])
-                    seq = sa + sb[::-1][1:]
-                else:
-                    mid = link_by[(ea, eb)].oriented(prof, ea)
-                    if not mid:
-                        continue
-                    routes[prof] = geom.join(geom.join(Pa, mid), Pb[::-1])
-                    seq = sa + sb[::-1]
-            if not routes or len(set(seq)) != len(seq):
-                continue
-            t = make(tuple(seq), routes)
-            if t is None or t.mode != a.mode or t.status != "pool":
-                continue
-            used |= {a.uid, b.uid}
-            t.status, t.order = "chosen", min(a.order or 9999, b.order or 9999)
-            t.reason = f"through line joining {a.uid} and {b.uid} across downtown ({ang:.0f} degrees)"
-            for s_ in (a, b):
-                s_.status, s_.reason = "replaced", f"joined into through line {t.uid}"
-                out.remove(s_)
-            out.append(t)
-            joined.append((t, a, b))
-            if log:
-                log(f"  through line {t.uid}: {a.uid} + {b.uid} across {by[d].name} ({t.mode}, {t.km:.0f} km)")
+                        if ang < min_angle:
+                            continue
+                        routes, seq = {}, None
+                        for prof in ("metro", "brt"):
+                            Pa, sa_ = _oriented(a, prof, ea)
+                            Pb, sb_ = _oriented(b, prof, eb)
+                            if not (Pa and Pb):
+                                continue
+                            if ea == eb:
+                                routes[prof] = geom.join(Pa, Pb[::-1])
+                                seq = sa_ + sb_[::-1][1:]
+                            else:
+                                mid = link_by[(ea, eb)].oriented(prof, ea)
+                                if not mid:
+                                    continue
+                                routes[prof] = geom.join(geom.join(Pa, mid), Pb[::-1])
+                                seq = sa_ + sb_[::-1]
+                        if routes and len(set(seq)) == len(seq):
+                            out.append((ang, a, b, tuple(seq), routes, d))
+    out.sort(key=lambda x: -x[0])
+    return out
+
+
+def pair(chosen, by, downtown_ids, make, min_angle=135.0, log=print, links=(), core_km=3.0):
+    """Join chosen stubs into through lines (options()), best-aligned pairs first, each stub at most
+    once. `make(seq, routes)` builds and decides a candidate (a Cand with mode and status set). A
+    pair is joined only if the through line gets the stubs' mode and passes the generator's tests.
+    Returns (lines, joined [(through, a, b)])."""
+    out = list(chosen)
+    joined = []
+    used = set()
+    for ang, a, b, seq, routes, d in options(chosen, by, downtown_ids, min_angle, links, core_km):
+        if a.uid in used or b.uid in used:
+            continue
+        t = make(seq, routes)
+        if t is None or t.mode != a.mode or t.status != "pool":
+            continue
+        used |= {a.uid, b.uid}
+        t.status, t.order = "chosen", min(a.order or 9999, b.order or 9999)
+        t.reason = f"through line joining {a.uid} and {b.uid} across downtown ({ang:.0f} degrees)"
+        for s_ in (a, b):
+            s_.status, s_.reason = "replaced", f"joined into through line {t.uid}"
+            out.remove(s_)
+        out.append(t)
+        joined.append((t, a, b))
+        if log:
+            log(f"  through line {t.uid}: {a.uid} + {b.uid} across {by[d].name} ({t.mode}, {t.km:.0f} km)")
     return out, joined
 
 

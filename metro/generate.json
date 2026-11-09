@@ -22,7 +22,8 @@
     "max_km": {"road": 25},
     "gabriel_slack": 0.9,
     "max_detour": {"road": 1.6, "rail": 1.5},
-    "end_gap_km": {"road": 1.2, "rail": 2.5}
+    "end_gap_km": {"road": 1.2, "rail": 2.5},
+    "via_km": 1.5
   },
   "lines": {
     "_doc": "Road candidate lines are shortest paths (route km) through the road links between every pair of centers and towns; a path is a candidate if its length is within some mode's [min_km, max_km], it is at most max_circuity x the straight distance between its ends and it turns no more than max_turn_deg at any center it passes. Each rail route is a candidate serving every center and town within links.end_gap_km.rail of the track.",
@@ -77,7 +78,21 @@
   "max_per_segment": null,
   "stack_km": 1.0,
     "max_lines": 80,
-    "model": {
+    "plan": {
+   "_doc": "Line planning (metro/lineplan.py): after the full model's pruning, a local search on the full model over the whole network (merge downtown stubs into through lines meeting at merge_min_angle_deg or more, a looser test than the automatic joins before the pruning, since the model judges each, add or swap lines to serve must-serve anchors, drop, add, swap a weak line for another along its corridor, change a headway). J = new daily trips - floor x ($M capital + value_opex_years x opex) - anchor_trips per must-serve registry anchor without a station within anchor_m. floor null: the pruning's min_trips_per_musd. Runs only with the full model.",
+   "enabled": true,
+   "rounds": 3,
+   "floor": null,
+   "anchor_trips": 1000,
+   "anchor_m": 600,
+   "must_serve": ["downtown", "airport", "university", "medical"],
+   "merge_min_angle_deg": 110,
+   "swap_weakest": 8,
+   "add_best": 8,
+   "headways": {"metro": [4, 6, 8, 10], "brt": [6, 8, 12, 15], "commuter": [15, 20, 30], "streetcar": [12, 20]},
+   "procs": null
+  },
+  "model": {
       "_doc": "Full-model selection (metro/modelselect.py), off unless enabled (or generate(full_model=True), CLI --full-model). The sketch selection runs with its floor x pool_floor_factor (0: every candidate its other rules allow: no duplicates or islands), up to pool_max_lines lines and pool_budget_factor x the budget, to give a wider pool, then the dfwt demand model prunes it: each line's value is the mean of the daily trips the pool network loses without it and the trips it adds alone to today's network, in judge_year (default: the first of generate's future_years, else the year after existing_year) on the land use of the whole first pool open (fixed through the rounds), per $M of capital + value_opex_years x opex. Rounds drop the worse half of the lines below min_trips_per_musd until none is, then the lowest-valued lines until the pool fits the budget. The model's trips are several times the sketch's (transfers, feeder buses, growth), so the floor is its own: 1.0, about the 10th percentile of DFW Transit's 2 million plan's lines on the same measure (results/two_million/line_values.csv: 0.25 to 57, median 4.6, in 2100).",
       "enabled": false,
       "pool_floor_factor": 0.0,

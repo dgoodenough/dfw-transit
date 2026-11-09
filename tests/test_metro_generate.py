@@ -350,3 +350,60 @@ class RouterTests(unittest.TestCase):
             shutil.rmtree(tmp, ignore_errors=True)
             from dfwt import osmroute
             osmroute.set_origin(32.8, -97.0)
+
+
+class LinePlanTests(unittest.TestCase):
+    """metro/lineplan.py on a stand-in for the demand model: trips are a function of the line set."""
+
+    def setUp(self):
+        from metro import lineplan
+        self._eval = lineplan._evaluate
+
+    def tearDown(self):
+        from metro import lineplan
+        lineplan._evaluate = self._eval
+
+    def _planner(self, trips_of, budget=1000.0, anchors=(), rounds=3):
+        from metro import lineplan
+
+        class C:
+            def __init__(self, uid, P, capital, ratio=1.0, mode="brt"):
+                self.uid, self.P, self.capital, self.ratio, self.mode = uid, P, capital, ratio, mode
+                self.kind, self.seq, self.routes, self.reason, self.status = "road", ("A", uid), {}, "", "pool"
+                self.stops = [(0, P[0], None), (1, P[-1], None)]
+                self.station_xy = [P[0], P[-1]]
+                self.opex, self.peak_hour_load, self.order, self.headway = 0.0, 0.0, None, None
+
+            @property
+            def km(self):
+                return 10.0
+        cs = {u: C(u, P, cap) for u, P, cap in [("A1", [(0, 0), (10, 0)], 300), ("A2", [(0, 0.1), (10, 0.1)], 300),
+                                                  ("B1", [(0, 5), (10, 5)], 300), ("X1", [(20, 20), (30, 20)], 300)]}
+        cfg = {"staging": {"value_opex_years": 20}, "modes": {"brt": {"default_headway_min": 8, "vehicle_capacity": 100}}}
+        gp = {"selection": {"model": {"min_trips_per_musd": 1.0}, "plan": {"rounds": rounds, "anchor_trips": 1000, "procs": 1}}}
+        p = lineplan.Planner(list(cs.values()), None, None, cfg, gp, budget, 2050, None, {}, [], [],
+                             anchors, [], None, log=lambda *a: None)
+        lineplan._evaluate = lambda jobs, procs: {k: (trips_of(set(u)), 300.0 * len(u)) for k, u, _ in jobs}
+        p.merges = lambda S, H: []
+        return p, cs
+
+    def test_drops_a_duplicate_and_adds_a_better_line(self):
+        def trips(S):   # A1 and A2 run the same street: together worth one; B1 is worth 900 on its own
+            return 1000 * bool(S & {"A1", "A2"}) + 900 * ("B1" in S)
+        p, cs = self._planner(trips)
+        out = {c.uid for c in p.run([cs["A1"], cs["A2"]])}
+        self.assertIn("B1", out)
+        self.assertEqual(len(out & {"A1", "A2"}), 1)   # one of the two, not both
+
+    def test_budget_holds(self):
+        p, cs = self._planner(lambda S: 1000 * len(S), budget=600.0)
+        out = p.run([cs["A1"], cs["B1"]])
+        self.assertLessEqual(len(out), 2)
+
+    def test_an_unserved_anchor_costs_enough_to_add_a_line(self):
+        def trips(S):   # X1 carries little, but it is the only line to the airport
+            return 1000 * ("A1" in S) + 100 * ("X1" in S)
+        p, cs = self._planner(trips, anchors=[("Airport", "airport", 30.0, 20.0)])
+        out = p.run([cs["A1"]])
+        self.assertIn("X1", {c.uid for c in out})
+        self.assertEqual(p.end["unserved"], [])

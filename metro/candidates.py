@@ -58,24 +58,52 @@ def gabriel(nodes, max_km, slack):
     return out
 
 
-def build_links(m, router, urban, towns, gp, log=print):
+def build_links(m, router, urban, towns, gp, log=print, vias=()):
     """Road links over the Gabriel graph of centers and towns (a town only links to its
-    neighbours, so suburban corridors can reach it), each routed with both road profiles."""
+    neighbours, so suburban corridors can reach it), each routed with both road profiles.
+    `vias` [(name, x, y)]: anchors no center stands on (a campus beside downtown). A link whose
+    straight line passes within links.via_km of one, between its ends, is routed through it when
+    that route passes the link's detour test; its lines then stop there (generate._setup)."""
     L = gp["links"]
     links = []
     allc = urban + towns
     xy = [(c.x, c.y) for c in allc]
+    via_km = L.get("via_km", 0.0)
+    n_via = 0
     for i, j, d in gabriel(xy, L["max_km"]["road"], L["gabriel_slack"]):
         a, b = allc[i], allc[j]
         lk = Link(a.id, b.id, "road")
         lk.straight = d
+        lk.via = None
+        near = []
+        for name, vx, vy in vias:
+            t = ((vx - a.x) * (b.x - a.x) + (vy - a.y) * (b.y - a.y)) / max(d * d, 1e-9)
+            off = abs((b.x - a.x) * (a.y - vy) - (a.x - vx) * (b.y - a.y)) / max(d, 1e-9)
+            if 0.1 < t < 0.9 and off <= via_km:
+                near.append((off, name, vx, vy))
         for prof in ("metro", "brt"):
-            pts = router.route(prof, (a.lat, a.lon), (b.lat, b.lon))
-            lk.routes[prof] = _check(m, pts, a, b, d, L["max_detour"]["road"], L["end_gap_km"]["road"], lk, prof)
+            P = None
+            if near:
+                _, name, vx, vy = min(near)
+                vl = tuple(float(q) for q in m.ll(vx, vy))
+                p1 = router.route(prof, (a.lat, a.lon), vl)
+                p2 = router.route(prof, vl, (b.lat, b.lon))
+                if p1 and p2:
+                    P = _check(m, list(p1) + list(p2)[1:], a, b, d, L["max_detour"]["road"], L["end_gap_km"]["road"], lk, prof)
+                    if P is not None and min(math.dist(q, (vx, vy)) for q in geom.resample(P, 0.1)) > 0.3:
+                        P = None   # the roads didn't take it there
+                    if P is not None:
+                        lk.via = name
+            if P is None:
+                pts = router.route(prof, (a.lat, a.lon), (b.lat, b.lon))
+                P = _check(m, pts, a, b, d, L["max_detour"]["road"], L["end_gap_km"]["road"], lk, prof)
+            lk.routes[prof] = P
+        n_via += lk.via is not None
         links.append(lk)
     router.save()
     n_ok = {p: sum(1 for k in links if k.routes.get(p)) for p in ("metro", "brt")}
-    log(f"  links: {len(links)} road; routed metro profile {n_ok['metro']}, BRT profile {n_ok['brt']}")
+    log(f"  links: {len(links)} road; routed metro profile {n_ok['metro']}, BRT profile {n_ok['brt']}"
+        + (f"; {n_via} through an anchor" if vias else ""))
     return links
 
 
@@ -207,7 +235,8 @@ def place_stations(P, mode, anchors, gp, dens_fn, urban_density):
     L = cum[-1]
     sp = gp["stations"]["spacing_km"][mode]
     min_gap = gp["stations"]["min_gap_km"][mode]
-    pts = sorted([(max(0.0, min(L, s)), pr, ref) for s, pr, ref in anchors] + [(0.0, 0, None), (L, 0, None)])
+    pts = sorted([(max(0.0, min(L, s)), pr, ref) for s, pr, ref in anchors] + [(0.0, 0, None), (L, 0, None)],
+                 key=lambda a: (a[0], a[1]))
     # merge anchors closer than min_gap: keep the higher priority (existing 3 > center 2 > end 0)
     kept = []
     for a in pts:
