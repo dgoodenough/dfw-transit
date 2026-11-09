@@ -225,7 +225,7 @@ def _f(x, unit=""):
 
 
 def report(out, m, gp, cfg, urban, towns, links, cands, chosen, budget, spent, st, res, flags, secs, metro_id,
-           rail_why=None, skipped=None, asc_note=None, model_select=None):
+           rail_why=None, skipped=None, asc_note=None, model_select=None, sense=None):
     L = []
     w = L.append
     w(f"# Generated network: {metro_name(m)}")
@@ -328,6 +328,19 @@ def report(out, m, gp, cfg, urban, towns, links, cands, chosen, budget, spent, s
       f"(<= {gp['lines']['max_km']['streetcar']} km), BRT >= {M['brt']:,} (BRT over capacity becomes metro); "
       f"regional rail on existing track with >= {M['commuter_1600m']:,} within 1.6 km per km.")
     w("")
+    if sense:
+        w("## Rider sense")
+        w("")
+        w(f"- Metro lines running through a downtown: {sense['metro_through']} of {sense['metro']}.")
+        w(f"- BRT lines: {sense['brt']}; the median one runs {sense['brt_overlap_median']:.0%} of its length within 400 m of "
+          "another line.")
+        w(f"- Least straight line: {sense['min_straightness']:.2f} (end-to-end distance over length); worst winding over any "
+          f"3 km: {sense['max_winding']:.2f}x the straight line.")
+        if sense["anchors"]:
+            miss = [f"{n} ({k})" for n, k, ok in sense["anchors"] if not ok]
+            w(f"- Anchors (registry): {sum(1 for *_, ok in sense['anchors'] if ok)} of {len(sense['anchors'])} have a station "
+              "within 600 m" + (f"; not served: {', '.join(miss)}." if miss else "."))
+        w("")
     w("## 3. Chosen lines")
     w("")
     if model_select:

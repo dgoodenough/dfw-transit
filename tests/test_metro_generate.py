@@ -290,3 +290,54 @@ class BranchRuleTests(unittest.TestCase):
         self.assertIn("a branch", branch.reason)
         self.assertTrue(copy_.reason.startswith("duplicate"))
         self.assertAlmostEqual(branch.cost_charged, 1000 * 8 / 20, delta=80)   # its own 8 of 20 km
+
+
+class RouterTests(unittest.TestCase):
+    """Phase 3: anchors, through-running, winding."""
+
+    def test_winding_sees_a_staircase(self):
+        from metro import through
+        straight = [(0, 0), (10, 0)]
+        stairs = []
+        for k in range(10):
+            stairs += [(k, k % 2 * 0.0 + (k // 1) * 0.0), (k, 1.0 if k % 2 else 0.0)]
+        stairs = [(x * 0.5, y * 1.5) for x, y in [(i // 2, (i % 4 in (1, 2)) * 1) for i in range(40)]]
+        self.assertLess(through.max_winding(straight), 1.01)
+        self.assertGreater(through.max_winding(stairs), 1.5)
+
+    def test_angle_at_a_downtown(self):
+        from metro import through
+
+        class C:
+            def __init__(self, x, y):
+                self.x, self.y = x, y
+        by = {"D": C(0, 0), "A": C(-5, 0), "B": C(5, 0.5), "N": C(0, 5)}
+        self.assertGreater(through.angle_at(by, "D", "A", "B"), 170)
+        self.assertAlmostEqual(through.angle_at(by, "D", "A", "N"), 90, delta=0.1)
+
+    def test_a_downtown_anchor_moves_the_downtown(self):
+        try:
+            import pyarrow  # noqa: F401
+        except ImportError:
+            raise unittest.SkipTest("pyarrow not installed")
+        from metro import anchors, centers, generate
+        tmp = tempfile.mkdtemp()
+        try:
+            m = synthetic_metro(tmp)
+            p = generate.params()["centers"]
+            cs = centers.find(m, centers.Surface(m, p["grid_km"], p["kernel_km"]), p)
+            centers.classify(m, cs, p)
+            lat, lon = ll(20, 0)   # the smaller cluster
+            anchors.apply(m, cs, [{"name": "City Hall", "lat": lat, "lon": lon, "kind": "downtown"}], p, log=None)
+            down = [c for c in cs if c.kind == "downtown"]
+            self.assertEqual(len(down), 1)
+            self.assertAlmostEqual(down[0].x - float(m.xy(LAT0, LON0)[0]), 20, delta=1.5)
+            lat, lon = ll(10, 6)   # nowhere near a center: a new one
+            n = len(cs)
+            anchors.apply(m, cs, [{"name": "Airport", "lat": lat, "lon": lon, "kind": "airport", "weight": 20000}], p, log=None)
+            self.assertEqual(len(cs), n + 1)
+            self.assertEqual(cs[-1].anchor, "airport")
+        finally:
+            shutil.rmtree(tmp, ignore_errors=True)
+            from dfwt import osmroute
+            osmroute.set_origin(32.8, -97.0)
