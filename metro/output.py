@@ -61,7 +61,7 @@ def tables(m, ex, chosen, by, gp, cfg, y_open, namer, used_names, downtowns, cor
     line_names = {r["name"] for r in t["lines.csv"]}
     color_k = collections.Counter()
     new_ids = []
-    for k, c in enumerate(sorted(chosen, key=lambda c: c.order)):
+    for k, c in enumerate(sorted(chosen, key=lambda c: (c.order is None, c.order or 0, c.uid))):
         lid = f"G{k + 1:02d}"
         sids, pos = [], []
         cum = geom.cumlen(c.P)
@@ -96,7 +96,7 @@ def tables(m, ex, chosen, by, gp, cfg, y_open, namer, used_names, downtowns, cor
         color_k[mode] += 1
         c.line_id, c.line_name = lid, nm
         t["lines.csv"].append({"line_id": lid, "name": nm, "mode": mode, "status": "proposed", "color": col,
-                               "headway_min": "", "notes": f"generated ({c.uid}): {c.mode_reason}; {c.reason}"})
+                               "headway_min": getattr(c, "headway", None) or "", "notes": f"generated ({c.uid}): {c.mode_reason}; {c.reason}"})
         for i, sid in enumerate(sids):
             t["line_stops.csv"].append({"line_id": lid, "seq": i + 1, "station_id": sid, "year_opens": y_open})
         for i in range(len(sids) - 1):
@@ -225,7 +225,7 @@ def _f(x, unit=""):
 
 
 def report(out, m, gp, cfg, urban, towns, links, cands, chosen, budget, spent, st, res, flags, secs, metro_id,
-           rail_why=None, skipped=None, asc_note=None, model_select=None, sense=None):
+           rail_why=None, skipped=None, asc_note=None, model_select=None, sense=None, plan=None):
     L = []
     w = L.append
     w(f"# Generated network: {metro_name(m)}")
@@ -340,6 +340,25 @@ def report(out, m, gp, cfg, urban, towns, links, cands, chosen, budget, spent, s
             miss = [f"{n} ({k})" for n, k, ok in sense["anchors"] if not ok]
             w(f"- Anchors (registry): {sum(1 for *_, ok in sense['anchors'] if ok)} of {len(sense['anchors'])} have a station "
               "within 600 m" + (f"; not served: {', '.join(miss)}." if miss else "."))
+        w("")
+    if plan:
+        a0, a1 = plan["start"], plan["end"]
+        w("## Line planning")
+        w("")
+        w(f"After the pruning, a local search on the full model (metro/lineplan.py) improves the network as a whole: "
+          f"J = new daily trips - {plan['floor']} x ($M of capital + opex over the valuation years) - "
+          f"{plan['anchor_trips']:,.0f} for each must-serve anchor without a station. "
+          f"From {a0['lines']} lines, {a0['trips']:,.0f} daily trips, ${a0['capital'] / 1e3:.1f}B and {len(a0['unserved'])} "
+          f"anchors unserved to {a1['lines']} lines, {a1['trips']:,.0f} daily trips, ${a1['capital'] / 1e3:.1f}B and "
+          f"{len(a1['unserved'])} unserved (J {a1['J'] - a0['J']:+,.0f}).")
+        w("")
+        for h in plan["history"]:
+            for nm, dj in h["moves"]:
+                w(f"- Round {h['round']}: {nm} (J {dj:+,.0f})")
+        if not plan["history"]:
+            w("- No move improved the network.")
+        if a1["unserved"]:
+            w(f"- Still unserved: {', '.join(a1['unserved'])}.")
         w("")
     w("## 3. Chosen lines")
     w("")
