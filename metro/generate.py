@@ -158,11 +158,12 @@ class Existing:
 
 def generate(metro_id, budget_musd=None, years=None, out=None, run_model=True, override=None, log=print, metro=None,
              jobs_proxy=None, buildout=None, policies=None, future_years=None, full_model=None, plan_floors=None,
-             sweep_dir=None):
+             sweep_dir=None, on_floor=None, sweep_only=False):
     """Run every step for one metro; `metro` (an inputs.Metro) replaces reading data/metros/<id>/ (tests).
     `plan_floors`: also run the line planner at each of these floors (trips per $M) from the same pruned
     network, each written to sweep_dir/<floor>/<metro_id> (default <out>/sweep/<floor>); the result's
-    "sweep" holds their results by floor."""
+    "sweep" holds their results by floor. on_floor(floor, result) is called as each finishes (a floor whose
+    folder has a summary.json is skipped, so a rerun resumes); sweep_only skips the configured floor's output."""
     t0 = time.time()
     if buildout is None:   # the registry can ask for it (metros.json buildout: true)
         from . import fetch
@@ -283,8 +284,6 @@ def generate(metro_id, budget_musd=None, years=None, out=None, run_model=True, o
         gsel["selection"]["min_trips_per_musd"] *= mc["pool_floor_factor"]
         gsel["selection"]["max_lines"] = max(gsel["selection"]["max_lines"], mc.get("pool_max_lines", 0))
         log(f"  sketch pool (floor {gsel['selection']['min_trips_per_musd']} per $M) for the full model:")
-    chosen, spent = select.run(cands, sk, budget * (mc.get("pool_budget_factor", 1.0) if full_model else 1.0), gsel, cfg,
-                               exist_P, [v[:2] for v in ex.stations.values()], log)
     y_open = cfg["existing_year"] + gp["opens_after_years"]
     joined = []
     gpt = copy.deepcopy(gp)
@@ -297,24 +296,41 @@ def generate(metro_id, budget_musd=None, years=None, out=None, run_model=True, o
         cands.append(c)
         return c
     downtown_ids = [c.id for c in urban if c.kind == "downtown"]
-    if gsel["selection"].get("through", {}).get("enabled") and chosen:
-        chosen, joined = through.pair(chosen, by, [c.id for c in urban if c.kind == "downtown"], make,
-                                      gsel["selection"]["through"].get("min_angle_deg", 135), log, links=links,
-                                      core_km=gsel["selection"]["through"].get("core_km", 3.0))
-        spent = sum(c.capital for c in chosen)
-    model_rounds = judge = None
-    if full_model and chosen:
-        judge = mc.get("judge_year") or (min(future_years) if future_years else cfg["existing_year"] + 1)
+    model_rounds = None
+    judge = (mc.get("judge_year") or (min(future_years) if future_years else cfg["existing_year"] + 1)) if full_model else None
 
-        def build_net(cs):
-            t = output.tables(m, ex, cs, by, gp, cfg, y_open, namer, set(used_names), downtowns, core_r)
-            return output.load_net(t, cfg, "generated"), modelselect.line_cands(t)
-        with model.projection(m):
-            chosen, model_rounds = modelselect.prune(chosen, build_net, ctx, budget, gp, cfg, judge, log)
-        spent = sum(getattr(c, "model_capital", c.capital) for c in chosen)
-        model_rounds = {"year": judge, "floor": mc["min_trips_per_musd"], "pool_floor": gsel["selection"]["min_trips_per_musd"],
-                        "rounds": model_rounds}
-        log(f"  full model kept {len(chosen)} lines, ${spent / 1e3:.1f}B")
+    def build_net(cs):
+        t = output.tables(m, ex, cs, by, gp, cfg, y_open, namer, set(used_names), downtowns, core_r)
+        return output.load_net(t, cfg, "generated"), modelselect.line_cands(t)
+    # the greedy, the through lines and the full model's pruning take most of a big metro's run; with the full
+    # model their result is cached (out/cache/pruned.pkl, keyed on the parameters) so a rerun resumes from it
+    cache = _PruneCache(os.path.join(out, "cache", "pruned.pkl"), metro_id, gp, budget, policies, future_years) \
+        if full_model else None
+    hit = cache.load() if cache else None
+    if hit:
+        cands[:] = hit["cands"]
+        byuid = {c.uid: c for c in cands}
+        chosen, spent, model_rounds = [byuid[u] for u in hit["chosen"]], hit["spent"], hit["model_rounds"]
+        sk.best[...] = hit["sk_best"]
+        log(f"  the pruned network from the cache: {len(chosen)} lines, ${spent / 1e3:.1f}B")
+    else:
+        chosen, spent = select.run(cands, sk, budget * (mc.get("pool_budget_factor", 1.0) if full_model else 1.0), gsel,
+                                   cfg, exist_P, [v[:2] for v in ex.stations.values()], log)
+        if gsel["selection"].get("through", {}).get("enabled") and chosen:
+            chosen, joined = through.pair(chosen, by, [c.id for c in urban if c.kind == "downtown"], make,
+                                          gsel["selection"]["through"].get("min_angle_deg", 135), log, links=links,
+                                          core_km=gsel["selection"]["through"].get("core_km", 3.0))
+            spent = sum(c.capital for c in chosen)
+        if full_model and chosen:
+            with model.projection(m):
+                chosen, model_rounds = modelselect.prune(chosen, build_net, ctx, budget, gp, cfg, judge, log)
+            spent = sum(getattr(c, "model_capital", c.capital) for c in chosen)
+            model_rounds = {"year": judge, "floor": mc["min_trips_per_musd"],
+                            "pool_floor": gsel["selection"]["min_trips_per_musd"], "rounds": model_rounds}
+            log(f"  full model kept {len(chosen)} lines, ${spent / 1e3:.1f}B")
+        if cache:
+            cache.save({"cands": cands, "chosen": [c.uid for c in chosen], "spent": spent, "model_rounds": model_rounds,
+                        "sk_best": sk.best})
 
     def finish(chosen, cands, out, floor=None, names=None):
         """The line planner at `floor` (None: the configured selection.plan.floor), the planned network's
@@ -385,13 +401,52 @@ def generate(metro_id, budget_musd=None, years=None, out=None, run_model=True, o
     # folder (sweep_dir/<floor>/<metro>, default <out>/sweep/<floor>); then the configured floor into `out`
     sweep = {}
     for f in (plan_floors or []) if (full_model and chosen) else []:
+        d = os.path.join(sweep_dir, f"{f:g}", metro_id) if sweep_dir else os.path.join(out, "sweep", f"{f:g}")
+        if os.path.exists(os.path.join(d, "summary.json")):   # done before a restart (on_floor writes it)
+            log(f"  sweep: a floor of {f:g} is already done")
+            continue
         log(f"  sweep: the line planner at a floor of {f:g} trips per $M")
         c2, k2 = copy.deepcopy((chosen, cands))
-        d = os.path.join(sweep_dir, f"{f:g}", metro_id) if sweep_dir else os.path.join(out, "sweep", f"{f:g}")
         sweep[f] = finish(c2, k2, d, f, names=set(used_names))
+        if on_floor:
+            on_floor(f, sweep[f])
+    if sweep_only:
+        return {"sweep": sweep, "sweep_only": True}
     result = finish(chosen, cands, out)
     result["sweep"] = sweep
     return result
+
+
+class _PruneCache:
+    """The pruned network (the greedy, the through lines and the full model's pruning) of one run, keyed on
+    everything that decides it, so an interrupted run resumes from it."""
+    VERSION = 1
+
+    def __init__(self, path, metro_id, gp, budget, policies, future_years):
+        import hashlib
+        g = copy.deepcopy(gp)
+        g["selection"].pop("plan", None)   # the planner runs after it
+        blob = json.dumps({"v": self.VERSION, "id": metro_id, "gp": g, "budget": budget, "policies": policies,
+                           "years": list(future_years or [])}, sort_keys=True, default=str)
+        self.path, self.key = path, hashlib.sha256(blob.encode()).hexdigest()
+
+    def load(self):
+        import pickle
+        if not os.path.exists(self.path):
+            return None
+        try:
+            with open(self.path, "rb") as f:
+                d = pickle.load(f)
+        except Exception:
+            return None
+        return d if d.get("key") == self.key else None
+
+    def save(self, d):
+        import pickle
+        os.makedirs(os.path.dirname(self.path), exist_ok=True)
+        with open(self.path + ".part", "wb") as f:
+            pickle.dump(dict(d, key=self.key), f, protocol=pickle.HIGHEST_PROTOCOL)
+        os.replace(self.path + ".part", self.path)
 
 
 def registry_entry(metro_id, m):
