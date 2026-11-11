@@ -449,3 +449,39 @@ class AirportSpurTests(unittest.TestCase):
         self.assertEqual(by[v.seq[-1]].name, "Airport")
         self.assertAlmostEqual(v.P[-1][0], 2.5)
         self.assertAlmostEqual(v.capital, 100.0 + 2.5 * 50)   # the spur at the elevated premium
+
+
+class BorderTests(unittest.TestCase):
+    """metro/model.py add_border: crossers from Mexico join the commutes at their bridge, car-free."""
+
+    def test_crossers_at_the_bridge(self):
+        import numpy as np
+        from dfwt import config, geo
+        from metro import model
+
+        class Z:
+            pass
+        z = Z()
+        lat, lon = np.array([31.75, 31.80, 31.70]), np.array([-106.49, -106.40, -106.30])
+        z.x, z.y = geo.Projector().xy(lat, lon)
+        z.n, z.pop, z.jobs = 3, np.array([1000.0, 5000.0, 4000.0]), np.array([3000.0, 2000.0, 5000.0])
+
+        class Ctx:
+            pass
+        ctx = Ctx()
+        ctx.zones, ctx.od = z, np.array([[10.0, 20.0, 10.0], [50.0, 100.0, 50.0], [40.0, 40.0, 80.0]], dtype=np.float32)
+        cfg = config.load()
+        cfg["demand"]["total_commutes"] = 400.0
+        cfg["demand"]["border"] = [{"port": "El Paso", "lat": 31.7486, "lon": -106.4869, "pedestrians_day": 1000,
+                                    "bus_day": 100}]
+        out = model.add_border(ctx, cfg)
+        rc = cfg["ridership"]
+        n = 1100 * 2 / (rc["round_trip"] / rc["work_share_of_transit_trips"] * rc["telework"])
+        self.assertEqual(out[0][1], 0)                                   # the zone at the bridge
+        self.assertAlmostEqual(float(ctx.od[0].sum()), 40.0 + n, places=2)   # spread like the zone's own commutes
+        self.assertAlmostEqual(float(ctx.od[0, 1] / ctx.od[0, 0]), 2.0, places=3)
+        self.assertAlmostEqual(cfg["demand"]["total_commutes"], 400.0 + n, places=3)
+        self.assertGreater(z.carless_floor[0], 0.5)                      # mostly crossers, none with a car here
+        self.assertEqual(float(z.carless_floor[1]), 0.0)
+        model.add_border(ctx, cfg)                                       # a second call on the same cfg
+        self.assertAlmostEqual(cfg["demand"]["total_commutes_residents"], 400.0)

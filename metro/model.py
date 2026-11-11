@@ -90,7 +90,48 @@ def context(m, cfg):
         ctx.od, ctx.od_source = demand.gravity(ctx.zones, cfg), "gravity"
     ctx._seed = (None, None)
     ctx._year = {}
+    ctx.border = add_border(ctx, cfg)
     return ctx
+
+
+def add_border(ctx, cfg, max_km=3.0):
+    """People crossing from Mexico (cfg demand.border, the registry's ports of entry: pedestrians and bus
+    passengers a day, who have no car on this side) added to the zone at their bridge: each crosser makes
+    two trips a day, so they count as 2 / (trips per transit commuter x telework) commutes, spread over the
+    destinations the zone's own commutes go to, and as people in that zone (the regional commute total grows
+    with them, so nobody else's shrinks), with no car (the zone's car-free share at least theirs). The census
+    and LODES count only people who live in the US, so none of them are in the trip tables otherwise.
+    Returns [(port, zone index, crossers, commutes added)]."""
+    ports = cfg["demand"].get("border") or []
+    if not ports:
+        return []
+    dc, rc = cfg["demand"], cfg["ridership"]
+    base = dc.setdefault("total_commutes_residents", dc["total_commutes"])   # idempotent across calls on one cfg
+    per = 2.0 / (rc["round_trip"] / rc["work_share_of_transit_trips"] * rc["telework"])
+    z = ctx.zones
+    per_person = base / max(float(z.pop.sum()), 1.0)
+    carless = np.zeros(z.n)
+    out = []
+    for p in ports:
+        x, y = geo.Projector().xy(np.array([p["lat"]]), np.array([p["lon"]]))
+        d = np.hypot(z.x - x[0], z.y - y[0])
+        i = int(np.argmin(d))
+        if d[i] > max_km:
+            continue
+        crossers = float(p.get("pedestrians_day", 0)) + float(p.get("bus_day", 0))
+        n = crossers * per
+        row = np.asarray(ctx.od[i], dtype=np.float64)
+        if row.sum() <= 0:   # nobody commutes from the bridge's zone: destinations by jobs, nearer first
+            dj = np.hypot(z.x - z.x[i], z.y - z.y[i])
+            row = z.jobs * np.exp(-dj / 8.0)
+        ctx.od[i] = ctx.od[i] + (n * row / row.sum()).astype(ctx.od.dtype)
+        people = n / per_person
+        z.pop[i] += people
+        carless[i] += people
+        out.append((p.get("port", ""), i, crossers, n))
+    dc["total_commutes"] = base + sum(o[3] for o in out)
+    z.carless_floor = np.where(z.pop > 0, carless / np.maximum(z.pop, 1e-9), 0.0)
+    return out
 
 
 def all_open(net):

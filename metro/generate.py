@@ -207,6 +207,8 @@ def generate(metro_id, budget_musd=None, years=None, out=None, run_model=True, o
     for c in anchor_centers:   # an anchor keeps its own name
         c.name = c.anchor_name
     cfg = model.metro_cfg(m, urban, cfg0, growth=entry.get("growth"))   # the metro's own growth, if the registry gives it
+    if entry.get("border"):   # people crossing from Mexico on foot or by bus (metro/model.py add_border)
+        cfg["demand"]["border"] = entry["border"]
     downtowns = [(c.x, c.y) for c in urban if c.kind == "downtown"]
     core_r = gp["grade"]["core_radius_km"]
     urban_density = cfg["growth"]["tod"]["setting_density_per_km2"]["urban"]
@@ -232,6 +234,8 @@ def generate(metro_id, budget_musd=None, years=None, out=None, run_model=True, o
 
     # 3. mode, stations, cost, sketch value per candidate ---------------------------
     ctx, od = model.gravity_od(m, cfg)
+    for port, i, crossers, n in getattr(ctx, "border", []):
+        log(f"  border: {port}: {crossers:,.0f} crossers a day on foot or by bus, {n:,.0f} commutes, at zone {m.geoid[i]}")
     asc_note = ridership_constant(metro_id, m, cfg, ctx, ex, log)   # before the sketch: it uses the constant too
     if policies:
         # A policy package (config.json keys, e.g. a scenario's access and parking levers) goes on top of the
@@ -502,7 +506,10 @@ def calibrate(metro_id, log=print):
     cp = gp["centers"]
     urban = centers.find(m, centers.Surface(m, cp["grid_km"], cp["kernel_km"]), cp)
     centers.classify(m, urban, cp)
-    cfg = model.metro_cfg(m, urban, config.load(), growth=registry_entry(metro_id, m).get("growth"))
+    entry = registry_entry(metro_id, m)
+    cfg = model.metro_cfg(m, urban, config.load(), growth=entry.get("growth"))
+    if entry.get("border"):
+        cfg["demand"]["border"] = entry["border"]
     ex = Existing(m, cfg["modes"])
     ctx, _ = model.gravity_od(m, cfg)
     note = ridership_constant(metro_id, m, cfg, ctx, ex, log)
