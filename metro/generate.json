@@ -32,6 +32,7 @@
     "max_circuity": 1.5,
     "max_winding": 2.2,
     "through_max_km": {"metro": 70, "brt": 50},
+    "airport_spur": {"_doc": "metro/spurs.py: a pool line of a mode ending within max_km of an airport terminal the routes can't reach (more than a station's walk from the center it marks) gets a variant running on to it, the spur priced at the mode's elevated rate; at most per_airport variants an airport, the best by sketch value.", "enabled": true, "max_km": 4.0, "per_airport": 6},
     "max_turn_deg": 75
   },
   "modes": {

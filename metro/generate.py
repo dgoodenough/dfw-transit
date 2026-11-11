@@ -30,7 +30,7 @@ import numpy as np
 
 from dfwt import config, evaluate, geo
 
-from . import anchors as anchors_mod, candidates, centers, geom, inputs, lineplan, model, output, modelselect, routing, select, sketch, through
+from . import anchors as anchors_mod, candidates, centers, geom, inputs, lineplan, model, output, modelselect, routing, select, sketch, spurs, through
 
 PARAMS = os.path.join(os.path.dirname(os.path.abspath(__file__)), "generate.json")
 
@@ -261,6 +261,10 @@ def generate(metro_id, budget_musd=None, years=None, out=None, run_model=True, o
     exist_P = [ln["P"] for ln in ex.lines]
     for c in cands:
         _decide(c, m, cfg, gp, zidx, by, ex, sk, downtowns, core_r, dens_fn, urban_density, exist_P)
+    # airport terminals off the road graph: lines ending near one get a variant with a spur to it (metro/spurs.py)
+    spurs.add(m, cands, by, anchor_centers, gp, cfg,
+              lambda seq: Cand(f"S{len(cands) + 1:03d}", "road", seq, None),
+              lambda c, mode, P: _setup(c, mode, P, m, cfg, gp, by, ex, sk, downtowns, core_r, dens_fn, urban_density), log)
     pool = [c for c in cands if c.status == "pool"]
     log(f"  candidates: {len(cands)} paths, {len(pool)} with a mode "
         f"({', '.join(f'{k} {sum(c.mode == k for c in pool)}' for k in ('metro', 'streetcar', 'brt', 'commuter'))})")

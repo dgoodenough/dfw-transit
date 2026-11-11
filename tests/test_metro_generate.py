@@ -407,3 +407,45 @@ class LinePlanTests(unittest.TestCase):
         out = p.run([cs["A1"]])
         self.assertIn("X1", {c.uid for c in out})
         self.assertEqual(p.end["unserved"], [])
+
+
+class AirportSpurTests(unittest.TestCase):
+    """metro/spurs.py: a line ending near an airport terminal off the road graph gets a variant running on to it."""
+
+    def test_a_spur_to_the_terminal(self):
+        from metro import spurs
+
+        class M:
+            def ll(self, x, y):
+                return 30.0 + y / 111.0, -97.0 + x / 96.0
+
+        class C:
+            def __init__(self, uid, seq, P, ratio):
+                self.uid, self.seq, self.P, self.ratio = uid, seq, P, ratio
+                self.mode, self.kind, self.status, self.mode_reason = "brt", "road", "pool", ""
+                self.capital, self.opex, self.new_trips = 100.0, 1.0, 500.0
+
+        class A:   # the center the airport anchor marks, 2.5 km from the terminal
+            x, y = 0.0, 0.0
+            anchor_list = [("Airport", "airport", 2.5, 0.0)]
+        by = {}
+        cands = [C("R1", ("C1", "C2"), [(-10.0, 0.0), (0.0, 0.0)], 2.0),     # ends at the airport's center
+                 C("R2", ("C3", "C4"), [(0.0, 20.0), (0.0, 10.0)], 3.0)]      # nowhere near it
+        made = []
+
+        def make(seq):
+            c = C(f"S{len(made) + 1}", seq, None, 0.0)
+            made.append(c)
+            return c
+
+        def setup(c, mode, P):
+            c.P, c.mode, c.capital, c.opex, c.new_trips = P, mode, 100.0, 1.0, 600.0
+        gp = {"lines": {"airport_spur": {"enabled": True, "max_km": 4.0, "per_airport": 6}}}
+        cfg = {"staging": {"value_opex_years": 20}, "cost_musd_per_km": {"brt": {"surface": 30, "elevated": 80}}}
+        out = spurs.add(M(), cands, by, [A()], gp, cfg, make, setup, log=None)
+        self.assertEqual(len(out), 1)
+        v = out[0]
+        self.assertEqual(v.seq[:2], ("C1", "C2"))
+        self.assertEqual(by[v.seq[-1]].name, "Airport")
+        self.assertAlmostEqual(v.P[-1][0], 2.5)
+        self.assertAlmostEqual(v.capital, 100.0 + 2.5 * 50)   # the spur at the elevated premium
