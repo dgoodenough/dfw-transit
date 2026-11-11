@@ -8,7 +8,7 @@ import numpy as np
 from dfwt import config, geo, validate
 from dfwt.network import Network
 
-from . import geom, inputs, model
+from . import candidates, geom, inputs, model
 
 OPTIONAL_EMPTY = {   # written empty so dfwt doesn't fall back to DFW's plan tables (network/)
     "stages.csv": ["line_id", "stage", "kind", "from_stop", "to_stop", "year_opens", "until_year", "via_line",
@@ -107,8 +107,7 @@ def tables(m, ex, chosen, by, gp, cfg, y_open, namer, used_names, downtowns, cor
                 lo, hi = (max(1.5 * d, 0.15) if d > 0.03 else 0.0 for d in moved)
                 seg = [seg[0]] + [p for p in seg[1:-1] if math.dist(p, seg[0]) > lo and math.dist(p, seg[-1]) > hi] \
                     + [seg[-1]]
-            core = any(math.dist(seg[0], d) <= core_r or math.dist(seg[-1], d) <= core_r for d in downtowns)
-            grade = "tunnel" if mode == "metro" and core else "surface"
+            grade = candidates.hop_grade(mode, seg[0], seg[-1], downtowns, core_r, gp["grade"].get("tunnel_radius_km"))
             ll = geom.to_ll(m, seg)
             t["line_segments.csv"].append({"line_id": lid, "seq": i + 1, "year_opens": y_open, "grade": grade,
                                            "geometry_source": "generated", "locked": "",
@@ -359,6 +358,11 @@ def report(out, m, gp, cfg, urban, towns, links, cands, chosen, budget, spent, s
             w("- No move improved the network.")
         if a1["unserved"]:
             w(f"- Still unserved: {', '.join(a1['unserved'])}.")
+        cr = plan.get("crowded") or []
+        w(f"- Crowding (the full model's loads in {plan.get('judge_year')}, peak hour, peak direction): "
+          + ("no line over capacity." if not cr else "; ".join(
+              f"{u} {ph:,.0f} an hour against {cap:,.0f} every {hw:g} min, "
+              + (f"now every {new:g} min" if new else "over capacity even at its shortest headway") for u, ph, cap, hw, new in cr) + "."))
         w("")
     w("## 3. Chosen lines")
     w("")

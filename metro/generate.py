@@ -359,10 +359,11 @@ def generate(metro_id, budget_musd=None, years=None, out=None, run_model=True, o
                                            anchor_pts, [v[:2] for v in ex.stations.values()],
                                            modelselect.land_use(ctx, net0, judge), log)
                 chosen = planner.run(chosen)
+                crowded = modelselect.capacity_fix(chosen, build_net, ctx, gpf, cfg, judge, log)   # its riders against its capacity
                 chosen = modelselect.revalue(chosen, build_net, ctx, gp, cfg, judge, log)   # values and order of the final network
             spent_f = planner.end["capital"]
             plan_result = {"start": planner.start, "end": planner.end, "history": planner.history, "floor": planner.floor,
-                           "anchor_trips": planner.anchor_trips}
+                           "anchor_trips": planner.anchor_trips, "crowded": crowded, "judge_year": judge}
 
         # 5. output ---------------------------------------------------------------------
         os.makedirs(out, exist_ok=True)
@@ -547,7 +548,7 @@ def _setup(c, mode, P, m, cfg, gp, by, ex, sk, downtowns, core_r, dens_fn, urban
     c.along = [s for s, _, _ in c.stops]
     refs = [r[1] if r and r[0] == "E" else None for _, _, r in c.stops]
     c.capital, c.grades = candidates.line_cost(cfg, mode, [(s, p, rf) for (s, p, _), rf in zip(c.stops, refs)], P,
-                                               downtowns, core_r, ex.station_modes)
+                                               downtowns, core_r, ex.station_modes, gp["grade"].get("tunnel_radius_km"))
     # a downtown terminal: tail track and turnback (candidates.terminal_cost), which a through line doesn't need
     c.terminal_cost = candidates.terminal_cost(gp.get("terminals"), cfg, mode, c.stops, c.grades, downtowns, core_r)
     c.capital += c.terminal_cost
