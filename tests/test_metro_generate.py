@@ -485,3 +485,18 @@ class BorderTests(unittest.TestCase):
         self.assertEqual(float(z.carless_floor[1]), 0.0)
         model.add_border(ctx, cfg)                                       # a second call on the same cfg
         self.assertAlmostEqual(cfg["demand"]["total_commutes_residents"], 400.0)
+
+
+class TerminalCostTests(unittest.TestCase):
+    """candidates.terminal_cost: a line ending downtown pays for its terminal; a through line doesn't."""
+
+    def test_downtown_ends_pay(self):
+        from metro import candidates
+        cfg = {"cost_musd_per_km": {"metro": {"surface": 140, "tunnel": 600}}}
+        tc = {"enabled": True, "tail_km": 0.4, "turnback_musd": {"metro": {"tunnel": 50, "surface": 15}}}
+        down, r = [(0.0, 0.0)], 1.5
+        stub = [(0, (0.5, 0.0), None), (5, (5.5, 0.0), None)]               # ends downtown, in tunnel there
+        through = [(0, (-5.0, 0.0), None), (5, (0.0, 0.0), None), (10, (5.0, 0.0), None)]
+        self.assertAlmostEqual(candidates.terminal_cost(tc, cfg, "metro", stub, ["tunnel"], down, r), 0.4 * 600 + 50)
+        self.assertEqual(candidates.terminal_cost(tc, cfg, "metro", through, ["surface", "surface"], down, r), 0.0)
+        self.assertEqual(candidates.terminal_cost({"enabled": False}, cfg, "metro", stub, ["tunnel"], down, r), 0.0)

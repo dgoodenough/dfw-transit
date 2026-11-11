@@ -296,6 +296,24 @@ def line_cost(cfg, mode, stops, P, downtowns, core_r, existing_mode_stations):
     return cap, grades
 
 
+def terminal_cost(tc, cfg, mode, stops, grades, downtowns, core_r):
+    """$M for the line's ends that lie in a downtown core (within core_r of a downtown): tail track past
+    the last platform (tc tail_km at the grade of the line's last hop, at the mode's cost per km for it),
+    for turning trains back and laying them over, plus crossovers and signals (tc turnback_musd by mode
+    and grade). A line running through downtown has no end there and pays none of it; two lines ending
+    there pay it twice. Elsewhere the land is cheap and a terminal is in the line's cost per km."""
+    if not tc or not tc.get("enabled") or len(stops) < 2:
+        return 0.0
+    per_km = cfg["cost_musd_per_km"][mode]
+    tb = tc.get("turnback_musd", {}).get(mode, {})
+    out = 0.0
+    for k, g in ((0, grades[0] if grades else "surface"), (len(stops) - 1, grades[-1] if grades else "surface")):
+        p = stops[k][1]
+        if any(math.dist(p, d) <= core_r for d in downtowns):
+            out += tc.get("tail_km", 0.4) * per_km.get(g, per_km["surface"]) + tb.get(g, tb.get("surface", 0.0))
+    return out
+
+
 def run_minutes(cfg, mode, stops):
     mc = cfg["modes"][mode]
     km = stops[-1][0] - stops[0][0]

@@ -548,6 +548,9 @@ def _setup(c, mode, P, m, cfg, gp, by, ex, sk, downtowns, core_r, dens_fn, urban
     refs = [r[1] if r and r[0] == "E" else None for _, _, r in c.stops]
     c.capital, c.grades = candidates.line_cost(cfg, mode, [(s, p, rf) for (s, p, _), rf in zip(c.stops, refs)], P,
                                                downtowns, core_r, ex.station_modes)
+    # a downtown terminal: tail track and turnback (candidates.terminal_cost), which a through line doesn't need
+    c.terminal_cost = candidates.terminal_cost(gp.get("terminals"), cfg, mode, c.stops, c.grades, downtowns, core_r)
+    c.capital += c.terminal_cost
     c.opex = candidates.opex_musd(cfg, mode, c.stops)
     n = len(c.stops)
     in_core = lambda k: any(math.dist(c.station_xy[k], d) <= core_r for d in downtowns)  # noqa: E731

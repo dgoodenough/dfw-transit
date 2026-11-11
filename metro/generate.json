@@ -54,6 +54,7 @@
     "snap_existing_m": 300,
     "transfer_m": 650
   },
+  "terminals": {"_doc": "candidates.terminal_cost: a line ending in a downtown core (within grade.core_radius_km) pays for its terminal there: tail_km of track past the last platform at the grade of its last hop (the mode's cost per km for that grade, config.json), for turning trains back and laying them over, plus crossovers and signals (turnback_musd by mode and grade). A through line pays none of it. From the cost model's own unit costs, not fitted to produce through lines: a metro line ending in a downtown tunnel pays about $290M, a BRT line ending downtown about $27M. Peer projects spend far more to get rid of downtown stubs (LA's Regional Connector, about $1.8B, joined three lines' downtown ends).", "enabled": true, "tail_km": 0.4, "turnback_musd": {"metro": {"tunnel": 50, "elevated": 25, "surface": 15}, "commuter": {"surface": 20, "elevated": 30, "tunnel": 60}, "brt": {"surface": 15, "elevated": 20, "tunnel": 40}, "streetcar": {"surface": 5}}},
   "grade": {
     "_doc": "Grade for costing: metro in tunnel within core_radius_km of a downtown center (as the DFW tools cost proposed metro inside config cores), surface elsewhere; BRT, streetcar and regional rail at surface.",
     "core_radius_km": 1.5

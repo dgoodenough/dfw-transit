@@ -100,7 +100,8 @@ def prune(pool, build_net, ctx, budget, gp, cfg, year, log=print):
             c.model_trips = (w + a) / 2
             # its share of the network's capital: track and platforms shared with other lines of its mode
             # (a branch's trunk) split evenly among them (dfwt Network.shared_cost_musd)
-            c.model_capital = net.shared_cost_musd(net.lines[lid]) if net is not None else c.capital
+            c.model_capital = (net.shared_cost_musd(net.lines[lid]) + getattr(c, "terminal_cost", 0.0)) if net is not None \
+                else c.capital   # the network's costs leave out downtown terminals (candidates.terminal_cost)
             c.model_ratio = c.model_trips / max(c.model_capital + years * c.opex, 1.0)
         return full, none
 
@@ -149,7 +150,7 @@ def revalue(pool, build_net, ctx, gp, cfg, year, log=print):
         c = by[uid_of[lid]]
         c.model_without, c.model_alone = w, a
         c.model_trips = (w + a) / 2
-        c.model_capital = net.shared_cost_musd(net.lines[lid])
+        c.model_capital = net.shared_cost_musd(net.lines[lid]) + getattr(c, "terminal_cost", 0.0)
         c.model_ratio = c.model_trips / max(c.model_capital + years * c.opex, 1.0)
     pool = sorted(pool, key=lambda c: -getattr(c, "model_ratio", 0.0))
     for k, c in enumerate(pool, 1):
