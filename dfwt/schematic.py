@@ -2267,8 +2267,13 @@ def build(nets, log=None, cache=True):
     webmap: {"sets": {key: layout}, "versions": [[key, label, modes]], "default", "geoWater"}."""
     out = {"sets": {}, "versions": [], "default": DEFAULT_VERSION, "geoWater": waterways_geo()}
     for key, label, modes in VERSIONS:
-        out["sets"][key] = layout_json(version_nets(nets, modes), log=log, cache=cache)
+        vn = version_nets(nets, modes)
+        if not any(n.lines for n in vn.values()):   # a region with none of these modes (no rail): no such version
+            continue
+        out["sets"][key] = layout_json(vn, log=log, cache=cache)
         out["versions"].append([key, label, list(modes) if modes else None])
+    if out["default"] not in out["sets"] and out["versions"]:
+        out["default"] = out["versions"][0][0]
     return out
 
 
