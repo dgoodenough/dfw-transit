@@ -93,7 +93,7 @@ def site_for(m, entry, title, sub, back_href, back_text, layers_url):
 
 
 def build(metro_id, scenarios, labels, out_html, folder=None, asc=None, policies=None, budget_musd_per_year=None,
-          title=None, sub="", back_href="../index.html", back_text="The statewide plan", log=print):
+          title=None, sub="", back_href="../index.html", back_text="The statewide plan", start_year=None, log=print):
     """Evaluate each scenario of the metro's network on its own model and write the DFW-style page.
     scenarios: {key: {line_id: opening year}}; labels: {key: label}. Returns the page's path."""
     from .generate import registry_entry
@@ -111,6 +111,7 @@ def build(metro_id, scenarios, labels, out_html, folder=None, asc=None, policies
     site = site_for(m, entry, title or f"{summ.get('name', metro_id).split(',')[0].split('-')[0]} Transit", sub,
                     back_href, back_text, f"{base}_layers/")
     site["labels"] = labels
+    site["start_year"] = start_year
     site["layers_dir"] = os.path.join(os.path.dirname(out_html), f"{base}_layers")
     nets, evals = {}, {}
     with model.projection(m):
