@@ -52,11 +52,11 @@ def reroutes(net, ln):
     return [(until, old) for _, until, old, it in net.variants.get(ln.id, []) if it.get("reroute")]
 
 
-def line_extras(net, ln):
+def line_extras(net, ln, region_of=None):
     """Display fields of a line beyond the model's: its region (Lines panel) and, for a rerouted
     line, the old routing it runs until the new track opens (the diagram draws it in those
     years from schematic paths[key + schematic.PRE])."""
-    out = {"region": line_region(net.stations, ln.stop_ids)}
+    out = {"region": (region_of or line_region)(net.stations, ln.stop_ids)}
     for until, old in reroutes(net, ln):
         out["pre"] = {"until": until, "segs": [[s.year, round(s.km, 2)] for s in old.segments]}
     return out
@@ -112,7 +112,58 @@ def drawn(net):
     return raw, st_piece
 
 
-def write(nets, evals, out_path):
+# What a page for another region changes (write(..., site=...)): DFW's literals in the template, replaced as text
+# so that DFW's own page is unchanged when no site is given.
+DFW_TEXT = {
+    "title": "<title>DFW Transit Map</title>",
+    "aria": 'aria-label="Map of the DFW transit network"',
+    "h1": "<h1>DFW Transit</h1>",
+    "sub": "A phased plan for Dallas–Fort Worth. Drag the year, switch plans, plan a trip from any address. Speculative, not an official plan.",
+    "story": '<a class="sub" href="index.html" style="display:inline-block;margin-top:2px">&larr; Why this plan: the story</a>',
+    "view": "setView([32.84, -97.03], 10)",
+    "box": "const GEO_BOX = [-98.1, 32.2, -95.9, 33.6];   // lon/lat box addresses are searched in (the metroplex)",
+    "kmlat": "Math.cos(32.8 * Math.PI / 180)",
+    "geo": "&lat=32.8&lon=-97.0&limit=8",
+    "area": "No address in the DFW area matches",
+    "region": "(the Dallas–Fort Worth region,",
+    "layers": ("loadScript('layers/zones.js')", "loadScript(`layers/${key}.js`)", "beside the map, in layers/)"),
+}
+
+
+def _site_text(html, site):
+    """The template with a region's own title, header, view, address box and layers folder (site: see write)."""
+    lat, lon = site["center"]
+    box = site["geo_box"]
+    lay = site.get("layers_url", "layers/")
+    rep = [(DFW_TEXT["title"], f"<title>{site['title']}</title>"),
+           (DFW_TEXT["aria"], f'aria-label="Map of the {site["short"]} transit network"'),
+           (DFW_TEXT["h1"], f"<h1>{site['title']}</h1>"),
+           (DFW_TEXT["sub"], site["sub"]),
+           (DFW_TEXT["story"], f'<a class="sub" href="{site.get("back_href", "index.html")}" style="display:inline-block;margin-top:2px">&larr; {site.get("back_text", "Back")}</a>'),
+           (DFW_TEXT["view"], f"setView([{lat:.3f}, {lon:.3f}], {site.get('zoom', 10)})"),
+           (DFW_TEXT["box"], f"const GEO_BOX = [{box[0]}, {box[1]}, {box[2]}, {box[3]}];   // lon/lat box addresses are searched in"),
+           (DFW_TEXT["kmlat"], f"Math.cos({lat:.1f} * Math.PI / 180)"),
+           (DFW_TEXT["geo"], f"&lat={lat:.1f}&lon={lon:.1f}&limit=8"),
+           (DFW_TEXT["area"], f"No address in the {site['short']} area matches"),
+           (DFW_TEXT["region"], f"(the {site['short']} region,"),
+           (DFW_TEXT["layers"][0], f"loadScript('{lay}zones.js')"),
+           (DFW_TEXT["layers"][1], f"loadScript(`{lay}${{key}}.js`)"),
+           (DFW_TEXT["layers"][2], f"beside the map, in {lay})")]
+    for a, b in rep:
+        if a not in html:
+            raise ValueError(f"template changed: {a[:60]!r} not found")
+        html = html.replace(a, b)
+    return html
+
+
+def write(nets, evals, out_path, site=None):
+    """The map page. `site` (another region; None for DFW): {"title", "short" (name in messages), "sub" (header
+    line), "center" (lat, lon), "zoom", "geo_box" [lon0, lat0, lon1, lat1], "zones" (a demand.Zones: the trip
+    planner's feeder zones and the data layers), "regions" ({key: label} for the Lines panel) and "region_of"
+    (fn(stations, stop_ids) -> key), "labels" ({scenario key: label}), "cities" ([(name, lat, lon)] for the
+    diagram), "waterways" (a geojson path, "" for none), "layers_dir" and "layers_url" (where the data layers
+    go and how the page finds them), "back_href" / "back_text" (the header link)}."""
+    site = site or {}
     cfg = next(iter(nets.values())).cfg
     geoms, gidx = [], {}
     stations = {}
@@ -125,7 +176,8 @@ def write(nets, evals, out_path):
         return gidx[key]
 
     scen = {}
-    zones = demand.Zones(cfg)   # base-year block groups: the trip planner's feeder zones and garages
+    zones = site.get("zones") or demand.Zones(cfg)   # base-year block groups: the trip planner's feeder zones and garages
+    labels = dict(LABELS, **(site.get("labels") or {}))
     feeds = False
     for key, net in nets.items():
         ev = evals[key]
@@ -140,7 +192,7 @@ def write(nets, evals, out_path):
                 "notes": ln.notes, "first": ln.first_year, "km": round(ln.km, 1),
                 "cost": m.get("cost_musd", 0), "value": m.get("value_per_musd", ""),
                 "load": m.get("peak_hour_load", 0),
-                "segs": [[s.year, round(s.km, 2)] for s in ln.segments], **line_extras(net, ln),
+                "segs": [[s.year, round(s.km, 2)] for s in ln.segments], **line_extras(net, ln, site.get("region_of")),
             })
         # drawn geometry: shared-track pieces, each with its lines in side-by-side order
         raw, st_piece = drawn(net)
@@ -169,7 +221,7 @@ def write(nets, evals, out_path):
                 gkey[k] = len(graphs)
                 graphs.append({"runs": runs, "walks": walks})
             years[y] = gkey[k]
-        scen[key] = {"label": LABELS.get(key, key), "lines": lines, "pieces": pieces, "stPiece": st_piece, "graphs": graphs, "yearGraph": years,
+        scen[key] = {"label": labels.get(key, key), "lines": lines, "pieces": pieces, "stPiece": st_piece, "graphs": graphs, "yearGraph": years,
                      "metrics": ev["years"],
                      "boardings": {r["station_id"]: r["boardings_final"] for r in ev["stations"]},
                      "grades": station_grades(net),
@@ -181,7 +233,7 @@ def write(nets, evals, out_path):
         feeds = feeds or scen[key]["trip"]["feed"] is not None
     data = {"years": cfg["years"], "boardPenalty": cfg["transfer"]["penalty_min"],
             "build": cfg["staging"]["construction_years"],
-            "modes": {m: v["label"] for m, v in cfg["modes"].items()}, "regions": REGIONS,
+            "modes": {m: v["label"] for m, v in cfg["modes"].items()}, "regions": site.get("regions", REGIONS),
             # "What it means for you": the costed service day; feeder buses are in the operating cost
             # when the model prices them (operating.feeder_usd_per_boarding)
             "operating": {**{k: cfg["operating"][k] for k in ("span_hours", "days_per_year")},
@@ -193,11 +245,19 @@ def write(nets, evals, out_path):
                      [k for k in scen if k not in (cfg.get("default_scenario"), "plan", "v1_baseline", "right_sized")]}
     # diagram view (dfwt/schematic.py): one layout per version (schematic.VERSIONS): Rail, BRT
     # (every BRT line, the 2M arterial grid too) and All (rail and the plan's BRT corridors).
-    data["schem"] = schematic.build(nets)
+    old = schematic.CITIES, schematic.WATERWAYS
+    try:
+        if site:
+            schematic.CITIES, schematic.WATERWAYS = site.get("cities", []), site.get("waterways", "")
+        data["schem"] = schematic.build(nets)
+    finally:
+        schematic.CITIES, schematic.WATERWAYS = old
     # data layers (dfwt/layers.py): per-area numbers by year, in scripts the page loads on demand
-    data["layers"] = layers.write(zones, evals, os.path.join(os.path.dirname(out_path), "layers"))
+    data["layers"] = layers.write(zones, evals, site.get("layers_dir") or os.path.join(os.path.dirname(out_path), "layers"))
     with open(TEMPLATE, encoding="utf-8") as f:
         html = f.read()
+    if site:
+        html = _site_text(html, site)
     css, js = (open(p, encoding="utf-8").read() for p in SCHEM_FILES)
     html = html.replace("<!--__SCHEMATIC__-->", f"<style>\n{css}</style>\n<script>\n{js}</script>")
     html = html.replace("/*__DATA__*/null", json.dumps(data, separators=(",", ":")))
