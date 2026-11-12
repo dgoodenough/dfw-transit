@@ -363,6 +363,7 @@ def generate(metro_id, budget_musd=None, years=None, out=None, run_model=True, o
                 chosen = modelselect.revalue(chosen, build_net, ctx, gp, cfg, judge, log)   # values and order of the final network
             spent_f = planner.end["capital"]
             plan_result = {"start": planner.start, "end": planner.end, "history": planner.history, "floor": planner.floor,
+                           "exact": getattr(planner, "exact_result", None),
                            "anchor_trips": planner.anchor_trips, "crowded": crowded, "judge_year": judge}
 
         # 5. output ---------------------------------------------------------------------

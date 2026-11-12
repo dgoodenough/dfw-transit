@@ -353,11 +353,19 @@ def report(out, m, gp, cfg, urban, towns, links, cands, chosen, budget, spent, s
         w("")
         for h in plan["history"]:
             for nm, dj in h["moves"]:
-                w(f"- Round {h['round']}: {nm} (J {dj:+,.0f})")
+                w((f"- {nm[0].upper()}{nm[1:]}" if h["round"] == "exact" else f"- Round {h['round']}: {nm}") + f" (J {dj:+,.0f})")
         if not plan["history"]:
             w("- No move improved the network.")
         if a1["unserved"]:
             w(f"- Still unserved: {', '.join(a1['unserved'])}.")
+        ex = plan.get("exact")
+        if ex:
+            w("- Exact program: " + (f"the pool's {ex['pool']} lines make too many networks to evaluate every one; the local "
+                                     "search's network stands." if ex.get("subsets") is None else
+                                     f"every network the pool's {ex['pool']} lines can make within the money ({ex['subsets']:,}) "
+                                     "evaluated on the full model; " + ("the local search's network is the optimum." if
+                                     ex["local_was_optimal"] else f"the optimum beats the local search by J "
+                                     f"{ex['J_exact'] - ex['J_local']:+,.0f} and is the plan.")))
         cr = plan.get("crowded") or []
         w(f"- Crowding (the full model's loads in {plan.get('judge_year')}, peak hour, peak direction): "
           + ("no line over capacity." if not cr else "; ".join(

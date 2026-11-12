@@ -14,7 +14,9 @@ with the network's capital (shared track split among its lines) within the budge
 pruning's own (selection.model.min_trips_per_musd): a line is worth its cost when it carries that
 many trips per $M. This is the line-planning program of texas-transit's study/cabinet/network.md
 (after Borndoerfer, Groetschel and Pfetsch, and Schoebel), solved by local search rather than as
-an integer program, since each evaluation is a run of the demand model.
+an integer program, since each evaluation is a run of the demand model. Where the pool is small
+(selection.plan.exact_max_evals networks or fewer within the money: the small metros), it is then
+solved exactly by evaluating every network the pool can make (Planner.exact).
 
 Moves, each from the current network:
   merge    two lines of a mode ending in the same downtown core from opposite sides run as one
@@ -187,6 +189,54 @@ class Planner:
             out.append((f"{c.uid} every {h:g} min (was {cur:g})", set(S), H2))
         return out
 
+    # ---------------------------------------------------------------- the exact program
+    def exact(self, cur):
+        """Where the pool is small enough (a small metro), every network the pool can make is evaluated
+        on the full model: the best J among them is the exact optimum of the program over the pool
+        (each line at the local search's headway or its mode's default), where the local search is
+        only a local one. Subsets whose lines' standalone capital is over 1.5 x the budget are skipped
+        (shared track can't save that much); the rest are checked against the budget as the search
+        checks them. Returns the new current state if it beats the local search's, else None; records
+        what it found in self.exact_result."""
+        import itertools
+        j0, S0, H0, _, _ = cur
+        limit = self.gp["selection"].get("plan", {}).get("exact_max_evals", 0)
+        self.exact_result = None
+        if not limit:
+            return None
+        U = sorted(self.pool)
+        if 2 ** len(U) > 64 * limit:   # far too many to enumerate even before the money is counted
+            self.exact_result = {"pool": len(U), "subsets": None, "limit": limit}
+            self.log(f"  exact program: the pool's {len(U)} lines are too many to enumerate; the local search stands")
+            return None
+        cap = {u: self.pool[u].capital + getattr(self.pool[u], "terminal_cost", 0.0) for u in U}
+        subsets, n = [], 0
+        for k in range(len(U) + 1):
+            for T in itertools.combinations(U, k):
+                if sum(cap[u] for u in T) <= 1.5 * self.budget:
+                    subsets.append(set(T))
+                    if len(subsets) > limit:
+                        self.exact_result = {"pool": len(U), "subsets": None, "limit": limit}
+                        self.log(f"  exact program: the pool's {len(U)} lines make more than {limit:,} networks "
+                                 "within the money; the local search stands")
+                        return None
+        H = {u: H0.get(u) or getattr(self.pool[u], "headway", None) for u in U}
+        res = self.run_moves([("exact", T, {u: H[u] for u in T if H[u]}) for T in subsets], S0, H0)
+        best = max(res, key=lambda r: r[0])
+        same = best[2] == S0
+        self.exact_result = {"pool": len(U), "subsets": len(subsets), "J_local": j0, "J_exact": best[0],
+                             "local_was_optimal": same or best[0] <= j0 + 1e-6}
+        if same or best[0] <= j0 + 1e-6:
+            self.log(f"  exact program: {len(subsets):,} networks of the pool's {len(U)} lines evaluated; "
+                     "the local search's network is the optimum")
+            return None
+        add, drop = sorted(best[2] - S0), sorted(S0 - best[2])
+        nm = "exact program:" + (" add " + " ".join(add) if add else "") + (" drop " + " ".join(drop) if drop else "")
+        self.log(f"  exact program: {len(subsets):,} networks of the pool's {len(U)} lines evaluated; the optimum "
+                 f"beats the local search by J {best[0] - j0:+,.0f} ({nm[len('exact program: '):]})")
+        self.history.append({"round": "exact", "moves": [(nm, best[0] - j0)], "J": best[0]})
+        return (best[0], best[2], best[3], best[4], best[5])
+
     # ---------------------------------------------------------------- the search
     def run(self, chosen):
         S = {c.uid for c in chosen}
@@ -239,6 +289,9 @@ class Planner:
             for nm, dj in self.history[-1]["moves"]:
                 self.log(f"    {nm}: J {dj:+,.0f}")
             tabu = S - cur[1]
+        ex = self.exact(cur)
+        if ex is not None:
+            cur = ex
         j, S, H, trips, cap = cur
         self.end = {"J": j, "trips": trips, "capital": cap, "lines": len(S), "unserved": self.unserved(S)}
         self.log(f"  line planning: {len(S)} lines, {trips:,.0f} daily trips, ${cap / 1e3:.1f}B, J {j:,.0f} "

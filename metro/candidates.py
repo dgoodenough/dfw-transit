@@ -6,9 +6,10 @@
    route is too roundabout (links.max_detour) or starts too far from its centers is dropped.
    Regional rail is generated separately (`rail_lines`): from each downtown or major center
    along standard-gauge track to the centers and towns 20-90 km away.
-2. Lines: for every pair of centers, the shortest path through the links (route km) is a
-   candidate line if it is the right length for some mode, not too circuitous and has no
-   sharp turn at a center it passes (config "lines").
+2. Lines: for every pair of centers, the shortest path through the links (route km), and the
+   cheapest path of an edge-based search that charges for turns (config lines.turn_pen_km), are
+   candidate lines if they are the right length for some mode, not too circuitous and have no
+   sharp turn at a center they pass (config "lines").
 3. Mode: from corridor density, people + jobs within 800 m of the routed line per route-km
    (config "modes"). Road paths: metro / streetcar / BRT by threshold; rail paths: regional rail.
 4. Stations: every center the line passes, every existing station within snap_existing_m of it,
@@ -171,8 +172,9 @@ def _check(m, pts, ca, cb, d, max_detour, max_gap, lk, prof):
 
 
 def paths(centers, links, kind, profile, gp, ends_ok=None):
-    """Shortest paths (route km) between every pair of centers over links of `kind` routed
-    with `profile`; filtered by length, circuity and turns. Returns [(node ids, polyline)]."""
+    """Shortest paths (route km), and with lines.turn_pen_km the best paths of a search that charges for
+    turns (_search_turns), between every pair of centers over links of `kind` routed with `profile`;
+    filtered by length, circuity and turns. Returns [(node ids, polyline)]."""
     by = {c.id: c for c in centers}
     adj = {c.id: [] for c in centers}
     for lk in links:
@@ -183,28 +185,16 @@ def paths(centers, links, kind, profile, gp, ends_ok=None):
     lo = min(Lc["min_km"][m] for m in (["commuter"] if kind == "rail" else ["metro", "brt", "streetcar"]))
     hi = max(Lc["max_km"][m] for m in (["commuter"] if kind == "rail" else ["metro", "brt", "streetcar"]))
     out = {}
+    pen = Lc.get("turn_pen_km")
     for s in adj:
-        dist, prev, pq = {s: 0.0}, {}, [(0.0, s)]
-        while pq:
-            d, u = heapq.heappop(pq)
-            if d > dist.get(u, 1e18) or d > hi:
-                continue
-            for v, w, lk in adj[u]:
-                if d + w < dist.get(v, 1e18):
-                    dist[v], prev[v] = d + w, (u, lk)
-                    heapq.heappush(pq, (d + w, v))
-        for t, d in dist.items():
+        found = list(_search(s, adj, hi).items())
+        if pen is not None:   # and each pair's best smooth path, where it differs from its shortest
+            found += list(_search_turns(s, adj, by, hi, Lc["max_turn_deg"], pen).items())
+        for t, (d, seq, lks) in found:
             if t <= s or d < lo or d > hi:
                 continue
             if ends_ok and not ends_ok(by[s], by[t]):
                 continue
-            seq, lks = [t], []
-            while seq[-1] != s:
-                u, lk = prev[seq[-1]]
-                lks.append(lk)
-                seq.append(u)
-            seq.reverse()
-            lks.reverse()
             straight = math.hypot(by[s].x - by[t].x, by[s].y - by[t].y)
             if d > Lc["max_circuity"] * max(straight, 1.0):
                 continue
@@ -217,8 +207,79 @@ def paths(centers, links, kind, profile, gp, ends_ok=None):
                 P = geom.join(P, Q)
             if Lc.get("max_winding") and _winding(P) > Lc["max_winding"]:
                 continue   # a staircase: some 3 km of it wanders more than max_winding x the straight line
-            out[tuple(seq)] = P
+            out.setdefault(tuple(seq), P)
     return list(out.items())
+
+
+def _search(s, adj, hi):
+    """Plain shortest paths (route km) from s through the links: {t: (km, centers, links)}. Turns are
+    checked afterwards, so a pair whose shortest path turns too sharply gets no candidate at all."""
+    dist, prev, pq = {s: 0.0}, {}, [(0.0, s)]
+    while pq:
+        d, u = heapq.heappop(pq)
+        if d > dist.get(u, 1e18) or d > hi:
+            continue
+        for v, w, lk in adj[u]:
+            if d + w < dist.get(v, 1e18):
+                dist[v], prev[v] = d + w, (u, lk)
+                heapq.heappush(pq, (d + w, v))
+    out = {}
+    for t, d in dist.items():
+        seq, lks = [t], []
+        while seq[-1] != s:
+            u, lk = prev[seq[-1]]
+            lks.append(lk)
+            seq.append(u)
+        out[t] = (d, seq[::-1], lks[::-1])
+    return out
+
+
+def _search_turns(s, adj, by, hi, max_turn, pen_km):
+    """Edge-based shortest paths from s: the search state is (center, the center before it), so a turn
+    at a center is known when it is made. A turn sharper than max_turn is never taken, and every turn
+    costs pen_km x (turn / 90 deg)^2 of route km, so of two paths of about the same length the straighter
+    wins, and a pair whose shortest path bends too sharply still gets its best smooth one.
+    {t: (route km, centers, links)}, the cheapest state arriving at each t."""
+    def turn(a, b, c):
+        return geom.turn_deg((by[a].x, by[a].y), (by[b].x, by[b].y), (by[c].x, by[c].y))
+
+    start = (s, None)
+    cost, km, prev = {start: 0.0}, {start: 0.0}, {}
+    pq = [(0.0, 0, s, None)]
+    tie = 0
+    while pq:
+        c, _, u, p = heapq.heappop(pq)
+        st = (u, p)
+        if c > cost.get(st, 1e18) or km[st] > hi:
+            continue
+        for v, w, lk in adj[u]:
+            if v == p:
+                continue
+            t = turn(p, u, v) if p is not None else 0.0
+            if t > max_turn:
+                continue
+            ns = (v, u)
+            nc = c + w + pen_km * (t / 90.0) ** 2
+            if nc < cost.get(ns, 1e18):
+                cost[ns], km[ns], prev[ns] = nc, km[st] + w, (st, lk)
+                tie += 1
+                heapq.heappush(pq, (nc, tie, v, u))
+    best = {}
+    for st, c in cost.items():
+        if st[0] != s and c < best.get(st[0], (1e18, None))[0]:
+            best[st[0]] = (c, st)
+    out = {}
+    for t, (_, st) in best.items():
+        seq, lks, cur = [t], [], st
+        while cur != start:
+            cur, lk = prev[cur]
+            lks.append(lk)
+            seq.append(cur[0])
+        seq.reverse()
+        if len(set(seq)) < len(seq):
+            continue   # a path that loops back through a center to make its turns: not a line
+        out[t] = (km[st], seq, lks[::-1])
+    return out
 
 
 def _winding(P):
