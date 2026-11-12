@@ -12,6 +12,7 @@
   python -m metro adapt-dfw                           write DFW's inputs in the contract shape
   python -m metro check-dfw [--no-model] [--reuse]     generate DFW, compare with the hand plan
   python -m metro names <id> [--out DIR] [--overrides DIR]   name and colour a generated network
+  python -m metro tables <id> [--years FILE] [--out DIR]      draft stages.csv / service.csv and validate
                                                       (reports/generator_dfw_check.md)
 """
 import argparse
@@ -52,6 +53,10 @@ def main(argv=None):
     nm.add_argument("metro")
     nm.add_argument("--out", help="the generated folder (default generated/<id>)")
     nm.add_argument("--overrides", help="a folder with line_names.csv / station_renames.csv hand fixes")
+    tb = sub.add_parser("tables", help="draft stages.csv / service.csv for a generated network and validate it (metro/tables.py)")
+    tb.add_argument("metro")
+    tb.add_argument("--years", help="a JSON file {line_id: opening year} (e.g. a statewide schedule's)")
+    tb.add_argument("--out", help="the generated folder (default generated/<id>)")
     k = sub.add_parser("calibrate", help="fit the ridership constant to the registry's calibration boardings")
     k.add_argument("metro")
     sub.add_parser("adapt-dfw", help="write data/metros/dfw/ from the repo's DFW inputs")
@@ -81,6 +86,10 @@ def main(argv=None):
         import json
         from .generate import calibrate
         print(json.dumps(calibrate(a.metro), indent=1))
+        return 0
+    if a.cmd == "tables":
+        from .tables import main as tables_main
+        tables_main(a.metro, a.years and os.path.abspath(a.years), a.out and os.path.abspath(a.out))
         return 0
     if a.cmd == "names":
         from .names import main as names_main
