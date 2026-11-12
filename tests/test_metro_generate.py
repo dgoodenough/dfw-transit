@@ -324,6 +324,27 @@ class RouterTests(unittest.TestCase):
         self.assertGreater(through.angle_at(by, "D", "A", "B"), 170)
         self.assertAlmostEqual(through.angle_at(by, "D", "A", "N"), 90, delta=0.1)
 
+    def test_turns_are_searched_not_filtered(self):
+        """A to T: the shortest path turns 90 degrees at B; a longer one through C bends gently. The plain
+        search finds only the sharp one (which the turn filter then drops); the edge-based one finds C's."""
+        from metro import candidates
+
+        class C:
+            def __init__(self, x, y):
+                self.x, self.y = x, y
+        by = {"A": C(0, 0), "B": C(4, 0), "T": C(4, 4), "C": C(2.5, 1.0)}
+        adj = {k: [] for k in by}
+        for u, v, km in (("A", "B", 4.0), ("B", "T", 4.0), ("A", "C", 5.0), ("C", "T", 5.0)):
+            adj[u].append((v, km, (u, v)))
+            adj[v].append((u, km, (u, v)))
+        plain = candidates._search("A", adj, 100)
+        self.assertEqual(plain["T"][1], ["A", "B", "T"])
+        turns = candidates._search_turns("A", adj, by, 100, 75, 1.5)
+        self.assertEqual(turns["T"][1], ["A", "C", "T"])
+        self.assertAlmostEqual(turns["T"][0], 10.0)          # route km, without the penalty
+        gentle = candidates._search_turns("A", adj, by, 100, 120, 1.5)   # the 90-degree turn allowed: its penalty
+        self.assertEqual(gentle["T"][1], ["A", "B", "T"])                # (1.5 km) is less than the 2 km detour
+
     def test_a_downtown_anchor_moves_the_downtown(self):
         try:
             import pyarrow  # noqa: F401
@@ -363,7 +384,7 @@ class LinePlanTests(unittest.TestCase):
         from metro import lineplan
         lineplan._evaluate = self._eval
 
-    def _planner(self, trips_of, budget=1000.0, anchors=(), rounds=3):
+    def _planner(self, trips_of, budget=1000.0, anchors=(), rounds=3, exact=0):
         from metro import lineplan
 
         class C:
@@ -380,7 +401,8 @@ class LinePlanTests(unittest.TestCase):
         cs = {u: C(u, P, cap) for u, P, cap in [("A1", [(0, 0), (10, 0)], 300), ("A2", [(0, 0.1), (10, 0.1)], 300),
                                                   ("B1", [(0, 5), (10, 5)], 300), ("X1", [(20, 20), (30, 20)], 300)]}
         cfg = {"staging": {"value_opex_years": 20}, "modes": {"brt": {"default_headway_min": 8, "vehicle_capacity": 100}}}
-        gp = {"selection": {"model": {"min_trips_per_musd": 1.0}, "plan": {"rounds": rounds, "anchor_trips": 1000, "procs": 1}}}
+        gp = {"selection": {"model": {"min_trips_per_musd": 1.0}, "plan": {"rounds": rounds, "anchor_trips": 1000, "procs": 1,
+                                                                        "exact_max_evals": exact}}}
         p = lineplan.Planner(list(cs.values()), None, None, cfg, gp, budget, 2050, None, {}, [], [],
                              anchors, [], None, log=lambda *a: None)
         lineplan._evaluate = lambda jobs, procs: {k: (trips_of(set(u)), 300.0 * len(u)) for k, u, _ in jobs}
@@ -399,6 +421,16 @@ class LinePlanTests(unittest.TestCase):
         p, cs = self._planner(lambda S: 1000 * len(S), budget=600.0)
         out = p.run([cs["A1"], cs["B1"]])
         self.assertLessEqual(len(out), 2)
+
+    def test_the_exact_program_finds_what_one_move_at_a_time_cannot(self):
+        def trips(S):   # B1 and X1 are worth nothing alone and 2,000 together (riders who change between them)
+            return 700 * ("A1" in S) + 2000 * ({"B1", "X1"} <= S)
+        p, cs = self._planner(trips)
+        self.assertEqual({c.uid for c in p.run([cs["A1"]])}, {"A1"})           # adding either one alone loses J
+        p, cs = self._planner(trips, exact=4096)
+        self.assertEqual({c.uid for c in p.run([cs["A1"]])}, {"A1", "B1", "X1"})
+        self.assertEqual(p.exact_result["subsets"], 16)   # every set of the 4 lines, the empty one too: all within 1.5 x the money
+        self.assertFalse(p.exact_result["local_was_optimal"])
 
     def test_an_unserved_anchor_costs_enough_to_add_a_line(self):
         def trips(S):   # X1 carries little, but it is the only line to the airport

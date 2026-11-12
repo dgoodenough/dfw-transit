@@ -33,7 +33,9 @@
     "max_winding": 2.2,
     "through_max_km": {"metro": 70, "brt": 50},
     "airport_spur": {"_doc": "metro/spurs.py: a pool line of a mode ending within max_km of an airport terminal the routes can't reach (more than a station's walk from the center it marks) gets a variant running on to it, the spur priced at the mode's elevated rate; at most per_airport variants an airport, the best by sketch value.", "enabled": true, "max_km": 4.0, "per_airport": 6},
-    "max_turn_deg": 75
+    "max_turn_deg": 75,
+    "turn_pen_km": null,
+    "_turn_doc": "candidates.paths searches edge-based (the state is the center and the one before it): a turn over max_turn_deg at a center is never taken and each turn costs turn_pen_km x (turn / 90 deg)^2 of route km, and each pair's cheapest such path is a candidate beside its shortest one (where the shortest passes the filters): a pair whose shortest path bends too sharply still gets its best smooth path, and a pair with a straighter path almost as short gets that too. null (the default): shortest paths only, sharp ones dropped afterwards. Tested at 1.5 on Austin, El Paso, the Rio Grande Valley, Corpus Christi and College Station (texas-transit study/second_session.md, item 12): 8% more candidate paths in Austin, no better network anywhere (Austin: J 483,943 against 484,135 without it), so off."
   },
   "modes": {
     "_doc": "Mode choice from corridor density = people + jobs within 800 m of the routed line per route-km. Road corridors: metro if density >= metro and length >= its min_km; else streetcar if density >= streetcar and length <= its max_km; else BRT if density >= brt (BRT that would run over capacity at its headway is upgraded to metro when the length allows); else not a candidate. Rail corridors: regional (commuter) rail if density within 1.6 km of the line >= commuter_1600m. Calibrated on DFW: today's DART light rail lines run 4,600-10,300 (median 7,800), the hand-planned BRT 1,900-7,700 (median 4,000), proposed metro 3,000-12,000 (median 7,200); 7,000 per route-km is about 4,400 people + jobs per km2 across the 1.6 km wide band, near the 30 per gross acre US light-rail break-even (Guerra & Cervero 2011).",
@@ -85,6 +87,8 @@
    "_doc": "Line planning (metro/lineplan.py): after the full model's pruning, a local search on the full model over the whole network (merge downtown stubs into through lines meeting at merge_min_angle_deg or more, a looser test than the automatic joins before the pruning, since the model judges each, add or swap lines to serve must-serve anchors, drop, add, swap a weak line for another along its corridor, change a headway). J = new daily trips - floor x ($M capital + value_opex_years x opex) - anchor_trips per must-serve registry anchor without a station within anchor_m. floor null: the pruning's min_trips_per_musd. Runs only with the full model.",
    "enabled": true,
    "rounds": 3,
+   "exact_max_evals": 4096,
+   "_exact_doc": "lineplan.Planner.exact: when the pool of lines makes at most this many networks within 1.5 x the money, every one is evaluated on the full model and the best kept (the exact optimum over the pool); 0: off.",
    "floor": null,
    "anchor_trips": 1000,
    "anchor_m": 600,
