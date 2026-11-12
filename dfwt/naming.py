@@ -91,13 +91,15 @@ def clean_street(name, keep_type=False, places=()):
 
 
 class Namer:
-    def __init__(self, roads=True, roads_path=None, places=True):
+    def __init__(self, roads=True, roads_path=None, places=True, gazetteer=(), landmarks=()):
         """roads_path: another region's roads.parquet (default data/osm/roads.parquet);
-        places=False skips the DFW gazetteer files (a metro elsewhere)."""
+        places=False skips the DFW gazetteer files (a metro elsewhere); gazetteer: other files in the same
+        Overpass JSON shape (a metro's own, metro/overture.fetch_gazetteer); landmarks: [(lat, lon, name)]
+        named first wherever they are (a metro registry's anchors)."""
         self.proj = geo.Projector()
         self.places, self.hoods, self.landmarks, self.towns = [], [], [], []
-        for fn in ("dfw_gazetteer.json", "dfw_hoods.json", "dfw_poi.json") if places else ():
-            p = config.path("data", fn)
+        paths = [config.path("data", fn) for fn in (("dfw_gazetteer.json", "dfw_hoods.json", "dfw_poi.json") if places else ())]
+        for p in paths + list(gazetteer or ()):
             if not os.path.exists(p):
                 continue
             with open(p, encoding="utf-8") as f:
@@ -113,9 +115,11 @@ class Namer:
                 if t.get("place") in ("city", "town", "village", "hamlet", "suburb"):
                     self.places.append(nm.lower())
                     self.towns.append((xy, nm))
-                if t.get("amenity") in ("hospital", "university", "college") or t.get("healthcare") == "hospital" \
+                if t.get("amenity") in ("hospital", "university", "college", "landmark") or t.get("healthcare") == "hospital" \
                         or t.get("shop") == "mall":
                     self.landmarks.append((xy, nm))
+        for lat, lon, nm in landmarks or ():
+            self.landmarks.append((self.proj.xy(lat, lon), nm))
         self.places = set(self.places)
         self.hoods = sorted(set(self.hoods))
         self.landmarks = sorted(set(self.landmarks))

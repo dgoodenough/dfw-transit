@@ -92,6 +92,81 @@ def fetch_places(release, bbox, out, min_confidence=0.5):
     return slim.num_rows
 
 
+# Landmarks for station names (dfwt/naming.py): a place of one of these categories whose name says what it is.
+# Overture's categories are noisy (a dental clinic filed as a hospital, a salon as a college), so the name has to
+# match too, and the confidence be high.
+LANDMARK = {
+    "hospital": (r"hospital|medical cent(er|re)|health (system|science)", r"clinic|dental|urgent|dpc|imaging|surgery cent"),
+    "general_hospital": (r"hospital|medical cent(er|re)", r"clinic"),
+    "college_university": (r"university|college|\buniv\b", r"salon|bible|beauty|barber|institute of|academy|seminary|online|office|"
+                                                         r"bookstore|football|athletic|department|school of|center for"),
+    "shopping_mall": (r"\bmall\b|galleria|town cent(er|re)|outlets?\b", r"strip|plaza\b"),
+    "stadium_arena": (r"stadium|arena|field|park\b|center\b", r"batting|indoor|skate|soccer complex"),
+    "museum": (r"museum", r"kids|party|studio|gallery\b"),
+    "zoo": (r"\bzoo\b", r""),
+}
+# Neighbourhoods: Overture's macrohoods, and neighbourhoods notable enough to have a Wikidata item (its
+# neighbourhood layer also holds housing subdivisions: "Timbergrove Manor", "Maxroy Mews"). Airports come from the
+# metro registry's anchors instead (Overture's include private strips and airline counters).
+HOOD_SUBTYPES = ("macrohood", "neighborhood")
+TOWN_SUBTYPES = ("locality",)
+
+
+def fetch_gazetteer(release, bbox, out, min_confidence=0.9):
+    """Landmarks, neighbourhoods and towns inside bbox -> out, in the Overpass JSON shape dfwt.naming.Namer
+    reads ({"elements": [{lat, lon, tags: {name, amenity|shop|place|...}}]}). Returns (landmarks, hoods, towns)."""
+    import re
+    import pyarrow.compute as pc
+    import pyarrow.dataset as ds
+    import pyarrow.fs as fs
+    s3 = fs.S3FileSystem(anonymous=True, region=REGION)
+    els = []
+    d = ds.dataset(f"{BUCKET}/release/{release}/theme=places/type=place/", filesystem=s3, format="parquet")
+    f = _bbox_filter(pc, bbox) & (pc.field("confidence") >= min_confidence) & pc.field("basic_category").isin(list(LANDMARK))
+    tbl = d.to_table(columns=["names", "basic_category", "bbox"], filter=f)
+    tag = {"hospital": ("amenity", "hospital"), "general_hospital": ("amenity", "hospital"),
+           "college_university": ("amenity", "university"), "shopping_mall": ("shop", "mall")}
+    seen = set()
+    for nm, cat, bb in zip(tbl.column("names").to_pylist(), tbl.column("basic_category").to_pylist(), tbl.column("bbox").to_pylist()):
+        name = ((nm or {}).get("primary") or "").strip()
+        good, bad = LANDMARK[cat]
+        if not name or not re.search(good, name, re.I) or (bad and re.search(bad, name, re.I)) or re.search(r" - |[:,(]", name):
+            continue
+        key = (name.lower(), round(bb["ymin"], 2), round(bb["xmin"], 2))
+        if key in seen:
+            continue
+        seen.add(key)
+        k, v = tag.get(cat, ("amenity", "landmark"))
+        els.append({"lat": bb["ymin"], "lon": bb["xmin"], "tags": {"name": name, k: v, "overture_category": cat}})
+    n_land = len(els)
+    d = ds.dataset(f"{BUCKET}/release/{release}/theme=divisions/type=division/", filesystem=s3, format="parquet")
+    f = _bbox_filter(pc, bbox) & pc.field("subtype").isin(list(HOOD_SUBTYPES + TOWN_SUBTYPES))
+    tbl = d.to_table(columns=["names", "subtype", "class", "wikidata", "bbox", "population"], filter=f)
+    n_hood = n_town = 0
+    for nm, sub, cls, wd, bb, pop in zip(tbl.column("names").to_pylist(), tbl.column("subtype").to_pylist(),
+                                         tbl.column("class").to_pylist(), tbl.column("wikidata").to_pylist(),
+                                         tbl.column("bbox").to_pylist(), tbl.column("population").to_pylist()):
+        name = ((nm or {}).get("primary") or "").strip()
+        if not name:
+            continue
+        lat, lon = (bb["ymin"] + bb["ymax"]) / 2, (bb["xmin"] + bb["xmax"]) / 2
+        if sub in TOWN_SUBTYPES:   # cities and towns, not the hamlets and villages Overture also lists
+            if cls in ("city", "town") or (pop or 0) >= 5000:
+                els.append({"lat": lat, "lon": lon, "tags": {"name": name, "place": "town", "population": pop}})
+                n_town += 1
+        elif sub == "macrohood" or wd:
+            els.append({"lat": lat, "lon": lon, "tags": {"name": name, "place": "suburb" if sub == "macrohood" else "neighbourhood"}})
+            n_hood += 1
+    os.makedirs(os.path.dirname(out), exist_ok=True)
+    import json
+    with open(out, "w", encoding="utf-8") as fh:
+        json.dump({"source": f"Overture Maps {release}: places (landmark categories, confidence >= {min_confidence}, "
+                             "names that say what they are) and divisions (macrohoods, neighbourhoods with a Wikidata item, "
+                             "cities and towns among the localities)", "elements": els}, fh)
+    print(f"  gazetteer: {n_land} landmarks, {n_hood} neighbourhoods, {n_town} towns")
+    return n_land, n_hood, n_town
+
+
 def nearest_zone_counts(zone_lonlat, pt_lonlat, max_km=5.0, chunk=4000):
     """Count points by nearest zone centroid (equirectangular distance), ignoring points more
     than `max_km` from every centroid (outside the metro's counties, mostly). Returns

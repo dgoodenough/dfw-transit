@@ -25,9 +25,14 @@ LABEL = {"metro": "Metro", "brt": "BRT", "commuter": "Rail", "streetcar": "Stree
 SNAP_M = 250
 
 
-def make_namer(m):
+def make_namer(m, anchors=None):
+    """dfwt's station namer on the metro's roads, with its gazetteer (step 1's gazetteer stage: landmarks,
+    neighbourhoods, towns from Overture) and the registry's anchors other than the downtown as landmarks."""
     from dfwt.naming import Namer
-    return Namer(roads=True, roads_path=m.osm.get("roads"), places=False)
+    gz = os.path.join(m.folder, "gazetteer.json")
+    marks = [(a["lat"], a["lon"], a["name"]) for a in (anchors or []) if a.get("kind") != "downtown" and a.get("name")]
+    return Namer(roads=True, roads_path=m.osm.get("roads"), places=False,
+                 gazetteer=[gz] if os.path.exists(gz) else [], landmarks=marks)
 
 
 def place_name(namer, lat, lon, used, fallback):

@@ -22,8 +22,8 @@ from dfwt import config
 
 from . import census, gtfs, inputs, lodes, mobilitydb, net, overture
 
-STAGES = ("zones", "od", "gtfs", "overture", "places")
-DEFAULT_STAGES = ("zones", "od", "gtfs", "overture")
+STAGES = ("zones", "od", "gtfs", "overture", "gazetteer", "places")
+DEFAULT_STAGES = ("zones", "od", "gtfs", "overture", "gazetteer")
 ZONE_COLUMNS = ["geoid", "lat", "lon", "pop", "jobs", "area_km2", "county_fips"]
 
 
@@ -284,6 +284,21 @@ class Run:
                     release=rel, url=overture.source_url(rel, "theme=transportation/type=segment"),
                     license="© OpenStreetMap contributors, ODbL 1.0 (via Overture Maps Foundation)",
                     bbox=bbox, files=out)
+
+    # ---------- gazetteer (station names) ----------
+    def stage_gazetteer(self):
+        print("gazetteer (landmarks, neighbourhoods and towns for station names)")
+        bbox = self.need_bbox()
+        rel = overture.resolve_release(self.opts.get("overture_release"))
+        p = os.path.join(self.dir, "gazetteer.json")
+        try:
+            n = overture.fetch_gazetteer(rel, bbox, p)
+        except Exception as e:
+            self.source("overture_gazetteer", status="failed", release=rel, error=str(e)[:300])
+            return
+        self.source("overture_gazetteer", status="ok", release=rel, landmarks=n[0], neighbourhoods=n[1], towns=n[2],
+                    license="Overture Maps places (CDLA Permissive 2.0) and divisions (ODbL 1.0)")
+        self.output("gazetteer.json", landmarks=n[0], neighbourhoods=n[1], towns=n[2])
 
     # ---------- places proxy (opt-in) ----------
     def stage_places(self):
