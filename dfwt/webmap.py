@@ -149,6 +149,10 @@ def _site_text(html, site):
            (DFW_TEXT["layers"][0], f"loadScript('{lay}zones.js')"),
            (DFW_TEXT["layers"][1], f"loadScript(`{lay}${{key}}.js`)"),
            (DFW_TEXT["layers"][2], f"beside the map, in {lay})")]
+    if site.get("start_year"):   # the year the page opens on (DFW's opens on its first); the nearest model year
+        rep.append(("let scenKey = D.order[0], yi = 0,",
+                    f"let scenKey = D.order[0], yi = Math.max(0, D.years.findIndex(y => y >= {int(site['start_year'])})),"))
+        rep.append(("$('slider').max = D.years.length - 1;", "$('slider').max = D.years.length - 1; $('slider').value = yi;"))
     for a, b in rep:
         if a not in html:
             raise ValueError(f"template changed: {a[:60]!r} not found")
@@ -160,7 +164,7 @@ def write(nets, evals, out_path, site=None):
     """The map page. `site` (another region; None for DFW): {"title", "short" (name in messages), "sub" (header
     line), "center" (lat, lon), "zoom", "geo_box" [lon0, lat0, lon1, lat1], "zones" (a demand.Zones: the trip
     planner's feeder zones and the data layers), "regions" ({key: label} for the Lines panel) and "region_of"
-    (fn(stations, stop_ids) -> key), "labels" ({scenario key: label}), "cities" ([(name, lat, lon)] for the
+    (fn(stations, stop_ids) -> key), "labels" ({scenario key: label}), "start_year" (the year it opens on), "cities" ([(name, lat, lon)] for the
     diagram), "waterways" (a geojson path, "" for none), "layers_dir" and "layers_url" (where the data layers
     go and how the page finds them), "back_href" / "back_text" (the header link)}."""
     site = site or {}

@@ -895,7 +895,7 @@ function legendDraw() {
     h += sample(`<line x1="1" y1="6" x2="37" y2="6" stroke="var(--glow)" stroke-width="11" stroke-linecap="round" opacity=".5"/><line x1="1" y1="6" x2="37" y2="6" stroke="${grey}" stroke-width="5" stroke-linecap="round"/>`, 'Opened this interval');
     h += sample(`<line x1="1" y1="6" x2="37" y2="6" stroke="${grey}" stroke-width="2.2" stroke-linecap="round" opacity=".4"/><circle cx="19" cy="6" r="2.2" fill="${fill}" stroke="${ink}" stroke-width=".9" opacity=".5"/>`, 'Not yet open');
     h += sample(`<line x1="1" y1="3" x2="37" y2="3" stroke="${grey}" stroke-width="2.6"/><line x1="1" y1="9" x2="37" y2="9" stroke="${grey}" stroke-width="2.6"/><rect x="15" y="-1" width="8" height="14" rx="4" fill="${fill}" stroke="${ink}" stroke-width="1.3"/>`, 'Interchange');
-    h += sample(`<line x1="1" y1="6" x2="37" y2="6" stroke="var(--water)" stroke-width="4" stroke-linecap="round"/>`, 'Waterways');
+    if (SDS.geoWater && (SDS.geoWater.rivers.length || SDS.geoWater.lakes.length)) h += sample(`<line x1="1" y1="6" x2="37" y2="6" stroke="var(--water)" stroke-width="4" stroke-linecap="round"/>`, 'Waterways');   // a region without waterways data has none
   } else {
     h += sample(`<line x1="1" y1="6" x2="37" y2="6" stroke="${grey}" stroke-width="4.5" stroke-linecap="round"/>`, D.modes.metro);
     h += sample(`<line x1="1" y1="6" x2="37" y2="6" stroke="${grey}" stroke-width="4"/><line x1="1" y1="6" x2="37" y2="6" stroke="var(--bg)" stroke-width="1.3" stroke-dasharray="6 4"/>`, D.modes.commuter);
@@ -903,7 +903,7 @@ function legendDraw() {
     h += sample(`<line x1="1" y1="6" x2="37" y2="6" stroke="var(--glow)" stroke-width="10" opacity=".45"/><line x1="1" y1="6" x2="37" y2="6" stroke="${grey}" stroke-width="4.5"/>`, 'Opened this interval');
     h += sample(`<line x1="1" y1="6" x2="37" y2="6" stroke="${grey}" stroke-width="6" stroke-dasharray="1 8" stroke-linecap="round" opacity=".7"/>`, 'Under construction');
     h += sample(`<line x1="1" y1="6" x2="37" y2="6" stroke="${grey}" stroke-width="4.5" stroke-linecap="round" opacity=".2"/>`, 'Not yet open');
-    h += sample(`<line x1="1" y1="6" x2="37" y2="6" stroke="var(--water)" stroke-width="4" stroke-linecap="round"/>`, 'Waterways');
+    if (SDS.geoWater && (SDS.geoWater.rivers.length || SDS.geoWater.lakes.length)) h += sample(`<line x1="1" y1="6" x2="37" y2="6" stroke="var(--water)" stroke-width="4" stroke-linecap="round"/>`, 'Waterways');   // a region without waterways data has none
     if (window.layerKey) h += layerKey();   // the data layer's colour key (map.html)
   }
   legend.lastElementChild.innerHTML = h;
