@@ -198,7 +198,7 @@ def generate(metro_id, budget_musd=None, years=None, out=None, run_model=True, o
     entry = registry_entry(metro_id, m)
     anchor_centers = anchors_mod.apply(m, urban, entry.get("anchors"), cp, log)   # airports, campuses, the downtown
     towns = centers.towns(m, surf, cp, urban)
-    namer = output.make_namer(m)
+    namer = output.make_namer(m, entry.get("anchors"))
     used_names = set()
     for c in urban + towns:
         c.name = output.place_name(namer, c.lat, c.lon, used_names, c.id)
@@ -397,6 +397,10 @@ def generate(metro_id, budget_musd=None, years=None, out=None, run_model=True, o
                       time.time() - t0, metro_id, rail_why=rail_why, skipped=ex.skipped, asc_note=asc_note,
                       model_select=model_rounds, sense=sense, plan=plan_result)
         output.preview(out, m, surf, urban, towns, ex, chosen, tables)
+        if gp.get("names", {}).get("enabled", True) and chosen:   # agency-style names and colours (metro/names.py)
+            from . import names as names_mod
+            ovr = inputs.home("names", metro_id)
+            names_mod.name_network(out, m, entry.get("anchors"), ovr if os.path.isdir(ovr) else None, log)
         log(f"  wrote {os.path.relpath(out, config.ROOT)}/ in {time.time() - t0:.0f}s")
         return {"out": out, "asc": cfg["ridership"]["asc"], "asc_note": asc_note, "chosen": chosen, "cands": cands,
                 "centers": urban, "towns": towns, "stats": stats, "model": res, "model_select": model_rounds,

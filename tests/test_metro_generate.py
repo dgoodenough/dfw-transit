@@ -532,3 +532,30 @@ class TerminalCostTests(unittest.TestCase):
         self.assertAlmostEqual(candidates.terminal_cost(tc, cfg, "metro", stub, ["tunnel"], down, r), 0.4 * 600 + 50)
         self.assertEqual(candidates.terminal_cost(tc, cfg, "metro", through, ["surface", "surface"], down, r), 0.0)
         self.assertEqual(candidates.terminal_cost({"enabled": False}, cfg, "metro", stub, ["tunnel"], down, r), 0.0)
+
+
+class NamesTests(unittest.TestCase):
+    """metro/names.py: agency-style names for a generated network."""
+
+    def test_gtfs_names_cleaned(self):
+        from metro import names
+        self.assertEqual(names.clean_line("700 METRORAIL RED LINE"), "METRORail Red Line")
+        self.assertEqual(names.clean_line("550-Metro Rail Red Line"), "MetroRail Red Line")
+        self.assertEqual(names.clean_line("433 Silver Line"), "Silver Line")
+        self.assertEqual(names.clean_station("Fannin South Stn SB"), "Fannin South")
+        self.assertEqual(names.clean_station("Northwest Transit Center - Platform 1"), "Northwest Transit Center")
+        self.assertEqual(names.end_label("Long Point / Antoine"), "Long Point")
+        self.assertEqual(names.end_label("Texas Medical Center"), "Texas Medical Center")
+
+    def test_a_brt_line_takes_its_street(self):
+        from metro import names
+
+        class N:
+            places = set()
+
+            def streets(self, lat, lon, r):   # the line runs on Main Street but for its last stretch
+                return [(5, "Main", "Main Street", "primary")] if lon < 0.009 else [(5, "Elm", "Elm Street", "primary")]
+        P = [(0.0, x / 1000) for x in range(0, 11)]   # about 1.1 km east along the equator
+        ms = names.main_streets(N(), P)
+        self.assertEqual(ms[0][0], "Main")
+        self.assertGreater(ms[0][1], 0.55)
