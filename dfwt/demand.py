@@ -389,7 +389,9 @@ def no_car_share(zones, cfg):
         return None
     dens = activity_density(zones)
     xs, ys = zip(*nc["share_by_density"])
-    return np.interp(dens, xs, ys)
+    share = np.interp(dens, xs, ys)
+    floor = zones.__dict__.get("carless_floor")   # zones with people who have no car here (border crossers, metro/model.py)
+    return np.maximum(share, floor) if floor is not None else share
 
 
 def activity_density(zones, r_km=0.8):

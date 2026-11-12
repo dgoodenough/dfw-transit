@@ -100,7 +100,8 @@ def prune(pool, build_net, ctx, budget, gp, cfg, year, log=print):
             c.model_trips = (w + a) / 2
             # its share of the network's capital: track and platforms shared with other lines of its mode
             # (a branch's trunk) split evenly among them (dfwt Network.shared_cost_musd)
-            c.model_capital = net.shared_cost_musd(net.lines[lid]) if net is not None else c.capital
+            c.model_capital = (net.shared_cost_musd(net.lines[lid]) + getattr(c, "terminal_cost", 0.0)) if net is not None \
+                else c.capital   # the network's costs leave out downtown terminals (candidates.terminal_cost)
             c.model_ratio = c.model_trips / max(c.model_capital + years * c.opex, 1.0)
         return full, none
 
@@ -133,6 +134,63 @@ def prune(pool, build_net, ctx, budget, gp, cfg, year, log=print):
     return pool, rounds
 
 
+def crowding(net, year, r, cfg):
+    """{line_id: (peak-hour peak-direction riders, seats-and-standing an hour at its headway, headway)} from
+    a run_year result with loads, as dfwt evaluate.evaluate measures it: the line's busiest link's daily
+    commuters x trips per commuter, 10% in the peak hour, 60% in the peak direction."""
+    from dfwt.graph import YearGraph
+    g = YearGraph(net, year)
+    rc = cfg["ridership"]
+    peak = {}
+    for i, run in enumerate(g.runs):
+        ld = r["hop_load"][i]
+        if len(ld):
+            peak[run.line.id] = max(peak.get(run.line.id, 0.0), float(ld.max()))
+    out = {}
+    for lid, p in peak.items():
+        ln = net.lines[lid]
+        hw = ln.headway_at(year)
+        ph = p * rc["round_trip"] / rc["work_share_of_transit_trips"] * 0.10 * 0.6
+        out[lid] = (ph, 60.0 / hw * cfg["modes"][ln.mode]["vehicle_capacity"] * ln.capacity_factor, hw)
+    return out
+
+
+def capacity_fix(pool, build_net, ctx, gp, cfg, year, log=print):
+    """The crowding check (texas-transit study/second_session.md, item 3): run the full model with loads on
+    the planned network (its own land use, every line open, in `year`) and give each line that its riders
+    would overfill the longest headway of selection.plan.headways that carries them; a line still over
+    capacity at its shortest is flagged. Sets each line's capacity_used. Returns [(cand uid, peak-hour
+    riders, capacity, old headway, new headway or None)] for the lines over capacity."""
+    from . import candidates
+    net, uid_of = build_net(pool)
+    if net is None or not uid_of:
+        return []
+    net = evaluate._all_open(net)
+    r = evaluate.run_year(ctx, net, year, want_loads=True, inputs=land_use(ctx, net, year))
+    by = {c.uid: c for c in pool}
+    opts = gp["selection"].get("plan", {}).get("headways", {})
+    out = []
+    for lid, (ph, cap, hw) in crowding(net, year, r, cfg).items():
+        c = by.get(uid_of.get(lid))
+        if c is None:
+            continue
+        c.capacity_used = ph / cap if cap else 0.0
+        if ph <= cap:
+            continue
+        per_vehicle = cap * hw / 60.0
+        fits = [h for h in opts.get(c.mode, []) if 60.0 / h * per_vehicle >= ph]
+        new = max(fits) if fits else min(opts.get(c.mode, [hw]) + [hw])
+        if new < hw:
+            c.headway = new
+            c.opex = candidates.opex_musd(cfg, c.mode, c.stops, new)
+        out.append((c.uid, ph, cap, hw, new if new < hw else None))
+        log(f"  crowding: {c.uid} ({c.mode}) carries {ph:,.0f} an hour at its peak against {cap:,.0f} every {hw:g} min"
+            + (f": every {new:g} min" if new < hw else ": over capacity even at its shortest headway"))
+    if not out:
+        log(f"  crowding: no line over capacity in {year}")
+    return out
+
+
 def revalue(pool, build_net, ctx, gp, cfg, year, log=print):
     """Value every line of a finished network (after metro/lineplan.py has changed it) as prune() does, on
     its own land use (every line open): model_without, model_alone, model_trips, model_capital and
@@ -149,7 +207,7 @@ def revalue(pool, build_net, ctx, gp, cfg, year, log=print):
         c = by[uid_of[lid]]
         c.model_without, c.model_alone = w, a
         c.model_trips = (w + a) / 2
-        c.model_capital = net.shared_cost_musd(net.lines[lid])
+        c.model_capital = net.shared_cost_musd(net.lines[lid]) + getattr(c, "terminal_cost", 0.0)
         c.model_ratio = c.model_trips / max(c.model_capital + years * c.opex, 1.0)
     pool = sorted(pool, key=lambda c: -getattr(c, "model_ratio", 0.0))
     for k, c in enumerate(pool, 1):

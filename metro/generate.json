@@ -32,6 +32,7 @@
     "max_circuity": 1.5,
     "max_winding": 2.2,
     "through_max_km": {"metro": 70, "brt": 50},
+    "airport_spur": {"_doc": "metro/spurs.py: a pool line of a mode ending within max_km of an airport terminal the routes can't reach (more than a station's walk from the center it marks) gets a variant running on to it, the spur priced at the mode's elevated rate; at most per_airport variants an airport, the best by sketch value.", "enabled": true, "max_km": 4.0, "per_airport": 6},
     "max_turn_deg": 75
   },
   "modes": {
@@ -53,9 +54,11 @@
     "snap_existing_m": 300,
     "transfer_m": 650
   },
+  "terminals": {"_doc": "candidates.terminal_cost: a line ending in a downtown core (within grade.core_radius_km) pays for its terminal there: tail_km of track past the last platform at the grade of its last hop (the mode's cost per km for that grade, config.json), for turning trains back and laying them over, plus crossovers and signals (turnback_musd by mode and grade). A through line pays none of it. From the cost model's own unit costs, not fitted to produce through lines: a metro line ending in a downtown tunnel pays about $290M, a BRT line ending downtown about $27M. Peer projects spend far more to get rid of downtown stubs (LA's Regional Connector, about $1.8B, joined three lines' downtown ends).", "enabled": true, "tail_km": 0.4, "turnback_musd": {"metro": {"tunnel": 50, "elevated": 25, "surface": 15}, "commuter": {"surface": 20, "elevated": 30, "tunnel": 60}, "brt": {"surface": 15, "elevated": 20, "tunnel": 40}, "streetcar": {"surface": 5}}},
   "grade": {
-    "_doc": "Grade for costing: metro in tunnel within core_radius_km of a downtown center (as the DFW tools cost proposed metro inside config cores), surface elsewhere; BRT, streetcar and regional rail at surface.",
-    "core_radius_km": 1.5
+    "_doc": "Grade for costing (candidates.hop_grade): metro in tunnel within tunnel_radius_km of a downtown center (the densest core), elevated in the rest of core_radius_km, surface elsewhere (null tunnel_radius_km: tunnel in all of the core, as the DFW tools cost proposed metro inside config cores); BRT, streetcar and regional rail at surface.",
+    "core_radius_km": 1.5,
+    "tunnel_radius_km": 0.8
   },
   "sketch": {
     "_doc": "Sketch demand used to rank candidates (metro/sketch.py): commutes (gravity model, or LODES when given) between the walk catchments (walk_km) of a line's stations, and park & ride catchments (pnr from config.access) at regional-rail stations and line termini, each pair's transit share from the config.json ridership logit (drive vs this line's door-to-door time). Value = daily trips the line adds over what today's lines and the lines already chosen already give each zone pair (single-line trips; transfers are left to the full model). Garages cap park & ride riders at config pnr_spaces x pnr_people_per_space.",

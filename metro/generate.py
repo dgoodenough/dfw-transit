@@ -30,7 +30,7 @@ import numpy as np
 
 from dfwt import config, evaluate, geo
 
-from . import anchors as anchors_mod, candidates, centers, geom, inputs, lineplan, model, output, modelselect, routing, select, sketch, through
+from . import anchors as anchors_mod, candidates, centers, geom, inputs, lineplan, model, output, modelselect, routing, select, sketch, spurs, through
 
 PARAMS = os.path.join(os.path.dirname(os.path.abspath(__file__)), "generate.json")
 
@@ -157,8 +157,13 @@ class Existing:
 
 
 def generate(metro_id, budget_musd=None, years=None, out=None, run_model=True, override=None, log=print, metro=None,
-             jobs_proxy=None, buildout=None, policies=None, future_years=None, full_model=None):
-    """Run every step for one metro; `metro` (an inputs.Metro) replaces reading data/metros/<id>/ (tests)."""
+             jobs_proxy=None, buildout=None, policies=None, future_years=None, full_model=None, plan_floors=None,
+             sweep_dir=None, on_floor=None, sweep_only=False):
+    """Run every step for one metro; `metro` (an inputs.Metro) replaces reading data/metros/<id>/ (tests).
+    `plan_floors`: also run the line planner at each of these floors (trips per $M) from the same pruned
+    network, each written to sweep_dir/<floor>/<metro_id> (default <out>/sweep/<floor>); the result's
+    "sweep" holds their results by floor. on_floor(floor, result) is called as each finishes (a floor whose
+    folder has a summary.json is skipped, so a rerun resumes); sweep_only skips the configured floor's output."""
     t0 = time.time()
     if buildout is None:   # the registry can ask for it (metros.json buildout: true)
         from . import fetch
@@ -202,6 +207,8 @@ def generate(metro_id, budget_musd=None, years=None, out=None, run_model=True, o
     for c in anchor_centers:   # an anchor keeps its own name
         c.name = c.anchor_name
     cfg = model.metro_cfg(m, urban, cfg0, growth=entry.get("growth"))   # the metro's own growth, if the registry gives it
+    if entry.get("border"):   # people crossing from Mexico on foot or by bus (metro/model.py add_border)
+        cfg["demand"]["border"] = entry["border"]
     downtowns = [(c.x, c.y) for c in urban if c.kind == "downtown"]
     core_r = gp["grade"]["core_radius_km"]
     urban_density = cfg["growth"]["tod"]["setting_density_per_km2"]["urban"]
@@ -227,6 +234,8 @@ def generate(metro_id, budget_musd=None, years=None, out=None, run_model=True, o
 
     # 3. mode, stations, cost, sketch value per candidate ---------------------------
     ctx, od = model.gravity_od(m, cfg)
+    for port, i, crossers, n in getattr(ctx, "border", []):
+        log(f"  border: {port}: {crossers:,.0f} crossers a day on foot or by bus, {n:,.0f} commutes, at zone {m.geoid[i]}")
     asc_note = ridership_constant(metro_id, m, cfg, ctx, ex, log)   # before the sketch: it uses the constant too
     if policies:
         # A policy package (config.json keys, e.g. a scenario's access and parking levers) goes on top of the
@@ -257,6 +266,10 @@ def generate(metro_id, budget_musd=None, years=None, out=None, run_model=True, o
     exist_P = [ln["P"] for ln in ex.lines]
     for c in cands:
         _decide(c, m, cfg, gp, zidx, by, ex, sk, downtowns, core_r, dens_fn, urban_density, exist_P)
+    # airport terminals off the road graph: lines ending near one get a variant with a spur to it (metro/spurs.py)
+    spurs.add(m, cands, by, anchor_centers, gp, cfg,
+              lambda seq: Cand(f"S{len(cands) + 1:03d}", "road", seq, None),
+              lambda c, mode, P: _setup(c, mode, P, m, cfg, gp, by, ex, sk, downtowns, core_r, dens_fn, urban_density), log)
     pool = [c for c in cands if c.status == "pool"]
     log(f"  candidates: {len(cands)} paths, {len(pool)} with a mode "
         f"({', '.join(f'{k} {sum(c.mode == k for c in pool)}' for k in ('metro', 'streetcar', 'brt', 'commuter'))})")
@@ -275,8 +288,6 @@ def generate(metro_id, budget_musd=None, years=None, out=None, run_model=True, o
         gsel["selection"]["min_trips_per_musd"] *= mc["pool_floor_factor"]
         gsel["selection"]["max_lines"] = max(gsel["selection"]["max_lines"], mc.get("pool_max_lines", 0))
         log(f"  sketch pool (floor {gsel['selection']['min_trips_per_musd']} per $M) for the full model:")
-    chosen, spent = select.run(cands, sk, budget * (mc.get("pool_budget_factor", 1.0) if full_model else 1.0), gsel, cfg,
-                               exist_P, [v[:2] for v in ex.stations.values()], log)
     y_open = cfg["existing_year"] + gp["opens_after_years"]
     joined = []
     gpt = copy.deepcopy(gp)
@@ -289,69 +300,158 @@ def generate(metro_id, budget_musd=None, years=None, out=None, run_model=True, o
         cands.append(c)
         return c
     downtown_ids = [c.id for c in urban if c.kind == "downtown"]
-    if gsel["selection"].get("through", {}).get("enabled") and chosen:
-        chosen, joined = through.pair(chosen, by, [c.id for c in urban if c.kind == "downtown"], make,
-                                      gsel["selection"]["through"].get("min_angle_deg", 135), log, links=links,
-                                      core_km=gsel["selection"]["through"].get("core_km", 3.0))
-        spent = sum(c.capital for c in chosen)
-    model_rounds = plan_result = None
-    if full_model and chosen:
-        judge = mc.get("judge_year") or (min(future_years) if future_years else cfg["existing_year"] + 1)
+    model_rounds = None
+    judge = (mc.get("judge_year") or (min(future_years) if future_years else cfg["existing_year"] + 1)) if full_model else None
 
-        def build_net(cs):
-            t = output.tables(m, ex, cs, by, gp, cfg, y_open, namer, set(used_names), downtowns, core_r)
-            return output.load_net(t, cfg, "generated"), modelselect.line_cands(t)
-        with model.projection(m):
-            chosen, model_rounds = modelselect.prune(chosen, build_net, ctx, budget, gp, cfg, judge, log)
-        spent = sum(getattr(c, "model_capital", c.capital) for c in chosen)
-        model_rounds = {"year": judge, "floor": mc["min_trips_per_musd"], "pool_floor": gsel["selection"]["min_trips_per_musd"],
-                        "rounds": model_rounds}
-        log(f"  full model kept {len(chosen)} lines, ${spent / 1e3:.1f}B")
-        if gp["selection"].get("plan", {}).get("enabled") and chosen:
+    def build_net(cs):
+        t = output.tables(m, ex, cs, by, gp, cfg, y_open, namer, set(used_names), downtowns, core_r)
+        return output.load_net(t, cfg, "generated"), modelselect.line_cands(t)
+    # the greedy, the through lines and the full model's pruning take most of a big metro's run; with the full
+    # model their result is cached (out/cache/pruned.pkl, keyed on the parameters) so a rerun resumes from it
+    cache = _PruneCache(os.path.join(out, "cache", "pruned.pkl"), metro_id, gp, budget, policies, future_years) \
+        if full_model else None
+    hit = cache.load() if cache else None
+    if hit:
+        cands[:] = hit["cands"]
+        byuid = {c.uid: c for c in cands}
+        chosen, spent, model_rounds = [byuid[u] for u in hit["chosen"]], hit["spent"], hit["model_rounds"]
+        sk.best[...] = hit["sk_best"]
+        log(f"  the pruned network from the cache: {len(chosen)} lines, ${spent / 1e3:.1f}B")
+    else:
+        chosen, spent = select.run(cands, sk, budget * (mc.get("pool_budget_factor", 1.0) if full_model else 1.0), gsel,
+                                   cfg, exist_P, [v[:2] for v in ex.stations.values()], log)
+        if gsel["selection"].get("through", {}).get("enabled") and chosen:
+            chosen, joined = through.pair(chosen, by, [c.id for c in urban if c.kind == "downtown"], make,
+                                          gsel["selection"]["through"].get("min_angle_deg", 135), log, links=links,
+                                          core_km=gsel["selection"]["through"].get("core_km", 3.0))
+            spent = sum(c.capital for c in chosen)
+        if full_model and chosen:
+            with model.projection(m):
+                chosen, model_rounds = modelselect.prune(chosen, build_net, ctx, budget, gp, cfg, judge, log)
+            spent = sum(getattr(c, "model_capital", c.capital) for c in chosen)
+            model_rounds = {"year": judge, "floor": mc["min_trips_per_musd"],
+                            "pool_floor": gsel["selection"]["min_trips_per_musd"], "rounds": model_rounds}
+            log(f"  full model kept {len(chosen)} lines, ${spent / 1e3:.1f}B")
+        if cache:
+            cache.save({"cands": cands, "chosen": [c.uid for c in chosen], "spent": spent, "model_rounds": model_rounds,
+                        "sk_best": sk.best})
+
+    def finish(chosen, cands, out, floor=None, names=None):
+        """The line planner at `floor` (None: the configured selection.plan.floor), the planned network's
+        values, the output folder and the model runs. The plan_floors sweep calls it on copies."""
+        flags_f = list(flags)
+        spent_f, plan_result = spent, None
+        gpf = gp
+        if floor is not None:
+            gpf = copy.deepcopy(gp)
+            gpf["selection"].setdefault("plan", {})["floor"] = floor
+        if full_model and chosen and gpf["selection"].get("plan", {}).get("enabled"):
+            def make_f(seq, routes):   # a through line across downtown, into this copy's candidates
+                c = Cand(f"T{len(cands) + 1:03d}", "road", seq, None)
+                c.routes = routes
+                _decide(c, m, cfg, gpt, zidx, by, ex, sk, downtowns, core_r, dens_fn, urban_density, exist_P)
+                cands.append(c)
+                return c
             anchor_pts = [a for c in anchor_centers for a in getattr(c, "anchor_list", [])]
             with model.projection(m):
                 net0, _ = build_net(chosen)
-                planner = lineplan.Planner(cands, build_net, ctx, cfg, gp, budget, judge, make, by, downtown_ids, links,
+                planner = lineplan.Planner(cands, build_net, ctx, cfg, gpf, budget, judge, make_f, by, downtown_ids, links,
                                            anchor_pts, [v[:2] for v in ex.stations.values()],
                                            modelselect.land_use(ctx, net0, judge), log)
                 chosen = planner.run(chosen)
+                crowded = modelselect.capacity_fix(chosen, build_net, ctx, gpf, cfg, judge, log)   # its riders against its capacity
                 chosen = modelselect.revalue(chosen, build_net, ctx, gp, cfg, judge, log)   # values and order of the final network
-            spent = planner.end["capital"]
+            spent_f = planner.end["capital"]
             plan_result = {"start": planner.start, "end": planner.end, "history": planner.history, "floor": planner.floor,
-                           "anchor_trips": planner.anchor_trips}
+                           "anchor_trips": planner.anchor_trips, "crowded": crowded, "judge_year": judge}
 
-    # 5. output ---------------------------------------------------------------------
-    tables = output.tables(m, ex, chosen, by, gp, cfg, y_open, namer, used_names, downtowns, core_r)
-    output.write_tables(out, tables)
-    output.write_csv(os.path.join(out, "centers.csv"), [c.as_row() for c in urban + towns])
-    output.write_csv(os.path.join(out, "candidates.csv"), [c.row() for c in sorted(cands, key=_cand_key)])
-    stats = output.network_stats(out, m, cfg, tables, ex.tables)
-    res = None
-    if run_model and not chosen:
-        log("  no line chosen: demand model skipped")
-        flags.append("no candidate corridor reached a mode's density threshold, so no line was chosen")
-    elif run_model:
-        log("  demand model (dfwt, today's land use, every line open) ...")
-        res = output.model_runs(m, cfg, ctx, tables, ex)
-        if future_years:
-            # every line open in later years: the metro's growth plus station-area development (config growth),
-            # today's network under the same growth for comparison
-            res["future"] = {}
-            with model.projection(m):
-                base = output.load_net(ex.tables, cfg, "existing")
-                gen = output.load_net(tables, cfg, "generated")
-                for y in future_years:
-                    log(f"  demand model, {y} ...")
-                    res["future"][y] = {"generated": model.run_future(ctx, gen, y),
-                                        "existing": model.run_future(ctx, base, y) if base.lines else None}
-    sense = through.metrics(chosen, by, downtown_ids, anchor_centers)
-    output.report(out, m, gp, cfg, urban, towns, links, cands, chosen, budget, spent, stats, res, flags,
-                  time.time() - t0, metro_id, rail_why=rail_why, skipped=ex.skipped, asc_note=asc_note,
-                  model_select=model_rounds, sense=sense, plan=plan_result)
-    output.preview(out, m, surf, urban, towns, ex, chosen, tables)
-    log(f"  wrote {os.path.relpath(out, config.ROOT)}/ in {time.time() - t0:.0f}s")
-    return {"out": out, "asc": cfg["ridership"]["asc"], "asc_note": asc_note, "chosen": chosen, "cands": cands, "centers": urban, "towns": towns, "stats": stats,
-            "model": res, "model_select": model_rounds, "plan": plan_result, "sense": sense, "through": joined, "budget": budget, "spent": spent, "tables": tables, "ex_tables": ex.tables, "m": m, "cfg": cfg}
+        # 5. output ---------------------------------------------------------------------
+        os.makedirs(out, exist_ok=True)
+        names = used_names if names is None else names
+        tables = output.tables(m, ex, chosen, by, gp, cfg, y_open, namer, names, downtowns, core_r)
+        output.write_tables(out, tables)
+        output.write_csv(os.path.join(out, "centers.csv"), [c.as_row() for c in urban + towns])
+        output.write_csv(os.path.join(out, "candidates.csv"), [c.row() for c in sorted(cands, key=_cand_key)])
+        stats = output.network_stats(out, m, cfg, tables, ex.tables)
+        res = None
+        if run_model and not chosen:
+            log("  no line chosen: demand model skipped")
+            flags_f.append("no candidate corridor reached a mode's density threshold, so no line was chosen")
+        elif run_model:
+            log("  demand model (dfwt, today's land use, every line open) ...")
+            res = output.model_runs(m, cfg, ctx, tables, ex)
+            if future_years:
+                # every line open in later years: the metro's growth plus station-area development (config growth),
+                # today's network under the same growth for comparison
+                res["future"] = {}
+                with model.projection(m):
+                    base = output.load_net(ex.tables, cfg, "existing")
+                    gen = output.load_net(tables, cfg, "generated")
+                    for y in future_years:
+                        log(f"  demand model, {y} ...")
+                        res["future"][y] = {"generated": model.run_future(ctx, gen, y),
+                                            "existing": model.run_future(ctx, base, y) if base.lines else None}
+        sense = through.metrics(chosen, by, downtown_ids, anchor_centers)
+        output.report(out, m, gp, cfg, urban, towns, links, cands, chosen, budget, spent_f, stats, res, flags_f,
+                      time.time() - t0, metro_id, rail_why=rail_why, skipped=ex.skipped, asc_note=asc_note,
+                      model_select=model_rounds, sense=sense, plan=plan_result)
+        output.preview(out, m, surf, urban, towns, ex, chosen, tables)
+        log(f"  wrote {os.path.relpath(out, config.ROOT)}/ in {time.time() - t0:.0f}s")
+        return {"out": out, "asc": cfg["ridership"]["asc"], "asc_note": asc_note, "chosen": chosen, "cands": cands,
+                "centers": urban, "towns": towns, "stats": stats, "model": res, "model_select": model_rounds,
+                "plan": plan_result, "sense": sense, "through": joined, "budget": budget, "spent": spent_f,
+                "tables": tables, "ex_tables": ex.tables, "m": m, "cfg": cfg}
+
+    # the plan_floors sweep: the line planner at each floor from the same pruned network (copies), each to its own
+    # folder (sweep_dir/<floor>/<metro>, default <out>/sweep/<floor>); then the configured floor into `out`
+    sweep = {}
+    for f in (plan_floors or []) if (full_model and chosen) else []:
+        d = os.path.join(sweep_dir, f"{f:g}", metro_id) if sweep_dir else os.path.join(out, "sweep", f"{f:g}")
+        if os.path.exists(os.path.join(d, "summary.json")):   # done before a restart (on_floor writes it)
+            log(f"  sweep: a floor of {f:g} is already done")
+            continue
+        log(f"  sweep: the line planner at a floor of {f:g} trips per $M")
+        c2, k2 = copy.deepcopy((chosen, cands))
+        sweep[f] = finish(c2, k2, d, f, names=set(used_names))
+        if on_floor:
+            on_floor(f, sweep[f])
+    if sweep_only:
+        return {"sweep": sweep, "sweep_only": True}
+    result = finish(chosen, cands, out)
+    result["sweep"] = sweep
+    return result
+
+
+class _PruneCache:
+    """The pruned network (the greedy, the through lines and the full model's pruning) of one run, keyed on
+    everything that decides it, so an interrupted run resumes from it."""
+    VERSION = 1
+
+    def __init__(self, path, metro_id, gp, budget, policies, future_years):
+        import hashlib
+        g = copy.deepcopy(gp)
+        g["selection"].pop("plan", None)   # the planner runs after it
+        blob = json.dumps({"v": self.VERSION, "id": metro_id, "gp": g, "budget": budget, "policies": policies,
+                           "years": list(future_years or [])}, sort_keys=True, default=str)
+        self.path, self.key = path, hashlib.sha256(blob.encode()).hexdigest()
+
+    def load(self):
+        import pickle
+        if not os.path.exists(self.path):
+            return None
+        try:
+            with open(self.path, "rb") as f:
+                d = pickle.load(f)
+        except Exception:
+            return None
+        return d if d.get("key") == self.key else None
+
+    def save(self, d):
+        import pickle
+        os.makedirs(os.path.dirname(self.path), exist_ok=True)
+        with open(self.path + ".part", "wb") as f:
+            pickle.dump(dict(d, key=self.key), f, protocol=pickle.HIGHEST_PROTOCOL)
+        os.replace(self.path + ".part", self.path)
 
 
 def registry_entry(metro_id, m):
@@ -407,7 +507,10 @@ def calibrate(metro_id, log=print):
     cp = gp["centers"]
     urban = centers.find(m, centers.Surface(m, cp["grid_km"], cp["kernel_km"]), cp)
     centers.classify(m, urban, cp)
-    cfg = model.metro_cfg(m, urban, config.load(), growth=registry_entry(metro_id, m).get("growth"))
+    entry = registry_entry(metro_id, m)
+    cfg = model.metro_cfg(m, urban, config.load(), growth=entry.get("growth"))
+    if entry.get("border"):
+        cfg["demand"]["border"] = entry["border"]
     ex = Existing(m, cfg["modes"])
     ctx, _ = model.gravity_od(m, cfg)
     note = ridership_constant(metro_id, m, cfg, ctx, ex, log)
@@ -445,7 +548,10 @@ def _setup(c, mode, P, m, cfg, gp, by, ex, sk, downtowns, core_r, dens_fn, urban
     c.along = [s for s, _, _ in c.stops]
     refs = [r[1] if r and r[0] == "E" else None for _, _, r in c.stops]
     c.capital, c.grades = candidates.line_cost(cfg, mode, [(s, p, rf) for (s, p, _), rf in zip(c.stops, refs)], P,
-                                               downtowns, core_r, ex.station_modes)
+                                               downtowns, core_r, ex.station_modes, gp["grade"].get("tunnel_radius_km"))
+    # a downtown terminal: tail track and turnback (candidates.terminal_cost), which a through line doesn't need
+    c.terminal_cost = candidates.terminal_cost(gp.get("terminals"), cfg, mode, c.stops, c.grades, downtowns, core_r)
+    c.capital += c.terminal_cost
     c.opex = candidates.opex_musd(cfg, mode, c.stops)
     n = len(c.stops)
     in_core = lambda k: any(math.dist(c.station_xy[k], d) <= core_r for d in downtowns)  # noqa: E731

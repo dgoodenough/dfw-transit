@@ -407,3 +407,96 @@ class LinePlanTests(unittest.TestCase):
         out = p.run([cs["A1"]])
         self.assertIn("X1", {c.uid for c in out})
         self.assertEqual(p.end["unserved"], [])
+
+
+class AirportSpurTests(unittest.TestCase):
+    """metro/spurs.py: a line ending near an airport terminal off the road graph gets a variant running on to it."""
+
+    def test_a_spur_to_the_terminal(self):
+        from metro import spurs
+
+        class M:
+            def ll(self, x, y):
+                return 30.0 + y / 111.0, -97.0 + x / 96.0
+
+        class C:
+            def __init__(self, uid, seq, P, ratio):
+                self.uid, self.seq, self.P, self.ratio = uid, seq, P, ratio
+                self.mode, self.kind, self.status, self.mode_reason = "brt", "road", "pool", ""
+                self.capital, self.opex, self.new_trips = 100.0, 1.0, 500.0
+
+        class A:   # the center the airport anchor marks, 2.5 km from the terminal
+            x, y = 0.0, 0.0
+            anchor_list = [("Airport", "airport", 2.5, 0.0)]
+        by = {}
+        cands = [C("R1", ("C1", "C2"), [(-10.0, 0.0), (0.0, 0.0)], 2.0),     # ends at the airport's center
+                 C("R2", ("C3", "C4"), [(0.0, 20.0), (0.0, 10.0)], 3.0)]      # nowhere near it
+        made = []
+
+        def make(seq):
+            c = C(f"S{len(made) + 1}", seq, None, 0.0)
+            made.append(c)
+            return c
+
+        def setup(c, mode, P):
+            c.P, c.mode, c.capital, c.opex, c.new_trips = P, mode, 100.0, 1.0, 600.0
+        gp = {"lines": {"airport_spur": {"enabled": True, "max_km": 4.0, "per_airport": 6}}}
+        cfg = {"staging": {"value_opex_years": 20}, "cost_musd_per_km": {"brt": {"surface": 30, "elevated": 80}}}
+        out = spurs.add(M(), cands, by, [A()], gp, cfg, make, setup, log=None)
+        self.assertEqual(len(out), 1)
+        v = out[0]
+        self.assertEqual(v.seq[:2], ("C1", "C2"))
+        self.assertEqual(by[v.seq[-1]].name, "Airport")
+        self.assertAlmostEqual(v.P[-1][0], 2.5)
+        self.assertAlmostEqual(v.capital, 100.0 + 2.5 * 50)   # the spur at the elevated premium
+
+
+class BorderTests(unittest.TestCase):
+    """metro/model.py add_border: crossers from Mexico join the commutes at their bridge, car-free."""
+
+    def test_crossers_at_the_bridge(self):
+        import numpy as np
+        from dfwt import config, geo
+        from metro import model
+
+        class Z:
+            pass
+        z = Z()
+        lat, lon = np.array([31.75, 31.80, 31.70]), np.array([-106.49, -106.40, -106.30])
+        z.x, z.y = geo.Projector().xy(lat, lon)
+        z.n, z.pop, z.jobs = 3, np.array([1000.0, 5000.0, 4000.0]), np.array([3000.0, 2000.0, 5000.0])
+
+        class Ctx:
+            pass
+        ctx = Ctx()
+        ctx.zones, ctx.od = z, np.array([[10.0, 20.0, 10.0], [50.0, 100.0, 50.0], [40.0, 40.0, 80.0]], dtype=np.float32)
+        cfg = config.load()
+        cfg["demand"]["total_commutes"] = 400.0
+        cfg["demand"]["border"] = [{"port": "El Paso", "lat": 31.7486, "lon": -106.4869, "pedestrians_day": 1000,
+                                    "bus_day": 100}]
+        out = model.add_border(ctx, cfg)
+        rc = cfg["ridership"]
+        n = 1100 * 2 / (rc["round_trip"] / rc["work_share_of_transit_trips"] * rc["telework"])
+        self.assertEqual(out[0][1], 0)                                   # the zone at the bridge
+        self.assertAlmostEqual(float(ctx.od[0].sum()), 40.0 + n, places=2)   # spread like the zone's own commutes
+        self.assertAlmostEqual(float(ctx.od[0, 1] / ctx.od[0, 0]), 2.0, places=3)
+        self.assertAlmostEqual(cfg["demand"]["total_commutes"], 400.0 + n, places=3)
+        self.assertGreater(z.carless_floor[0], 0.5)                      # mostly crossers, none with a car here
+        self.assertEqual(float(z.carless_floor[1]), 0.0)
+        model.add_border(ctx, cfg)                                       # a second call on the same cfg
+        self.assertAlmostEqual(cfg["demand"]["total_commutes_residents"], 400.0)
+
+
+class TerminalCostTests(unittest.TestCase):
+    """candidates.terminal_cost: a line ending downtown pays for its terminal; a through line doesn't."""
+
+    def test_downtown_ends_pay(self):
+        from metro import candidates
+        cfg = {"cost_musd_per_km": {"metro": {"surface": 140, "tunnel": 600}}}
+        tc = {"enabled": True, "tail_km": 0.4, "turnback_musd": {"metro": {"tunnel": 50, "surface": 15}}}
+        down, r = [(0.0, 0.0)], 1.5
+        stub = [(0, (0.5, 0.0), None), (5, (5.5, 0.0), None)]               # ends downtown, in tunnel there
+        through = [(0, (-5.0, 0.0), None), (5, (0.0, 0.0), None), (10, (5.0, 0.0), None)]
+        self.assertAlmostEqual(candidates.terminal_cost(tc, cfg, "metro", stub, ["tunnel"], down, r), 0.4 * 600 + 50)
+        self.assertEqual(candidates.terminal_cost(tc, cfg, "metro", through, ["surface", "surface"], down, r), 0.0)
+        self.assertEqual(candidates.terminal_cost({"enabled": False}, cfg, "metro", stub, ["tunnel"], down, r), 0.0)

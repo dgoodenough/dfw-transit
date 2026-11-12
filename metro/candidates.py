@@ -269,7 +269,18 @@ def place_stations(P, mode, anchors, gp, dens_fn, urban_density):
 
 
 # ------------------------------------------------------------------ costing
-def line_cost(cfg, mode, stops, P, downtowns, core_r, existing_mode_stations):
+def hop_grade(mode, p0, p1, downtowns, core_r, tunnel_r=None):
+    """A hop's grade: metro in tunnel within tunnel_r of a downtown (the densest core; None: all of
+    core_r, as before), elevated in the rest of the core, at surface elsewhere; other modes at surface."""
+    if mode != "metro" or not downtowns:
+        return "surface"
+    d = min(min(math.dist(p0, q), math.dist(p1, q)) for q in downtowns)
+    if d <= (core_r if tunnel_r is None else tunnel_r):
+        return "tunnel"
+    return "elevated" if d <= core_r else "surface"
+
+
+def line_cost(cfg, mode, stops, P, downtowns, core_r, existing_mode_stations, tunnel_r=None):
     """(capital $M at 2025 prices, [grade per hop], km) of a line with stops [(s, xy, ref)]."""
     per_km = cfg["cost_musd_per_km"][mode]
     sc = cfg["station_cost_musd"]
@@ -278,7 +289,7 @@ def line_cost(cfg, mode, stops, P, downtowns, core_r, existing_mode_stations):
     def core(p):
         return any(math.dist(p, d) <= core_r for d in downtowns)
     for (s0, p0, _), (s1, p1, _) in zip(stops, stops[1:]):
-        g = "tunnel" if mode == "metro" and (core(p0) or core(p1)) else "surface"
+        g = hop_grade(mode, p0, p1, downtowns, core_r, tunnel_r)
         grades.append(g)
         cap += (s1 - s0) * per_km.get(g, per_km["surface"])
     sp = cfg["access"]["pnr_spaces"]
@@ -294,6 +305,24 @@ def line_cost(cfg, mode, stops, P, downtowns, core_r, existing_mode_stations):
             elif i in (0, len(stops) - 1):
                 cap += sp.get(mode + "_terminus", sp["terminus"]) * per_space
     return cap, grades
+
+
+def terminal_cost(tc, cfg, mode, stops, grades, downtowns, core_r):
+    """$M for the line's ends that lie in a downtown core (within core_r of a downtown): tail track past
+    the last platform (tc tail_km at the grade of the line's last hop, at the mode's cost per km for it),
+    for turning trains back and laying them over, plus crossovers and signals (tc turnback_musd by mode
+    and grade). A line running through downtown has no end there and pays none of it; two lines ending
+    there pay it twice. Elsewhere the land is cheap and a terminal is in the line's cost per km."""
+    if not tc or not tc.get("enabled") or len(stops) < 2:
+        return 0.0
+    per_km = cfg["cost_musd_per_km"][mode]
+    tb = tc.get("turnback_musd", {}).get(mode, {})
+    out = 0.0
+    for k, g in ((0, grades[0] if grades else "surface"), (len(stops) - 1, grades[-1] if grades else "surface")):
+        p = stops[k][1]
+        if any(math.dist(p, d) <= core_r for d in downtowns):
+            out += tc.get("tail_km", 0.4) * per_km.get(g, per_km["surface"]) + tb.get(g, tb.get("surface", 0.0))
+    return out
 
 
 def run_minutes(cfg, mode, stops):

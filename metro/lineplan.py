@@ -110,6 +110,8 @@ class Planner:
         """moves: [(name, S', H')] -> [(J, name, S', H', trips, cap)]."""
         jobs = [(k, tuple(sorted(S2)), {u: h for u, h in H2.items() if u in S2}) for k, (_, S2, H2) in enumerate(moves)]
         res = _evaluate(jobs, self.procs)
+        # the network's capital plus the downtown terminals its costs leave out (candidates.terminal_cost)
+        res = {k: (t, c + sum(getattr(self.pool[u], "terminal_cost", 0.0) for u in moves[k][1])) for k, (t, c) in res.items()}
         return [(self.J(S2, H2, *res[k]), nm, S2, H2) + res[k] for k, (nm, S2, H2) in enumerate(moves)]
 
     # ---------------------------------------------------------------- moves
