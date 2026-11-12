@@ -184,6 +184,7 @@ T_SHARP = 4.0         # per line turning back on itself (135 degrees or more) at
 UNSHARP_LEG, UNSHARP_GAP = 0.25, 0.45   # _unsharp: shortest leg of a redrawn edge; clearance it keeps
 DIRS = np.array([(math.cos(k * math.pi / 4), math.sin(k * math.pi / 4)) for k in range(8)])
 CITY_KM = 1.2         # an area name stands beside the busiest station this close to its centre
+WATERWAYS = None   # another region's waterways.geojson ("" for none); None: DFW's data/waterways.geojson
 CITIES = [("Fort Worth", 32.7555, -97.3308), ("Dallas", 32.7810, -96.7990), ("Denton", 33.2148, -97.1331),
           ("Arlington", 32.7357, -97.1081), ("DFW Airport", 32.8998, -97.0403), ("Plano", 33.0198, -96.6989)]
 
@@ -1450,9 +1451,13 @@ def _octi_path(pts):
     return np.array(out)
 
 
+def _water_path():
+    return config.path("data", "waterways.geojson") if WATERWAYS is None else WATERWAYS
+
+
 def _load_water():
     """[(name, kind, area_km2, [km point arrays])] from data/waterways.geojson."""
-    path = config.path("data", "waterways.geojson")
+    path = _water_path()
     if not os.path.exists(path):
         return []
     with open(path, encoding="utf-8") as f:
@@ -2219,7 +2224,7 @@ def _cache_key(nets):
     """A digest of everything a layout depends on: the code, the waterways and every
     scenario's stations, stop sequences, segment geometry and transfers."""
     h = hashlib.sha256()
-    for path in (__file__, config.path("data", "waterways.geojson")):
+    for path in (__file__, _water_path()):
         if os.path.exists(path):
             with open(path, "rb") as f:
                 h.update(f.read())
@@ -2269,7 +2274,7 @@ def build(nets, log=None, cache=True):
 
 def waterways_geo():
     """The waterways as [lat, lon] polylines/polygons for the geographic map layer."""
-    path = config.path("data", "waterways.geojson")
+    path = _water_path()
     if not os.path.exists(path):
         return {"rivers": [], "lakes": []}
     with open(path, encoding="utf-8") as f:
